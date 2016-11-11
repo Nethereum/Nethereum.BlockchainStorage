@@ -11,7 +11,7 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.JsonRpc.IpcClient;
 using NLog.Fluent;
 
-namespace Nethereum.Blockchain.Processing.Console
+namespace Nethereum.BlockchainStore.Processing.Console
 {
     public class StorageProcessor
     {
@@ -47,14 +47,19 @@ namespace Nethereum.Blockchain.Processing.Console
             var valueTrasactionProcessor = new ValueTransactionProcessor(transactionRepository,
                 addressTransactionRepository);
 
-            var tranactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
+            var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
                 valueTrasactionProcessor, contractCreationTransactionProcessor);
 
 
             if (postVm)
-                _procesor = new BlockVmPostProcessor(_web3, blockRepository, tranactionProcessor);
+                _procesor = new BlockVmPostProcessor(_web3, blockRepository, transactionProcessor);
             else
-                _procesor = new BlockProcessor(_web3, blockRepository, tranactionProcessor);
+            {
+                transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
+                _procesor = new BlockProcessor(_web3, blockRepository, transactionProcessor);
+            }
+                
+                
         }
 
         public async Task Init()

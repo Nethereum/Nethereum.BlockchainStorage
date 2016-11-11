@@ -7,8 +7,8 @@
     <ProjectGuid>{2217951E-8662-4319-9298-F26EDD78A5C8}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nethereum.Blockchain.Processing.Console</RootNamespace>
-    <AssemblyName>Nethereum.Blockchain.Processing.Console</AssemblyName>
+    <RootNamespace>Nethereum.BlockchainStore.Processing.Console</RootNamespace>
+    <AssemblyName>Nethereum.BlockchainStore.Processing.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

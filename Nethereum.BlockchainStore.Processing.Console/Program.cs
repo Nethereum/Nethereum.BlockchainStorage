@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Nethereum.Blockchain.Processing.Console
+namespace Nethereum.BlockchainStore.Processing.Console
 {
     internal class Program
     {

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables", "Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj", "{BC3A7125-EDC5-4F02-9F39-B01CC46930B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.Blockchain.Processing.Console", "Nethereum.Blockchain.Processing.Console\Nethereum.Blockchain.Processing.Console.csproj", "{2217951E-8662-4319-9298-F26EDD78A5C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Processing.Console", "Nethereum.BlockchainStore.Processing.Console\Nethereum.BlockchainStore.Processing.Console.csproj", "{2217951E-8662-4319-9298-F26EDD78A5C8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9CDE4559-4CD2-4495-A620-0A251AC3712D}"
 	ProjectSection(SolutionItems) = preProject
