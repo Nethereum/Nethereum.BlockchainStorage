@@ -23,5 +23,11 @@ namespace Nethereum.BlockchainStore.SqlServer
                 .SingleOrDefaultAsync(t => t.BlockNumber == blockNumber.Value.ToString());
         }
 
+        public static async Task<Contract> FindByContractAddressAsync(this DbSet<Contract> contracts, string contractAddress)
+        {
+            return await contracts
+                .SingleOrDefaultAsync(c => c.Address == contractAddress);
+        }
+
     }
 }
