@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.SqlServer.Tests
 {
@@ -12,6 +13,11 @@ namespace Nethereum.BlockchainStore.SqlServer.Tests
         public static BlockchainDbContextFactory CreateDbContextFactory(string schema = "localhost")
         {
             return  new BlockchainDbContextFactory(Utils.connectionString, schema);
+        }
+
+        public static HexBigInteger CreateBlockTimestamp()
+        {
+            return new HexBigInteger(DateTimeOffset.UnixEpoch.ToUnixTimeSeconds());
         }
     }
 }

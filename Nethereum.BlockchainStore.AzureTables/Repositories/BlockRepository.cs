@@ -16,9 +16,9 @@ namespace Nethereum.BlockchainStore.Repositories
             BlockTable = new AzureTable(blockCloudTable);
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes block)
+        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
         {
-            var blockEntity = MapBlock(block, new Block(BlockTable));
+            var blockEntity = MapBlock(source, new Block(BlockTable));
             await blockEntity.InsertOrReplaceAsync().ConfigureAwait(false);
         }
 

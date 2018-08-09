@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Tests
 
         protected static HexBigInteger CreateBlockTimestamp()
         {
-            return new HexBigInteger(DateTimeOffset.UnixEpoch.ToUnixTimeSeconds());
+            return Utils.CreateBlockTimestamp();
         }
 
         protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, Entities.TransactionBase storedTransaction)

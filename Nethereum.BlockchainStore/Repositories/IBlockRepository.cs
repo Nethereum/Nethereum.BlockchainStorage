@@ -5,6 +5,6 @@ namespace Nethereum.BlockchainStore.Processors
 {
     public interface IBlockRepository
     {
-        Task UpsertBlockAsync(BlockWithTransactionHashes block);
+        Task UpsertBlockAsync(BlockWithTransactionHashes source);
     }
 }
