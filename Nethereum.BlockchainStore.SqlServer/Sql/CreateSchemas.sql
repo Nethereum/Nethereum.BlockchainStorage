@@ -1,3 +1,6 @@
+USE BlockchainStorage
+GO
+
 CREATE SCHEMA [localhost]
 GO
 CREATE SCHEMA [ropsten]

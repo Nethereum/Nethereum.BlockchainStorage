@@ -35,5 +35,12 @@ namespace Nethereum.BlockchainStore.SqlServer
                 .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.LogIndex == logIndex);
         }
 
+        public static async Task<TransactionVmStack> FindByTransactionHashAync(
+            this DbSet<TransactionVmStack> transactionVmStacks, string transactionHash)
+        {
+            return await transactionVmStacks
+                .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash);
+        }
+
     }
 }

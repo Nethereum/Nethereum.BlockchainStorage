@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
         {
             using (var context = _contextFactory.CreateContext())
             {
-                Entities.Transaction tx = await FindOrCreate(transaction, context);
+                Entities.Transaction tx = await FindOrCreate(transaction, context).ConfigureAwait(false);
 
                 MapValues(transaction, tx);
                 MapValues(receipt, tx);
@@ -32,7 +32,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 else
                     context.Transactions.Update(tx);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false) ;
             }
         }
 
@@ -40,7 +40,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
         {
             using (var context = _contextFactory.CreateContext())
             {
-                Entities.Transaction tx = await FindOrCreate(transaction, context);
+                Entities.Transaction tx = await FindOrCreate(transaction, context).ConfigureAwait(false);
 
                 MapValues(transaction, tx);
                 MapValues(receipt, tx);
@@ -55,14 +55,14 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 else
                     context.Transactions.Update(tx);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false) ;
             }
         }
 
         private static async Task<Entities.Transaction> FindOrCreate(Transaction transaction, BlockchainDbContext context)
         {
             return await context.Transactions
-                         .FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash) ??
+                         .FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash).ConfigureAwait(false)  ??
                      new Entities.Transaction();
         }
 

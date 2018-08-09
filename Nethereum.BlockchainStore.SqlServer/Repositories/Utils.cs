@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Nethereum.Hex.HexTypes;
+﻿using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.SqlServer.Repositories
 {

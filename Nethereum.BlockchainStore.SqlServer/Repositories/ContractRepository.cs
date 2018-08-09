@@ -41,7 +41,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
 
             using (var context = _contextFactory.CreateContext())
             {
-                var contract = await context.Contracts.FindByContractAddressAsync(contractAddress);
+                var contract = await context.Contracts.FindByContractAddressAsync(contractAddress).ConfigureAwait(false) ;
                 return contract != null;
             }
         }
@@ -50,7 +50,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var contract = await context.Contracts.FindByContractAddressAsync(contractAddress) ?? new Contract();
+                var contract = await context.Contracts.FindByContractAddressAsync(contractAddress).ConfigureAwait(false)  ?? new Contract();
 
                 MapValues(contractAddress, code, transaction, contract);
 
@@ -59,7 +59,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 else
                     context.Contracts.Update(contract);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false) ;
 
                 _cachedContracts.AddOrUpdate(contract.Address, contract,
                     (s, existingContract) => contract);

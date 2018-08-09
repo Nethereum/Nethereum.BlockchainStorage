@@ -1,10 +1,10 @@
+using System.Threading.Tasks;
 using Nethereum.BlockchainStore.SqlServer.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.SqlServer.Tests
+namespace Nethereum.BlockchainStore.SqlServer.Tests.RepositoryTests
 {
     public class AddressTransactionRepositoryTests: TransactionBaseRepositoryTests
     {

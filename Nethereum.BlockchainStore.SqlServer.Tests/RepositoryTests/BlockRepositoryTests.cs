@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.SqlServer.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.SqlServer.Tests
+namespace Nethereum.BlockchainStore.SqlServer.Tests.RepositoryTests
 {
     public class BlockRepositoryTests
     {

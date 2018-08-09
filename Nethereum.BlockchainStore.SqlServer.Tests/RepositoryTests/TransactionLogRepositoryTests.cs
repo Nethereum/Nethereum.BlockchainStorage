@@ -1,9 +1,9 @@
-﻿using Nethereum.BlockchainStore.SqlServer.Repositories;
+﻿using System.Threading.Tasks;
+using Nethereum.BlockchainStore.SqlServer.Repositories;
 using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.SqlServer.Tests
+namespace Nethereum.BlockchainStore.SqlServer.Tests.RepositoryTests
 {
     public class TransactionLogRepositoryTests
     {

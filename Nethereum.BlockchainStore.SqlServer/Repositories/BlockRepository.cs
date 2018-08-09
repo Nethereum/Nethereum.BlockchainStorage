@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var block = await context.Blocks.FindByBlockNumberAsync(source.Number) ?? new Entities.Block();
+                var block = await context.Blocks.FindByBlockNumberAsync(source.Number).ConfigureAwait(false) ?? new Entities.Block();
 
                 MapBlock(source, block);
 
@@ -27,7 +27,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 else
                     context.Blocks.Update(block);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false) ;
             }
         }
 

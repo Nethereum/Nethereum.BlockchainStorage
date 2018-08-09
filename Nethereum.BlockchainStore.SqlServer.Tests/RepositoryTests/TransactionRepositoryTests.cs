@@ -1,8 +1,8 @@
-﻿using Nethereum.BlockchainStore.SqlServer.Repositories;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Nethereum.BlockchainStore.SqlServer.Repositories;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.SqlServer.Tests
+namespace Nethereum.BlockchainStore.SqlServer.Tests.RepositoryTests
 {
     public class TransactionRepositoryTests: TransactionBaseRepositoryTests
     {

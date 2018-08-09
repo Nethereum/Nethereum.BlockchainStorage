@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(transactionHash, logIndex)
+                var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(transactionHash, logIndex).ConfigureAwait(false) 
                           ?? new Entities.TransactionLog();
 
                 MapValues(transactionHash, logIndex, log, transactionLog);
@@ -28,7 +28,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 else
                     context.TransactionLogs.Update(transactionLog);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 

@@ -1,12 +1,10 @@
-﻿using Nethereum.RPC.Eth.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.SqlServer.Tests
+namespace Nethereum.BlockchainStore.SqlServer.Tests.RepositoryTests
 {
     public abstract class TransactionBaseRepositoryTests
     {
