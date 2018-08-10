@@ -57,7 +57,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Console
             await _contractRepository.FillCache().ConfigureAwait(false);
         }
 
-        public async Task<bool> ExecuteAsync(int startBlock, int endBlock)
+        public async Task<bool> ExecuteAsync(long startBlock, long endBlock)
         {
             await Init();
             while (startBlock <= endBlock)

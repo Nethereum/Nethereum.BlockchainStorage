@@ -1,0 +1,3 @@
+dotnet ef migrations remove -f
+dotnet ef migrations add Migration1
+dotnet ef database update

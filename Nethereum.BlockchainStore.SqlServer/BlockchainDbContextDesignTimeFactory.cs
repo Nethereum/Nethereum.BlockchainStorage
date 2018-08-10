@@ -1,4 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace Nethereum.BlockchainStore.SqlServer
 {
@@ -14,44 +19,61 @@ namespace Nethereum.BlockchainStore.SqlServer
 
     public class BlockchainDbContextDesignTimeFactory : IDesignTimeDbContextFactory<BlockchainDbContext>
     {
-        public const string connectionString =
-            "Data Source=davewhiffin.database.windows.net;Database=BlockchainStorage;Integrated Security=False;User ID=davewhiffin;Password=G4@BJMQvCZ7e|@5b;Connect Timeout=60;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
+        string RecurseUntilFound(string directory, string fileToFind)
+        {
+            if (Directory.GetFiles(directory, fileToFind).Length > 0)
+            {
+                return directory;
+            }
+
+            var parent = Directory.GetParent(directory);
+            if (parent == null)
+                return null;
+
+            return RecurseUntilFound(parent.FullName, fileToFind);
+        }
+
+        string FindAppSettingsDirectory()
+        {
+            var assemblyFilePath = typeof(BlockchainDbContextDesignTimeFactory).Assembly.Location;
+            var startingDirectory = Path.GetDirectoryName(assemblyFilePath);
+            return RecurseUntilFound(startingDirectory, "appsettings.json");
+        }
+        
         public BlockchainDbContext CreateDbContext(string[] args)
         {
-            return new BlockchainDbContext(connectionString, "localhost");
+            var path = FindAppSettingsDirectory();
+
+            //TODO: !!! 
+            path = @"C:\dev\repos\Nethereum.BlockchainStorage\Nethereum.BlockchainStore.SqlServer";
+
+            if (path == null)
+                throw new Exception("appsettings.json file could not be found");
+
+            var config = new ConfigurationBuilder()
+                .SetBasePath(path)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            //var connectionStringName = GetEnvironmentVariable("connectionName", "Unrecognised connection name");
+            var connectionString = config.GetConnectionString("BlockchainDbStorageDesignTime_localhost");
+            var schema = config.GetValue<string>("BlockchainDbStorageDesignTimeSchema");
+
+            return new BlockchainDbContext(connectionString, schema);
         }
-    }
 
-    /*
-    public EspaceBiereContext CreateDbContext(string[] args)
-    {
-        var appSettingsFinder = new DefaultAppSettingsFinder();
-        var path = appSettingsFinder.FindPath<DbContextFactory>("EspaceBiere.sln", "EspaceBiere.Web");
-        var config = new ConfigBuilder()
-            .SetBasePath(path)
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables()
-            .Build();
-            20
-        var connectionStringName = GetEnvironmentVariable("ConnName", ConnNameError);
-        var connectionString = config.GetConnectionString(connectionStringName);
-        var builder = new DbContextOptionsBuilder<EspaceBiereContext>();
-        builder.UseSqlServer(connectionString);
-
-        return new EspaceBiereContext(builder.Options);
-    }
-
-    private string GetEnvironmentVariable(string name, string errorMessage)
-    {
-        var connectionStringName = Environment.GetEnvironmentVariable(name);
-
-        if (string.IsNullOrWhiteSpace(connectionStringName))
+        private string GetEnvironmentVariable(string name, string errorMessage)
         {
-            throw new Exception(errorMessage);
-        }
+            var connectionStringName = Environment.GetEnvironmentVariable(name);
 
-        return connectionStringName;
-    }
-     */
+            if (string.IsNullOrWhiteSpace(connectionStringName))
+            {
+                throw new Exception(errorMessage);
+            }
+
+            return connectionStringName;
+        }
+    }     
 }

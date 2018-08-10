@@ -1,30 +1,53 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Nethereum.BlockchainStore.SqlServer.Console
 {
-    class Program
+    partial class Program
     {
-        private static readonly string schema = "localhost";
 
-        private static readonly string connectionString = BlockchainDbContextDesignTimeFactory.connectionString;
+        public static Dictionary<string, ProcessorConfiguration> Configurations = new Dictionary<string, ProcessorConfiguration>
+        {
+            {
+                "localhost",
+                new ProcessorConfiguration(
+                    blockchainUrl: "http://localhost:8545", 
+                    dbServer: "localhost\\SQLEXPRESS01",
+                    database: "BlockchainStorage",
+                    dbSchema: "localhost",
+                    dbUserName: "localhost1", 
+                    dbPassword: "MeLLfMA1wBlJCzSGZhkO"){FromBlock = 0, ToBlock = 37}
+            },
+            {
+                "rinkeby",
+                new ProcessorConfiguration(
+                    blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60", 
+                    dbServer: "localhost\\SQLEXPRESS01",
+                    database: "BlockchainStorage",
+                    dbSchema: "rinkeby",
+                    dbUserName: "rinkeby1", 
+                    dbPassword: "rzNk9PyskZg0jLIl"){FromBlock = 2688459, ToBlock = 2788459}
+            }
+        };
 
         private static void Main(string[] args)
         {
-            //2788459
-            //var url = args?.Length == 0 ? "http://localhost:8545" : args[0];
-            var url = args?.Length == 0 ? "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60" : args[0];
-            var start = args?.Length > 1 ? Convert.ToInt32(args[1]) : 2688459;
-            var end = args?.Length > 2 ? Convert.ToInt32(args[2]) : 2788459;
 
-            var postVm = false;
-            if (args.Length > 3)
-                if (args[3].ToLower() == "postvm")
-                    postVm = true;
+            new BlockchainDbContextDesignTimeFactory().CreateDbContext(new string[]{});
 
-            var proc = new StorageProcessor(url, connectionString, schema, postVm);
+            string configurationName = args?.Length == 0 ? "localhost" : args[0];
+
+            if (!Configurations.ContainsKey(configurationName))
+            {
+                throw new Exception($"Unknown configuration name - '{configurationName}'");
+            }
+
+            var configuration = Configurations[configurationName];
+
+            var proc = new StorageProcessor(configuration.BlockchainUrl, configuration.ConnectionString, configuration.Schema, configuration.PostVm);
             proc.Init().Wait();
-            var result = proc.ExecuteAsync(start, end).Result;
+            var result = proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock).Result;
 
             Debug.WriteLine(result);
             System.Console.WriteLine(result);

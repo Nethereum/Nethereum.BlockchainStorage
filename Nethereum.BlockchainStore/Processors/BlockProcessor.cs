@@ -29,6 +29,11 @@ namespace Nethereum.BlockchainStore.Repositories
 
             await _blockRepository.UpsertBlockAsync(block);
 
+            if (block == null)
+            {
+                int y = 1;
+            }
+
             await ProcessTransactions(block);
         }
 
