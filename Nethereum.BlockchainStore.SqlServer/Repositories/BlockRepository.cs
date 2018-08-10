@@ -22,6 +22,8 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
 
                 MapBlock(source, block);
 
+                block.UpdateRowDates();
+
                 if (block.IsNew())
                     context.Blocks.Add(block);
                 else

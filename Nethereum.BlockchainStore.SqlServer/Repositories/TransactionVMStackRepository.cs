@@ -22,6 +22,8 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
 
                 MapValues(transactionHash, address, stackTrace, record);
 
+                record.UpdateRowDates();
+
                 if (record.IsNew())
                     context.TransactionVmStacks.Add(record);
                 else

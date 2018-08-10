@@ -23,6 +23,8 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
 
                 MapValues(transactionHash, logIndex, log, transactionLog);
 
+                transactionLog.UpdateRowDates();
+
                 if (transactionLog.IsNew())
                     context.TransactionLogs.Add(transactionLog);
                 else

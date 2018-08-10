@@ -54,6 +54,8 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
 
                 MapValues(contractAddress, code, transaction, contract);
 
+                contract.UpdateRowDates();
+
                 if (contract.IsNew())
                     context.Contracts.Add(contract);
                 else

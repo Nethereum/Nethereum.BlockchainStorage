@@ -27,6 +27,8 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 tx.Error = string.Empty;
                 tx.HasVmStack = false;
 
+                tx.UpdateRowDates();
+
                 if (tx.IsNew())
                     context.Transactions.Add(tx);
                 else
@@ -49,6 +51,8 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
                 tx.TimeStamp = (long)timeStamp.Value;
                 tx.Error = error ?? string.Empty;
                 tx.HasVmStack = hasVmStack;
+
+                tx.UpdateRowDates();
 
                 if (tx.IsNew())
                     context.Transactions.Add(tx);

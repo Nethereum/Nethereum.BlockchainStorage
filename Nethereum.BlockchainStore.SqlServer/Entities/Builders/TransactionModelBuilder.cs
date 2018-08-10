@@ -12,6 +12,10 @@ namespace Nethereum.BlockchainStore.SqlServer
             _entityBuilder.HasKey(b => b.RowIndex);
 
             _entityBuilder.HasIndex(b => new {b.BlockNumber, b.Hash}).IsUnique();
+            _entityBuilder.HasIndex(b => b.Hash);
+            _entityBuilder.HasIndex(b => b.AddressFrom);
+            _entityBuilder.HasIndex(b => b.AddressTo);
+            _entityBuilder.HasIndex(b => b.NewContractAddress);
 
             _entityBuilder.Property(t => t.BlockHash).IsHash();
             _entityBuilder.Property(t => t.BlockNumber).IsBigInteger().IsRequired();

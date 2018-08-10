@@ -14,9 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Entities.png = Entities.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.SqlServer", "Nethereum.BlockchainStore.SqlServer\Nethereum.BlockchainStore.SqlServer.csproj", "{6884E220-6D42-452E-9410-FDBE59EA8DCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.SqlServer", "Nethereum.BlockchainStore.SqlServer\Nethereum.BlockchainStore.SqlServer.csproj", "{6884E220-6D42-452E-9410-FDBE59EA8DCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.SqlServer.Tests", "Nethereum.BlockchainStore.SqlServer.Tests\Nethereum.BlockchainStore.SqlServer.Tests.csproj", "{55B20979-C6B4-4786-B96C-EA3C4F86D766}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.SqlServer.Tests", "Nethereum.BlockchainStore.SqlServer.Tests\Nethereum.BlockchainStore.SqlServer.Tests.csproj", "{55B20979-C6B4-4786-B96C-EA3C4F86D766}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.SqlServer.Console", "Nethereum.BlockchainStore.SqlServer.Console\Nethereum.BlockchainStore.SqlServer.Console.csproj", "{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{55B20979-C6B4-4786-B96C-EA3C4F86D766}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55B20979-C6B4-4786-B96C-EA3C4F86D766}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55B20979-C6B4-4786-B96C-EA3C4F86D766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,7 +21,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Tests.RepositoryTests
             Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);
             Assert.Equal(transaction.From, storedTransaction.AddressFrom);
             Assert.Equal((long)transaction.TransactionIndex.Value, storedTransaction.TransactionIndex);
-            Assert.Equal(transaction.Value.ToString(), storedTransaction.Value);
+            Assert.Equal(transaction.Value.Value.ToString(), storedTransaction.Value);
             Assert.Equal(transaction.To, storedTransaction.AddressTo);
             Assert.Equal(newContractAddress, storedTransaction.NewContractAddress);
             Assert.Equal(transaction.BlockNumber.Value.ToString(), storedTransaction.BlockNumber);

@@ -21,7 +21,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
             to.BlockHash = @from.BlockHash;
             to.Hash = @from.TransactionHash;
             to.AddressFrom = @from.From;
-            to.Value = @from.Value.ToString();
+            to.Value = @from.Value.Value.ToString();
             to.AddressTo = @from.To ?? string.Empty;
             to.BlockNumber = @from.BlockNumber.Value.ToString();
             to.Gas = (long)@from.Gas.Value;

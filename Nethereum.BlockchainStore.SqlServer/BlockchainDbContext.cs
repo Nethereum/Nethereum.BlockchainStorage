@@ -23,7 +23,6 @@ namespace Nethereum.BlockchainStore.SqlServer
             modelBuilder.ApplyConfiguration(new TransactionModelBuilder());
             modelBuilder.ApplyConfiguration(new TransactionLogModelBuilder());
             modelBuilder.ApplyConfiguration(new TransactionLogVmStackModelBuilder());
-            modelBuilder.ApplyConfiguration(new AddressTransactionModelBuilder());
             base.OnModelCreating(modelBuilder);
         }
 
@@ -37,7 +36,6 @@ namespace Nethereum.BlockchainStore.SqlServer
 
         public DbSet<Block> Blocks { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<AddressTransaction> AddressTransactions { get; set; }
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<TransactionLog> TransactionLogs { get; set; }
         public DbSet<TransactionVmStack> TransactionVmStacks { get; set; }
