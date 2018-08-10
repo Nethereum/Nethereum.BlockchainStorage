@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.SqlServer.Console", "Nethereum.BlockchainStore.SqlServer.Console\Nethereum.BlockchainStore.SqlServer.Console.csproj", "{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Entities", "Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj", "{E1F2FC53-43D5-4747-8697-20C8D2599875}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53EA2EBB-80EB-470E-ADB7-01C3F32F375B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1F2FC53-43D5-4747-8697-20C8D2599875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1F2FC53-43D5-4747-8697-20C8D2599875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1F2FC53-43D5-4747-8697-20C8D2599875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1F2FC53-43D5-4747-8697-20C8D2599875}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.SqlServer.Entities;
-using Nethereum.BlockchainStore.SqlServer.Entities.Builders;
+using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.SqlServer.EntityBuilders;
 
 namespace Nethereum.BlockchainStore.SqlServer
 {
@@ -18,11 +18,11 @@ namespace Nethereum.BlockchainStore.SqlServer
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(_schema);
-            modelBuilder.ApplyConfiguration(new BlockModelBuilder());
-            modelBuilder.ApplyConfiguration(new ContractModelBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionModelBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionLogModelBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionLogVmStackModelBuilder());
+            modelBuilder.ApplyConfiguration(new BlockEntityBuilder());
+            modelBuilder.ApplyConfiguration(new ContractEntityBuilder());
+            modelBuilder.ApplyConfiguration(new TransactionEntityBuilder());
+            modelBuilder.ApplyConfiguration(new TransactionLogEntityBuilder());
+            modelBuilder.ApplyConfiguration(new TransactionLogVmStackEntityBuilder());
             base.OnModelCreating(modelBuilder);
         }
 

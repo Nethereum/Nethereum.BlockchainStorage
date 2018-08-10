@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.SqlServer.Entities;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.SqlServer

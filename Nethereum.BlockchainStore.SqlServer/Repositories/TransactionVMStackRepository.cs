@@ -1,7 +1,7 @@
 ﻿using Nethereum.BlockchainStore.Repositories;
-using Nethereum.BlockchainStore.SqlServer.Entities;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.SqlServer.Repositories
 {
@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
             }
         }
 
-        private void MapValues(string transactionHash, string address, JObject stackTrace, Entities.TransactionVmStack transactionVmStack)
+        private void MapValues(string transactionHash, string address, JObject stackTrace, TransactionVmStack transactionVmStack)
         {
             transactionVmStack.TransactionHash = transactionHash;
             transactionVmStack.Address = address;

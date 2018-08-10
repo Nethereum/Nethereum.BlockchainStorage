@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Nethereum.BlockchainStore.SqlServer.Entities
+﻿namespace Nethereum.BlockchainStore.Entities
 {
     public class TransactionVmStack: TableRow
     {

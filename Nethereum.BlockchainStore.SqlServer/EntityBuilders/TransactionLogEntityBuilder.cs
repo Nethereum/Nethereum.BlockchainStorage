@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nethereum.BlockchainStore.Entities;
 
-namespace Nethereum.BlockchainStore.SqlServer.Entities.Builders
+namespace Nethereum.BlockchainStore.SqlServer.EntityBuilders
 {
-    public class TransactionLogModelBuilder : BaseModelBuilder, IEntityTypeConfiguration<TransactionLog>
+    public class TransactionLogEntityBuilder : BaseEntityBuilder, IEntityTypeConfiguration<TransactionLog>
     {
         public void Configure(EntityTypeBuilder<TransactionLog> entityBuilder)
         {

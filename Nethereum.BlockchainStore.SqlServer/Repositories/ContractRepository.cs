@@ -1,16 +1,16 @@
 ﻿using Nethereum.BlockchainStore.Repositories;
-using Nethereum.BlockchainStore.SqlServer.Entities;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Nethereum.BlockchainStore.Entities;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.SqlServer.Repositories
 {
     public class ContractRepository : RepositoryBase, IContractRepository
     {
-        private readonly ConcurrentDictionary<string, Entities.Contract> _cachedContracts = new ConcurrentDictionary<string, Contract>();
+        private readonly ConcurrentDictionary<string, Contract> _cachedContracts = new ConcurrentDictionary<string, Contract>();
 
         public ContractRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
@@ -68,7 +68,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
             }
         }
 
-        private void MapValues(string contractAddress, string code, Transaction transaction, Entities.Contract contract)
+        private void MapValues(string contractAddress, string code, Transaction transaction, Contract contract)
         {
             contract.Address = contractAddress;
             contract.Code = code;

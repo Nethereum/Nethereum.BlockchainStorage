@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nethereum.BlockchainStore.SqlServer.Entities
+namespace Nethereum.BlockchainStore.Entities
 {
     public class TableRow
     {

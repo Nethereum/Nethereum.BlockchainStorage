@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Nethereum.BlockchainStore.SqlServer
+namespace Nethereum.BlockchainStore.SqlServer.EntityBuilders
 {
-    public static class ModelBuilderExtensions
+    public static class EntityBuilderExtensions
     {
         public const int AddressLength = 43;
         public const int HashLength = 67;
@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainStore.SqlServer
         public static PropertyBuilder<TProperty> IsAddress<TProperty>(
             this PropertyBuilder<TProperty> propertyBuilder)
         {
-            return propertyBuilder.HasMaxLength(HashLength);
+            return propertyBuilder.HasMaxLength(AddressLength);
         }
 
         public static PropertyBuilder<TProperty> IsHash<TProperty>(
@@ -30,7 +30,7 @@ namespace Nethereum.BlockchainStore.SqlServer
         public static PropertyBuilder<TProperty> IsBigInteger<TProperty>(
             this PropertyBuilder<TProperty> propertyBuilder)
         {
-            return propertyBuilder.HasMaxLength(HashLength);
+            return propertyBuilder.HasMaxLength(BigIntegerLength);
         }
     }
 }

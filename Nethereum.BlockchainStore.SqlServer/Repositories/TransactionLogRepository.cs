@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Repositories;
-using Nethereum.BlockchainStore.SqlServer.Entities;
 using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.SqlServer.Repositories
@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
             using (var context = _contextFactory.CreateContext())
             {
                 var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(transactionHash, logIndex).ConfigureAwait(false) 
-                          ?? new Entities.TransactionLog();
+                          ?? new TransactionLog();
 
                 MapValues(transactionHash, logIndex, log, transactionLog);
 

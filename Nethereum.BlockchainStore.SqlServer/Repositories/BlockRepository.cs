@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.SqlServer.Repositories
 {
@@ -18,7 +19,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var block = await context.Blocks.FindByBlockNumberAsync(source.Number).ConfigureAwait(false) ?? new Entities.Block();
+                var block = await context.Blocks.FindByBlockNumberAsync(source.Number).ConfigureAwait(false) ?? new Block();
 
                 MapBlock(source, block);
 
@@ -33,7 +34,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Repositories
             }
         }
 
-        public void MapBlock(BlockWithTransactionHashes source, Entities.Block block)
+        public void MapBlock(BlockWithTransactionHashes source, Block block)
         {
             block.BlockNumber = source.Number.Value.ToString();
             block.Difficulty = source.Difficulty.ToLong();

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nethereum.BlockchainStore.Entities;
 
-namespace Nethereum.BlockchainStore.SqlServer.Entities.Builders
+namespace Nethereum.BlockchainStore.SqlServer.EntityBuilders
 {
-    public class ContractModelBuilder:  BaseModelBuilder, IEntityTypeConfiguration<Contract>
+    public class ContractEntityBuilder:  BaseEntityBuilder, IEntityTypeConfiguration<Contract>
     {
         public void Configure(EntityTypeBuilder<Contract> entityBuilder)
         {
