@@ -1,22 +1,31 @@
-﻿namespace Nethereum.BlockchainStore.SqlServer.Console
-{
-    partial class Program
-    {
-        public class ProcessorConfiguration
-        {
-            public ProcessorConfiguration(string blockchainUrl, string dbServer, string database, string dbSchema, string dbUserName, string dbPassword)
-            {
-                BlockchainUrl = blockchainUrl;
-                Schema = dbSchema;
-                ConnectionString = $"Data Source={dbServer};Database={database};Integrated Security=False;User ID={dbUserName};Password={dbPassword};Connect Timeout=60;";
-            }
+﻿using System;
+using Microsoft.Extensions.Configuration;
 
-            public string BlockchainUrl { get; }
-            public string ConnectionString { get; }
-            public string Schema { get; }
-            public long FromBlock { get; set; } = 0;
-            public long ToBlock { get; set; } = 0;
-            public bool PostVm { get; set; } = false;
+namespace Nethereum.BlockchainStore.SqlServer.Console
+{
+    public class ProcessorConfiguration
+    {
+        public ProcessorConfiguration(string blockchainUrl, string dbSchema)
+        {
+            BlockchainUrl = blockchainUrl;
+            Schema = dbSchema;
+        }
+
+        public string BlockchainUrl { get; }
+        public string Schema { get; }
+        public long FromBlock { get; set; } = 0;
+        public long ToBlock { get; set; } = 0;
+        public bool PostVm { get; set; } = false;
+
+        public string GetConnectionString()
+        {
+            var config = ConfigurationUtils.Build(this.GetType());
+            var connectionStringName = $"BlockchainDbStorage_{Schema}";
+            var connectionString = config.GetConnectionString(connectionStringName);
+            if (string.IsNullOrEmpty(connectionString))
+                throw new Exception($"Null or empty connection string for schema: {Schema} and connection string name: {connectionStringName}");
+
+            return connectionString;
         }
     }
 }
