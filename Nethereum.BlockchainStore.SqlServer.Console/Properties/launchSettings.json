@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Nethereum.BlockchainStore.SqlServer.Console": {
-      "commandName": "Project",
-      "commandLineArgs": "localhost"
+      "commandName": "Project"
     }
   }
 }

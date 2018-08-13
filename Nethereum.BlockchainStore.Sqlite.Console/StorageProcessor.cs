@@ -8,7 +8,7 @@ using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using NLog.Fluent;
 
-namespace Nethereum.BlockchainStore.SqlServer.Console
+namespace Nethereum.BlockchainStore.Sqlite.Console
 {
     public class StorageProcessor
     {
@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Console
         {
             _web3 = new Web3.Web3(url);
 
-            var contextFactory = new BlockchainDbContextFactory(connectionString, schema);
+            var contextFactory = new BlockchainDbContextFactory(connectionString);
 
             var blockRepository = new BlockRepository(contextFactory);
             var transactionRepository = new TransactionRepository(contextFactory);

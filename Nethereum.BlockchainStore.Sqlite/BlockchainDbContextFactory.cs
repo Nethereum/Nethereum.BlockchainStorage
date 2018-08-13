@@ -1,22 +1,21 @@
 ﻿using Nethereum.Blockchain.EFCore;
+using Nethereum.Blockchain.Sqlite;
 using Nethereum.BlockchainStore.EFCore;
 
-namespace Nethereum.BlockchainStore.SqlServer
+namespace Nethereum.BlockchainStore.Sqlite
 {
     public class BlockchainDbContextFactory : IBlockchainDbContextFactory
     {
         private readonly string _connectionString;
-        private readonly string _schema;
 
-        public BlockchainDbContextFactory(string connectionString, string schema)
+        public BlockchainDbContextFactory(string connectionString)
         {
             _connectionString = connectionString;
-            _schema = schema;
         }
 
         public BlockchainDbContextBase CreateContext()
         {
-            return new BlockchainDbContext(_connectionString, _schema);
+            return new BlockchainDbContext();
         }
     }
 }
