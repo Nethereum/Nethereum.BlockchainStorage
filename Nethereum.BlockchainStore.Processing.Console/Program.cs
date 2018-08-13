@@ -7,8 +7,7 @@ namespace Nethereum.BlockchainStore.Processing.Console
     {
         private static readonly string prefix = "Morden";
 
-        private static readonly string connectionString =
-            "DefaultEndpointsProtocol=https;AccountName=davewhiffin;AccountKey=5+OvslIhZ/HU8awGFTIYeH9kyrIO8nz0DGZ8qM1V4KFtRzveKo6Yt4argVSqt+bEl7aG9Ayo8Tq3AW6Cy8tVcg==;EndpointSuffix=core.windows.net";
+        private static readonly string connectionString = "<put your azure table connection string here>";
 
         private static void Main(string[] args)
         {
