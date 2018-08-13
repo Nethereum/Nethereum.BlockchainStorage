@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.Repositories;
-using Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests;
+using Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.EFCore.Sqlite.RepositoryTests

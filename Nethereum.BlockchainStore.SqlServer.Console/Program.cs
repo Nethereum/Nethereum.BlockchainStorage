@@ -1,21 +1,19 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Processor;
 
 namespace Nethereum.BlockchainStore.SqlServer.Console
 {
-    partial class Program
+    public class Program
     {
-        private static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            var presetName = args?.Length == 0 ? ConfigurationPresets.Default : args[0];
-            var configuration = ConfigurationPresets.Get(presetName);
+            var presetName = args?.Length == 0 ? ProcessorConfigurationPresets.Default : args[0];
+            var configuration = ProcessorConfigurationPresets.Get(presetName);
 
-            var proc = new StorageProcessor(configuration.BlockchainUrl, configuration.GetConnectionString(), configuration.Schema, configuration.PostVm);
-            proc.Init().Wait();
-            var result = proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock).Result;
+            var contextFactory = new BlockchainDbContextFactory(configuration.GetConnectionString(), configuration.Schema);
 
-            Debug.WriteLine($"Finished With Success: {result}");
-            System.Console.WriteLine(result);
-            System.Console.ReadLine();
+            return ProcessorConsole.Execute(args, contextFactory, configuration).Result;
         }
     }
 }

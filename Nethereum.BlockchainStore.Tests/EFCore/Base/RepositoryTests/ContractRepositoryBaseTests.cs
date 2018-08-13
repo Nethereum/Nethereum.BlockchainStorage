@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.Repositories;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests
+namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
 {
     public abstract class ContractRepositoryBaseTests: RepositoryTestBase
     {

@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Nethereum.BlockchainStore.SqlServer.Console": {
+    "Nethereum.BlockchainStore.Sqlite.Console": {
       "commandName": "Project",
       "commandLineArgs": "rinkeby"
     }

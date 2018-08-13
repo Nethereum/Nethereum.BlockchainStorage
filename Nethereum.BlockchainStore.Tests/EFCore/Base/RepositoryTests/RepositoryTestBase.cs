@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Nethereum.BlockchainStore.EFCore;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests
+namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
 {
     public class RepositoryTestBase
     {

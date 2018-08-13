@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests;
+﻿using Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests;
 
 namespace Nethereum.BlockchainStore.Tests.EFCore.Sqlite.RepositoryTests
 {

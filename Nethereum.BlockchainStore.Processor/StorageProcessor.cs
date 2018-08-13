@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.Repositories;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.PostProcessors;
@@ -8,7 +9,7 @@ using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using NLog.Fluent;
 
-namespace Nethereum.BlockchainStore.Sqlite.Console
+namespace Nethereum.BlockchainStore.Processor
 {
     public class StorageProcessor
     {
@@ -18,11 +19,9 @@ namespace Nethereum.BlockchainStore.Sqlite.Console
         private int _retryNumber;
         private readonly ContractRepository _contractRepository;
 
-        public StorageProcessor(string url, string connectionString, string schema, bool postVm = false)
+        public StorageProcessor(string url, IBlockchainDbContextFactory contextFactory, bool postVm = false)
         {
             _web3 = new Web3.Web3(url);
-
-            var contextFactory = new BlockchainDbContextFactory(connectionString);
 
             var blockRepository = new BlockRepository(contextFactory);
             var transactionRepository = new TransactionRepository(contextFactory);
@@ -47,14 +46,18 @@ namespace Nethereum.BlockchainStore.Sqlite.Console
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
                 _procesor = new BlockProcessor(_web3, blockRepository, transactionProcessor);
-            }
-                
-                
+            }       
         }
 
         public async Task Init()
         {
             await _contractRepository.FillCache().ConfigureAwait(false);
+        }
+
+        public bool ProcessTransactionsInParallel
+        {
+            get => BlockProcessor.ProcessTransactionsInParallel;
+            set => BlockProcessor.ProcessTransactionsInParallel = value;
         }
 
         public async Task<bool> ExecuteAsync(long startBlock, long endBlock)

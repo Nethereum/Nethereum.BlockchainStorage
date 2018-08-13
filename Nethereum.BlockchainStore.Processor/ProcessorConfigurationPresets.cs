@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Nethereum.BlockchainStore.SqlServer.Console
+namespace Nethereum.BlockchainStore.Processor
 {
-    public static class ConfigurationPresets
+    public static class ProcessorConfigurationPresets
     {
         public static string Default { get; } = "localhost";
 
@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainStore.SqlServer.Console
                 "rinkeby",
                 new ProcessorConfiguration(
                     blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60", 
-                    dbSchema: "rinkeby"){FromBlock = 2688459, ToBlock = 2788459}
+                    dbSchema: "rinkeby"){FromBlock = 2788359, ToBlock = 2788459}
             }
         };
 

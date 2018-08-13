@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
+using Utils = Nethereum.BlockchainStore.Tests.EFCore.Base.Common.Utils;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests
+namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
 {
     public abstract class BlockRepositoryBaseTests: RepositoryTestBase
     {
@@ -26,7 +28,7 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests
                 GasLimit = new HexBigInteger("4712388"),
                 GasUsed = new HexBigInteger("1886574"),
                 Size = new HexBigInteger("608"),
-                Timestamp = Nethereum.BlockchainStore.EFCore.Tests.Common.Utils.CreateBlockTimestamp(),
+                Timestamp = Utils.CreateBlockTimestamp(),
                 TotalDifficulty = new HexBigInteger("2027"),
                 ExtraData = "0xd983010802846765746887676f312e392e328777696e646f7773000000000000823caa2ecfd32e52827d5fc58e9a6c203c5599e730d0d47c1b10f60ddcff40cb65ef4906023e2e0d32b3814345cce246d3ee56eae47afdb51308b40653940fce01",
                 BlockHash = "0x337cd6feedafac6abba40eff40fb1957e08985180f5a03016924ef72fc7b04b9",

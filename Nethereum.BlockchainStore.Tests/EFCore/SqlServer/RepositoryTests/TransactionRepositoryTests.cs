@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.Repositories;
-using Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests;
 using Nethereum.BlockchainStore.SqlServer;
+using Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests;
 using Xunit;
 using Utils = Nethereum.BlockchainStore.Tests.EFCore.SqlServer.Common.Utils;
 

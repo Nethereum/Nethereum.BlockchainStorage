@@ -1,7 +1,7 @@
 ﻿using System;
 using Nethereum.Hex.HexTypes;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.Common
+namespace Nethereum.BlockchainStore.Tests.EFCore.Base.Common
 {
     public static class Utils
     {

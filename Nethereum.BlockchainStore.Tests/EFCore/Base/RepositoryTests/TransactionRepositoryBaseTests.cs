@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.Repositories;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.Hex.HexTypes;
@@ -7,9 +8,9 @@ using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
-using Utils = Nethereum.BlockchainStore.EFCore.Tests.Common.Utils;
+using Utils = Nethereum.BlockchainStore.Tests.EFCore.Base.Common.Utils;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.RepositoryTests
+namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
 {
     public abstract class TransactionRepositoryBaseTests: RepositoryTestBase
     {
