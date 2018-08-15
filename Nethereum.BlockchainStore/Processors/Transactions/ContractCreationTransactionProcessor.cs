@@ -1,8 +1,7 @@
-using System.Runtime.Remoting.Messaging;
-using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions

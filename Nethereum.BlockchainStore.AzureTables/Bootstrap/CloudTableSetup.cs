@@ -1,4 +1,5 @@
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -64,7 +65,7 @@ namespace Nethereum.BlockchainStore.Bootstrap
             var storageAccount = GetStorageAccount();
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(name);
-            table.CreateIfNotExists();
+            table.CreateIfNotExistsAsync().Wait();
             return table;
         }
     }

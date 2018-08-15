@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.DebugGeth.DTOs;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using Newtonsoft.Json.Linq;
@@ -17,7 +16,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly IAddressTransactionRepository _addressTransactionRepository;
         private readonly ITransactionVMStackRepository _transactionVmStackRepository;
         private readonly ITransactionLogRepository _transactionLogRepository;
-        protected VmStackErrorChecker VmStackErrorChecker { get; set; }
+        //protected VmStackErrorChecker VmStackErrorChecker { get; set; }
         protected Web3.Web3 Web3 { get; set; }
 
         public ContractTransactionProcessor(
@@ -33,7 +32,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             _addressTransactionRepository = addressTransactionRepository;
             _transactionVmStackRepository = transactionVmStackRepository;
             _transactionLogRepository = transactionLogRepository;
-            VmStackErrorChecker = new VmStackErrorChecker();
+           // VmStackErrorChecker = new VmStackErrorChecker();
         }
 
         public async Task<bool> IsTransactionForContractAsync(Transaction transaction)
@@ -66,7 +65,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
                 if (stackTrace != null)
                 {
-                    error = VmStackErrorChecker.GetError(stackTrace);
+                    //error = VmStackErrorChecker.GetError(stackTrace);
                     hasError = !string.IsNullOrEmpty(error);
                     hasStackTrace = true;
                     await _transactionVmStackRepository.UpsertAsync(transactionHash, transaction.To, stackTrace);
@@ -111,10 +110,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
         protected async Task<JObject> GetTransactionVmStack(string transactionHash)
         {
-            return
-                await
-                    Web3.DebugGeth.TraceTransaction.SendRequestAsync(transactionHash,
-                        new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = true});
+            return null;
+            //return
+            //    await
+            //        Web3.DebugGeth.TraceTransaction.SendRequestAsync(transactionHash,
+            //            new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = true});
         }
     }
 }
