@@ -20,7 +20,7 @@ A DB user is created for each schema and allocated permissions only to that sche
 		* (Feel free to change the passwords in the script)
 		* use master
 		* Run Script : Sql\01 CreateDbLogins.sql
-* Create the database and schema
+* Create the database and schema (runs migrations and db updates)
 	* From the command line 
 		* cd to Nethereum.BlockchainStore.SqlServer 
 		* run DbInitialCreate.bat

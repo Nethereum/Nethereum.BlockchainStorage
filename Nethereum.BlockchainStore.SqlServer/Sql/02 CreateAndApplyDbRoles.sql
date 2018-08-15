@@ -3,7 +3,7 @@ IMPORTANT - PLEASE READ
 
 Ensure you have applied the EF migrations to the database first!
 
-This adds the logins for the sql server as users of the database
+This script adds the logins for the sql server as users of the database
 It adds groups with permissions to the different schemas
 It adds the users to the relevant groups
 

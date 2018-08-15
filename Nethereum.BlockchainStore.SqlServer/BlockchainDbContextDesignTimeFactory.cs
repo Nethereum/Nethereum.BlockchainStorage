@@ -9,6 +9,9 @@ namespace Nethereum.BlockchainStore.SqlServer
         For each blockchain test net we have a different SQL schema
         Each schema has the same tables
         It means the same db can store data for different block chains
+        It relies on the appsettings.json file
+        It should contain a SQL server connection string called BlockchainDbStorageDesignTime
+        This must have the necessary permissions to read and create objects
      */
 
     public class BlockchainDbContextDesignTimeFactory_localhost: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_localhost>{}
