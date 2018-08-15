@@ -51,13 +51,11 @@ namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
             Assert.Equal(logIndex, storedLog.LogIndex);
             Assert.Equal(address, storedLog.Address);
             Assert.Equal(data, storedLog.Data);
-            Assert.Equal(topic0, storedLog.Topic0);
+            Assert.Equal(topic0, storedLog.EventHash);
+            Assert.Equal(topic1, storedLog.IndexVal1);
+            Assert.Equal(topic2, storedLog.IndexVal2);
+            Assert.Equal(topic3, storedLog.IndexVal3);
 
-            var storedTopics = JArray.Parse(storedLog.Topics);
-            Assert.Equal(topic0, storedTopics[0]);
-            Assert.Equal(topic1, storedTopics[1]);
-            Assert.Equal(topic2, storedTopics[2]);
-            Assert.Equal(topic3, storedTopics[3]);
 
         }
     }

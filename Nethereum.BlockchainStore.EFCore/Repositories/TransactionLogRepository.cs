@@ -38,11 +38,19 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             transactionLog.Address = log["address"].Value<string>() ?? string.Empty;
             transactionLog.Data = log["data"].Value<string>() ?? string.Empty;
             var topics = log["topics"] as JArray;
-            if (topics != null)
+
+            if (topics?.Count > 0)
             {
-                transactionLog.Topics = topics.ToString();
-                if (topics.Count > 0)
-                    transactionLog.Topic0 = topics[0].ToString();
+                transactionLog.EventHash = topics[0].Value<string>();
+
+                if (topics.Count > 1)
+                    transactionLog.IndexVal1 = topics[1].Value<string>();
+
+                if (topics.Count > 2)
+                    transactionLog.IndexVal2 = topics[2].Value<string>();
+
+                if (topics.Count > 3)
+                    transactionLog.IndexVal3 = topics[3].Value<string>();
             }
         }
     }

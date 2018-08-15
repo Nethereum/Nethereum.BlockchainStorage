@@ -192,22 +192,38 @@ namespace Nethereum.BlockchainStore.Sqlite.Migrations
                     b.Property<string>("Data")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("EventHash")
+                        .HasMaxLength(67);
+
+                    b.Property<string>("IndexVal1")
+                        .HasMaxLength(67);
+
+                    b.Property<string>("IndexVal2")
+                        .HasMaxLength(67);
+
+                    b.Property<string>("IndexVal3")
+                        .HasMaxLength(67);
+
                     b.Property<long>("LogIndex");
 
                     b.Property<DateTime?>("RowCreated");
 
                     b.Property<DateTime?>("RowUpdated");
 
-                    b.Property<string>("Topic0")
-                        .HasMaxLength(67);
-
-                    b.Property<string>("Topics")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("TransactionHash")
                         .IsRequired();
 
                     b.HasKey("RowIndex");
+
+                    b.HasIndex("Address");
+
+                    b.HasIndex("EventHash");
+
+                    b.HasIndex("IndexVal1");
+
+                    b.HasIndex("IndexVal2");
+
+                    b.HasIndex("IndexVal3");
 
                     b.HasIndex("TransactionHash", "LogIndex")
                         .IsUnique();

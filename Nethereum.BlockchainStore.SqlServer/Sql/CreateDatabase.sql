@@ -300,8 +300,10 @@ CREATE TABLE [localhost].[TransactionLogs](
 	[TransactionHash] [nvarchar](450) NOT NULL,
 	[LogIndex] [bigint] NOT NULL,
 	[Address] [nvarchar](43) NULL,
-	[Topics] [nvarchar](max) NULL,
-	[Topic0] [nvarchar](67) NULL,
+	[EventHash] [nvarchar](67) NULL,
+	[IndexVal1] [nvarchar](67) NULL,
+	[IndexVal2] [nvarchar](67) NULL,
+	[IndexVal3] [nvarchar](67) NULL,
 	[Data] [nvarchar](max) NULL,
  CONSTRAINT [PK_TransactionLogs] PRIMARY KEY CLUSTERED 
 (
@@ -399,6 +401,35 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_TransactionHash_LogIndex] O
 GO
 SET ANSI_PADDING ON
 GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_EventHash] ON [localhost].[TransactionLogs]
+(
+	[EventHash]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal1] ON [localhost].[TransactionLogs]
+(
+	[IndexVal1]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal2] ON [localhost].[TransactionLogs]
+(
+	[IndexVal2]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal3] ON [localhost].[TransactionLogs]
+(
+	[IndexVal3]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+
 /****** Object:  Index [IX_TransactionLogVmStacks_Address]    Script Date: 10/08/2018 14:50:47 ******/
 CREATE NONCLUSTERED INDEX [IX_TransactionLogVmStacks_Address] ON [localhost].[TransactionLogVmStacks]
 (
@@ -519,8 +550,10 @@ CREATE TABLE [main].[TransactionLogs](
 	[TransactionHash] [nvarchar](450) NOT NULL,
 	[LogIndex] [bigint] NOT NULL,
 	[Address] [nvarchar](43) NULL,
-	[Topics] [nvarchar](max) NULL,
-	[Topic0] [nvarchar](67) NULL,
+	[EventHash] [nvarchar](67) NULL,
+	[IndexVal1] [nvarchar](67) NULL,
+	[IndexVal2] [nvarchar](67) NULL,
+	[IndexVal3] [nvarchar](67) NULL,
 	[Data] [nvarchar](max) NULL,
  CONSTRAINT [PK_TransactionLogs] PRIMARY KEY CLUSTERED 
 (
@@ -618,6 +651,35 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_TransactionHash_LogIndex] O
 GO
 SET ANSI_PADDING ON
 GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_EventHash] ON [main].[TransactionLogs]
+(
+	[EventHash]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal1] ON [main].[TransactionLogs]
+(
+	[IndexVal1]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal2] ON [main].[TransactionLogs]
+(
+	[IndexVal2]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal3] ON [main].[TransactionLogs]
+(
+	[IndexVal3]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+
 /****** Object:  Index [IX_TransactionLogVmStacks_Address]    Script Date: 10/08/2018 14:50:47 ******/
 CREATE NONCLUSTERED INDEX [IX_TransactionLogVmStacks_Address] ON [main].[TransactionLogVmStacks]
 (
@@ -739,8 +801,10 @@ CREATE TABLE [kovan].[TransactionLogs](
 	[TransactionHash] [nvarchar](450) NOT NULL,
 	[LogIndex] [bigint] NOT NULL,
 	[Address] [nvarchar](43) NULL,
-	[Topics] [nvarchar](max) NULL,
-	[Topic0] [nvarchar](67) NULL,
+	[EventHash] [nvarchar](67) NULL,
+	[IndexVal1] [nvarchar](67) NULL,
+	[IndexVal2] [nvarchar](67) NULL,
+	[IndexVal3] [nvarchar](67) NULL,
 	[Data] [nvarchar](max) NULL,
  CONSTRAINT [PK_TransactionLogs] PRIMARY KEY CLUSTERED 
 (
@@ -836,6 +900,35 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_TransactionHash_LogIndex] O
 	[LogIndex] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_EventHash] ON [kovan].[TransactionLogs]
+(
+	[EventHash]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal1] ON [kovan].[TransactionLogs]
+(
+	[IndexVal1]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal2] ON [kovan].[TransactionLogs]
+(
+	[IndexVal2]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal3] ON [kovan].[TransactionLogs]
+(
+	[IndexVal3]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+
 SET ANSI_PADDING ON
 GO
 /****** Object:  Index [IX_TransactionLogVmStacks_Address]    Script Date: 10/08/2018 14:50:47 ******/
@@ -959,8 +1052,10 @@ CREATE TABLE [rinkeby].[TransactionLogs](
 	[TransactionHash] [nvarchar](450) NOT NULL,
 	[LogIndex] [bigint] NOT NULL,
 	[Address] [nvarchar](43) NULL,
-	[Topics] [nvarchar](max) NULL,
-	[Topic0] [nvarchar](67) NULL,
+	[EventHash] [nvarchar](67) NULL,
+	[IndexVal1] [nvarchar](67) NULL,
+	[IndexVal2] [nvarchar](67) NULL,
+	[IndexVal3] [nvarchar](67) NULL,
 	[Data] [nvarchar](max) NULL,
  CONSTRAINT [PK_TransactionLogs] PRIMARY KEY CLUSTERED 
 (
@@ -1058,6 +1153,35 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_TransactionHash_LogIndex] O
 GO
 SET ANSI_PADDING ON
 GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_EventHash] ON [rinkeby].[TransactionLogs]
+(
+	[EventHash]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal1] ON [rinkeby].[TransactionLogs]
+(
+	[IndexVal1]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal2] ON [rinkeby].[TransactionLogs]
+(
+	[IndexVal2]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal3] ON [rinkeby].[TransactionLogs]
+(
+	[IndexVal3]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+
 /****** Object:  Index [IX_TransactionLogVmStacks_Address]    Script Date: 10/08/2018 14:50:47 ******/
 CREATE NONCLUSTERED INDEX [IX_TransactionLogVmStacks_Address] ON [rinkeby].[TransactionLogVmStacks]
 (
@@ -1179,8 +1303,10 @@ CREATE TABLE [ropsten].[TransactionLogs](
 	[TransactionHash] [nvarchar](450) NOT NULL,
 	[LogIndex] [bigint] NOT NULL,
 	[Address] [nvarchar](43) NULL,
-	[Topics] [nvarchar](max) NULL,
-	[Topic0] [nvarchar](67) NULL,
+	[EventHash] [nvarchar](67) NULL,
+	[IndexVal1] [nvarchar](67) NULL,
+	[IndexVal2] [nvarchar](67) NULL,
+	[IndexVal3] [nvarchar](67) NULL,
 	[Data] [nvarchar](max) NULL,
  CONSTRAINT [PK_TransactionLogs] PRIMARY KEY CLUSTERED 
 (
@@ -1278,6 +1404,35 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_TransactionHash_LogIndex] O
 GO
 SET ANSI_PADDING ON
 GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_EventHash] ON [ropsten].[TransactionLogs]
+(
+	[EventHash]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal1] ON [ropsten].[TransactionLogs]
+(
+	[IndexVal1]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal2] ON [ropsten].[TransactionLogs]
+(
+	[IndexVal2]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_TransactionLogs_IndexVal3] ON [ropsten].[TransactionLogs]
+(
+	[IndexVal3]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+
 /****** Object:  Index [IX_TransactionLogVmStacks_Address]    Script Date: 10/08/2018 14:50:47 ******/
 CREATE NONCLUSTERED INDEX [IX_TransactionLogVmStacks_Address] ON [ropsten].[TransactionLogVmStacks]
 (
