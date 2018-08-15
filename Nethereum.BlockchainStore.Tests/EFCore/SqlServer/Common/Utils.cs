@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainStore.SqlServer;
+﻿using Nethereum.BlockchainStore.EFCore.SqlServer;
 
 namespace Nethereum.BlockchainStore.Tests.EFCore.SqlServer.Common
 {
