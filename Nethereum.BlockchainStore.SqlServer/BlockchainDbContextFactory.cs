@@ -24,7 +24,7 @@ namespace Nethereum.BlockchainStore.SqlServer
         private readonly Type _typeOfContext;
 
         public BlockchainDbContextFactory(string connectionString, string schema): 
-            this(connectionString, Enum.Parse<DbSchemaNames>(schema)){}
+            this(connectionString, (DbSchemaNames)Enum.Parse(typeof(DbSchemaNames), schema)){}
 
         public BlockchainDbContextFactory(string connectionString, DbSchemaNames dbSchemaName)
         {
