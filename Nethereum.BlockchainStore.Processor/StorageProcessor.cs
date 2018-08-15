@@ -75,6 +75,8 @@ namespace Nethereum.BlockchainStore.Processor
                 }
                 catch (Exception ex)
                 {
+                    System.Console.WriteLine(ex.Message);
+
                     if (ex.StackTrace.Contains("Only one usage of each socket address"))
                     {
                         Thread.Sleep(1000);

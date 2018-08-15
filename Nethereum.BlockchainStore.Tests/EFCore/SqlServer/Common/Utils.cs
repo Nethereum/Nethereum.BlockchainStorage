@@ -7,9 +7,9 @@ namespace Nethereum.BlockchainStore.Tests.EFCore.SqlServer.Common
         public const string connectionString =
             "Data Source=localhost\\SQLEXPRESS01;Database=BlockchainStorage;Integrated Security=False;User ID=localhost1;Password=MeLLfMA1wBlJCzSGZhkO;Connect Timeout=60;";
 
-        public static BlockchainDbContextFactory CreateSqlServerContextFactory(string schema = "localhost")
+        public static BlockchainDbContextFactory CreateSqlServerContextFactory(DbSchemaNames dbSchemaName = DbSchemaNames.localhost)
         {
-            return  new BlockchainDbContextFactory(Utils.connectionString, schema);
+            return  new BlockchainDbContextFactory(Utils.connectionString, dbSchemaName);
         }
     }
 }

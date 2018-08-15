@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Processors;
@@ -30,6 +31,9 @@ namespace Nethereum.BlockchainStore.Repositories
         public virtual async Task ProcessBlockAsync(long blockNumber)
         {
             var block = await GetBlockWithTransactionHashesAsync(blockNumber);
+
+            if(block == null)
+                throw new Exception($"Block is null, ensure it exists.  BlockNumber: {blockNumber}");
 
             await _blockRepository.UpsertBlockAsync(block);
 
