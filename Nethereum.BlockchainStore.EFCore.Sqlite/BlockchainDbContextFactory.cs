@@ -1,4 +1,4 @@
-﻿using Nethereum.Blockchain.EFCore;
+﻿using Nethereum.BlockchainStore.EFCore;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite
 {

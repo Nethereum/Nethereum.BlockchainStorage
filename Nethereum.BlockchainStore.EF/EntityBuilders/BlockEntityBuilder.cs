@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             Property(b => b.Hash).IsHash().IsRequired();
             Property(b => b.ParentHash).IsHash().IsRequired();
             Property(b => b.Miner).IsAddress();
-            HasIndex(b => new {b.BlockNumber, b.Hash}).IsUnique();                
+            HasIndex(b => new {b.BlockNumber, b.Hash}).HasName("IX_Block_BlockNumber_Hash").IsUnique();                
         }
     }
 }

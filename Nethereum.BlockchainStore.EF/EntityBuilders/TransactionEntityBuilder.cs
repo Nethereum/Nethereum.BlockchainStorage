@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             ToTable("Transactions");
             HasKey(b => b.RowIndex);
 
-            HasIndex(b => new {b.BlockNumber, b.Hash}).IsUnique();
+            HasIndex(b => new {b.BlockNumber, b.Hash}).HasName("IX_Transactions_BlockNumber_Hash").IsUnique();
             HasIndex(b => b.Hash);
             HasIndex(b => b.AddressFrom);
             HasIndex(b => b.AddressTo);

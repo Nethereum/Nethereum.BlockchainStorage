@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.EFCore;
-using Nethereum.BlockchainStore.EFCore.Repositories;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nethereum.BlockchainStore.EF.Repositories;
+using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Xunit;
-using Utils = Nethereum.BlockchainStore.Tests.EFCore.Base.Common.Utils;
+using Utils = Nethereum.BlockchainStore.EF.Tests.Base.Common.Utils;
 
-namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
+namespace Nethereum.BlockchainStore.EF.Tests.Base.RepositoryTests
 {
     public abstract class BlockRepositoryBaseTests: RepositoryTestBase
     {
@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
         {
         }
 
-        [Fact]
+        [TestMethod]
         public async Task UpsertAsync()
         {
             var repo = new BlockRepository(contextFactory);
@@ -42,21 +42,21 @@ namespace Nethereum.BlockchainStore.Tests.EFCore.Base.RepositoryTests
 
             var context = contextFactory.CreateContext();
             var storedBlock = await context.Blocks.FindByBlockNumberAsync(source.Number);
-            Assert.NotNull(storedBlock);
+            Assert.IsNotNull(storedBlock);
 
-            Assert.Equal(source.Number.Value.ToString(), storedBlock.BlockNumber);
-            Assert.Equal(source.Difficulty.ToLong(), storedBlock.Difficulty);
-            Assert.Equal(source.GasLimit.ToLong(), storedBlock.GasLimit);
-            Assert.Equal(source.GasUsed.ToLong(), storedBlock.GasUsed);
-            Assert.Equal(source.Size.ToLong(), storedBlock.Size);
-            Assert.Equal(source.Timestamp.ToLong(), storedBlock.Timestamp);
-            Assert.Equal(source.TotalDifficulty.ToLong(), storedBlock.TotalDifficulty);
-            Assert.Equal(source.ExtraData, storedBlock.ExtraData);
-            Assert.Equal(source.BlockHash, storedBlock.Hash);
-            Assert.Equal(source.ParentHash, storedBlock.ParentHash);
-            Assert.Equal(source.Miner, storedBlock.Miner);
-            Assert.Equal(new HexBigInteger(source.Nonce).ToLong(), storedBlock.Nonce);
-            Assert.Equal(source.TransactionHashes.Length, storedBlock.TransactionCount);
+            Assert.AreEqual(source.Number.Value.ToString(), storedBlock.BlockNumber);
+            Assert.AreEqual(source.Difficulty.ToLong(), storedBlock.Difficulty);
+            Assert.AreEqual(source.GasLimit.ToLong(), storedBlock.GasLimit);
+            Assert.AreEqual(source.GasUsed.ToLong(), storedBlock.GasUsed);
+            Assert.AreEqual(source.Size.ToLong(), storedBlock.Size);
+            Assert.AreEqual(source.Timestamp.ToLong(), storedBlock.Timestamp);
+            Assert.AreEqual(source.TotalDifficulty.ToLong(), storedBlock.TotalDifficulty);
+            Assert.AreEqual(source.ExtraData, storedBlock.ExtraData);
+            Assert.AreEqual(source.BlockHash, storedBlock.Hash);
+            Assert.AreEqual(source.ParentHash, storedBlock.ParentHash);
+            Assert.AreEqual(source.Miner, storedBlock.Miner);
+            Assert.AreEqual(new HexBigInteger(source.Nonce).ToLong(), storedBlock.Nonce);
+            Assert.AreEqual(source.TransactionHashes.Length, storedBlock.TransactionCount);
         }
     }
 }

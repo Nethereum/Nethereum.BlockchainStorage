@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.EFCore.EntityBuilders;
 
-namespace Nethereum.Blockchain.EFCore
+namespace Nethereum.BlockchainStore.EFCore
 {
     public abstract class BlockchainDbContextBase: DbContext
     {

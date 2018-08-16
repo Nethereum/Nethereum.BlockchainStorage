@@ -8,7 +8,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
     /// <summary>
     /// An empty stub - the SQL implementation doesn't require this table as the Transaction table already holds the address
     /// </summary>
-    public class AddressTransactionRepository : TransactionBaseRepository, IAddressTransactionRepository
+    public class AddressTransactionRepository : RepositoryBase,  IAddressTransactionRepository
     {
         public AddressTransactionRepository(IBlockchainDbContextFactory contextFactory):base(contextFactory){}
 

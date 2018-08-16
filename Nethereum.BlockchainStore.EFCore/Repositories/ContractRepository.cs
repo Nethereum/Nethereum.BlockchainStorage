@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
@@ -51,7 +52,7 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             {
                 var contract = await context.Contracts.FindByContractAddressAsync(contractAddress).ConfigureAwait(false)  ?? new Contract();
 
-                MapValues(contractAddress, code, transaction, contract);
+                contract.Map(contractAddress, code, transaction);
 
                 contract.UpdateRowDates();
 
@@ -65,14 +66,6 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
                 _cachedContracts.AddOrUpdate(contract.Address, contract,
                     (s, existingContract) => contract);
             }
-        }
-
-        private void MapValues(string contractAddress, string code, Transaction transaction, Contract contract)
-        {
-            contract.Address = contractAddress;
-            contract.Code = code;
-            contract.TransactionHash = transaction.TransactionHash;
-            contract.Creator = transaction.From;
         }
     }
 }

@@ -1,16 +1,13 @@
-﻿using Nethereum.BlockchainStore.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Nethereum.RPC.Eth.DTOs;
-using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
-namespace Nethereum.BlockchainStore.EF.Repositories
+namespace Nethereum.BlockchainStore.Entities.Mapping
 {
-    public abstract class TransactionBaseRepository: RepositoryBase
+    public static class TransactionMapping
     {
-        protected TransactionBaseRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
-        {
-        }
-
-        protected static void MapValues(TransactionReceipt @from, TransactionBase to)
+        public static void Map(this TransactionBase to, TransactionReceipt @from)
         {
             to.TransactionIndex = (long)@from.TransactionIndex.Value;
             to.GasUsed = (long)@from.GasUsed.Value;
@@ -18,7 +15,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             to.HasLog = @from.Logs.Count > 0;
         }
 
-        protected static void MapValues(Transaction @from, TransactionBase to)
+        public static void Map(this TransactionBase to, Nethereum.RPC.Eth.DTOs.Transaction @from)
         {
             to.BlockHash = @from.BlockHash;
             to.Hash = @from.TransactionHash;

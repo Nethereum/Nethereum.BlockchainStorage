@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 
@@ -20,7 +21,7 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
                                  .FindByTransactionHashAync(transactionHash).ConfigureAwait(false)  ??
                              new TransactionVmStack();
 
-                MapValues(transactionHash, address, stackTrace, record);
+                record.Map(transactionHash, address, stackTrace);
 
                 record.UpdateRowDates();
 

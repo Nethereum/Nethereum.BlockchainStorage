@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Nethereum.Blockchain.EFCore;
+using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.EntityBuilders;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite

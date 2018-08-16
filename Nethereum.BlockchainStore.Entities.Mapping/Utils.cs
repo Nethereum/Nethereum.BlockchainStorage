@@ -1,6 +1,6 @@
 ﻿using Nethereum.Hex.HexTypes;
 
-namespace Nethereum.BlockchainStore.EF.Repositories
+namespace Nethereum.BlockchainStore.Entities.Mapping
 {
     public static class Utils
     {

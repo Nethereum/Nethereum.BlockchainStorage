@@ -1,12 +1,13 @@
 ﻿using System.Data.Entity.Migrations;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
-    public class TransactionRepository : TransactionBaseRepository, ITransactionRepository
+    public class TransactionRepository : RepositoryBase, ITransactionRepository
     {
         public TransactionRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory){}
 
@@ -16,8 +17,8 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             {
                 BlockchainStore.Entities.Transaction tx = await FindOrCreate(transaction, context).ConfigureAwait(false);
 
-                MapValues(transaction, tx);
-                MapValues(receipt, tx);
+                tx.Map(transaction);
+                tx.Map(receipt);
 
                 tx.NewContractAddress = contractAddress;
                 tx.Failed = false;
@@ -39,8 +40,8 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             {
                 BlockchainStore.Entities.Transaction tx = await FindOrCreate(transaction, context).ConfigureAwait(false);
 
-                MapValues(transaction, tx);
-                MapValues(receipt, tx);
+                tx.Map(transaction);
+                tx.Map(receipt);
 
                 tx.Failed = failed;
                 tx.TimeStamp = (long)timeStamp.Value;

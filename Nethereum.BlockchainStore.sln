@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore", "Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj", "{63EE26BD-D2AF-465D-A2C3-749B57C34493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables", "Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj", "{BC3A7125-EDC5-4F02-9F39-B01CC46930B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.AzureTables", "Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj", "{BC3A7125-EDC5-4F02-9F39-B01CC46930B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9CDE4559-4CD2-4495-A620-0A251AC3712D}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,15 +22,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EFCore", "Nethereum.BlockchainStore.EFCore\Nethereum.BlockchainStore.EFCore.csproj", "{7DDF81CD-18AB-4F2D-A927-69AD613DEC95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Tests", "Nethereum.BlockchainStore.Tests\Nethereum.BlockchainStore.Tests.csproj", "{10232473-80DD-4E80-9BD3-DFBEF528F64F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EFCore.Tests", "Nethereum.BlockchainStore.EFCore.Tests\Nethereum.BlockchainStore.EFCore.Tests.csproj", "{10232473-80DD-4E80-9BD3-DFBEF528F64F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EFCore.Processor", "Nethereum.BlockchainStore.EFCore.Processor\Nethereum.BlockchainStore.EFCore.Processor.csproj", "{4933BA9E-A85D-4F59-8975-348C0E78EFC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF", "Nethereum.BlockchainStore.EF\Nethereum.BlockchainStore.EF.csproj", "{309808CD-A47F-43FE-AB4C-3CC68C868A07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF", "Nethereum.BlockchainStore.EF\Nethereum.BlockchainStore.EF.csproj", "{309808CD-A47F-43FE-AB4C-3CC68C868A07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Entities", "Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj", "{D2A436E2-47EA-49BF-B713-4CAC90986755}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Entities", "Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj", "{D2A436E2-47EA-49BF-B713-4CAC90986755}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables.Console", "Nethereum.BlockchainStore.AzureTables.Console\Nethereum.BlockchainStore.AzureTables.Console.csproj", "{498298A0-1D56-4A8A-8FCF-B4B7B891B5AC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Entities.Mapping", "Nethereum.BlockchainStore.Entities.Mapping\Nethereum.BlockchainStore.Entities.Mapping.csproj", "{0414AA63-E051-454B-96BB-9B6E26BAB85B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.Sqlite", "Nethereum.BlockchainStore.EF.Sqlite\Nethereum.BlockchainStore.EF.Sqlite.csproj", "{0D487C6E-7AD7-4F92-BDB7-AE6F1609628B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.Sqlite.Console", "Nethereum.BlockchainStore.EF.Sqlite.Console\Nethereum.BlockchainStore.EF.Sqlite.Console.csproj", "{7542D79D-CB1C-44D5-8065-B310DAF73B5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.Tests", "Nethereum.BlockchainStore.EF.Tests\Nethereum.BlockchainStore.EF.Tests.csproj", "{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,6 +94,22 @@ Global
 		{498298A0-1D56-4A8A-8FCF-B4B7B891B5AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{498298A0-1D56-4A8A-8FCF-B4B7B891B5AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{498298A0-1D56-4A8A-8FCF-B4B7B891B5AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0414AA63-E051-454B-96BB-9B6E26BAB85B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0414AA63-E051-454B-96BB-9B6E26BAB85B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0414AA63-E051-454B-96BB-9B6E26BAB85B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0414AA63-E051-454B-96BB-9B6E26BAB85B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D487C6E-7AD7-4F92-BDB7-AE6F1609628B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D487C6E-7AD7-4F92-BDB7-AE6F1609628B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D487C6E-7AD7-4F92-BDB7-AE6F1609628B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D487C6E-7AD7-4F92-BDB7-AE6F1609628B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7542D79D-CB1C-44D5-8065-B310DAF73B5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7542D79D-CB1C-44D5-8065-B310DAF73B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7542D79D-CB1C-44D5-8065-B310DAF73B5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7542D79D-CB1C-44D5-8065-B310DAF73B5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

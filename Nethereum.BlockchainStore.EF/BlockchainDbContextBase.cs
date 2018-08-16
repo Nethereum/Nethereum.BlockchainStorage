@@ -11,6 +11,9 @@ namespace Nethereum.BlockchainStore.EF
 {
     public abstract class BlockchainDbContextBase: DbContext
     {
+        protected BlockchainDbContextBase(){}
+        protected BlockchainDbContextBase(string connectionName) : base(connectionName){}
+
         public DbSet<Block> Blocks { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Contract> Contracts { get; set; }

@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             Property(m => m.IndexVal3).IsHash();
             Property(m => m.Data).IsUnlimitedText();
 
-            HasIndex(m => new { m.TransactionHash, m.LogIndex}).IsUnique();
+            HasIndex(m => new { m.TransactionHash, m.LogIndex}).HasName("IX_TransactionLogs_TransactionHash_LogIndex").IsUnique();
             HasIndex(m => m.Address);
             HasIndex(m => m.EventHash);
             HasIndex(m => new {m.IndexVal1});

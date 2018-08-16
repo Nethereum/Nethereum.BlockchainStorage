@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity.Migrations;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 
@@ -21,8 +22,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
                                  .FindByTransactionHashAync(transactionHash).ConfigureAwait(false)  ??
                              new TransactionVmStack();
 
-                MapValues(transactionHash, address, stackTrace, record);
-
+                record.Map(transactionHash, address, stackTrace);
                 record.UpdateRowDates();
 
                 context.TransactionVmStacks.AddOrUpdate(record);
@@ -30,13 +30,6 @@ namespace Nethereum.BlockchainStore.EF.Repositories
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
-
-        private void MapValues(string transactionHash, string address, JObject stackTrace, TransactionVmStack transactionVmStack)
-        {
-            transactionVmStack.TransactionHash = transactionHash;
-            transactionVmStack.Address = address;
-            transactionVmStack.StructLogs = ((JArray) stackTrace["structLogs"]).ToString();
-        }
-
+    
     }
 }

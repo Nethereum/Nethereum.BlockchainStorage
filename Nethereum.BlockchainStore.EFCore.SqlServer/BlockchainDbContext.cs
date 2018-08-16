@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Nethereum.Blockchain.EFCore;
+using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.EFCore.EntityBuilders;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer
