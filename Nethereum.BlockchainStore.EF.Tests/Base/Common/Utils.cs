@@ -7,7 +7,7 @@ namespace Nethereum.BlockchainStore.EF.Tests.Base.Common
     {
         public static HexBigInteger CreateBlockTimestamp()
         {
-            return new HexBigInteger((Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
+            return new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         }
     }
 }

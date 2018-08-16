@@ -1,8 +1,7 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.EFCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Nethereum.BlockchainStore.EFCore.EntityBuilders;
+using System;
+using System.Reflection;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer
 {
@@ -56,11 +55,6 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(Schema);
-            modelBuilder.ApplyConfiguration(new BlockEntityBuilder());
-            modelBuilder.ApplyConfiguration(new ContractEntityBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionEntityBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionLogEntityBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionLogVmStackEntityBuilder());
             base.OnModelCreating(modelBuilder);
         }
 

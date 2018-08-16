@@ -1,5 +1,6 @@
 using System.Numerics;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Wintellect.Azure.Storage.Table;
@@ -8,6 +9,9 @@ namespace Nethereum.BlockchainStore.Entities
 {
     public abstract class TransactionBase : TableEntityBase
     {
+        private static readonly long minusOne = (long) -1;
+        private static readonly long zero = (long) 0;
+
         public TransactionBase(AzureTable azureTable, DynamicTableEntity dynamicTableEntity = null)
             : base(azureTable, dynamicTableEntity)
         {
@@ -29,13 +33,13 @@ namespace Nethereum.BlockchainStore.Entities
 
         public long TimeStamp
         {
-            get { return Get(-1); }
+            get { return Get(minusOne); }
             set { Set(value); }
         }
 
         public long TransactionIndex
         {
-            get { return Get(0); }
+            get { return Get(zero); }
             set { Set(value); }
         }
 
@@ -50,13 +54,13 @@ namespace Nethereum.BlockchainStore.Entities
 
         public long Gas
         {
-            get { return Get(0); }
+            get { return Get(zero); }
             protected set { Set(value); }
         }
 
         public long GasPrice
         {
-            get { return Get(0); }
+            get { return Get(zero); }
             protected set { Set(value); }
         }
 
@@ -68,7 +72,7 @@ namespace Nethereum.BlockchainStore.Entities
 
         public long Nonce
         {
-            get { return Get(0); }
+            get { return Get(zero); }
             set { Set(value); }
         }
 
@@ -86,13 +90,13 @@ namespace Nethereum.BlockchainStore.Entities
 
         public long GasUsed
         {
-            get { return Get(0); }
+            get { return Get(zero); }
             protected set { Set(value); }
         }
 
         public long CumulativeGasUsed
         {
-            get { return Get(0); }
+            get { return Get(zero); }
             protected set { Set(value); }
         }
 
@@ -146,7 +150,7 @@ namespace Nethereum.BlockchainStore.Entities
             transaction.SetBlockNumber(transactionSource.BlockNumber);
             transaction.SetGas(transactionSource.Gas);
             transaction.SetGasPrice(transactionSource.GasPrice);
-            transaction.Input = transactionSource.Input ?? string.Empty;
+            transaction.Input = transaction.Input.RestrictToAzureTableStorageLimit(valIfTooLong: string.Empty);
             transaction.Nonce = (long) transactionSource.Nonce.Value;
             transaction.Failed = failed;
             transaction.SetGasUsed(transactionReceipt.GasUsed);
