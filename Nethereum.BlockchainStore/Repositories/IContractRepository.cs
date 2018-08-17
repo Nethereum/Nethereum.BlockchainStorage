@@ -5,6 +5,7 @@ namespace Nethereum.BlockchainStore.Repositories
 {
     public interface IContractRepository
     {
+        Task FillCache();
         Task UpsertAsync(string contractAddress, string code, Transaction transaction);
         Task<bool> ExistsAsync(string contractAddress);
     }

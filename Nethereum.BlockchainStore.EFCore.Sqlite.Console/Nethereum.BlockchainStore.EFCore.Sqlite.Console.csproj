@@ -10,7 +10,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.Processor\Nethereum.BlockchainStore.EFCore.Processor.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.Sqlite\Nethereum.BlockchainStore.EFCore.Sqlite.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
   </ItemGroup>  

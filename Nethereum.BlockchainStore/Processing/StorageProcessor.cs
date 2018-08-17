@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.EFCore.Repositories;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.PostProcessors;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using NLog.Fluent;
 
-namespace Nethereum.BlockchainStore.EFCore.Processor
+namespace Nethereum.BlockchainStore.Processing
 {
     public class StorageProcessor
     {
@@ -16,18 +15,18 @@ namespace Nethereum.BlockchainStore.EFCore.Processor
         private readonly Web3.Web3 _web3;
         private readonly IBlockProcessor _procesor;
         private int _retryNumber;
-        private readonly ContractRepository _contractRepository;
+        private readonly IContractRepository _contractRepository;
 
-        public StorageProcessor(string url, IBlockchainDbContextFactory contextFactory, bool postVm = false)
+        public StorageProcessor(string url, IBlockchainStoreRepositoryFactory repositoryFactory, bool postVm = false)
         {
             _web3 = new Web3.Web3(url);
 
-            var blockRepository = new BlockRepository(contextFactory);
-            var transactionRepository = new TransactionRepository(contextFactory);
-            var addressTransactionRepository = new AddressTransactionRepository(contextFactory);
-            _contractRepository = new ContractRepository(contextFactory);
-            var logRepository = new TransactionLogRepository(contextFactory);
-            var vmStackRepository = new TransactionVMStackRepository(contextFactory);
+            var blockRepository = repositoryFactory.CreatBlockRepository();
+            var transactionRepository = repositoryFactory.CreatetTransactionRepository();
+            var addressTransactionRepository = repositoryFactory.CreateAddressTransactionRepository();
+            _contractRepository = repositoryFactory.CreateContractRepository();
+            var logRepository = repositoryFactory.CreateTransactionLogRepository();
+            var vmStackRepository = repositoryFactory.CreateTransactionVmStackRepository();
 
             var contractTransactionProcessor = new ContractTransactionProcessor(_web3, _contractRepository,
                 transactionRepository, addressTransactionRepository, vmStackRepository, logRepository);

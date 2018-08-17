@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainStore.EFCore.Processor;
+﻿using Nethereum.BlockchainStore.Processing;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer.Console
 {
@@ -8,10 +8,9 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Console
         {
             var presetName = args?.Length == 0 ? ProcessorConfigurationPresets.Default : args[0];
             var configuration = ProcessorConfigurationPresets.Get(presetName);
-
             var contextFactory = new BlockchainDbContextFactory(configuration.GetConnectionString(), configuration.Schema);
-
-            return ProcessorConsole.Execute(args, contextFactory, configuration).Result;
+            var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
+            return ProcessorConsole.Execute(args, repositoryFactory, configuration).Result;
         }
     }
 }

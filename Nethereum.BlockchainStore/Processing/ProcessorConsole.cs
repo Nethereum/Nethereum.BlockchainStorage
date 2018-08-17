@@ -1,13 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Repositories;
 
-namespace Nethereum.BlockchainStore.EFCore.Processor
+namespace Nethereum.BlockchainStore.Processing
 {
     public class ProcessorConsole
     {
-        public static async Task<int> Execute(string[] args, IBlockchainDbContextFactory contextFactory, ProcessorConfiguration configuration)
+        public static async Task<int> Execute(string[] args, IBlockchainStoreRepositoryFactory repositoryFactory, ProcessorConfiguration configuration)
         {
-            var proc = new StorageProcessor(configuration.BlockchainUrl, contextFactory, configuration.PostVm);
+            var proc = new StorageProcessor(configuration.BlockchainUrl, repositoryFactory, configuration.PostVm);
             await proc.Init();
 
             var stopWatch = Stopwatch.StartNew();
@@ -16,9 +17,7 @@ namespace Nethereum.BlockchainStore.EFCore.Processor
 
             var result = await proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock).ConfigureAwait(false);
 
-            var duration = stopWatch.Elapsed;
-
-            System.Console.WriteLine("Duration: " + duration);
+            System.Console.WriteLine("Duration: " + stopWatch.Elapsed);
 
             Debug.WriteLine($"Finished With Success: {result}");
             System.Console.WriteLine("Finished. Success:" + result);

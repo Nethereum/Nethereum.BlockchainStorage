@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
+using Nethereum.BlockchainStore.EFCore;
 
-namespace Nethereum.BlockchainStore.EFCore.Processor
+namespace Nethereum.BlockchainStore.Processing
 {
     public class ProcessorConfiguration
     {

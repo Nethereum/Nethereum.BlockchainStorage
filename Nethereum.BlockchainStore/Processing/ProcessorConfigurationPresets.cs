@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Nethereum.BlockchainStore.EFCore.Processor
+namespace Nethereum.BlockchainStore.Processing
 {
     public static class ProcessorConfigurationPresets
     {
