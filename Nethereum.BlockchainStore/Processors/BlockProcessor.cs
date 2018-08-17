@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Processing;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.Hex.HexTypes;
@@ -33,7 +34,7 @@ namespace Nethereum.BlockchainStore.Repositories
             var block = await GetBlockWithTransactionHashesAsync(blockNumber);
 
             if(block == null)
-                throw new Exception($"Block is null, ensure it exists.  BlockNumber: {blockNumber}");
+                throw new BlockNotFoundException(blockNumber);
 
             await _blockRepository.UpsertBlockAsync(block);
 

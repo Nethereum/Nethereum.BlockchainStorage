@@ -2,15 +2,14 @@
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite.Console
 {
-    class Program
+    public static class Program
     {
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
-            var presetName = args?.Length == 0 ? ProcessorConfigurationPresets.Default : args[0];
-            var configuration = ProcessorConfigurationPresets.Get(presetName);
-            var contextFactory = new BlockchainDbContextFactory(configuration.GetConnectionString());
+            var configuration = ProcessorConfigurationPresets.Get(args);
+            var contextFactory = new SqliteBlockchainDbContextFactory(configuration.GetConnectionString());
             var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
-            return ProcessorConsole.Execute(args, repositoryFactory, configuration).Result;
+            return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }
 }

@@ -2,33 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.Entities;
 
-namespace Nethereum.BlockchainStore.EFCore.SqlServer
+namespace Nethereum.BlockchainStore.EF.SqlServer
 {
-    public class BlockchainDbContextFactory : IBlockchainDbContextFactory
+    public class SqlServerBlockchainDbContextFactory : IBlockchainDbContextFactory
     {
         static readonly Dictionary<DbSchemaNames, Type> SchemaToDbContextTypes;
 
-        static BlockchainDbContextFactory()
+        static SqlServerBlockchainDbContextFactory()
         {
-            SchemaToDbContextTypes = typeof(BlockchainDbContextFactory).Assembly.GetTypes()
+            SchemaToDbContextTypes = typeof(SqlServerBlockchainDbContextFactory).Assembly.GetTypes()
                 .Where(t => typeof(SqlServerBlockchainDbContext).IsAssignableFrom(t))
                 .Select(t => new {Type = t, Schema = (DbSchemaAttribute) t.GetCustomAttribute(typeof(DbSchemaAttribute))})
                 .Where(o => o.Schema != null)
                 .ToDictionary(el => el.Schema.DbSchemaName, el => el.Type);
         }
 
-        private readonly string _connectionString;
+        private readonly string _connectionName;
         private readonly Type _typeOfContext;
 
-        public BlockchainDbContextFactory(string connectionString, string schema): 
-            this(connectionString, (DbSchemaNames)Enum.Parse(typeof(DbSchemaNames), schema)){}
+        public SqlServerBlockchainDbContextFactory(string connectionName, string schema): 
+            this(connectionName, (DbSchemaNames)Enum.Parse(typeof(DbSchemaNames), schema)){}
 
-        public BlockchainDbContextFactory(string connectionString, DbSchemaNames dbSchemaName)
+        public SqlServerBlockchainDbContextFactory(string connectionName, DbSchemaNames dbSchemaName)
         {
-            _connectionString = connectionString;
+            _connectionName = connectionName;
 
             if(!SchemaToDbContextTypes.ContainsKey(dbSchemaName))
                 throw new Exception($"Unsupported or unknown schema '{dbSchemaName}'.  Could not locate a BlockchainDbContext type based on the schema");
@@ -38,7 +37,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
 
         public BlockchainDbContextBase CreateContext()
         {
-            return (BlockchainDbContextBase) Activator.CreateInstance(_typeOfContext, new object[] {_connectionString});
+            return (SqlServerBlockchainDbContext) Activator.CreateInstance(_typeOfContext, new object[] {_connectionName});
         }
     }
 }

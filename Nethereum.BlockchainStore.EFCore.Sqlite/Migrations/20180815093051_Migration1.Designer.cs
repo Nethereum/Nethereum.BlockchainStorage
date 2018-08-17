@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite.Migrations
 {
-    [DbContext(typeof(BlockchainDbContext))]
+    [DbContext(typeof(SqliteBlockchainDbContext))]
     [Migration("20180815093051_Migration1")]
     partial class Migration1
     {

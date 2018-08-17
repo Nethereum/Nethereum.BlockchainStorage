@@ -27,9 +27,9 @@ namespace Nethereum.BlockchainStore.Repositories
             await contract.InsertOrReplaceAsync().ConfigureAwait(false);
         }
 
-        public virtual Task FillCache()
+        public virtual async Task FillCache()
         {
-            return Task.CompletedTask;
+            await Contract.InitContractsCacheAsync(Table).ConfigureAwait(false);
         }
     }
 }

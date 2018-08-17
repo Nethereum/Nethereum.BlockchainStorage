@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Processors;
@@ -14,14 +15,16 @@ namespace Nethereum.BlockchainStore.Processing
         private const int MaxRetries = 3;
         private readonly Web3.Web3 _web3;
         private readonly IBlockProcessor _procesor;
-        private int _retryNumber;
         private readonly IContractRepository _contractRepository;
+        private readonly IBlockRepository _blockRepository;
+        private readonly WaitForBlockStrategy _waitForBlockStrategy;
 
         public StorageProcessor(string url, IBlockchainStoreRepositoryFactory repositoryFactory, bool postVm = false)
         {
+            _waitForBlockStrategy = new WaitForBlockStrategy();
             _web3 = new Web3.Web3(url);
 
-            var blockRepository = repositoryFactory.CreatBlockRepository();
+            _blockRepository = repositoryFactory.CreatBlockRepository();
             var transactionRepository = repositoryFactory.CreatetTransactionRepository();
             var addressTransactionRepository = repositoryFactory.CreateAddressTransactionRepository();
             _contractRepository = repositoryFactory.CreateContractRepository();
@@ -37,13 +40,12 @@ namespace Nethereum.BlockchainStore.Processing
             var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
                 valueTrasactionProcessor, contractCreationTransactionProcessor);
 
-
             if (postVm)
-                _procesor = new BlockVmPostProcessor(_web3, blockRepository, transactionProcessor);
+                _procesor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
             else
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                _procesor = new BlockProcessor(_web3, blockRepository, transactionProcessor);
+                _procesor = new BlockProcessor(_web3, _blockRepository, transactionProcessor);
             }       
         }
 
@@ -58,18 +60,74 @@ namespace Nethereum.BlockchainStore.Processing
             set => BlockProcessor.ProcessTransactionsInParallel = value;
         }
 
-        public async Task<bool> ExecuteAsync(long startBlock, long endBlock)
+        public class WaitForBlockStrategy
         {
+            private int[] waitIntervals = {1000, 2000, 5000, 10000, 15000};
+
+            public async Task Apply(int retryCount)
+            {
+                var intervalMs = retryCount >= waitIntervals.Length ? waitIntervals.Last() : waitIntervals[retryCount];
+                await Task.Delay(intervalMs);
+            }
+        }
+
+        /// <summary>
+        /// Allow the processor to resume from where it left off
+        /// </summary>
+        private async Task<long> GetStartingBlockNumber()
+        {
+            var blockNumber = await _blockRepository.GetMaxBlockNumber();
+            blockNumber = blockNumber == 0 ? 0 : blockNumber - 1;
+
+            if (MinimumBlockNumber.HasValue && MinimumBlockNumber > blockNumber)
+                return MinimumBlockNumber.Value;
+
+            return blockNumber;
+
+        }
+
+        public long? MinimumBlockNumber { get; set; }
+
+        public async Task<bool> ExecuteAsync(long? startBlock, long? endBlock, int retryNumber = 0)
+        {
+            startBlock = startBlock ?? await GetStartingBlockNumber();
+            endBlock = endBlock ?? long.MaxValue;
+            bool runContinuously = endBlock == long.MaxValue;
+            
             await Init();
+
             while (startBlock <= endBlock)
                 try
                 {
-                    await _procesor.ProcessBlockAsync(startBlock).ConfigureAwait(false);
-                    _retryNumber = 0;
-                    if (startBlock.ToString().EndsWith("0"))
-                        System.Console.WriteLine(startBlock + " " + DateTime.Now.ToString("s"));
+                    System.Console.WriteLine($"{DateTime.Now.ToString("s")}. Block: {startBlock}. Attempt: {retryNumber}");
 
+                    await _procesor.ProcessBlockAsync(startBlock.Value).ConfigureAwait(false);
+                    retryNumber = 0;
                     startBlock = startBlock + 1;
+                }
+                catch (BlockNotFoundException blockNotFoundException)
+                {
+                    System.Console.WriteLine(blockNotFoundException.Message);
+
+                    if (runContinuously)
+                    {
+                        System.Console.WriteLine("Waiting for block...");
+                        await _waitForBlockStrategy.Apply(retryNumber);
+                        await ExecuteAsync(startBlock, endBlock, retryNumber + 1);
+                    }
+                    else
+                    {
+                        if (retryNumber != MaxRetries)
+                        {
+                            await ExecuteAsync(startBlock, endBlock, retryNumber + 1).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            startBlock = startBlock + 1;
+                            Log.Error().Exception(blockNotFoundException).Message("BlockNumber" + startBlock).Write();
+                            System.Console.WriteLine($"Skipping block");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -83,10 +141,9 @@ namespace Nethereum.BlockchainStore.Processing
                     }
                     else
                     {
-                        if (_retryNumber != MaxRetries)
+                        if (retryNumber != MaxRetries)
                         {
-                            _retryNumber = _retryNumber + 1;
-                            await ExecuteAsync(startBlock, endBlock).ConfigureAwait(false);
+                            await ExecuteAsync(startBlock, endBlock, retryNumber + 1).ConfigureAwait(false);
                         }
                         else
                         {

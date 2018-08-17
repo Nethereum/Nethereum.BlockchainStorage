@@ -22,6 +22,8 @@ namespace Nethereum.BlockchainStore.Repositories
             await blockEntity.InsertOrReplaceAsync().ConfigureAwait(false);
         }
 
+        
+
         public Block MapBlock(BlockWithTransactionHashes blockSource, Block blockOutput)
         {
             blockOutput.SetBlockNumber(blockSource.Number);
@@ -39,6 +41,12 @@ namespace Nethereum.BlockchainStore.Repositories
             blockOutput.TransactionCount = blockSource.TransactionHashes.Length;
 
             return blockOutput;
+        }
+
+        //TODO: Implement 
+        public Task<long> GetMaxBlockNumber()
+        {
+            return Task.FromResult((long)0);
         }
     }
 }

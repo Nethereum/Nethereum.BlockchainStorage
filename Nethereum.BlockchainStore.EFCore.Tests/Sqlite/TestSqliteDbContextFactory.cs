@@ -3,7 +3,7 @@ using Nethereum.BlockchainStore.EFCore.Sqlite;
 
 namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite
 {
-    public class TestSqliteDbContextFactory : BlockchainDbContextFactory
+    public class TestSqliteDbContextFactory : SqliteBlockchainDbContextFactory
     {
         public static readonly object _lock = new object();
         public static bool _dbExists = false;
@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite
                 {
                     if (!_dbExists)
                     {
-                        new BlockchainDbContext(ConnectionString).Database.EnsureCreated();
+                        new SqliteBlockchainDbContext(ConnectionString).Database.EnsureCreated();
                         _dbExists = true;
                     }
                 }

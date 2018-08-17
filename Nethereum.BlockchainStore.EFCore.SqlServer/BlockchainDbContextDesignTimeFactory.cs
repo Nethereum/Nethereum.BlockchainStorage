@@ -14,15 +14,15 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
         This must have the necessary permissions to read and create objects
      */
 
-    public class BlockchainDbContextDesignTimeFactory_dbo: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_dbo>{}
-    public class BlockchainDbContextDesignTimeFactory_localhost: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_localhost>{}
-    public class BlockchainDbContextDesignTimeFactory_rinkeby: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_rinkeby>{}
-    public class BlockchainDbContextDesignTimeFactory_kovan: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_kovan>{}
-    public class BlockchainDbContextDesignTimeFactory_ropsten: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_ropsten>{} 
-    public class BlockchainDbContextDesignTimeFactory_main: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_main>{}
+    public class BlockchainDbContextDesignTimeFactory_dbo: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_dbo>{}
+    public class BlockchainDbContextDesignTimeFactory_localhost: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_localhost>{}
+    public class BlockchainDbContextDesignTimeFactory_rinkeby: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_rinkeby>{}
+    public class BlockchainDbContextDesignTimeFactory_kovan: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_kovan>{}
+    public class BlockchainDbContextDesignTimeFactory_ropsten: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_ropsten>{} 
+    public class BlockchainDbContextDesignTimeFactory_main: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_main>{}
    
     public abstract class BlockchainDbContextDesignTimeFactory<T> : IDesignTimeDbContextFactory<T>
-        where T : BlockchainDbContext
+        where T : SqlServerBlockchainDbContext
     {
         public T CreateDbContext(string[] args)
         {

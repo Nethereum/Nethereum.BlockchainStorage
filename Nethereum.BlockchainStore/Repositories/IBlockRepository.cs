@@ -6,5 +6,6 @@ namespace Nethereum.BlockchainStore.Processors
     public interface IBlockRepository
     {
         Task UpsertBlockAsync(BlockWithTransactionHashes source);
+        Task<long> GetMaxBlockNumber();
     }
 }

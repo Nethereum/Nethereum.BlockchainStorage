@@ -6,9 +6,13 @@ namespace Nethereum.BlockchainStore.Processing
 {
     public class ProcessorConsole
     {
-        public static async Task<int> Execute(string[] args, IBlockchainStoreRepositoryFactory repositoryFactory, ProcessorConfiguration configuration)
+        public static async Task<int> Execute(IBlockchainStoreRepositoryFactory repositoryFactory, ProcessorConfiguration configuration)
         {
-            var proc = new StorageProcessor(configuration.BlockchainUrl, repositoryFactory, configuration.PostVm);
+            var proc = new StorageProcessor(configuration.BlockchainUrl, repositoryFactory, configuration.PostVm)
+            {
+                MinimumBlockNumber = configuration.MinimumBlockNumber
+            };
+
             await proc.Init();
 
             var stopWatch = Stopwatch.StartNew();

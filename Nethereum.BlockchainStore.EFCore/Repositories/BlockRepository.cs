@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
@@ -11,6 +12,15 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
     {
         public BlockRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
+        }
+
+        public async Task<long> GetMaxBlockNumber()
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                var max = await context.Blocks.MaxAsync(b => b.BlockNumber);
+                return string.IsNullOrEmpty(max) ? 0 : long.Parse(max);
+            }
         }
 
         public async Task UpsertBlockAsync(BlockWithTransactionHashes source)

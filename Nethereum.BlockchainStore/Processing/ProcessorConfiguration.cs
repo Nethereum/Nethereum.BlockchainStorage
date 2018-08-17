@@ -14,8 +14,9 @@ namespace Nethereum.BlockchainStore.Processing
 
         public string BlockchainUrl { get; }
         public string Schema { get; }
-        public long FromBlock { get; set; } = 0;
-        public long ToBlock { get; set; } = 0;
+        public long? MinimumBlockNumber { get; set; }
+        public long? FromBlock { get; set; }
+        public long? ToBlock { get; set; }
         public bool PostVm { get; set; } = false;
 
         public string GetConnectionString()
