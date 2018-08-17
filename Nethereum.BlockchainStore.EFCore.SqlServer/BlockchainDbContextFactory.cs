@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Nethereum.BlockchainStore.EFCore;
+using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer
 {

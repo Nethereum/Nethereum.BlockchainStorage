@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainStore.EF.SqlServer;
+using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.EF.Tests.SqlServer
 {
@@ -6,7 +7,7 @@ namespace Nethereum.BlockchainStore.EF.Tests.SqlServer
     {
         public TestSqlServerContextFactory():base(
             "BlockchainDbContext_sqlserver", 
-            DbSchemaNames.localhost
+            DbSchemaNames.dbo
             )
         {
             

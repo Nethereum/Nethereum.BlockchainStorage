@@ -14,8 +14,4 @@
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Sql\" />
-  </ItemGroup>
-
 </Project>

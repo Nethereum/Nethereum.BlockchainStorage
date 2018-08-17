@@ -19,6 +19,11 @@ EXEC master..sp_addsrvrolemember @loginame = N'blockchain_storage_admin', @rolen
 GO
 
 -- Default logins for each schema - feel free to change passwords
+IF NOT EXISTS(select sid from sys.syslogins where name = 'blockchaindbo1') 
+BEGIN
+	CREATE LOGIN blockchaindbo1 WITH PASSWORD = 'bALLfMA1wBlJCzSGZhkO';
+END
+GO
 IF NOT EXISTS(select sid from sys.syslogins where name = 'localhost1') 
 BEGIN
 	CREATE LOGIN localhost1 WITH PASSWORD = 'MeLLfMA1wBlJCzSGZhkO';

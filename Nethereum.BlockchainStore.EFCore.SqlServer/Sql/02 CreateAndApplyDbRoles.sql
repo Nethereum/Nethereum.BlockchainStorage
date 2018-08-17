@@ -11,6 +11,12 @@ It adds the users to the relevant groups
 
 USE [BlockchainStorage]
 GO
+IF NOT EXISTS(SELECT uid FROM sysusers WHERE name = 'blockchaindbo1')
+BEGIN
+	CREATE USER [blockchaindbo1] FOR LOGIN [blockchaindbo1] WITH DEFAULT_SCHEMA=[dbo]
+END
+GO
+
 IF NOT EXISTS(SELECT uid FROM sysusers WHERE name = 'ropsten1')
 BEGIN
 	CREATE USER [ropsten1] FOR LOGIN [ropsten1] WITH DEFAULT_SCHEMA=[ropsten]
@@ -38,6 +44,12 @@ GO
 IF NOT EXISTS(SELECT uid FROM sysusers WHERE name = 'kovan1')
 BEGIN
 	CREATE USER [kovan1] FOR LOGIN [kovan1] WITH DEFAULT_SCHEMA=[kovan]
+END
+GO
+
+IF NOT EXISTS(SELECT uid from sysusers where issqlrole = 1 and name = 'blockchain_dbo_users')
+BEGIN
+	CREATE ROLE [blockchain_dbo_users]
 END
 GO
 
@@ -71,6 +83,11 @@ BEGIN
 END
 GO
 
+IF NOT EXISTS(select 1 from sys.database_role_members where user_name(member_principal_id) = 'blockchaindbo1' and user_name(role_principal_id) = 'blockchain_dbo_users')
+BEGIN
+	ALTER ROLE [blockchain_dbo_users] ADD MEMBER [blockchaindbo1]
+END
+GO
 
 IF NOT EXISTS(select 1 from sys.database_role_members where user_name(member_principal_id) = 'ropsten1' and user_name(role_principal_id) = 'ropsten_users')
 BEGIN
@@ -102,6 +119,18 @@ BEGIN
 END
 GO
 
+GRANT ALTER ON SCHEMA :: dbo TO blockchain_dbo_users;  
+GO
+GRANT INSERT ON SCHEMA :: dbo TO blockchain_dbo_users;  
+GO
+GRANT SELECT ON SCHEMA :: dbo TO blockchain_dbo_users;  
+GO
+GRANT UPDATE ON SCHEMA :: dbo TO blockchain_dbo_users;  
+GO
+GRANT DELETE ON SCHEMA :: dbo TO blockchain_dbo_users;  
+GO
+GRANT EXECUTE ON SCHEMA :: dbo TO blockchain_dbo_users;  
+GO
 
 GRANT ALTER ON SCHEMA :: localhost TO localhost_users;  
 GO

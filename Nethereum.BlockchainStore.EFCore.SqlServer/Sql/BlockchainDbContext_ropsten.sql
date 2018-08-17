@@ -174,7 +174,7 @@ CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [ropsten].[Transaction
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20180815113527_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20180817100301_InitialCreate', N'2.1.1-rtm-30846');
 
 GO
 

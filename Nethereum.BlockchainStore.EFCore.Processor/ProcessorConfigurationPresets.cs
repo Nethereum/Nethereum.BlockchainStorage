@@ -5,10 +5,16 @@ namespace Nethereum.BlockchainStore.EFCore.Processor
 {
     public static class ProcessorConfigurationPresets
     {
-        public static string Default { get; } = "localhost";
+        public static string Default { get; } = "dbo";
 
         public static Dictionary<string, ProcessorConfiguration> All = new Dictionary<string, ProcessorConfiguration>
         {
+            {
+                "dbo",
+                new ProcessorConfiguration(
+                    blockchainUrl: "http://localhost:8545", 
+                    dbSchema: "dbo"){FromBlock = 0, ToBlock = 37}
+            },
             {
                 "localhost",
                 new ProcessorConfiguration(

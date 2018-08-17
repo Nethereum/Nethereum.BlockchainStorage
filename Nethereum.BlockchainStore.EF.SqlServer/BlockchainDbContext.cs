@@ -2,9 +2,16 @@
 using System;
 using System.Data.Entity;
 using System.Reflection;
+using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.EF.SqlServer
 {
+    [DbSchema(DbSchemaNames.dbo)]
+    public class BlockchainDbContext_dbo : BlockchainDbContext
+    {
+        public BlockchainDbContext_dbo(string connectionName) : base(connectionName){}
+    }
+    
     [DbSchema(DbSchemaNames.localhost)]
     public class BlockchainDbContext_localhost : BlockchainDbContext
     {

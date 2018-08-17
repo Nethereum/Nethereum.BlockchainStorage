@@ -6,16 +6,16 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nethereum.BlockchainStore.EFCore.SqlServer;
 
-namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.BlockchainDbContext_mainMigrations
+namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.BlockchainDbContext_localhostMigrations
 {
-    [DbContext(typeof(BlockchainDbContext_main))]
-    partial class BlockchainDbContext_mainModelSnapshot : ModelSnapshot
+    [DbContext(typeof(BlockchainDbContext_localhost))]
+    partial class BlockchainDbContext_localhostModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("main")
+                .HasDefaultSchema("localhost")
                 .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);

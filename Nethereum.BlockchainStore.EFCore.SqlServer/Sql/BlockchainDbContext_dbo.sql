@@ -9,11 +9,7 @@ END;
 
 GO
 
-IF SCHEMA_ID(N'kovan') IS NULL EXEC(N'CREATE SCHEMA [kovan];');
-
-GO
-
-CREATE TABLE [kovan].[Blocks] (
+CREATE TABLE [dbo].[Blocks] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
@@ -35,7 +31,7 @@ CREATE TABLE [kovan].[Blocks] (
 
 GO
 
-CREATE TABLE [kovan].[Contracts] (
+CREATE TABLE [dbo].[Contracts] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
@@ -50,7 +46,7 @@ CREATE TABLE [kovan].[Contracts] (
 
 GO
 
-CREATE TABLE [kovan].[TransactionLogs] (
+CREATE TABLE [dbo].[TransactionLogs] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
@@ -67,7 +63,7 @@ CREATE TABLE [kovan].[TransactionLogs] (
 
 GO
 
-CREATE TABLE [kovan].[TransactionLogVmStacks] (
+CREATE TABLE [dbo].[TransactionLogVmStacks] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
@@ -79,7 +75,7 @@ CREATE TABLE [kovan].[TransactionLogVmStacks] (
 
 GO
 
-CREATE TABLE [kovan].[Transactions] (
+CREATE TABLE [dbo].[Transactions] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
@@ -109,72 +105,72 @@ CREATE TABLE [kovan].[Transactions] (
 
 GO
 
-CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [kovan].[Blocks] ([BlockNumber], [Hash]);
+CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [dbo].[Blocks] ([BlockNumber], [Hash]);
 
 GO
 
-CREATE INDEX [IX_Contracts_Address] ON [kovan].[Contracts] ([Address]);
+CREATE INDEX [IX_Contracts_Address] ON [dbo].[Contracts] ([Address]);
 
 GO
 
-CREATE INDEX [IX_Contracts_Name] ON [kovan].[Contracts] ([Name]);
+CREATE INDEX [IX_Contracts_Name] ON [dbo].[Contracts] ([Name]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogs_Address] ON [kovan].[TransactionLogs] ([Address]);
+CREATE INDEX [IX_TransactionLogs_Address] ON [dbo].[TransactionLogs] ([Address]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogs_EventHash] ON [kovan].[TransactionLogs] ([EventHash]);
+CREATE INDEX [IX_TransactionLogs_EventHash] ON [dbo].[TransactionLogs] ([EventHash]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogs_IndexVal1] ON [kovan].[TransactionLogs] ([IndexVal1]);
+CREATE INDEX [IX_TransactionLogs_IndexVal1] ON [dbo].[TransactionLogs] ([IndexVal1]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogs_IndexVal2] ON [kovan].[TransactionLogs] ([IndexVal2]);
+CREATE INDEX [IX_TransactionLogs_IndexVal2] ON [dbo].[TransactionLogs] ([IndexVal2]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogs_IndexVal3] ON [kovan].[TransactionLogs] ([IndexVal3]);
+CREATE INDEX [IX_TransactionLogs_IndexVal3] ON [dbo].[TransactionLogs] ([IndexVal3]);
 
 GO
 
-CREATE UNIQUE INDEX [IX_TransactionLogs_TransactionHash_LogIndex] ON [kovan].[TransactionLogs] ([TransactionHash], [LogIndex]);
+CREATE UNIQUE INDEX [IX_TransactionLogs_TransactionHash_LogIndex] ON [dbo].[TransactionLogs] ([TransactionHash], [LogIndex]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogVmStacks_Address] ON [kovan].[TransactionLogVmStacks] ([Address]);
+CREATE INDEX [IX_TransactionLogVmStacks_Address] ON [dbo].[TransactionLogVmStacks] ([Address]);
 
 GO
 
-CREATE INDEX [IX_TransactionLogVmStacks_TransactionHash] ON [kovan].[TransactionLogVmStacks] ([TransactionHash]);
+CREATE INDEX [IX_TransactionLogVmStacks_TransactionHash] ON [dbo].[TransactionLogVmStacks] ([TransactionHash]);
 
 GO
 
-CREATE INDEX [IX_Transactions_AddressFrom] ON [kovan].[Transactions] ([AddressFrom]);
+CREATE INDEX [IX_Transactions_AddressFrom] ON [dbo].[Transactions] ([AddressFrom]);
 
 GO
 
-CREATE INDEX [IX_Transactions_AddressTo] ON [kovan].[Transactions] ([AddressTo]);
+CREATE INDEX [IX_Transactions_AddressTo] ON [dbo].[Transactions] ([AddressTo]);
 
 GO
 
-CREATE INDEX [IX_Transactions_Hash] ON [kovan].[Transactions] ([Hash]);
+CREATE INDEX [IX_Transactions_Hash] ON [dbo].[Transactions] ([Hash]);
 
 GO
 
-CREATE INDEX [IX_Transactions_NewContractAddress] ON [kovan].[Transactions] ([NewContractAddress]);
+CREATE INDEX [IX_Transactions_NewContractAddress] ON [dbo].[Transactions] ([NewContractAddress]);
 
 GO
 
-CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [kovan].[Transactions] ([BlockNumber], [Hash]);
+CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [dbo].[Transactions] ([BlockNumber], [Hash]);
 
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20180817100315_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20180817100248_InitialCreate', N'2.1.1-rtm-30846');
 
 GO
 

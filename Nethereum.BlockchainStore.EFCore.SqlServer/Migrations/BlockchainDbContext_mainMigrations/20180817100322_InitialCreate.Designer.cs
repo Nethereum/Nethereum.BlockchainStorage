@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nethereum.BlockchainStore.EFCore.SqlServer;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.BlockchainDbContext_mainMigrations
 {
     [DbContext(typeof(BlockchainDbContext_main))]
-    partial class BlockchainDbContext_mainModelSnapshot : ModelSnapshot
+    [Migration("20180817100322_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

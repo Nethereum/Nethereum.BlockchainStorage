@@ -3,19 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nethereum.BlockchainStore.EFCore.SqlServer;
 
-namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.BlockchainDbContext_mainMigrations
+namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.BlockchainDbContext_kovanMigrations
 {
-    [DbContext(typeof(BlockchainDbContext_main))]
-    partial class BlockchainDbContext_mainModelSnapshot : ModelSnapshot
+    [DbContext(typeof(BlockchainDbContext_kovan))]
+    [Migration("20180817100315_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("main")
+                .HasDefaultSchema("kovan")
                 .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);

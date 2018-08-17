@@ -14,6 +14,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
         This must have the necessary permissions to read and create objects
      */
 
+    public class BlockchainDbContextDesignTimeFactory_dbo: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_dbo>{}
     public class BlockchainDbContextDesignTimeFactory_localhost: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_localhost>{}
     public class BlockchainDbContextDesignTimeFactory_rinkeby: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_rinkeby>{}
     public class BlockchainDbContextDesignTimeFactory_kovan: BlockchainDbContextDesignTimeFactory<BlockchainDbContext_kovan>{}
