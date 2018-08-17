@@ -18,6 +18,7 @@ namespace Nethereum.BlockchainStore.Processing
         public long? FromBlock { get; set; }
         public long? ToBlock { get; set; }
         public bool PostVm { get; set; } = false;
+        public bool ProcessBlockTransactionsInParallel { get; set; } = true;
 
         public string GetConnectionString()
         {

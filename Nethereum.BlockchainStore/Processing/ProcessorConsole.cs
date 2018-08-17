@@ -10,14 +10,11 @@ namespace Nethereum.BlockchainStore.Processing
         {
             var proc = new StorageProcessor(configuration.BlockchainUrl, repositoryFactory, configuration.PostVm)
             {
-                MinimumBlockNumber = configuration.MinimumBlockNumber
+                MinimumBlockNumber = configuration.MinimumBlockNumber,
+                ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel
             };
 
-            await proc.Init();
-
             var stopWatch = Stopwatch.StartNew();
-
-            proc.ProcessTransactionsInParallel = true;
 
             var result = await proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock).ConfigureAwait(false);
 

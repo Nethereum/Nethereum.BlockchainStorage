@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainStore.Processing
             }       
         }
 
-        public async Task Init()
+        private async Task Init()
         {
             await _contractRepository.FillCache().ConfigureAwait(false);
         }

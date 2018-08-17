@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,7 @@ namespace Nethereum.BlockchainStore.Entities
 {
     public class Contract : TableEntityBase
     {
-        private static List<Contract> cachedContracts;
+        private static readonly ConcurrentDictionary<string, Contract> CachedContracts = new ConcurrentDictionary<string, Contract>();
 
         public Contract(AzureTable at, DynamicTableEntity dte = null) : base(at, dte)
         {
@@ -122,7 +123,7 @@ namespace Nethereum.BlockchainStore.Entities
             };
             contract.InitCode(code);
 
-            cachedContracts?.Add(contract);
+            CachedContracts.AddOrUpdate(contract.Address, contract, (s, existingContract) => contract);
 
             return contract;
         }
@@ -150,8 +151,11 @@ namespace Nethereum.BlockchainStore.Entities
 
         public static async Task<Contract> FindAsync(AzureTable table, string contractAddress)
         {
-            if (cachedContracts != null) return cachedContracts.FirstOrDefault(x => x.Address == contractAddress);
-
+            if(CachedContracts.TryGetValue(contractAddress, out Contract contract))
+            {
+                return contract;
+            }
+            
             var tr =
                 await
                     table.ExecuteAsync(TableOperation.Retrieve(contractAddress.ToLowerInvariant().HtmlEncode(),
@@ -164,8 +168,12 @@ namespace Nethereum.BlockchainStore.Entities
 
         public static async Task InitContractsCacheAsync(CloudTable table)
         {
-            if (cachedContracts != null)
-                cachedContracts = await FindAllAsync(table).ConfigureAwait(false);
+            var contracts = await FindAllAsync(table).ConfigureAwait(false);
+            CachedContracts.Clear();
+            foreach (var contract in contracts)
+            {
+                CachedContracts.AddOrUpdate(contract.Address, contract, (s, existingContract) => contract);
+            }
         }
 
         public static async Task<List<Contract>> FindAllAsync(AzureTable table)
