@@ -77,7 +77,7 @@ namespace Nethereum.BlockchainStore.Processing
         private async Task<long> GetStartingBlockNumber()
         {
             var blockNumber = await _blockRepository.GetMaxBlockNumber();
-            blockNumber = blockNumber == 0 ? 0 : blockNumber - 1;
+            blockNumber = blockNumber <= 0 ? 0 : blockNumber - 1;
 
             if (MinimumBlockNumber.HasValue && MinimumBlockNumber > blockNumber)
                 return MinimumBlockNumber.Value;
