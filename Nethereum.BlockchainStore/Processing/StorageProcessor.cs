@@ -18,14 +18,15 @@ namespace Nethereum.BlockchainStore.Processing
         private readonly IContractRepository _contractRepository;
         private readonly IBlockRepository _blockRepository;
         private readonly WaitForBlockStrategy _waitForBlockStrategy;
+        private bool _contractCacheInitialised = false;
 
         public StorageProcessor(string url, IBlockchainStoreRepositoryFactory repositoryFactory, bool postVm = false)
         {
             _waitForBlockStrategy = new WaitForBlockStrategy();
             _web3 = new Web3.Web3(url);
 
-            _blockRepository = repositoryFactory.CreatBlockRepository();
-            var transactionRepository = repositoryFactory.CreatetTransactionRepository();
+            _blockRepository = repositoryFactory.CreateBlockRepository();
+            var transactionRepository = repositoryFactory.CreateTransactionRepository();
             var addressTransactionRepository = repositoryFactory.CreateAddressTransactionRepository();
             _contractRepository = repositoryFactory.CreateContractRepository();
             var logRepository = repositoryFactory.CreateTransactionLogRepository();
@@ -49,9 +50,13 @@ namespace Nethereum.BlockchainStore.Processing
             }       
         }
 
-        private async Task Init()
+        private async Task InitContractCache()
         {
-            await _contractRepository.FillCache().ConfigureAwait(false);
+            if (!_contractCacheInitialised)
+            {
+                await _contractRepository.FillCache().ConfigureAwait(false);
+                _contractCacheInitialised = true;
+            }
         }
 
         public bool ProcessTransactionsInParallel
@@ -94,7 +99,7 @@ namespace Nethereum.BlockchainStore.Processing
             endBlock = endBlock ?? long.MaxValue;
             bool runContinuously = endBlock == long.MaxValue;
             
-            await Init();
+            await InitContractCache();
 
             while (startBlock <= endBlock)
                 try

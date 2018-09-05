@@ -20,23 +20,23 @@ namespace Nethereum.BlockchainStore.EFCore
             return RecurseUntilFound(parent.FullName, fileToFind);
         }
 
-        static string FindAppSettingsDirectory(Type type)
+        static string FindAppSettingsDirectory(Type type, string appSettingsFileName)
         {
             var assemblyFilePath = type.Assembly.Location;
             var startingDirectory = Path.GetDirectoryName(assemblyFilePath);
-            return RecurseUntilFound(startingDirectory, "appsettings.json");
+            return RecurseUntilFound(startingDirectory, appSettingsFileName);
         }
 
-        public static IConfigurationRoot Build(Type type)
+        public static IConfigurationRoot Build(Type type, string appSettingsFileName = "appsettings.json")
         {
-            string path = FindAppSettingsDirectory(type);
+            string path = FindAppSettingsDirectory(type, appSettingsFileName);
 
             if(path == null)
                 throw new Exception("Failed to find the appsettings.json file.  Please ensure it is in somewhere within the path of the executable.");
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(path)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile(appSettingsFileName, optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 

@@ -5,10 +5,10 @@ namespace Nethereum.BlockchainStore.Repositories
     public interface IBlockchainStoreRepositoryFactory
     {
         IAddressTransactionRepository CreateAddressTransactionRepository();
-        IBlockRepository CreatBlockRepository();
+        IBlockRepository CreateBlockRepository();
         IContractRepository CreateContractRepository();
         ITransactionLogRepository CreateTransactionLogRepository();
-        ITransactionRepository CreatetTransactionRepository();
+        ITransactionRepository CreateTransactionRepository();
         ITransactionVMStackRepository CreateTransactionVmStackRepository();
     }
 }

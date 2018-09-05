@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Nethereum.BlockchainStore.CosmosCore.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "rinkeby"
+    }
+  }
+}

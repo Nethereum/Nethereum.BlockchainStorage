@@ -78,7 +78,7 @@ namespace Nethereum.BlockchainStore.Bootstrap
             return new AddressTransactionRepository(GetAddressTransactionsTable());
         }
 
-        public IBlockRepository CreatBlockRepository()
+        public IBlockRepository CreateBlockRepository()
         {
             return new BlockRepository(GetBlocksTable());
         }
@@ -93,7 +93,7 @@ namespace Nethereum.BlockchainStore.Bootstrap
             return new TransactionLogRepository(GetTransactionsLogTable());
         }
 
-        public ITransactionRepository CreatetTransactionRepository()
+        public ITransactionRepository CreateTransactionRepository()
         {
             return new TransactionRepository(GetTransactionsTable());
         }

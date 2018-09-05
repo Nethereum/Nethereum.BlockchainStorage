@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.Tests", "Nethereum.BlockchainStore.EF.Tests\Nethereum.BlockchainStore.EF.Tests.csproj", "{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.SqlServer", "Nethereum.BlockchainStore.EF.SqlServer\Nethereum.BlockchainStore.EF.SqlServer.csproj", "{DB173474-84AB-496F-A062-7A00C6C6B3B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.SqlServer", "Nethereum.BlockchainStore.EF.SqlServer\Nethereum.BlockchainStore.EF.SqlServer.csproj", "{DB173474-84AB-496F-A062-7A00C6C6B3B6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EF", "EF", "{DB94E59A-6469-49BC-8629-6174990EE133}"
 EndProject
@@ -41,9 +41,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EFCore", "EFCore", "{674E3D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureTableStorage", "AzureTableStorage", "{94A26589-358C-4D9E-AF7D-BCF4476A804E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Utils", "Nethereum.BlockchainStore.Utils\Nethereum.BlockchainStore.Utils.csproj", "{E96A862F-A912-4FBB-8B73-1E1B0B16D588}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Utils", "Nethereum.BlockchainStore.Utils\Nethereum.BlockchainStore.Utils.csproj", "{E96A862F-A912-4FBB-8B73-1E1B0B16D588}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables.Console", "Nethereum.BlockchainStore.AzureTables.Console\Nethereum.BlockchainStore.AzureTables.Console.csproj", "{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CosmosCore", "CosmosCore", "{60286D0D-6F09-4FF0-B51D-C3822CA107A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.CosmosCore", "Nethereum.BlockchainStore.CosmosCore\Nethereum.BlockchainStore.CosmosCore.csproj", "{128CD31E-0D08-401F-BEA0-11D48226D328}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.CosmosCore.Console", "Nethereum.BlockchainStore.CosmosCore.Console\Nethereum.BlockchainStore.CosmosCore.Console.csproj", "{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +125,14 @@ Global
 		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{128CD31E-0D08-401F-BEA0-11D48226D328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{128CD31E-0D08-401F-BEA0-11D48226D328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{128CD31E-0D08-401F-BEA0-11D48226D328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{128CD31E-0D08-401F-BEA0-11D48226D328}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +151,8 @@ Global
 		{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8} = {DB94E59A-6469-49BC-8629-6174990EE133}
 		{DB173474-84AB-496F-A062-7A00C6C6B3B6} = {DB94E59A-6469-49BC-8629-6174990EE133}
 		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE} = {94A26589-358C-4D9E-AF7D-BCF4476A804E}
+		{128CD31E-0D08-401F-BEA0-11D48226D328} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
+		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B38D1C4-9FAE-4BA6-A315-8451597A4E9C}

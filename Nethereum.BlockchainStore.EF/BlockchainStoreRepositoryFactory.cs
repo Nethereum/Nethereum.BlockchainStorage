@@ -13,11 +13,11 @@ namespace Nethereum.BlockchainStore.EF
             _blockchainDbContextFactory = contextFactory;
         }
 
-        public IBlockRepository CreatBlockRepository() => new BlockRepository(_blockchainDbContextFactory);
+        public IBlockRepository CreateBlockRepository() => new BlockRepository(_blockchainDbContextFactory);
         public IAddressTransactionRepository CreateAddressTransactionRepository() => new AddressTransactionRepository(_blockchainDbContextFactory);
         public IContractRepository CreateContractRepository() => new ContractRepository(_blockchainDbContextFactory);
         public ITransactionLogRepository CreateTransactionLogRepository() => new TransactionLogRepository(_blockchainDbContextFactory);
         public ITransactionVMStackRepository CreateTransactionVmStackRepository() => new TransactionVMStackRepository(_blockchainDbContextFactory);
-        public ITransactionRepository CreatetTransactionRepository() => new TransactionRepository(_blockchainDbContextFactory);
+        public ITransactionRepository CreateTransactionRepository() => new TransactionRepository(_blockchainDbContextFactory);
     }
 }
