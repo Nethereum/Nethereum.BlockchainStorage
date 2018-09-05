@@ -35,6 +35,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
             }
         }
 
+        //TODO: Sort out how best to configure this - remove hard coded app settings file
         public static CosmosRepositoryFactory Create()
         {
             var config = ConfigurationUtils.Build(typeof(CosmosRepositoryFactory), "appsettings.development.js");
