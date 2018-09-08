@@ -6,6 +6,7 @@ using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
@@ -35,12 +36,12 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
             }
         }
 
-        //TODO: Sort out how best to configure this - remove hard coded app settings file
-        public static CosmosRepositoryFactory Create()
+        public static CosmosRepositoryFactory Create(string[] args = null)
         {
-            var config = ConfigurationUtils.Build(typeof(CosmosRepositoryFactory), "appsettings.development.js");
-
-            var key = config.GetConnectionString("Cosmos");
+            var config = ConfigurationUtils.Build(args, 
+                "Nethereum.BlockchainStore.CosmosCore.Console.UserSecrets");
+       
+            var key = config["CosmosAccessKey"];
             var endpointUri = config["CosmosEndpointUri"];
             var prefix = config["EnvironmentPrefix"];
 

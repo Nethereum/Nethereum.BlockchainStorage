@@ -36,11 +36,36 @@ namespace Nethereum.BlockchainStore.EFCore
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(path)
-                .AddJsonFile(appSettingsFileName, optional: true, reloadOnChange: true)
+                .AddJsonFile(appSettingsFileName, optional: true, reloadOnChange: false)
                 .AddEnvironmentVariables()
                 .Build();
 
             return config;
+        }
+
+        public static void SetEnvironment(string environment)
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
+        }
+
+        public static IConfigurationRoot Build(string[] args, string userSecretsId)
+        {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var baseJsonFile = "appsettings.json";
+            var environmentJsonFile = $"appsettings.{environment}.json";
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(baseJsonFile, optional: true, reloadOnChange: false)
+                .AddJsonFile(environmentJsonFile, optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .AddCommandLine(args);
+
+            if (environment == "development")
+                builder.AddUserSecrets(userSecretsId);
+
+            return builder.Build();
         }
     }
 }
