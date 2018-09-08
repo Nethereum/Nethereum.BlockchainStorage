@@ -13,12 +13,23 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
 {
     public class CosmosRepositoryFactory : IBlockchainStoreRepositoryFactory
     {
+        public static CosmosRepositoryFactory Create(string[] args = null, string userSecretsId = null)
+        {
+            var config = ConfigurationUtils.Build(args, userSecretsId);
+       
+            var endpointUri = config["CosmosEndpointUri"];
+            var key = config["CosmosAccessKey"];
+            var tag = config["CosmosDbTag"];
+
+            return new CosmosRepositoryFactory(endpointUri, key, tag);
+        }
+
         private readonly DocumentClient _client;
         private readonly string _databaseName;
 
-        public CosmosRepositoryFactory(string endpointUri, string key, string prefix)
+        public CosmosRepositoryFactory(string endpointUri, string key, string dbTag)
         {
-            _databaseName = "BlockchainStorage" + prefix ?? string.Empty;
+            _databaseName = "BlockchainStorage" + dbTag ?? string.Empty;
             _client = new DocumentClient(new Uri(endpointUri), key);
         }
 
@@ -34,18 +45,6 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
                 var docCollection = new DocumentCollection {Id = collection};
                 await _client.CreateDocumentCollectionIfNotExistsAsync(db.Resource.SelfLink, docCollection);
             }
-        }
-
-        public static CosmosRepositoryFactory Create(string[] args = null)
-        {
-            var config = ConfigurationUtils.Build(args, 
-                "Nethereum.BlockchainStore.CosmosCore.Console.UserSecrets");
-       
-            var key = config["CosmosAccessKey"];
-            var endpointUri = config["CosmosEndpointUri"];
-            var prefix = config["EnvironmentPrefix"];
-
-            return new CosmosRepositoryFactory(endpointUri, key, prefix);
         }
 
         public IBlockRepository CreateBlockRepository()

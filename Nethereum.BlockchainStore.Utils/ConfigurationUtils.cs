@@ -6,6 +6,8 @@ namespace Nethereum.BlockchainStore.EFCore
 {
     public static class ConfigurationUtils
     {
+        private const string AspnetcoreEnvironment = "ASPNETCORE_ENVIRONMENT";
+
         static string RecurseUntilFound(string directory, string fileToFind)
         {
             if (Directory.GetFiles(directory, fileToFind).Length > 0)
@@ -45,12 +47,12 @@ namespace Nethereum.BlockchainStore.EFCore
 
         public static void SetEnvironment(string environment)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
+            Environment.SetEnvironmentVariable(AspnetcoreEnvironment, environment);
         }
 
         public static IConfigurationRoot Build(string[] args, string userSecretsId)
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var environment = Environment.GetEnvironmentVariable(AspnetcoreEnvironment) ?? string.Empty;
 
             var baseJsonFile = "appsettings.json";
             var environmentJsonFile = $"appsettings.{environment}.json";
@@ -62,7 +64,7 @@ namespace Nethereum.BlockchainStore.EFCore
                 .AddEnvironmentVariables()
                 .AddCommandLine(args);
 
-            if (environment == "development")
+            if (environment.Equals("development", StringComparison.InvariantCultureIgnoreCase))
                 builder.AddUserSecrets(userSecretsId);
 
             return builder.Build();
