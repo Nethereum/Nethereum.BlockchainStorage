@@ -1,10 +1,12 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using System.Net;
+using Microsoft.Azure.Documents.Client;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -14,14 +16,37 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public Task<TransactionVmStack> FindByTransactionHashAync(string hash)
+        public async Task<TransactionVmStack> FindByTransactionHashAync(string hash)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(new CosmosTransactionVmStack(){TransactionHash = hash});
+            try
+            {
+                var response = await Client.ReadDocumentAsync<CosmosTransactionVmStack>(uri);
+                return response.Document;
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return null;
+
+                throw;
+            }
         }
 
-        public Task Remove(TransactionVmStack transactionVmStack)
+        public async Task Remove(TransactionVmStack transactionVmStack)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(transactionVmStack.TransactionHash);
+            try
+            {
+                await Client.DeleteDocumentAsync(uri);
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return;
+
+                throw;
+            }
         }
 
         public async Task UpsertAsync(string transactionHash, string address, JObject stackTrace)

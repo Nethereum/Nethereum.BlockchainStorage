@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <UserSecretsId>Nethereum.BlockchainStore.CosmosCore.Console.UserSecrets</UserSecretsId>
+    <UserSecretsId>Nethereum.BlockchainStore.CosmosCore.UserSecrets</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

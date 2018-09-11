@@ -14,9 +14,8 @@ namespace Nethereum.BlockchainStore.CosmosCore.Console
 
             var repositoryFactory = CosmosRepositoryFactory.Create(
                 args, 
-                "Nethereum.BlockchainStore.CosmosCore.Console.UserSecrets");
+                "Nethereum.BlockchainStore.CosmosCore.UserSecrets");
 
-            repositoryFactory.EnsureDatabaseAndCollections().Wait();
             return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }

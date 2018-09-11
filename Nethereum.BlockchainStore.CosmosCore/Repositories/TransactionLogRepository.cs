@@ -5,6 +5,7 @@ using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -14,9 +15,21 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(new CosmosTransactionLog{TransactionHash = hash, LogIndex = idx});
+            try
+            {
+                var response = await Client.ReadDocumentAsync<CosmosTransactionLog>(uri);
+                return response.Document;
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return null;
+
+                throw;
+            }
         }
 
         public async Task UpsertAsync(string transactionHash, long logIndex, JObject log)

@@ -25,6 +25,11 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
                 updatedDocument, options: null, disableAutomaticIdGeneration: true);
         }
 
+        protected Uri CreateDocumentUri(string id)
+        {
+            return UriFactory.CreateDocumentUri(DatabaseName, CollectionName, id);
+        }
+
         protected Uri CreateDocumentUri(ICosmosEntity entity)
         {
             return UriFactory.CreateDocumentUri(DatabaseName, CollectionName, entity.Id);

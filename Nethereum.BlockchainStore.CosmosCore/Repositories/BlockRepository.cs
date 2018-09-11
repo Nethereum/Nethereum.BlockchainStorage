@@ -8,6 +8,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -17,9 +18,21 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public Task<BlockchainStore.Entities.Block> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<BlockchainStore.Entities.Block> GetBlockAsync(HexBigInteger blockNumber)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(new CosmosBlock() {Id = blockNumber.Value.ToString()});
+            try
+            {
+                var response = await Client.ReadDocumentAsync<CosmosBlock>(uri);
+                return response.Document;
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return null;
+
+                throw;
+            }
         }
 
         public async Task<long> GetMaxBlockNumber()

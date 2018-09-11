@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <UserSecretsId>Nethereum.BlockchainStore.CosmosCore.UserSecrets</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

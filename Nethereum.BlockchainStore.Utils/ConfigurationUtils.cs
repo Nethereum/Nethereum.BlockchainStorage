@@ -6,6 +6,11 @@ namespace Nethereum.BlockchainStore.EFCore
 {
     public static class ConfigurationUtils
     {
+        public static Exception CreateKeyNotFoundException(string key)
+        {
+            return new InvalidOperationException($"Value for configuration key '{key}' is empty - ensure it is set in appsettings.json OR appsettings.{{environment}}.json OR environment variables OR command line args OR user secrets");
+        }
+
         private const string AspnetcoreEnvironment = "ASPNETCORE_ENVIRONMENT";
 
         static string RecurseUntilFound(string directory, string fileToFind)
@@ -62,7 +67,7 @@ namespace Nethereum.BlockchainStore.EFCore
                 .AddJsonFile(baseJsonFile, optional: true, reloadOnChange: false)
                 .AddJsonFile(environmentJsonFile, optional: true, reloadOnChange: false)
                 .AddEnvironmentVariables()
-                .AddCommandLine(args);
+                .AddCommandLine(args ?? new string[]{});
 
             if (environment.Equals("development", StringComparison.InvariantCultureIgnoreCase))
                 builder.AddUserSecrets(userSecretsId);

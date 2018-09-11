@@ -2,16 +2,16 @@
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
-using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class ContractRepository : CosmosRepositoryBase, IContractRepository
+    public class ContractRepository : CosmosRepositoryBase, IEntityContractRepository
     {
         private readonly ConcurrentDictionary<string, CosmosContract> _cachedContracts = new ConcurrentDictionary<string, CosmosContract>();
 
@@ -23,13 +23,13 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
             try
             {
-                var uri = CreateDocumentUri(new CosmosContract {Id = contractAddress});
+                var uri = CreateDocumentUri(contractAddress);
                 var response = await Client.ReadDocumentAsync<CosmosContract>(uri);
                 return response.Document != null;
             }
             catch (DocumentClientException dEx)
             {
-                if (dEx.StatusCode == HttpStatusCode.NotFound)
+                if (dEx.IsNotFound())
                     return false;
 
                 throw;
@@ -55,12 +55,45 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public bool IsCached(string contractAddress)
+        public async Task<Contract> FindByAddressAsync(string contractAddress)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(contractAddress);
+            try
+            {
+                var response = await Client.ReadDocumentAsync<CosmosContract>(uri);
+                return response.Document;
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return null;
+
+                throw;
+            }
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, Transaction transaction)
+        public bool IsCached(string contractAddress)
+        {
+            return _cachedContracts.ContainsKey(contractAddress);
+        }
+
+        public async Task RemoveAsync(Contract contract)
+        {
+            var uri = CreateDocumentUri(contract.Address);
+            try
+            {
+                await Client.DeleteDocumentAsync(uri);
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.StatusCode == HttpStatusCode.NotFound)
+                    return;
+
+                throw;
+            }
+        }
+
+        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction)
         {
             var contract = new CosmosContract { };
             contract.Map(contractAddress, code, transaction);

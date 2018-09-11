@@ -1,27 +1,43 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Microsoft.Extensions.Configuration;
 using Nethereum.BlockchainStore.CosmosCore.Repositories;
 using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using System;
-using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
 {
-    public class CosmosRepositoryFactory : IBlockchainStoreRepositoryFactory
+    public class CosmosRepositoryFactory : IBlockchainStoreEntityRepositoryFactory
     {
-        public static CosmosRepositoryFactory Create(string[] args = null, string userSecretsId = null)
+        public static CosmosRepositoryFactory Create(string[] args = null, string userSecretsId = null, bool deleteAllExistingCollections = false)
         {
             var config = ConfigurationUtils.Build(args, userSecretsId);
        
             var endpointUri = config["CosmosEndpointUri"];
+
+            if(string.IsNullOrEmpty(endpointUri))
+                throw ConfigurationUtils.CreateKeyNotFoundException("CosmosEndpointUri");
+
             var key = config["CosmosAccessKey"];
+
+            if(string.IsNullOrEmpty(endpointUri))
+                throw ConfigurationUtils.CreateKeyNotFoundException("CosmosAccessKey");
+
             var tag = config["CosmosDbTag"];
 
-            return new CosmosRepositoryFactory(endpointUri, key, tag);
+            var factory = new CosmosRepositoryFactory(endpointUri, key, tag);
+
+            var db = factory.CreateDbIfNotExistsAsync().Result;
+
+            if (deleteAllExistingCollections)
+                factory.DeleteAllCollections(db).Wait();
+
+            factory.CreateCollectionsIfNotExist(db).Wait();
+
+            return factory;
         }
 
         private readonly DocumentClient _client;
@@ -33,23 +49,45 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
             _client = new DocumentClient(new Uri(endpointUri), key);
         }
 
-        public async Task EnsureDatabaseAndCollections()
+        public async Task<Database> CreateDbIfNotExistsAsync()
         {
             var db = await _client.CreateDatabaseIfNotExistsAsync(
                 new Database {Id = _databaseName});
 
-            var collectionsToCreate = Enum.GetNames(typeof(CosmosCollectionName));
+            return db;
+        }
 
-            foreach (var collection in collectionsToCreate)
+        public async Task CreateCollectionsIfNotExist(Database db)
+        {
+            foreach (var collection in Enum.GetNames(typeof(CosmosCollectionName)))
             {
                 var docCollection = new DocumentCollection {Id = collection};
-                await _client.CreateDocumentCollectionIfNotExistsAsync(db.Resource.SelfLink, docCollection);
+                await _client.CreateDocumentCollectionIfNotExistsAsync(db.SelfLink, docCollection);
             }
         }
 
-        public IBlockRepository CreateBlockRepository()
+        public async Task DeleteAllCollections(Database db)
         {
-            return new BlockRepository(_client, _databaseName);
+            foreach (var collection in Enum.GetNames(typeof(CosmosCollectionName)))
+            {
+                var uri = UriFactory.CreateDocumentCollectionUri(db.Id, collection);
+
+                try
+                {
+                    var existingCollection = await _client.ReadDocumentCollectionAsync(uri);
+
+                    if (existingCollection.Resource != null)
+                    {
+                        await _client.DeleteDocumentCollectionAsync(uri);
+                    }
+                }
+                catch (DocumentClientException dEx)
+                {
+                    if (dEx.StatusCode == HttpStatusCode.NotFound)
+                        continue;
+
+                }
+            }
         }
 
         public IAddressTransactionRepository CreateAddressTransactionRepository()
@@ -57,24 +95,35 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
             return new AddressTransactionRepository(_client, _databaseName);
         }
 
-        public IContractRepository CreateContractRepository()
+        public IEntityBlockRepository CreateEntityBlockRepository()
+        {
+            return new BlockRepository(_client, _databaseName);
+        }
+
+        public IEntityContractRepository CreateEntityContractRepository()
         {
             return new ContractRepository(_client, _databaseName);
         }
 
-        public ITransactionLogRepository CreateTransactionLogRepository()
+        public IEntityTransactionLogRepository CreateEntityTransactionLogRepository()
         {
             return new TransactionLogRepository(_client, _databaseName);
         }
 
-        public ITransactionVMStackRepository CreateTransactionVmStackRepository()
+        public IEntityTransactionVMStackRepository CreateEntityTransactionVmStackRepository()
         {
             return new TransactionVMStackRepository(_client, _databaseName);
         }
 
-        public ITransactionRepository CreateTransactionRepository()
+        public IEntityTransactionRepository CreateEntityTransactionRepository()
         {
             return new TransactionRepository(_client, _databaseName);
         }
+
+        public IBlockRepository CreateBlockRepository() => CreateEntityBlockRepository();
+        public IContractRepository CreateContractRepository() => CreateEntityContractRepository();
+        public ITransactionLogRepository CreateTransactionLogRepository() => CreateEntityTransactionLogRepository();
+        public ITransactionRepository CreateTransactionRepository() => CreateEntityTransactionRepository();
+        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => CreateEntityTransactionVmStackRepository();
     }
 }

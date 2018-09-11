@@ -6,6 +6,7 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -15,9 +16,21 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        public async Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(new CosmosTransaction(){Hash = hash, BlockNumber = blockNumber.ToString()});
+            try
+            {
+                var response = await Client.ReadDocumentAsync<CosmosTransaction>(uri);
+                return response.Document;
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return null;
+
+                throw;
+            }
         }
 
         public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
