@@ -57,6 +57,23 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
             return db;
         }
 
+        public async Task DeleteDatabase()
+        {
+            var uri = UriFactory.CreateDatabaseUri(_databaseName);
+            try
+            {
+                await _client.DeleteDatabaseAsync(uri);
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return;
+
+                throw;
+            }
+
+        }
+
         public async Task CreateCollectionsIfNotExist(Database db)
         {
             foreach (var collection in Enum.GetNames(typeof(CosmosCollectionName)))
