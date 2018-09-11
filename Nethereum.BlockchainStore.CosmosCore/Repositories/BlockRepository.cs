@@ -1,18 +1,25 @@
 ﻿using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Processors;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class BlockRepository : CosmosRepositoryBase, IBlockRepository
+    public class BlockRepository : CosmosRepositoryBase, IEntityBlockRepository
     {
         public BlockRepository(DocumentClient client, string databaseName) : base(client, databaseName, CosmosCollectionName.Blocks)
         {
+        }
+
+        public Task<BlockchainStore.Entities.Block> GetBlockAsync(HexBigInteger blockNumber)
+        {
+            throw new System.NotImplementedException();
         }
 
         public async Task<long> GetMaxBlockNumber()

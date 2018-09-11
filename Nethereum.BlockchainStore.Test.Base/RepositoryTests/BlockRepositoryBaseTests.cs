@@ -1,26 +1,29 @@
-﻿using System;
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.EFCore.Repositories;
-using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using Nethereum.BlockchainStore.Entities.Mapping;
+using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Threading.Tasks;
 using Xunit;
-using Utils = Nethereum.BlockchainStore.EFCore.Tests.Base.Common.Utils;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.Base.RepositoryTests
+namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
-    public abstract class BlockRepositoryBaseTests: RepositoryTestBase
+    public class BlockRepositoryTests: IRepositoryTest
     {
-        protected BlockRepositoryBaseTests(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
+        private readonly IEntityBlockRepository _repo;
+
+        public BlockRepositoryTests(IEntityBlockRepository repo)
         {
+            this._repo = repo;
         }
 
-        [Fact]
+        public async Task RunAsync()
+        {
+            await UpsertAsync();
+        }
+
         public async Task UpsertAsync()
         {
-            var repo = new BlockRepository(contextFactory);
-            //setup
-
             var source = new BlockWithTransactionHashes
             {
                 Number = new HexBigInteger(DateTime.Now.Ticks),
@@ -38,10 +41,9 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.Base.RepositoryTests
                 TransactionHashes = new []{"0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e5"}
             };
 
-            await repo.UpsertBlockAsync(source);
+            await _repo.UpsertBlockAsync(source);
 
-            var context = contextFactory.CreateContext();
-            var storedBlock = await context.Blocks.FindByBlockNumberAsync(source.Number);
+            var storedBlock = await _repo.GetBlockAsync(source.Number);
             Assert.NotNull(storedBlock);
 
             Assert.Equal(source.Number.Value.ToString(), storedBlock.BlockNumber);

@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainStore.Processing.Console
             var presetName = args?.Length == 0 ? ProcessorConfigurationPresets.Default : args[0];
             var configuration = ProcessorConfigurationPresets.Get(presetName);
             var repositoryFactory = new CloudTableSetup(connectionString, configuration.Schema);
-            return ProcessorConsole.Execute(args, repositoryFactory, configuration).Result;
+            return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }
 }

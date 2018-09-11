@@ -47,9 +47,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CosmosCore", "CosmosCore", "{60286D0D-6F09-4FF0-B51D-C3822CA107A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.CosmosCore", "Nethereum.BlockchainStore.CosmosCore\Nethereum.BlockchainStore.CosmosCore.csproj", "{128CD31E-0D08-401F-BEA0-11D48226D328}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.CosmosCore", "Nethereum.BlockchainStore.CosmosCore\Nethereum.BlockchainStore.CosmosCore.csproj", "{128CD31E-0D08-401F-BEA0-11D48226D328}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.CosmosCore.Console", "Nethereum.BlockchainStore.CosmosCore.Console\Nethereum.BlockchainStore.CosmosCore.Console.csproj", "{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.CosmosCore.Console", "Nethereum.BlockchainStore.CosmosCore.Console\Nethereum.BlockchainStore.CosmosCore.Console.csproj", "{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Test.Base", "Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj", "{3600D4DF-41B5-47A5-AEB5-9F7F42E890CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +135,10 @@ Global
 		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3600D4DF-41B5-47A5-AEB5-9F7F42E890CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3600D4DF-41B5-47A5-AEB5-9F7F42E890CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3600D4DF-41B5-47A5-AEB5-9F7F42E890CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3600D4DF-41B5-47A5-AEB5-9F7F42E890CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

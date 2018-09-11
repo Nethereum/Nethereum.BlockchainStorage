@@ -2,6 +2,7 @@
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
@@ -10,17 +11,25 @@ using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
-    public class BlockRepository : RepositoryBase, IBlockRepository
+    public class BlockRepository : RepositoryBase, IEntityBlockRepository
     {
         public BlockRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
+        }
+
+        public async Task<Block> GetBlockAsync(HexBigInteger blockNumber)
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                return await context.Blocks.FindByBlockNumberAsync(blockNumber).ConfigureAwait(false);
+            }
         }
 
         public async Task<long> GetMaxBlockNumber()
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var max = await context.Blocks.MaxAsync(b => b.BlockNumber);
+                var max = await context.Blocks.MaxAsync(b => b.BlockNumber).ConfigureAwait(false);
                 return string.IsNullOrEmpty(max) ? 0 : long.Parse(max);
             }
         }

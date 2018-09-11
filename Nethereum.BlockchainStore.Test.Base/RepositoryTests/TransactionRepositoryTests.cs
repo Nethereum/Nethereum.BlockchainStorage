@@ -1,29 +1,33 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Nethereum.BlockchainStore.EF.Repositories;
 using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
+using Xunit;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
-using Utils = Nethereum.BlockchainStore.EF.Tests.Base.Common.Utils;
 
-namespace Nethereum.BlockchainStore.EF.Tests.Base.RepositoryTests
+namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
-    public abstract class TransactionRepositoryBaseTests: RepositoryTestBase
+    public class TransactionRepositoryTests: IRepositoryTest
     {
-        protected TransactionRepositoryBaseTests(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
+        static Random _random = new Random();
+        private readonly IEntityTransactionRepository _repo;
+
+        public TransactionRepositoryTests(IEntityTransactionRepository repo)
         {
+            this._repo = repo;
         }
 
-        static Random _random = new Random();
+        public async Task RunAsync()
+        {
+            await UpsertAsync_1();
+            await UpsertAsync_2();
+        }
 
-        [TestMethod]
         public async Task UpsertAsync_1()
         {
-            var repo = new TransactionRepository(contextFactory);
-
             var transaction = CreateDummyTransaction();
             var receipt = CreateDummyReceipt();
 
@@ -34,20 +38,15 @@ namespace Nethereum.BlockchainStore.EF.Tests.Base.RepositoryTests
             var failure = false;
 
             //initial insert
-            await repo.UpsertAsync(transaction, receipt, failure, blockTimestamp, hasVmStack, error);
+            await _repo.UpsertAsync(transaction, receipt, failure, blockTimestamp, hasVmStack, error);
+            var storedTransaction = await _repo.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
 
-            var context = contextFactory.CreateContext();
-            var storedTransaction = await context.Transactions.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
-
-            Assert.IsNotNull(storedTransaction);
+            Assert.NotNull(storedTransaction);
             EnsureCorrectStoredValues(transaction, receipt, blockTimestamp, address, error, null, hasVmStack, storedTransaction);
         }
 
-        [TestMethod]
         public async Task UpsertAsync_2()
         {
-            var repo = new TransactionRepository(contextFactory);
-
             var transaction = CreateDummyTransaction();
             var receipt = CreateDummyReceipt();
 
@@ -59,12 +58,11 @@ namespace Nethereum.BlockchainStore.EF.Tests.Base.RepositoryTests
             var code = "";
             var failure = false;
 
-            await repo.UpsertAsync(newContractAddress, code, transaction, receipt, failure, blockTimestamp);
+            await _repo.UpsertAsync(newContractAddress, code, transaction, receipt, failure, blockTimestamp);
 
-            var context = contextFactory.CreateContext();
-            var storedTransaction = await context.Transactions.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
+            var storedTransaction = await _repo.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
 
-            Assert.IsNotNull(storedTransaction);
+            Assert.NotNull(storedTransaction);
             EnsureCorrectStoredValues(transaction, receipt, blockTimestamp, address, error, newContractAddress, hasVmStack, storedTransaction);
         }
         protected static HexBigInteger CreateBlockTimestamp()
@@ -74,29 +72,29 @@ namespace Nethereum.BlockchainStore.EF.Tests.Base.RepositoryTests
 
         protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, TransactionBase storedTransaction)
         {
-            Assert.AreEqual(transaction.BlockHash, storedTransaction.BlockHash);
-            Assert.AreEqual(transaction.TransactionHash, storedTransaction.Hash);
-            Assert.AreEqual(transaction.From, storedTransaction.AddressFrom);
-            Assert.AreEqual((long)transaction.TransactionIndex.Value, storedTransaction.TransactionIndex);
-            Assert.AreEqual(transaction.Value.Value.ToString(), storedTransaction.Value);
-            Assert.AreEqual(transaction.To, storedTransaction.AddressTo);
-            Assert.AreEqual(newContractAddress, storedTransaction.NewContractAddress);
-            Assert.AreEqual(transaction.BlockNumber.Value.ToString(), storedTransaction.BlockNumber);
-            Assert.AreEqual((long)transaction.Gas.Value, storedTransaction.Gas);
-            Assert.AreEqual((long)transaction.GasPrice.Value, storedTransaction.GasPrice);
-            Assert.AreEqual(transaction.Input, storedTransaction.Input);
-            Assert.AreEqual((long)transaction.Nonce.Value, storedTransaction.Nonce);
-            Assert.IsFalse(storedTransaction.Failed);
-            Assert.AreEqual((long)receipt.GasUsed.Value, storedTransaction.GasUsed);
-            Assert.AreEqual((long)receipt.CumulativeGasUsed.Value, storedTransaction.CumulativeGasUsed);
-            Assert.IsFalse(storedTransaction.HasLog);
-            Assert.AreEqual((long)blockTimestamp.Value, storedTransaction.TimeStamp);
-            Assert.AreEqual(hasVmStack, storedTransaction.HasVmStack);
+            Assert.Equal(transaction.BlockHash, storedTransaction.BlockHash);
+            Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);
+            Assert.Equal(transaction.From, storedTransaction.AddressFrom);
+            Assert.Equal((long)transaction.TransactionIndex.Value, storedTransaction.TransactionIndex);
+            Assert.Equal(transaction.Value.Value.ToString(), storedTransaction.Value);
+            Assert.Equal(transaction.To, storedTransaction.AddressTo);
+            Assert.Equal(newContractAddress, storedTransaction.NewContractAddress);
+            Assert.Equal(transaction.BlockNumber.Value.ToString(), storedTransaction.BlockNumber);
+            Assert.Equal((long)transaction.Gas.Value, storedTransaction.Gas);
+            Assert.Equal((long)transaction.GasPrice.Value, storedTransaction.GasPrice);
+            Assert.Equal(transaction.Input, storedTransaction.Input);
+            Assert.Equal((long)transaction.Nonce.Value, storedTransaction.Nonce);
+            Assert.False(storedTransaction.Failed);
+            Assert.Equal((long)receipt.GasUsed.Value, storedTransaction.GasUsed);
+            Assert.Equal((long)receipt.CumulativeGasUsed.Value, storedTransaction.CumulativeGasUsed);
+            Assert.False(storedTransaction.HasLog);
+            Assert.Equal((long)blockTimestamp.Value, storedTransaction.TimeStamp);
+            Assert.Equal(hasVmStack, storedTransaction.HasVmStack);
 
             if(error == null)
-                Assert.IsTrue(string.IsNullOrEmpty(storedTransaction.Error));
+                Assert.True(string.IsNullOrEmpty(storedTransaction.Error));
             else
-                Assert.AreEqual(error, storedTransaction.Error);
+                Assert.Equal(error, storedTransaction.Error);
         }
 
         protected static TransactionReceipt CreateDummyReceipt()

@@ -1,21 +1,26 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.EFCore.Repositories;
+﻿using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.EFCore.Tests.Base.RepositoryTests
+namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
-    public abstract class TransactionLogRepositoryBaseTests: RepositoryTestBase
+    public class TransactionLogRepositoryTests: IRepositoryTest
     {
-        protected TransactionLogRepositoryBaseTests(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
+        private readonly IEntityTransactionLogRepository _repo;
+
+        public TransactionLogRepositoryTests(IEntityTransactionLogRepository repo)
         {
+            this._repo = repo;
         }
 
-        [Fact]
+        public async Task RunAsync()
+        {
+            await UpsertAsync();
+        }
+
         public async Task UpsertAsync()
         {
-            var transactionLogRepository = new TransactionLogRepository(contextFactory);
-
             var transactionHash = "0x020af76554bd67c6c716a70bf214eaf7284a483dd8597d7761f78fce11c83a0a";
 
             var address = "0xba0ef20713557e1c28e12464e4310dff04c0b3ba";
@@ -39,10 +44,9 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.Base.RepositoryTests
                     ]
                 }}");
 
-            await transactionLogRepository.UpsertAsync(transactionHash, logIndex, log);
+            await _repo.UpsertAsync(transactionHash, logIndex, log);
 
-            var context = contextFactory.CreateContext();
-            var storedLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(transactionHash, logIndex);
+            var storedLog = await _repo.FindByTransactionHashAndLogIndexAsync(transactionHash, logIndex);
 
             Assert.NotNull(storedLog);
 

@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainStore.EFCore
                 .SingleOrDefaultAsync(c => c.Address == contractAddress);
         }
 
-        public static async Task<TransactionLog> FindByTransactionHashAndLogIndex(this DbSet<TransactionLog> transactionLogs, string transactionHash, long logIndex)
+        public static async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(this DbSet<TransactionLog> transactionLogs, string transactionHash, long logIndex)
         {
             return await transactionLogs
                 .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.LogIndex == logIndex);

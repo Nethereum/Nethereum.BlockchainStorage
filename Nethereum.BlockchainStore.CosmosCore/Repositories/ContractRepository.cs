@@ -55,6 +55,11 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
+        public bool IsCached(string contractAddress)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task UpsertAsync(string contractAddress, string code, Transaction transaction)
         {
             var contract = new CosmosContract { };

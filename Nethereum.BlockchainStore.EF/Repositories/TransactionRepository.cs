@@ -7,7 +7,7 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
-    public class TransactionRepository : RepositoryBase, ITransactionRepository
+    public class TransactionRepository : RepositoryBase, IEntityTransactionRepository
     {
         public TransactionRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory){}
 
@@ -63,5 +63,12 @@ namespace Nethereum.BlockchainStore.EF.Repositories
                      new BlockchainStore.Entities.Transaction();
         }
 
+        public async Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                return await context.Transactions.FindByBlockNumberAndHashAsync(blockNumber, hash).ConfigureAwait(false);
+            }
+        }
     }
 }

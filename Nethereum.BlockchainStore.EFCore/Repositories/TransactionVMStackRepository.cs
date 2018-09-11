@@ -6,10 +6,32 @@ using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
 {
-    public class TransactionVMStackRepository : RepositoryBase, ITransactionVMStackRepository
+    public class TransactionVMStackRepository : RepositoryBase, IEntityTransactionVMStackRepository
     {
         public TransactionVMStackRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
+        }
+
+        public async Task<TransactionVmStack> FindByTransactionHashAync(string hash)
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                return await context.TransactionVmStacks.FindByTransactionHashAync(hash).ConfigureAwait(false);
+            }
+        }
+
+        public async Task Remove(TransactionVmStack transactionVmStack)
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                var t = await context.TransactionVmStacks.FindByTransactionHashAync(transactionVmStack.TransactionHash)
+                    .ConfigureAwait(false);
+                if (t != null)
+                {
+                    context.TransactionVmStacks.Remove(t);
+                    await context.SaveChangesAsync().ConfigureAwait(false);
+                }
+            }
         }
 
         public async Task UpsertAsync(string transactionHash, string address, JObject stackTrace)

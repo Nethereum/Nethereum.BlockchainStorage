@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Documents.Client;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
@@ -8,13 +9,18 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class TransactionRepository : CosmosRepositoryBase, ITransactionRepository
+    public class TransactionRepository : CosmosRepositoryBase, IEntityTransactionRepository
     {
         public TransactionRepository(DocumentClient client, string databaseName) : base(client, databaseName, CosmosCollectionName.Transactions)
         {
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
         {
             var tx = new CosmosTransaction();
             tx.Map(transaction);
@@ -31,7 +37,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             await UpsertDocumentAsync(tx);
         }
 
-        public async Task UpsertAsync(Transaction transaction, TransactionReceipt receipt, bool failed, HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
+        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt receipt, bool failed, HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
         {
             var tx = new CosmosTransaction();
             tx.Map(transaction);

@@ -13,4 +13,9 @@ namespace Nethereum.BlockchainStore.Repositories
             bool failed,
             HexBigInteger timeStamp, bool hasVmStack = false, string error = null);
     }
+
+    public interface IEntityTransactionRepository: ITransactionRepository
+    {
+        Task<Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash);
+    }
 }

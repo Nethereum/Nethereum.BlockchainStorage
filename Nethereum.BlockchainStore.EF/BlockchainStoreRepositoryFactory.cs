@@ -4,7 +4,7 @@ using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.EF
 {
-    public class BlockchainStoreRepositoryFactory : IBlockchainStoreRepositoryFactory
+    public class BlockchainStoreRepositoryFactory : IBlockchainStoreEntityRepositoryFactory
     {
         private readonly IBlockchainDbContextFactory _blockchainDbContextFactory;
 
@@ -13,11 +13,18 @@ namespace Nethereum.BlockchainStore.EF
             _blockchainDbContextFactory = contextFactory;
         }
 
-        public IBlockRepository CreateBlockRepository() => new BlockRepository(_blockchainDbContextFactory);
+        public IEntityBlockRepository CreateEntityBlockRepository() => new BlockRepository(_blockchainDbContextFactory);
         public IAddressTransactionRepository CreateAddressTransactionRepository() => new AddressTransactionRepository(_blockchainDbContextFactory);
-        public IContractRepository CreateContractRepository() => new ContractRepository(_blockchainDbContextFactory);
-        public ITransactionLogRepository CreateTransactionLogRepository() => new TransactionLogRepository(_blockchainDbContextFactory);
-        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => new TransactionVMStackRepository(_blockchainDbContextFactory);
-        public ITransactionRepository CreateTransactionRepository() => new TransactionRepository(_blockchainDbContextFactory);
+        public IEntityContractRepository CreateEntityContractRepository() => new ContractRepository(_blockchainDbContextFactory);
+        public IEntityTransactionLogRepository CreateEntityTransactionLogRepository() => new TransactionLogRepository(_blockchainDbContextFactory);
+        public IEntityTransactionVMStackRepository CreateEntityTransactionVmStackRepository() => new TransactionVMStackRepository(_blockchainDbContextFactory);
+        public IEntityTransactionRepository CreateEntityTransactionRepository() => new TransactionRepository(_blockchainDbContextFactory);
+
+        public IBlockRepository CreateBlockRepository() => CreateEntityBlockRepository();
+        public IContractRepository CreateContractRepository() => CreateEntityContractRepository();
+        public ITransactionLogRepository CreateTransactionLogRepository() => CreateEntityTransactionLogRepository();
+        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => CreateEntityTransactionVmStackRepository();
+        public ITransactionRepository CreateTransactionRepository() => CreateEntityTransactionRepository();
+
     }
 }

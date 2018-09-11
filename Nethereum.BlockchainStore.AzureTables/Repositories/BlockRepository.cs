@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Processors;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Wintellect.Azure.Storage.Table;
-using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -47,6 +48,11 @@ namespace Nethereum.BlockchainStore.Repositories
         public Task<long> GetMaxBlockNumber()
         {
             return Task.FromResult((long)0);
+        }
+
+        public Task<Entities.Block> GetBlockAsync(HexBigInteger blockNumber)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

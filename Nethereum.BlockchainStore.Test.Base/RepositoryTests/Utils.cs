@@ -1,13 +1,13 @@
 ﻿using System;
 using Nethereum.Hex.HexTypes;
 
-namespace Nethereum.BlockchainStore.EF.Tests.Base.Common
+namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public static class Utils
     {
         public static HexBigInteger CreateBlockTimestamp()
         {
-            return new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            return new HexBigInteger(DateTimeOffset.Now.ToUnixTimeSeconds());
         }
     }
 }
