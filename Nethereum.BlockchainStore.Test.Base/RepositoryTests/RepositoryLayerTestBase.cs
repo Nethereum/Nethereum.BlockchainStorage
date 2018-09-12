@@ -26,6 +26,12 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
         } 
     
         [Fact]
+        public virtual async Task TransactionRepositoryTests()
+        {
+            await new TransactionRepositoryTests( _repositoryFactory.CreateEntityTransactionRepository()).RunAsync();
+        } 
+
+        [Fact]
         public virtual async Task TransactionLogRepositoryTests()
         {
             await new TransactionLogRepositoryTests( _repositoryFactory.CreateEntityTransactionLogRepository()).RunAsync();

@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 
         public async Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
         {
-            var uri = CreateDocumentUri(new CosmosTransaction(){Hash = hash, BlockNumber = blockNumber.ToString()});
+            var uri = CreateDocumentUri(new CosmosTransaction(){Hash = hash, BlockNumber = blockNumber.Value.ToString()});
             try
             {
                 var response = await Client.ReadDocumentAsync<CosmosTransaction>(uri);

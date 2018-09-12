@@ -55,17 +55,10 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             {
                 using (var context = _contextFactory.CreateContext())
                 {
-
-                    System.Diagnostics.Debug.WriteLine(
-                        $"RAW: Block:{transaction.BlockNumber.Value}, Hash:{transaction.TransactionHash}");
-
                     var tx = await FindOrCreate(transaction, context).ConfigureAwait(false);
 
                     tx.Map(transaction);
                     tx.Map(receipt);
-
-                    System.Diagnostics.Debug.WriteLine(
-                        $"ENTITY: Block:{tx.BlockNumber}, Hash:{tx.Hash}, RowIndex:{tx.RowIndex}");
 
                     tx.Failed = failed;
                     tx.TimeStamp = (long) timeStamp.Value;

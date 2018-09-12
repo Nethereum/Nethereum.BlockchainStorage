@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Repositories;
@@ -24,6 +26,39 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
         {
             await UpsertAsync_1();
             await UpsertAsync_2();
+            await EnsureUpsertWorksConcurrently();
+        }
+
+        public async Task EnsureUpsertWorksConcurrently()
+        {
+            var transactions = new List<Tuple<Transaction, TransactionReceipt>>(5);
+
+            for (var i = 0; i < 5; i++)
+            {
+                var transaction = CreateDummyTransaction(i);
+                var receipt = CreateDummyReceipt(i);
+                transactions.Add(new Tuple<Transaction, TransactionReceipt>(transaction, receipt));
+            }
+
+            var blockTimestamp = CreateBlockTimestamp();
+            var address = "0x9209b29f2094457d3dba62d1953efea58176ba27";
+            var error = (string)null;
+            var hasVmStack = false;
+            var failure = false;
+
+            var upsertTasks = from item in transactions
+                select _repo.UpsertAsync(item.Item1, item.Item2, failure, blockTimestamp, hasVmStack, error);
+
+            await Task.WhenAll(upsertTasks);
+
+            foreach (var item in transactions)
+            {
+                var storedTransaction = await _repo.FindByBlockNumberAndHashAsync(item.Item1.BlockNumber, item.Item1.TransactionHash);
+
+                Assert.NotNull(storedTransaction);
+                EnsureCorrectStoredValues(item.Item1, item.Item2, blockTimestamp, address, error, null, hasVmStack, storedTransaction);
+            }
+
         }
 
         public async Task UpsertAsync_1()
@@ -37,7 +72,6 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             var hasVmStack = false;
             var failure = false;
 
-            //initial insert
             await _repo.UpsertAsync(transaction, receipt, failure, blockTimestamp, hasVmStack, error);
             var storedTransaction = await _repo.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
 
@@ -65,6 +99,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             Assert.NotNull(storedTransaction);
             EnsureCorrectStoredValues(transaction, receipt, blockTimestamp, address, error, newContractAddress, hasVmStack, storedTransaction);
         }
+
+
+
         protected static HexBigInteger CreateBlockTimestamp()
         {
             return Utils.CreateBlockTimestamp();
@@ -97,18 +134,18 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                 Assert.Equal(error, storedTransaction.Error);
         }
 
-        protected static TransactionReceipt CreateDummyReceipt()
+        protected static TransactionReceipt CreateDummyReceipt(int? txIndex = null)
         {
             return new TransactionReceipt
             {
-                TransactionIndex = new HexBigInteger(0),
+                TransactionIndex = new HexBigInteger(txIndex ?? 0),
                 GasUsed = new HexBigInteger(75),
                 CumulativeGasUsed = new HexBigInteger(90),
                 Logs = new JArray()
             };
         }
 
-        protected static Transaction CreateDummyTransaction()
+        protected static Transaction CreateDummyTransaction(int? counter = null)
         {
             return new Transaction
             {
@@ -121,8 +158,8 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                 Input = "0x3f97cddc0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000085368686868686868000000000000000000000000000000000000000000000000",
                 Nonce = new HexBigInteger(4),
                 To = "0xe6de16a66e5cd7270cc36a851818bc092884fe64",
-                TransactionHash = "0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e5",
-                TransactionIndex = new HexBigInteger(0)
+                TransactionHash = "0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e" + counter ?? "5",
+                TransactionIndex = new HexBigInteger(counter ?? 0)
             };
         }
 
