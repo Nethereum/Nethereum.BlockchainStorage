@@ -181,6 +181,10 @@
       <Project>{bc3a7125-edc5-4f02-9f39-b01cc46930b8}</Project>
       <Name>Nethereum.BlockchainStore.AzureTables</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Utils\Nethereum.BlockchainStore.Utils.csproj">
+      <Project>{e96a862f-a912-4fbb-8b73-1e1b0b16d588}</Project>
+      <Name>Nethereum.BlockchainStore.Utils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj">
       <Project>{63ee26bd-d2af-465d-a2c3-749b57c34493}</Project>
       <Name>Nethereum.BlockchainStore</Name>

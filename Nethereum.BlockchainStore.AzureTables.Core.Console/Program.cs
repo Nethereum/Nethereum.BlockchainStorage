@@ -1,9 +1,10 @@
-﻿using Nethereum.BlockchainStore.Bootstrap;
+﻿using System;
+using Nethereum.BlockchainStore.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
 
-namespace Nethereum.BlockchainStore.AzureTables.Console
+namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 {
-    public class Program
+    class Program
     {
         private const string ConnectionStringKey = "AzureStorageConnectionString";
 

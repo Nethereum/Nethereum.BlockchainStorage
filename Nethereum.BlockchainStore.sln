@@ -53,7 +53,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Test.Base", "Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj", "{3600D4DF-41B5-47A5-AEB5-9F7F42E890CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.CosmosCore.Tests", "Nethereum.BlockchainStore.CosmosCore.Tests\Nethereum.BlockchainStore.CosmosCore.Tests.csproj", "{77117972-3913-4E17-B027-EF05EEDBCB8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.CosmosCore.Tests", "Nethereum.BlockchainStore.CosmosCore.Tests\Nethereum.BlockchainStore.CosmosCore.Tests.csproj", "{77117972-3913-4E17-B027-EF05EEDBCB8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables.Core.Console", "Nethereum.BlockchainStore.AzureTables.Core.Console\Nethereum.BlockchainStore.AzureTables.Core.Console.csproj", "{84D7DE38-2D54-4E52-AD79-7101779E1995}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -145,6 +147,10 @@ Global
 		{77117972-3913-4E17-B027-EF05EEDBCB8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77117972-3913-4E17-B027-EF05EEDBCB8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77117972-3913-4E17-B027-EF05EEDBCB8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84D7DE38-2D54-4E52-AD79-7101779E1995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D7DE38-2D54-4E52-AD79-7101779E1995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84D7DE38-2D54-4E52-AD79-7101779E1995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84D7DE38-2D54-4E52-AD79-7101779E1995}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +172,7 @@ Global
 		{128CD31E-0D08-401F-BEA0-11D48226D328} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
 		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
 		{77117972-3913-4E17-B027-EF05EEDBCB8B} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
+		{84D7DE38-2D54-4E52-AD79-7101779E1995} = {94A26589-358C-4D9E-AF7D-BCF4476A804E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B38D1C4-9FAE-4BA6-A315-8451597A4E9C}

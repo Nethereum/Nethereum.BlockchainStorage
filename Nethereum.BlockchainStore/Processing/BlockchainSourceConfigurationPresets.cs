@@ -6,16 +6,10 @@ namespace Nethereum.BlockchainStore.Processing
 {
     public static class BlockchainSourceConfigurationPresets
     {
-        public static string Default { get; } = "dbo";
+        public static string Default { get; } = "localhost";
 
         public static Dictionary<string, BlockchainSourceConfiguration> All = new Dictionary<string, BlockchainSourceConfiguration>
         {
-            {
-                "dbo",
-                new BlockchainSourceConfiguration(
-                    blockchainUrl: "http://localhost:8545", 
-                    name: "dbo"){FromBlock = 0}
-            },
             {
                 "localhost",
                 new BlockchainSourceConfiguration(

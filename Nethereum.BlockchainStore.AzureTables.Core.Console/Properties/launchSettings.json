@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Nethereum.BlockchainStore.AzureTables.Core.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "--ASPNETCORE_ENVIRONMENT development --Blockchain rinkeby"
+    }
+  }
+}
