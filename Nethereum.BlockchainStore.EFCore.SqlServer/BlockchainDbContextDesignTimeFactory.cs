@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
 
         protected virtual string GetConnectionString()
         {
-            var config = ConfigurationUtils.Build(this.GetType());
+            var config = ConfigurationUtils.Build();
             var connectionStringName = $"BlockchainDbStorageDesignTime";
             var connectionString = config.GetConnectionString(connectionStringName);
             return connectionString;

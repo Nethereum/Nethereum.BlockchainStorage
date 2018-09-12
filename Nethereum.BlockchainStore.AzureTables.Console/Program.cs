@@ -1,6 +1,7 @@
 ﻿using Nethereum.BlockchainStore.Bootstrap;
+using Nethereum.BlockchainStore.Processing;
 
-namespace Nethereum.BlockchainStore.Processing.Console
+namespace Nethereum.BlockchainStore.AzureTables.Console
 {
     public class Program
     {

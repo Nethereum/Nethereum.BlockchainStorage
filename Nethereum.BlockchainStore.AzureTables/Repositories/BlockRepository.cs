@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Wintellect.Azure.Storage.Table;
+using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -22,8 +22,6 @@ namespace Nethereum.BlockchainStore.Repositories
             var blockEntity = MapBlock(source, new Block(BlockTable));
             await blockEntity.InsertOrReplaceAsync().ConfigureAwait(false);
         }
-
-        
 
         public Block MapBlock(BlockWithTransactionHashes blockSource, Block blockOutput)
         {

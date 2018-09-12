@@ -27,16 +27,21 @@ namespace Nethereum.BlockchainStore
             return RecurseUntilFound(parent.FullName, fileToFind);
         }
 
-        static string FindAppSettingsDirectory(Type type, string appSettingsFileName)
+        static string FindAppSettingsDirectory(string appSettingsFileName)
         {
-            var assemblyFilePath = type.Assembly.Location;
+            var assemblyFilePath = Directory.GetCurrentDirectory();
             var startingDirectory = Path.GetDirectoryName(assemblyFilePath);
             return RecurseUntilFound(startingDirectory, appSettingsFileName);
         }
 
-        public static IConfigurationRoot Build(Type type, string appSettingsFileName = "appsettings.json")
+        public static void SetEnvironment(string environment)
         {
-            string path = FindAppSettingsDirectory(type, appSettingsFileName);
+            Environment.SetEnvironmentVariable(AspnetcoreEnvironment, environment);
+        }
+
+        public static IConfigurationRoot Build(string appSettingsFileName = "appsettings.json")
+        {
+            string path = FindAppSettingsDirectory(appSettingsFileName);
 
             if(path == null)
                 throw new Exception("Failed to find the appsettings.json file.  Please ensure it is in somewhere within the path of the executable.");
@@ -48,11 +53,6 @@ namespace Nethereum.BlockchainStore
                 .Build();
 
             return config;
-        }
-
-        public static void SetEnvironment(string environment)
-        {
-            Environment.SetEnvironmentVariable(AspnetcoreEnvironment, environment);
         }
 
         public static IConfigurationRoot Build(string[] args, string userSecretsId = null)

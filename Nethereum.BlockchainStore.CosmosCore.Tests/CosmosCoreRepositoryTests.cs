@@ -1,6 +1,5 @@
 using System;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
-using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.Test.Base.RepositoryTests;
 using Xunit;
 
@@ -14,9 +13,8 @@ namespace Nethereum.BlockchainStore.CosmosCore.Tests
         public CosmosFixture()
         {
             ConfigurationUtils.SetEnvironment("development");
-
-            Factory = CosmosRepositoryFactory.Create(CommandLineArgs, UserSecretsId,
-                deleteAllExistingCollections: true);
+            var appConfig = ConfigurationUtils.Build(CommandLineArgs, UserSecretsId);
+            Factory = CosmosRepositoryFactory.Create(appConfig, deleteAllExistingCollections: true);
         }
 
         public CosmosRepositoryFactory Factory { get; }
