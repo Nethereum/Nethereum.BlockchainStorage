@@ -1,42 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace Nethereum.BlockchainStore.Processing
 {
-    public static class ProcessorConfigurationPresets
+    public static class BlockchainSourceConfigurationPresets
     {
         public static string Default { get; } = "dbo";
 
-        public static Dictionary<string, ProcessorConfiguration> All = new Dictionary<string, ProcessorConfiguration>
+        public static Dictionary<string, BlockchainSourceConfiguration> All = new Dictionary<string, BlockchainSourceConfiguration>
         {
             {
                 "dbo",
-                new ProcessorConfiguration(
+                new BlockchainSourceConfiguration(
                     blockchainUrl: "http://localhost:8545", 
-                    dbSchema: "dbo"){FromBlock = 0}
+                    name: "dbo"){FromBlock = 0}
             },
             {
                 "localhost",
-                new ProcessorConfiguration(
+                new BlockchainSourceConfiguration(
                     blockchainUrl: "http://localhost:8545", 
-                    dbSchema: "localhost"){FromBlock = 0}
+                    name: "localhost"){FromBlock = 0}
             },
             {
                 "rinkeby",
-                new ProcessorConfiguration(
+                new BlockchainSourceConfiguration(
                     blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60", 
-                    dbSchema: "rinkeby"){MinimumBlockNumber = 2830143}
+                    name: "rinkeby"){MinimumBlockNumber = 2830143}
             }
         };
 
-        public static ProcessorConfiguration Get(string[] consoleArgs)
+        public static BlockchainSourceConfiguration Get(IConfigurationRoot config)
         {
-            var presetName = consoleArgs?.Length == 0 ? Default : consoleArgs[0];
+            var presetName = config["Blockchain"] ?? Default;
             var configuration = Get(presetName);
             return configuration;
         }
 
-        public static ProcessorConfiguration Get(string name)
+        public static BlockchainSourceConfiguration Get(string name)
         {
             if(!All.ContainsKey(name))
                 throw new Exception($"There is no preset configuration for '{name}'");

@@ -1,21 +1,19 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Nethereum.BlockchainStore.CosmosCore.Repositories;
-using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
 {
     public class CosmosRepositoryFactory : IBlockchainStoreEntityRepositoryFactory
     {
-        public static CosmosRepositoryFactory Create(string[] args = null, string userSecretsId = null, bool deleteAllExistingCollections = false)
-        {
-            var config = ConfigurationUtils.Build(args, userSecretsId);
-       
+        public static CosmosRepositoryFactory Create(IConfigurationRoot config, bool deleteAllExistingCollections = false)
+        {       
             var endpointUri = config["CosmosEndpointUri"];
 
             if(string.IsNullOrEmpty(endpointUri))

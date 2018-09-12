@@ -6,10 +6,11 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Console
     {
         public static int Main(string[] args)
         {
-            var configuration = ProcessorConfigurationPresets.Get(args);
-            var contextFactory = new BlockchainDbContextFactory(configuration.GetConnectionString(), configuration.Schema);
-            var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
-            return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
+            var appConfig = ConfigurationUtils.Build(args, userSecretsId: "Nethereum.BlockchainStorage.EFCore.SqlServer");
+            var blockchainConfig = BlockchainSourceConfigurationPresets.Get(appConfig);
+            var dbContextFactory = SqlServerCoreBlockchainDbContextFactory.Create(appConfig);
+            var repositoryFactory = new BlockchainStoreRepositoryFactory(dbContextFactory);
+            return ProcessorConsole.Execute(repositoryFactory, blockchainConfig).Result;
         }
     }
 }

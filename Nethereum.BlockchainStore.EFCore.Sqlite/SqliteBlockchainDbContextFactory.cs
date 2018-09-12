@@ -1,7 +1,15 @@
-﻿namespace Nethereum.BlockchainStore.EFCore.Sqlite
+﻿using Microsoft.Extensions.Configuration;
+
+namespace Nethereum.BlockchainStore.EFCore.Sqlite
 {
     public class SqliteBlockchainDbContextFactory : IBlockchainDbContextFactory
     {
+        public static SqliteBlockchainDbContextFactory Create(IConfigurationRoot config)
+        {
+            var connectionString = config.GetBlockchainStorageConnectionString();
+            return new SqliteBlockchainDbContextFactory(connectionString);
+        }
+
         private readonly string _connectionString;
         private readonly object _lock = new object();
         private bool _dbExists = false;
@@ -18,7 +26,7 @@
             {
                 lock (_lock)
                 {
-                    if (_dbExists)
+                    if (!_dbExists)
                     {
                         context.Database.EnsureCreated();
                         _dbExists = true;

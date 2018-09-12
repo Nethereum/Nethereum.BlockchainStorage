@@ -8,9 +8,9 @@ namespace Nethereum.BlockchainStore.Processing.Console
 
         public static int Main(string[] args)
         {
-            var presetName = args?.Length == 0 ? ProcessorConfigurationPresets.Default : args[0];
-            var configuration = ProcessorConfigurationPresets.Get(presetName);
-            var repositoryFactory = new CloudTableSetup(connectionString, configuration.Schema);
+            var presetName = args?.Length == 0 ? BlockchainSourceConfigurationPresets.Default : args[0];
+            var configuration = BlockchainSourceConfigurationPresets.Get(presetName);
+            var repositoryFactory = new CloudTableSetup(connectionString, configuration.Name);
             return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }

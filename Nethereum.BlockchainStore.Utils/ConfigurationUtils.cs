@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Nethereum.BlockchainStore.EFCore
+namespace Nethereum.BlockchainStore
 {
     public static class ConfigurationUtils
     {
@@ -55,9 +55,14 @@ namespace Nethereum.BlockchainStore.EFCore
             Environment.SetEnvironmentVariable(AspnetcoreEnvironment, environment);
         }
 
-        public static IConfigurationRoot Build(string[] args, string userSecretsId)
+        public static IConfigurationRoot Build(string[] args, string userSecretsId = null)
         {
-            var environment = Environment.GetEnvironmentVariable(AspnetcoreEnvironment) ?? string.Empty;
+            var environmentBuilder = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .AddCommandLine(args ?? new string[] { })
+                .Build();
+
+            var environment = environmentBuilder[AspnetcoreEnvironment] ?? string.Empty;
 
             var baseJsonFile = "appsettings.json";
             var environmentJsonFile = $"appsettings.{environment}.json";
@@ -69,7 +74,7 @@ namespace Nethereum.BlockchainStore.EFCore
                 .AddEnvironmentVariables()
                 .AddCommandLine(args ?? new string[]{});
 
-            if (environment.Equals("development", StringComparison.InvariantCultureIgnoreCase))
+            if (userSecretsId != null && environment.Equals("development", StringComparison.InvariantCultureIgnoreCase))
                 builder.AddUserSecrets(userSecretsId);
 
             return builder.Build();

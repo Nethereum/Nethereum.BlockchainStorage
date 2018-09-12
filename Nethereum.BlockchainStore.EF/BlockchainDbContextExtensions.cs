@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.EF
             where T: TransactionBase
         {
             var blockNumberString = blockNumber.Value.ToString();
-            return await transactions
+            return await transactions.AsNoTracking()
                 .SingleOrDefaultAsync(t => t.BlockNumber == blockNumberString &&
                                            t.Hash == transactionHash);
         }

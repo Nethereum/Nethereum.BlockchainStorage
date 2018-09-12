@@ -1,6 +1,5 @@
 ﻿using System;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
-using Nethereum.BlockchainStore.EFCore;
 using Nethereum.BlockchainStore.Processing;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Console
@@ -9,13 +8,9 @@ namespace Nethereum.BlockchainStore.CosmosCore.Console
     {
         static int Main(string[] args)
         {
-            ConfigurationUtils.SetEnvironment("development");
-            var configuration = ProcessorConfigurationPresets.Get(args);
-
-            var repositoryFactory = CosmosRepositoryFactory.Create(
-                args, 
-                "Nethereum.BlockchainStore.CosmosCore.UserSecrets");
-
+            var appConfig = ConfigurationUtils.Build(args, userSecretsId: "Nethereum.BlockchainStore.CosmosCore.UserSecrets");
+            var configuration = BlockchainSourceConfigurationPresets.Get(appConfig);
+            var repositoryFactory = CosmosRepositoryFactory.Create(appConfig);
             return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }
