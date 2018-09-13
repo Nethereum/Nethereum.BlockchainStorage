@@ -12,9 +12,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
     {
         public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
 
-        public async Task<AddressTransaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string transactionHash)
+        public async Task<AddressTransaction> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
         {
-            var operation = TableOperation.Retrieve<AddressTransaction>(blockNumber.Value.ToString(), transactionHash);
+            var partitionKey = addrees.ToPartitionKey();
+            var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);
+            var operation = TableOperation.Retrieve<AddressTransaction>(partitionKey, rowKey);
             var results = await Table.ExecuteAsync(operation);
             return results.Result as AddressTransaction;
         }
@@ -30,7 +32,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         {
             var entity = AddressTransaction.CreateAddressTransaction(transaction,
                 transactionReceipt,
-                failedCreatingContract, blockTimestamp, null, null, false, newContractAddress);
+                failedCreatingContract, blockTimestamp, address, error, hasVmStack, newContractAddress);
 
             var result = await UpsertAsync(entity);
         }

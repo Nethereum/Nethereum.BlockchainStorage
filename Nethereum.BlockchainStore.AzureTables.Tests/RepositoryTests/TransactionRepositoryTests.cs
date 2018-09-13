@@ -112,7 +112,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
             Assert.Equal((long)transaction.TransactionIndex.Value, storedTransaction.TransactionIndex);
             Assert.Equal(transaction.Value.Value.ToString(), storedTransaction.Value);
             Assert.Equal(transaction.To, storedTransaction.AddressTo);
-            Assert.Equal(newContractAddress, storedTransaction.NewContractAddress);
+            Assert.Equal(newContractAddress ?? string.Empty, storedTransaction.NewContractAddress);
             Assert.Equal(transaction.BlockNumber.Value.ToString(), storedTransaction.BlockNumber);
             Assert.Equal((long)transaction.Gas.Value, storedTransaction.Gas);
             Assert.Equal((long)transaction.GasPrice.Value, storedTransaction.GasPrice);

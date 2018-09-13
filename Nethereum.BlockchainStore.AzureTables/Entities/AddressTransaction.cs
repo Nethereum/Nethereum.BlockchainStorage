@@ -6,6 +6,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public class AddressTransaction : TransactionBase
     {
+        public AddressTransaction()
+        {
+                
+        }
+
         public AddressTransaction(string address)
         {
             Address = address;
@@ -45,8 +50,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 
         public void SetRowKey(HexBigInteger blockNumber, string transactionHash)
         {
-            RowKey = WebUtility.HtmlEncode(blockNumber.Value.ToString()) + "_" +
-                    WebUtility.HtmlEncode(transactionHash.ToLowerInvariant());
+            RowKey = CreateRowKey(blockNumber, transactionHash);
+        }
+
+        public static string CreateRowKey(HexBigInteger blockNumber, string transactionHash)
+        {
+            return  blockNumber.Value.ToString().ToRowKey() + "_" +
+                    transactionHash.ToRowKey();
         }
     }
 }

@@ -18,17 +18,17 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public string Value { get; set; } = string.Empty;
         public abstract string AddressTo { get; set; }
         public abstract string BlockNumber { get; set; }
-        public long Gas { get; protected set; } = zero;
-        public long GasPrice { get; protected set; } = zero;
-        public string Input { get; protected set; } = string.Empty;
+        public long Gas { get; set; } = zero;
+        public long GasPrice { get; set; } = zero;
+        public string Input { get; set; } = string.Empty;
         public long Nonce { get; set; } = zero;
         public bool Failed { get; set; } = false;
-        public string ReceiptHash { get; protected set; } = string.Empty;
-        public long GasUsed { get; protected set; } = zero;
-        public long CumulativeGasUsed{ get; protected set; } = zero;
-        public bool HasLog { get; protected set; } = false;
-        public string Error{ get; protected set; } = string.Empty;
-        public bool HasVmStack{ get; protected set; } = false;
+        public string ReceiptHash { get; set; } = string.Empty;
+        public long GasUsed { get; set; } = zero;
+        public long CumulativeGasUsed{ get; set; } = zero;
+        public bool HasLog { get; set; } = false;
+        public string Error{ get; set; } = string.Empty;
+        public bool HasVmStack{ get; set; } = false;
         public string NewContractAddress{ get; set; } = string.Empty;
         public bool FailedCreateContract{ get; set; } = false;
 
@@ -52,7 +52,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             transaction.SetBlockNumber(transactionSource.BlockNumber);
             transaction.SetGas(transactionSource.Gas);
             transaction.SetGasPrice(transactionSource.GasPrice);
-            transaction.Input = transaction.Input.RestrictToAzureTableStorageLimit(valIfTooLong: string.Empty);
+            transaction.Input = transactionSource.Input.RestrictToAzureTableStorageLimit(valIfTooLong: string.Empty);
             transaction.Nonce = (long) transactionSource.Nonce.Value;
             transaction.Failed = failed;
             transaction.SetGasUsed(transactionReceipt.GasUsed);

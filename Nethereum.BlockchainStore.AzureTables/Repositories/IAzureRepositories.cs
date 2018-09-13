@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 
     public interface IAzureTableAddressTransactionRepository : IAddressTransactionRepository
     {
-        Task<AddressTransaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string transactionHash);
+        Task<AddressTransaction> FindByAddressBlockNumberAndHashAsync(string address, HexBigInteger blockNumber, string transactionHash);
     }
 
     public interface IAzureTableTransactionRepository : ITransactionRepository
@@ -37,7 +37,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 
     public interface IAzureTableTransactionVMStackRepository : ITransactionVMStackRepository
     {
-        Task<TransactionVmStack> FindByTransactionHashAync(string transactionHash);
+        Task<TransactionVmStack> FindByAddressAndTransactionHashAync(string address, string transactionHash);
     }
 
     public interface IBlockchainStoreAzureTablesRepositoryFactory : IBlockchainStoreRepositoryFactory

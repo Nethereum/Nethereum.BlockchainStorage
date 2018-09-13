@@ -11,9 +11,9 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         {
         }
 
-        public async Task<TransactionVmStack> FindByTransactionHashAync(string transactionHash)
+        public async Task<TransactionVmStack> FindByAddressAndTransactionHashAync(string address, string transactionHash)
         {
-            var operation = TableOperation.Retrieve<Entities.TransactionVmStack>(transactionHash, string.Empty);
+            var operation = TableOperation.Retrieve<Entities.TransactionVmStack>(address.ToPartitionKey(), transactionHash.ToRowKey());
             var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
             return results.Result as Entities.TransactionVmStack;
         }

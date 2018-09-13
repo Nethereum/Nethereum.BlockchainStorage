@@ -5,6 +5,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public class TransactionLog : TableEntity
     {
+        public TransactionLog()
+        {
+        }
+
         public TransactionLog(string hash, long logIndex)
         {
             TransactionHash = hash;

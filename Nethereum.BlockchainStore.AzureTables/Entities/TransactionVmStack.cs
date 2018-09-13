@@ -6,6 +6,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public class TransactionVmStack : TableEntity
     {
+        public TransactionVmStack()
+        {
+                
+        }
+
         public TransactionVmStack(string address, string hash)
         {
             Address = address;
@@ -74,7 +79,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
                 var val = property.GetValue(this) as string;
                 if (!string.IsNullOrEmpty(val))
                 {
-                    jarray.Add(JArray.Parse(val));
+                    foreach (var item in JArray.Parse(val))
+                    {
+                        jarray.Add(item);
+                    }
                 }
             }
 

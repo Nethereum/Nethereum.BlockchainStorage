@@ -37,6 +37,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
                 TransactionHashes = new []{"0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e5"}
             };
 
+            Assert.Equal(0, await _repo.GetMaxBlockNumber());
+
             await _repo.UpsertBlockAsync(source);
 
             var storedBlock = await _repo.GetBlockAsync(source.Number);
@@ -55,6 +57,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
             Assert.Equal(source.Miner, storedBlock.Miner);
             Assert.Equal(new HexBigInteger(source.Nonce).ToLong(), long.Parse(storedBlock.Nonce));
             Assert.Equal(source.TransactionHashes.Length, storedBlock.TransactionCount);
+
+            Assert.Equal((long) source.Number.Value, await _repo.GetMaxBlockNumber());
         }
     }
 }

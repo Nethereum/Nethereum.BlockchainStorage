@@ -5,6 +5,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public class Transaction : TransactionBase
     {
+        public Transaction()
+        {
+                
+        }
 
         public Transaction(string blockNumber, string hash)
         {

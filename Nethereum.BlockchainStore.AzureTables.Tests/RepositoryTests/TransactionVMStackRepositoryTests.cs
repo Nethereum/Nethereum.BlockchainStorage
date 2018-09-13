@@ -24,7 +24,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
 
             await _repo.UpsertAsync(transactionHash, address, stackTrace);
 
-            var storedRow = await _repo.FindByTransactionHashAync(transactionHash);
+            var storedRow = await _repo.FindByAddressAndTransactionHashAync(address, transactionHash);
 
             Assert.NotNull(storedRow);
 
