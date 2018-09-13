@@ -8,7 +8,7 @@ using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class ContractRepository : AzureTableRepository<Contract>, IContractRepository
+    public class ContractRepository : AzureTableRepository<Contract>, IAzureTableContractRepository
     {
         private static readonly ConcurrentDictionary<string, Contract> CachedContracts = new ConcurrentDictionary<string, Contract>();
 
@@ -76,6 +76,16 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             while (queryResult.ContinuationToken != null);
 
             return contracts;
+        }
+
+        public async Task<Contract> FindByAddressAsync(string contractAddress)
+        {
+            return await FindAsync(contractAddress).ConfigureAwait(false);
+        }
+
+        public bool IsCached(string contractAddress)
+        {
+            return CachedContracts.ContainsKey(contractAddress);
         }
     }
 }

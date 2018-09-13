@@ -8,9 +8,16 @@ using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAddressTransactionRepository
+    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAzureTableAddressTransactionRepository
     {
         public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
+
+        public async Task<AddressTransaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string transactionHash)
+        {
+            var operation = TableOperation.Retrieve<AddressTransaction>(blockNumber.Value.ToString(), transactionHash);
+            var results = await Table.ExecuteAsync(operation);
+            return results.Result as AddressTransaction;
+        }
 
         public async Task UpsertAsync(Transaction transaction,
             TransactionReceipt transactionReceipt,

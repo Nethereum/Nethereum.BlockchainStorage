@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
@@ -7,10 +8,17 @@ using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class TransactionRepository : AzureTableRepository<Entities.Transaction>, ITransactionRepository
+    public class TransactionRepository : AzureTableRepository<Entities.Transaction>, IAzureTableTransactionRepository
     {
         public TransactionRepository(CloudTable table) : base(table)
         {
+        }
+
+        public async Task<Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string transactionHash)
+        {
+            var operation = TableOperation.Retrieve<Entities.Transaction>(blockNumber.Value.ToString().ToPartitionKey(), transactionHash.ToRowKey());
+            var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
+            return results.Result as Entities.Transaction;
         }
 
         public async Task UpsertAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)

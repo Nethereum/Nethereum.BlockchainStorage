@@ -64,6 +64,23 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             return transactionVmStack;
         }
 
+        public JArray GetStructLogs()
+        {
+            var jarray = new JArray();
+
+            for(int i = 1; i < 26; i++)
+            {
+                var property = GetType().GetProperty("StructLogs" + i);
+                var val = property.GetValue(this) as string;
+                if (!string.IsNullOrEmpty(val))
+                {
+                    jarray.Add(JArray.Parse(val));
+                }
+            }
+
+            return jarray;
+        }
+
         public void InitStruct(JArray structLogs)
         {
             var currentProperty = 1;

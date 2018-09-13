@@ -10,7 +10,7 @@ using Block = Nethereum.BlockchainStore.AzureTables.Entities.Block;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class BlockRepository : AzureTableRepository<Block>, IBlockRepository
+    public class BlockRepository : AzureTableRepository<Block>, IAzureTableBlockRepository
     {
         private bool _maxBlockInitialised = false;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
