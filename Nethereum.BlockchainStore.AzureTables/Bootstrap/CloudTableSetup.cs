@@ -120,6 +120,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
         {
             var options = new TableRequestOptions { };
             var operationContext = new OperationContext() { };
+            await GetCountersTable().DeleteIfExistsAsync(options, operationContext);
             await GetContractsTable().DeleteIfExistsAsync(options, operationContext);
             await GetAddressTransactionsTable().DeleteIfExistsAsync(options, operationContext);
             await GetBlocksTable().DeleteIfExistsAsync(options, operationContext);
