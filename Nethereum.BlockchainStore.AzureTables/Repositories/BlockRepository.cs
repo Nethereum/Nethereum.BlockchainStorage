@@ -31,18 +31,22 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 
                 var blockEntity = MapBlock(source, new Block(source.Number.Value.ToString()));
                 await UpsertAsync(blockEntity);
-
-                var blockNumber = long.Parse(blockEntity.BlockNumber);
-
-                if(blockNumber > _maxBlockCounter.Value)
-                {
-                    _maxBlockCounter.Value = blockNumber;
-                    await UpsertAsync(_maxBlockCounter, _countersTable).ConfigureAwait(false);
-                }
+                await UpdateMaxBlockNumber(blockEntity);
             }
             finally
             {
                 _lock.Release();
+            }
+        }
+
+        private async Task UpdateMaxBlockNumber(Block blockEntity)
+        {
+            var blockNumber = long.Parse(blockEntity.BlockNumber);
+
+            if (blockNumber > _maxBlockCounter.Value)
+            {
+                _maxBlockCounter.Value = blockNumber;
+                await UpsertAsync(_maxBlockCounter, _countersTable).ConfigureAwait(false);
             }
         }
 
