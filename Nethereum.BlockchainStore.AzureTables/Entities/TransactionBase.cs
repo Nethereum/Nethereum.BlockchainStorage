@@ -1,134 +1,36 @@
 using System.Numerics;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect.Azure.Storage.Table;
 
-namespace Nethereum.BlockchainStore.Entities
+namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public abstract class TransactionBase : TableEntityBase
+    public abstract class TransactionBase : TableEntity
     {
         private static readonly long minusOne = (long) -1;
         private static readonly long zero = (long) 0;
 
-        public TransactionBase(AzureTable azureTable, DynamicTableEntity dynamicTableEntity = null)
-            : base(azureTable, dynamicTableEntity)
-        {
-        }
-
-        public string BlockHash
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
+        public string BlockHash { get; set; } = string.Empty;
         public abstract string Hash { get; set; }
-
-        public string AddressFrom
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public long TimeStamp
-        {
-            get { return Get(minusOne); }
-            set { Set(value); }
-        }
-
-        public long TransactionIndex
-        {
-            get { return Get(zero); }
-            set { Set(value); }
-        }
-
-        public string Value
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
+        public string AddressFrom { get; set; } = string.Empty;
+        public long TimeStamp { get; set; } = minusOne;
+        public long TransactionIndex { get; set; } = zero;
+        public string Value { get; set; } = string.Empty;
         public abstract string AddressTo { get; set; }
         public abstract string BlockNumber { get; set; }
-
-        public long Gas
-        {
-            get { return Get(zero); }
-            protected set { Set(value); }
-        }
-
-        public long GasPrice
-        {
-            get { return Get(zero); }
-            protected set { Set(value); }
-        }
-
-        public string Input
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public long Nonce
-        {
-            get { return Get(zero); }
-            set { Set(value); }
-        }
-
-        public bool Failed
-        {
-            get { return Get(false); }
-            set { Set(value); }
-        }
-
-        public string ReceiptHash
-        {
-            get { return Get(string.Empty); }
-            protected set { Set(value); }
-        }
-
-        public long GasUsed
-        {
-            get { return Get(zero); }
-            protected set { Set(value); }
-        }
-
-        public long CumulativeGasUsed
-        {
-            get { return Get(zero); }
-            protected set { Set(value); }
-        }
-
-        public bool HasLog
-        {
-            get { return Get(false); }
-            protected set { Set(value); }
-        }
-
-        public string Error
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public bool HasVmStack
-        {
-            get { return Get(false); }
-            set { Set(value); }
-        }
-
-        public string NewContractAddress
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public bool FailedCreateContract
-        {
-            get { return Get(false); }
-            set { Set(value); }
-        }
+        public long Gas { get; protected set; } = zero;
+        public long GasPrice { get; protected set; } = zero;
+        public string Input { get; protected set; } = string.Empty;
+        public long Nonce { get; set; } = zero;
+        public bool Failed { get; set; } = false;
+        public string ReceiptHash { get; protected set; } = string.Empty;
+        public long GasUsed { get; protected set; } = zero;
+        public long CumulativeGasUsed{ get; protected set; } = zero;
+        public bool HasLog { get; protected set; } = false;
+        public string Error{ get; protected set; } = string.Empty;
+        public bool HasVmStack{ get; protected set; } = false;
+        public string NewContractAddress{ get; set; } = string.Empty;
+        public bool FailedCreateContract{ get; set; } = false;
 
         public static TransactionBase CreateTransaction(
             TransactionBase transaction,

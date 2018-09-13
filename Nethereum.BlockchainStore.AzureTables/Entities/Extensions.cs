@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
@@ -22,6 +23,16 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public static string RestrictToAzureTableStorageLimit(this string val, string valIfTooLong = "")
         {
             return val.RestrictToAzureTableStorageLimit((v) => valIfTooLong);
+        }
+
+        public static string ToPartitionKey(this string val)
+        {
+            return val == null ? string.Empty : WebUtility.HtmlEncode(val.ToLowerInvariant());
+        }
+
+        public static string ToRowKey(this string val)
+        {
+            return val.ToPartitionKey();
         }
     }
 }

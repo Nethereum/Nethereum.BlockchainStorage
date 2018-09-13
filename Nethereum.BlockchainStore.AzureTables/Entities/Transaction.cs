@@ -1,45 +1,32 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.Hex.HexTypes;
+﻿using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect;
-using Wintellect.Azure.Storage.Table;
 
-namespace Nethereum.BlockchainStore.Entities
+namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public class Transaction : TransactionBase
     {
-        public Transaction(AzureTable azureTable, DynamicTableEntity dynamicTableEntity = null)
-            : base(azureTable, dynamicTableEntity)
+
+        public Transaction(string blockNumber, string hash)
         {
+            BlockNumber = blockNumber;
+            Hash = hash;
         }
 
         public override string Hash
         {
-            get { return Get(string.Empty); }
-            set
-            {
-                RowKey = value.ToLowerInvariant().HtmlEncode();
-                Set(value);
-            }
+            get => RowKey;
+            set => RowKey = value.ToRowKey();
         }
 
         public override string BlockNumber
         {
-            get { return Get(string.Empty); }
-            set
-            {
-                PartitionKey = value.ToLowerInvariant().HtmlEncode();
-                Set(value);
-            }
+            get => PartitionKey;
+            set => PartitionKey = value.ToPartitionKey();
         }
 
-        public override string AddressTo
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
+        public override string AddressTo { get; set; } = string.Empty;
 
-        public static Transaction CreateTransaction(AzureTable transactionTable,
+        public static Transaction CreateTransaction(
             RPC.Eth.DTOs.Transaction transactionSource,
             TransactionReceipt transactionReceipt,
             bool failed,
@@ -47,12 +34,12 @@ namespace Nethereum.BlockchainStore.Entities
         {
             return
                 (Transaction)
-                CreateTransaction(new Transaction(transactionTable), transactionSource, transactionReceipt,
+                CreateTransaction(new Transaction(transactionSource.BlockNumber.Value.ToString(), transactionSource.TransactionHash), transactionSource, transactionReceipt,
                     failed, timeStamp, error, hasVmStack);
         }
 
 
-        public static Transaction CreateTransaction(AzureTable transactionTable,
+        public static Transaction CreateTransaction(
             RPC.Eth.DTOs.Transaction transactionSource,
             TransactionReceipt transactionReceipt,
             bool failed,
@@ -60,7 +47,7 @@ namespace Nethereum.BlockchainStore.Entities
         {
             return
                 (Transaction)
-                CreateTransaction(new Transaction(transactionTable), transactionSource, transactionReceipt,
+                CreateTransaction(new Transaction(transactionSource.BlockNumber.Value.ToString(), transactionSource.TransactionHash), transactionSource, transactionReceipt,
                     failed, timeStamp, null, false, newContractAddress);
         }
     }

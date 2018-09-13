@@ -3,24 +3,21 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect.Azure.Storage.Table;
-using Block = Nethereum.BlockchainStore.Entities.Block;
+using Block = Nethereum.BlockchainStore.AzureTables.Entities.Block;
 
-namespace Nethereum.BlockchainStore.Repositories
+
+namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class BlockRepository : IBlockRepository
+    public class BlockRepository : AzureTableRepository<Block>, IBlockRepository
     {
-        protected AzureTable BlockTable { get; set; }
-
-        public BlockRepository(CloudTable blockCloudTable)
+        public BlockRepository(CloudTable table) : base(table)
         {
-            BlockTable = new AzureTable(blockCloudTable);
         }
 
         public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
         {
-            var blockEntity = MapBlock(source, new Block(BlockTable));
-            await blockEntity.InsertOrReplaceAsync().ConfigureAwait(false);
+            var blockEntity = MapBlock(source, new Block(source.Number.Value.ToString()));
+            await UpsertAsync(blockEntity);
         }
 
         public Block MapBlock(BlockWithTransactionHashes blockSource, Block blockOutput)
@@ -48,9 +45,13 @@ namespace Nethereum.BlockchainStore.Repositories
             return Task.FromResult((long)0);
         }
 
-        public Task<Entities.Block> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<Block> GetBlockAsync(HexBigInteger blockNumber)
         {
-            throw new System.NotImplementedException();
+            var operation = TableOperation.Retrieve<Block>(blockNumber.Value.ToString(), "");
+            var results = await _table.ExecuteAsync(operation);
+            return results.Result as Block;
         }
+
+
     }
 }

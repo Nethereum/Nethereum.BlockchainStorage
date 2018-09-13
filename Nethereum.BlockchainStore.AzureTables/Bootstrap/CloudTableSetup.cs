@@ -1,11 +1,11 @@
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainStore.AzureTables.Repositories;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 
-namespace Nethereum.BlockchainStore.Bootstrap
+namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 {
     public class CloudTableSetup: IBlockchainStoreRepositoryFactory
     {

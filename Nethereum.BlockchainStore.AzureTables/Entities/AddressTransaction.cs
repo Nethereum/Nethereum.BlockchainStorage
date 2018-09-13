@@ -1,48 +1,30 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.Hex.HexTypes;
+﻿using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect;
-using Wintellect.Azure.Storage.Table;
+using System.Net;
 
-namespace Nethereum.BlockchainStore.Entities
+namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public class AddressTransaction : TransactionBase
     {
-        public AddressTransaction(AzureTable azureTable, DynamicTableEntity dynamicTableEntity = null)
-            : base(azureTable, dynamicTableEntity)
+        public AddressTransaction(string address)
         {
+            Address = address;
         }
 
-        public override string Hash
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
+        public override string Hash { get; set; } = string.Empty;
 
         public string Address
         {
-            get { return Get(string.Empty); }
-            set
-            {
-                PartitionKey = value.ToLowerInvariant().HtmlEncode();
-                Set(value);
-            }
+            get => PartitionKey;
+            set => PartitionKey = value.ToPartitionKey();
         }
 
-        public override string AddressTo
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
+        public override string AddressTo { get; set; } = string.Empty;
 
         //Store as a string so it can be parsed as a BigInteger
-        public override string BlockNumber
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
+        public override string BlockNumber { get; set; } = string.Empty;
 
-        public static AddressTransaction CreateAddressTransaction(AzureTable addressTransactionTable,
+        public static AddressTransaction CreateAddressTransaction(
             RPC.Eth.DTOs.Transaction transactionSource,
             TransactionReceipt transactionReceipt,
             bool failed,
@@ -53,7 +35,7 @@ namespace Nethereum.BlockchainStore.Entities
             string newContractAddress = null
         )
         {
-            var transaction = new AddressTransaction(addressTransactionTable) {Address = address ?? string.Empty};
+            var transaction = new AddressTransaction(address ?? string.Empty);
             transaction.SetRowKey(transactionSource.BlockNumber, transactionSource.TransactionHash);
             return
                 (AddressTransaction)
@@ -63,8 +45,8 @@ namespace Nethereum.BlockchainStore.Entities
 
         public void SetRowKey(HexBigInteger blockNumber, string transactionHash)
         {
-            RowKey = blockNumber.Value.ToString().ToLowerInvariant().HtmlEncode() + "_" +
-                     transactionHash.ToLowerInvariant().HtmlEncode();
+            RowKey = WebUtility.HtmlEncode(blockNumber.Value.ToString()) + "_" +
+                    WebUtility.HtmlEncode(transactionHash.ToLowerInvariant());
         }
     }
 }

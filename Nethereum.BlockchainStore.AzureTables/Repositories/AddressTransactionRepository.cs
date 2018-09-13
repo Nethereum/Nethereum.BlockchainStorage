@@ -1,21 +1,16 @@
-using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.AzureTables.Entities;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect.Azure.Storage.Table;
+using System.Threading.Tasks;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class AddressTransactionRepository : IAddressTransactionRepository
+    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAddressTransactionRepository
     {
-        protected AzureTable Table { get; set; }
-
-        public AddressTransactionRepository(CloudTable cloudTable)
-        {
-            Table = new AzureTable(cloudTable);
-        }
+        public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
 
         public async Task UpsertAsync(Transaction transaction,
             TransactionReceipt transactionReceipt,
@@ -26,10 +21,11 @@ namespace Nethereum.BlockchainStore.Repositories
             bool hasVmStack = false,
             string newContractAddress = null)
         {
-            var entity = AddressTransaction.CreateAddressTransaction(Table, transaction,
+            var entity = AddressTransaction.CreateAddressTransaction(transaction,
                 transactionReceipt,
                 failedCreatingContract, blockTimestamp, null, null, false, newContractAddress);
-            await entity.InsertOrReplaceAsync().ConfigureAwait(false);
+
+            var result = await UpsertAsync(entity);
         }
     }
 }
