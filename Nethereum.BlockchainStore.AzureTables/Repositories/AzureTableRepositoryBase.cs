@@ -5,24 +5,29 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
     public class AzureTableRepository<TEntity> where TEntity: ITableEntity
     {
-        protected readonly CloudTable _table;
+        protected readonly CloudTable Table;
 
         public AzureTableRepository(CloudTable table)
         {
-            this._table = table;
+            this.Table = table;
         }
 
         public async Task<object> UpsertAsync(ITableEntity entity)
         {
+            return await UpsertAsync(entity, Table);
+        }
+
+        public async Task<object> UpsertAsync(ITableEntity entity, CloudTable table)
+        {
             var upsertOperation = TableOperation.InsertOrReplace(entity);
-            var result = await _table.ExecuteAsync(upsertOperation).ConfigureAwait(false);
+            var result = await table.ExecuteAsync(upsertOperation).ConfigureAwait(false);
             return result.Result;
         }
 
         public async Task<object> DeleteAsync(ITableEntity entity)
         {
             var deleteOperation = TableOperation.Delete(entity);
-            var result = await _table.ExecuteAsync(deleteOperation).ConfigureAwait(false);
+            var result = await Table.ExecuteAsync(deleteOperation).ConfigureAwait(false);
             return result.Result;
         }
 

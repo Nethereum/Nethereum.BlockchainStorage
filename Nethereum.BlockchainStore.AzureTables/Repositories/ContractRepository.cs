@@ -24,7 +24,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             }
 
             var operation = TableOperation.Retrieve<Contract>(contractAddress, "");
-            var results = await _table.ExecuteAsync(operation).ConfigureAwait(false);
+            var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
             return results.Result as Contract;
         }
 
@@ -69,7 +69,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 
             do
             {
-                queryResult = await _table.ExecuteQuerySegmentedAsync(tableQuery, continuationToken).ConfigureAwait(false);
+                queryResult = await Table.ExecuteQuerySegmentedAsync(tableQuery, continuationToken).ConfigureAwait(false);
                 contracts.AddRange(queryResult);
                 continuationToken = queryResult.ContinuationToken;
             } 

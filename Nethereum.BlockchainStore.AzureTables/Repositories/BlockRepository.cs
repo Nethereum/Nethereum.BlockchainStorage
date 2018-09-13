@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
@@ -10,14 +12,50 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
     public class BlockRepository : AzureTableRepository<Block>, IBlockRepository
     {
-        public BlockRepository(CloudTable table) : base(table)
+        private bool _maxBlockInitialised = false;
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
+        private Counter _maxBlockCounter = new Counter() {Name = "MaxBlockNumber", Value = 0};
+        private readonly CloudTable _countersTable;
+
+        public BlockRepository(CloudTable table, CloudTable countersTable) : base(table)
         {
+            _countersTable = countersTable;
         }
 
         public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
         {
-            var blockEntity = MapBlock(source, new Block(source.Number.Value.ToString()));
-            await UpsertAsync(blockEntity);
+            await _lock.WaitAsync();
+            try
+            {
+                await InitialiseMaxBlock();
+
+                var blockEntity = MapBlock(source, new Block(source.Number.Value.ToString()));
+                await UpsertAsync(blockEntity);
+
+                var blockNumber = long.Parse(blockEntity.BlockNumber);
+
+                if(blockNumber > _maxBlockCounter.Value)
+                {
+                    _maxBlockCounter.Value = blockNumber;
+                    await UpsertAsync(_maxBlockCounter, _countersTable).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+
+        private async Task InitialiseMaxBlock()
+        {
+            if (!_maxBlockInitialised)
+            {
+                var operation = TableOperation.Retrieve<Counter>(_maxBlockCounter.Name, "");
+                var results = await _countersTable.ExecuteAsync(operation);
+
+                _maxBlockCounter = results.Result as Counter ?? _maxBlockCounter;
+                _maxBlockInitialised = true;
+            }
         }
 
         public Block MapBlock(BlockWithTransactionHashes blockSource, Block blockOutput)
@@ -39,16 +77,24 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return blockOutput;
         }
 
-        //TODO: Implement 
-        public Task<long> GetMaxBlockNumber()
+        public async Task<long> GetMaxBlockNumber()
         {
-            return Task.FromResult((long)0);
+            await _lock.WaitAsync();
+            try
+            {
+                await InitialiseMaxBlock();
+                return _maxBlockCounter.Value;
+            }
+            finally
+            {
+                _lock.Release();
+            }
         }
 
         public async Task<Block> GetBlockAsync(HexBigInteger blockNumber)
         {
             var operation = TableOperation.Retrieve<Block>(blockNumber.Value.ToString(), "");
-            var results = await _table.ExecuteAsync(operation);
+            var results = await Table.ExecuteAsync(operation);
             return results.Result as Block;
         }
 

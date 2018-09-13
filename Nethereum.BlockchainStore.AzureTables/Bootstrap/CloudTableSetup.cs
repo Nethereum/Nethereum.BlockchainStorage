@@ -64,6 +64,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
             return GetTable(prefix + "Contracts");
         }
 
+        public CloudTable GetCountersTable()
+        {
+            return GetTable(prefix + "Counters");
+        }
+
         public CloudTable GetTable(string name)
         {
             var storageAccount = GetStorageAccount();
@@ -80,7 +85,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 
         public IBlockRepository CreateBlockRepository()
         {
-            return new BlockRepository(GetBlocksTable());
+            return new BlockRepository(GetBlocksTable(), GetCountersTable());
         }
 
         public IContractRepository CreateContractRepository()
