@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainStore.Entities;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Block = Nethereum.BlockchainStore.Entities.Block;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processors
 {
@@ -10,6 +9,6 @@ namespace Nethereum.BlockchainStore.Processors
     {
         Task UpsertBlockAsync(BlockWithTransactionHashes source);
         Task<long> GetMaxBlockNumber();
-        Task<IBlockView> GetBlockAsync(HexBigInteger blockNumber);
+        Task<IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber);
     }
 }

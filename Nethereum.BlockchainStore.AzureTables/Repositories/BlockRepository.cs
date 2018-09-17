@@ -96,7 +96,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             }
         }
 
-        public async Task<IBlockView> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber)
         {
             var operation = TableOperation.Retrieve<Block>(blockNumber.Value.ToString(), "");
             var results = await Table.ExecuteAsync(operation);

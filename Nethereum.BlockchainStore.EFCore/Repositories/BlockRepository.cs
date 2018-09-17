@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
         {
         }
 
-        public async Task<IBlockView> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber)
         {
             using (var context = _contextFactory.CreateContext())
             {

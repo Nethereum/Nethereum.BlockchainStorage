@@ -43,7 +43,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 
             await _repo.UpsertBlockAsync(source);
 
-            var storedBlock = await _repo.GetBlockAsync(source.Number);
+            var storedBlock = await _repo.FindByBlockNumberAsync(source.Number);
             Assert.NotNull(storedBlock);
 
             Assert.Equal(source.Number.Value.ToString(), storedBlock.BlockNumber);

@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public async Task<BlockchainStore.Entities.IBlockView> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<BlockchainStore.Entities.IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber)
         {
             var uri = CreateDocumentUri(new CosmosBlock() {Id = blockNumber.Value.ToString()});
             try
