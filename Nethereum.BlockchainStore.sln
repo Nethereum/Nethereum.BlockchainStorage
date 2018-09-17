@@ -57,7 +57,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.AzureTables.Core.Console", "Nethereum.BlockchainStore.AzureTables.Core.Console\Nethereum.BlockchainStore.AzureTables.Core.Console.csproj", "{84D7DE38-2D54-4E52-AD79-7101779E1995}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables.Tests", "Nethereum.BlockchainStore.AzureTables.Tests\Nethereum.BlockchainStore.AzureTables.Tests.csproj", "{8EEFD631-712C-4D4E-94A3-49CD2CA5541B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.AzureTables.Tests", "Nethereum.BlockchainStore.AzureTables.Tests\Nethereum.BlockchainStore.AzureTables.Tests.csproj", "{8EEFD631-712C-4D4E-94A3-49CD2CA5541B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSV", "CSV", "{2C2CECA5-279F-43E2-8992-EFA805A0C879}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Csv", "Nethereum.BlockchainStore.Csv\Nethereum.BlockchainStore.Csv.csproj", "{A4ED4886-27E7-41B7-A567-95F995035AEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Csv.Tests", "Nethereum.BlockchainStore.Csv.Tests\Nethereum.BlockchainStore.Csv.Tests.csproj", "{492A1A17-E628-4F4D-9EFA-73DF9825F714}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -157,6 +163,14 @@ Global
 		{8EEFD631-712C-4D4E-94A3-49CD2CA5541B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EEFD631-712C-4D4E-94A3-49CD2CA5541B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EEFD631-712C-4D4E-94A3-49CD2CA5541B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4ED4886-27E7-41B7-A567-95F995035AEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4ED4886-27E7-41B7-A567-95F995035AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4ED4886-27E7-41B7-A567-95F995035AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4ED4886-27E7-41B7-A567-95F995035AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{492A1A17-E628-4F4D-9EFA-73DF9825F714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{492A1A17-E628-4F4D-9EFA-73DF9825F714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{492A1A17-E628-4F4D-9EFA-73DF9825F714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{492A1A17-E628-4F4D-9EFA-73DF9825F714}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -180,6 +194,8 @@ Global
 		{77117972-3913-4E17-B027-EF05EEDBCB8B} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
 		{84D7DE38-2D54-4E52-AD79-7101779E1995} = {94A26589-358C-4D9E-AF7D-BCF4476A804E}
 		{8EEFD631-712C-4D4E-94A3-49CD2CA5541B} = {94A26589-358C-4D9E-AF7D-BCF4476A804E}
+		{A4ED4886-27E7-41B7-A567-95F995035AEB} = {2C2CECA5-279F-43E2-8992-EFA805A0C879}
+		{492A1A17-E628-4F4D-9EFA-73DF9825F714} = {2C2CECA5-279F-43E2-8992-EFA805A0C879}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B38D1C4-9FAE-4BA6-A315-8451597A4E9C}

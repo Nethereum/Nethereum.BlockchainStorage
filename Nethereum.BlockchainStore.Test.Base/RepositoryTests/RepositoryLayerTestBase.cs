@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Repositories;
 using Xunit;
 
@@ -16,31 +17,76 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
         [Fact]
         public virtual async Task BlockRepositoryTests()
         {
-            await new BlockRepositoryTests(_repositoryFactory.CreateBlockRepository()).RunAsync();
+            var repo = _repositoryFactory.CreateBlockRepository();
+            try
+            {
+                await new BlockRepositoryTests(repo).RunAsync();
+            }
+            finally
+            {
+                if(repo is IDisposable dispRep)
+                    dispRep.Dispose();
+            }
         } 
 
         [Fact]
         public virtual async Task ContractRepositoryTests()
         {
-            await new ContractRepositoryTests(_repositoryFactory.CreateContractRepository()).RunAsync();
+            var repo = _repositoryFactory.CreateContractRepository();
+            try
+            {
+                await new ContractRepositoryTests(repo).RunAsync();
+            }
+            finally
+            {
+                if(repo is IDisposable dispRep)
+                    dispRep.Dispose();
+            }
         } 
     
         [Fact]
         public virtual async Task TransactionRepositoryTests()
         {
-            await new TransactionRepositoryTests( _repositoryFactory.CreateTransactionRepository()).RunAsync();
+            var repo = _repositoryFactory.CreateTransactionRepository();
+            try
+            {
+                await new TransactionRepositoryTests(repo).RunAsync();
+            }
+            finally
+            {
+                if(repo is IDisposable dispRep)
+                    dispRep.Dispose();
+            }
         } 
 
         [Fact]
         public virtual async Task TransactionLogRepositoryTests()
         {
-            await new TransactionLogRepositoryTests( _repositoryFactory.CreateTransactionLogRepository()).RunAsync();
+            var repo = _repositoryFactory.CreateTransactionLogRepository();
+            try
+            {
+                await new TransactionLogRepositoryTests(repo).RunAsync();
+            }
+            finally
+            {
+                if(repo is IDisposable dispRep)
+                    dispRep.Dispose();
+            }
         } 
 
         [Fact]
         public virtual async Task TransactionLogVMStackTests()
         {
-            await new TransactionVMStackRepositoryTests(_repositoryFactory.CreateTransactionVmStackRepository()).RunAsync();
+            var repo = _repositoryFactory.CreateTransactionVmStackRepository();
+            try
+            {
+                await new TransactionVMStackRepositoryTests(repo).RunAsync();
+            }
+            finally
+            {
+                if(repo is IDisposable dispRep)
+                    dispRep.Dispose();
+            }
         } 
     }
 }
