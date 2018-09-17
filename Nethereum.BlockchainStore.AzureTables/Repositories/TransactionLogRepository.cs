@@ -1,18 +1,19 @@
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
+using TransactionLog = Nethereum.BlockchainStore.AzureTables.Entities.TransactionLog;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class TransactionLogRepository : AzureTableRepository<TransactionLog>, IAzureTableTransactionLogRepository
+    public class TransactionLogRepository : AzureTableRepository<TransactionLog>, ITransactionLogRepository
     {
         public TransactionLogRepository(CloudTable table) : base(table)
         {
         }
 
-        public async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(string transactionHash, long logIndex)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string transactionHash, long logIndex)
         {
             var operation = TableOperation.Retrieve<TransactionLog>(transactionHash, logIndex.ToString());
             var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);

@@ -1,10 +1,12 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using Nethereum.BlockchainStore.Entities;
+using System;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public class TransactionVmStack : TableEntity
+    public class TransactionVmStack : TableEntity, ITransactionVmStackView
     {
         public TransactionVmStack()
         {
@@ -54,6 +56,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public string StructLogs23 { get; set; } = string.Empty;
         public string StructLogs24 { get; set; } = string.Empty;
         public string StructLogs25 { get; set; } = string.Empty;
+
+        public string StructLogs => ConcatStructLogs();
+
+        private string ConcatStructLogs()
+        {
+            return GetStructLogs().ToString();
+        }
 
         public static TransactionVmStack CreateTransactionVmStack(string transactionHash,
             string address,

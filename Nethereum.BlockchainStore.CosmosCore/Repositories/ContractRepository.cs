@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class ContractRepository : CosmosRepositoryBase, IEntityContractRepository
+    public class ContractRepository : CosmosRepositoryBase, IContractRepository
     {
         private readonly ConcurrentDictionary<string, CosmosContract> _cachedContracts = new ConcurrentDictionary<string, CosmosContract>();
 
@@ -55,7 +55,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task<Contract> FindByAddressAsync(string contractAddress)
+        public async Task<IContractView> FindByAddressAsync(string contractAddress)
         {
             var uri = CreateDocumentUri(contractAddress);
             try
@@ -75,22 +75,6 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         public bool IsCached(string contractAddress)
         {
             return _cachedContracts.ContainsKey(contractAddress);
-        }
-
-        public async Task RemoveAsync(Contract contract)
-        {
-            var uri = CreateDocumentUri(contract.Address);
-            try
-            {
-                await Client.DeleteDocumentAsync(uri);
-            }
-            catch (DocumentClientException dEx)
-            {
-                if (dEx.StatusCode == HttpStatusCode.NotFound)
-                    return;
-
-                throw;
-            }
         }
 
         public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction)

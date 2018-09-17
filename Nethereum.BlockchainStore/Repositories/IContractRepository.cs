@@ -9,12 +9,8 @@ namespace Nethereum.BlockchainStore.Repositories
         Task FillCache();
         Task UpsertAsync(string contractAddress, string code, Transaction transaction);
         Task<bool> ExistsAsync(string contractAddress);
-    }
 
-    public interface IEntityContractRepository: IContractRepository
-    {
-        Task<Contract> FindByAddressAsync(string contractAddress);
-        Task RemoveAsync(Contract contract);
+        Task<IContractView> FindByAddressAsync(string contractAddress);
         bool IsCached(string contractAddress);
     }
 }

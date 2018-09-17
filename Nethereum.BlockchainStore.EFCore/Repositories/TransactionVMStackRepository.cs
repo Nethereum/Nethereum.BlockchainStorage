@@ -6,13 +6,21 @@ using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
 {
-    public class TransactionVMStackRepository : RepositoryBase, IEntityTransactionVMStackRepository
+    public class TransactionVMStackRepository : RepositoryBase, ITransactionVMStackRepository
     {
         public TransactionVMStackRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
         }
 
-        public async Task<TransactionVmStack> FindByTransactionHashAync(string hash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string hash)
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                return await context.TransactionVmStacks.FindByAddressAndTransactionHashAync(address, hash).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
         {
             using (var context = _contextFactory.CreateContext())
             {

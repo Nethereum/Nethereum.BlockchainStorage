@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Entities;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
@@ -10,7 +11,7 @@ using Block = Nethereum.BlockchainStore.AzureTables.Entities.Block;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class BlockRepository : AzureTableRepository<Block>, IAzureTableBlockRepository
+    public class BlockRepository : AzureTableRepository<Block>, IBlockRepository
     {
         private bool _maxBlockInitialised = false;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
@@ -75,7 +76,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             blockOutput.Hash = blockSource.BlockHash ?? string.Empty;
             blockOutput.ParentHash = blockSource.ParentHash ?? string.Empty;
             blockOutput.Miner = blockSource.Miner ?? string.Empty;
-            blockOutput.Nonce = blockSource.Nonce ?? string.Empty;
+            blockOutput.Nonce = string.IsNullOrEmpty(blockSource.Nonce) ? 0 : long.Parse(blockSource.Nonce);
             blockOutput.TransactionCount = blockSource.TransactionHashes.Length;
 
             return blockOutput;
@@ -95,7 +96,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             }
         }
 
-        public async Task<Block> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<IBlockView> GetBlockAsync(HexBigInteger blockNumber)
         {
             var operation = TableOperation.Retrieve<Block>(blockNumber.Value.ToString(), "");
             var results = await Table.ExecuteAsync(operation);

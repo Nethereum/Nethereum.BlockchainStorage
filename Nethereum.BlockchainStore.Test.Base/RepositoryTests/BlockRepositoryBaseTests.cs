@@ -10,9 +10,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public class BlockRepositoryTests: IRepositoryTest
     {
-        private readonly IEntityBlockRepository _repo;
+        private readonly IBlockRepository _repo;
 
-        public BlockRepositoryTests(IEntityBlockRepository repo)
+        public BlockRepositoryTests(IBlockRepository repo)
         {
             this._repo = repo;
         }
@@ -51,7 +51,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             Assert.Equal(source.GasLimit.ToLong(), storedBlock.GasLimit);
             Assert.Equal(source.GasUsed.ToLong(), storedBlock.GasUsed);
             Assert.Equal(source.Size.ToLong(), storedBlock.Size);
-            Assert.Equal(source.Timestamp.ToLong(), storedBlock.Timestamp);
+            Assert.Equal(source.Timestamp.ToLong(), storedBlock.TimeStamp);
             Assert.Equal(source.TotalDifficulty.ToLong(), storedBlock.TotalDifficulty);
             Assert.Equal(source.ExtraData, storedBlock.ExtraData);
             Assert.Equal(source.BlockHash, storedBlock.Hash);

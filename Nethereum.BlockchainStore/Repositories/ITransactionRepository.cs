@@ -12,10 +12,7 @@ namespace Nethereum.BlockchainStore.Repositories
             TransactionReceipt receipt,
             bool failed,
             HexBigInteger timeStamp, bool hasVmStack = false, string error = null);
-    }
 
-    public interface IEntityTransactionRepository: ITransactionRepository
-    {
-        Task<Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash);
+        Task<Entities.ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash);
     }
 }

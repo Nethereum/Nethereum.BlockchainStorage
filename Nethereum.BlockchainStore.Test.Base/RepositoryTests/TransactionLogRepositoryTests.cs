@@ -7,9 +7,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public class TransactionLogRepositoryTests: IRepositoryTest
     {
-        private readonly IEntityTransactionLogRepository _repo;
+        private readonly ITransactionLogRepository _repo;
 
-        public TransactionLogRepositoryTests(IEntityTransactionLogRepository repo)
+        public TransactionLogRepositoryTests(ITransactionLogRepository repo)
         {
             this._repo = repo;
         }

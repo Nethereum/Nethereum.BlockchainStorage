@@ -1,6 +1,6 @@
 ﻿namespace Nethereum.BlockchainStore.Entities
 {
-    public class Contract: TableRow
+    public class Contract : TableRow, IContractView
     {
         public string Address { get; set; }
         public string Name { get; set; }

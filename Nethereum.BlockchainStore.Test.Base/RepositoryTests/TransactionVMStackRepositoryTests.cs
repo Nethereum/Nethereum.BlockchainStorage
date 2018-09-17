@@ -7,9 +7,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public class TransactionVMStackRepositoryTests: IRepositoryTest
     {
-        private readonly IEntityTransactionVMStackRepository _repo;
+        private readonly ITransactionVMStackRepository _repo;
 
-        public TransactionVMStackRepositoryTests(IEntityTransactionVMStackRepository repo)
+        public TransactionVMStackRepositoryTests(ITransactionVMStackRepository repo)
         {
             this._repo = repo;
         }
@@ -25,15 +25,12 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             const string address = "0xba0ef20713557e1c28e12464e4310dff04c0b3ba";
             var stackTrace = JObject.Parse("{structLogs:['log1', 'log2']}");
 
-            var existingRow = await _repo.FindByTransactionHashAync(transactionHash);
-            if (existingRow != null)
-            {
-                await _repo.Remove(existingRow);
-            }
-
             await _repo.UpsertAsync(transactionHash, address, stackTrace);
 
             var storedRow = await _repo.FindByTransactionHashAync(transactionHash);
+
+            if (storedRow == null)
+                storedRow = await _repo.FindByAddressAndTransactionHashAync(address, transactionHash);
 
             Assert.NotNull(storedRow);
 

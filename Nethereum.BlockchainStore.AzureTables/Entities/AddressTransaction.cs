@@ -1,10 +1,11 @@
 ﻿using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Net;
+using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public class AddressTransaction : TransactionBase
+    public class AddressTransaction : TransactionBase, ITransactionView
     {
         public AddressTransaction()
         {

@@ -10,13 +10,13 @@ using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class TransactionRepository : CosmosRepositoryBase, IEntityTransactionRepository
+    public class TransactionRepository : CosmosRepositoryBase, ITransactionRepository
     {
         public TransactionRepository(DocumentClient client, string databaseName) : base(client, databaseName, CosmosCollectionName.Transactions)
         {
         }
 
-        public async Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        public async Task<BlockchainStore.Entities.ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
         {
             var uri = CreateDocumentUri(new CosmosTransaction(){Hash = hash, BlockNumber = blockNumber.Value.ToString()});
             try

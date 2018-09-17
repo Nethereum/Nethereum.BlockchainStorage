@@ -11,13 +11,13 @@ using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
-    public class BlockRepository : RepositoryBase, IEntityBlockRepository
+    public class BlockRepository : RepositoryBase, IBlockRepository
     {
         public BlockRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
         }
 
-        public async Task<Block> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<IBlockView> GetBlockAsync(HexBigInteger blockNumber)
         {
             using (var context = _contextFactory.CreateContext())
             {

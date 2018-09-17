@@ -5,6 +5,8 @@ using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.Repositories;
 using Xunit;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
@@ -13,12 +15,12 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
     [Collection("AzureTablesFixture")]
     public class AddressTransactionRepositoryTests
     {
-        static Random _random = new Random();
-        private readonly IAzureTableAddressTransactionRepository _repo;
+        static readonly Random _random = new Random();
+        private readonly IAddressTransactionRepository _repo;
 
         public AddressTransactionRepositoryTests(AzureTablesFixture fixture)
         {
-            this._repo = fixture.Factory.CreateAzureTablesAddressTransactionRepository();
+            this._repo = fixture.Factory.CreateAddressTransactionRepository();
         }
 
         [Fact]
@@ -34,7 +36,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
             var failure = false;
 
             await _repo.UpsertAsync(transaction, receipt, failure, blockTimestamp, address, error, hasVmStack);
-            AddressTransaction storedTransaction = await _repo.FindByAddressBlockNumberAndHashAsync(address, transaction.BlockNumber, transaction.TransactionHash);
+            var storedTransaction = await _repo.FindByAddressBlockNumberAndHashAsync(address, transaction.BlockNumber, transaction.TransactionHash);
 
             Assert.NotNull(storedTransaction);
             EnsureCorrectStoredValues(transaction, receipt, blockTimestamp, address, error, null, hasVmStack, storedTransaction);
@@ -42,10 +44,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
 
         protected static HexBigInteger CreateBlockTimestamp()
         {
-            return Utils.CreateBlockTimestamp();
+            return Test.Base.RepositoryTests.Utils.CreateBlockTimestamp();
         }
 
-        protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, AddressTransaction storedTransaction)
+        protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, ITransactionView storedTransaction)
         {
             Assert.Equal(transaction.BlockHash, storedTransaction.BlockHash);
             Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);

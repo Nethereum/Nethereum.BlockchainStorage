@@ -4,15 +4,16 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAzureTableAddressTransactionRepository
+    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAddressTransactionRepository
     {
         public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
 
-        public async Task<AddressTransaction> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
+        public async Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
         {
             var partitionKey = addrees.ToPartitionKey();
             var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);

@@ -1,6 +1,6 @@
 ﻿namespace Nethereum.BlockchainStore.Entities
 {
-    public class TransactionLog: TableRow
+    public class TransactionLog : TableRow, ITransactionLogView
     {
         public string TransactionHash { get; set; }
         public long LogIndex { get; set; }

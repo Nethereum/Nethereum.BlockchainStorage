@@ -1,24 +1,23 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
-using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class BlockRepository : CosmosRepositoryBase, IEntityBlockRepository
+    public class BlockRepository : CosmosRepositoryBase, IBlockRepository
     {
         public BlockRepository(DocumentClient client, string databaseName) : base(client, databaseName, CosmosCollectionName.Blocks)
         {
         }
 
-        public async Task<BlockchainStore.Entities.Block> GetBlockAsync(HexBigInteger blockNumber)
+        public async Task<BlockchainStore.Entities.IBlockView> GetBlockAsync(HexBigInteger blockNumber)
         {
             var uri = CreateDocumentUri(new CosmosBlock() {Id = blockNumber.Value.ToString()});
             try

@@ -1,10 +1,11 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.Hex.HexTypes;
 using System.Numerics;
+using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public class Block : TableEntity
+    public class Block : TableEntity, IBlockView
     {
         public Block()
         {
@@ -24,7 +25,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 
         public string Hash { get; set; } = string.Empty;
         public string ParentHash { get; set; } = string.Empty;
-        public string Nonce { get; set; } = string.Empty;
+        public long Nonce { get; set; } = 0;
         public string ExtraData { get; set; } = string.Empty;
         public long Difficulty { get; set; } = 0;
         public long TotalDifficulty { get; set; } = 0;

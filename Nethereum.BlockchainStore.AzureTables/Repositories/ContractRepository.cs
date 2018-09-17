@@ -1,14 +1,15 @@
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Repositories;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
+using Contract = Nethereum.BlockchainStore.AzureTables.Entities.Contract;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class ContractRepository : AzureTableRepository<Contract>, IAzureTableContractRepository
+    public class ContractRepository : AzureTableRepository<Contract>, IContractRepository
     {
         private static readonly ConcurrentDictionary<string, Contract> CachedContracts = new ConcurrentDictionary<string, Contract>();
 
@@ -78,7 +79,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return contracts;
         }
 
-        public async Task<Contract> FindByAddressAsync(string contractAddress)
+        public async Task<IContractView> FindByAddressAsync(string contractAddress)
         {
             return await FindAsync(contractAddress).ConfigureAwait(false);
         }

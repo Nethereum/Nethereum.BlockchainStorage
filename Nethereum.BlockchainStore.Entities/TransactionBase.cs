@@ -1,6 +1,6 @@
 ﻿namespace Nethereum.BlockchainStore.Entities
 {
-    public class TransactionBase: TableRow
+    public class TransactionBase : TableRow, ITransactionView
     {
         public string BlockHash { get; set; }
         public string BlockNumber { get; set; }

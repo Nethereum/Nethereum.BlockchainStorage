@@ -10,15 +10,15 @@ using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class TransactionVMStackRepository : CosmosRepositoryBase,  IEntityTransactionVMStackRepository
+    public class TransactionVMStackRepository : CosmosRepositoryBase,  ITransactionVMStackRepository
     {
         public TransactionVMStackRepository(DocumentClient client, string databaseName) : base(client, databaseName, CosmosCollectionName.TransactionVMStacks)
         {
         }
 
-        public async Task<TransactionVmStack> FindByTransactionHashAync(string hash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string hash)
         {
-            var uri = CreateDocumentUri(new CosmosTransactionVmStack(){TransactionHash = hash});
+            var uri = CreateDocumentUri(new CosmosTransactionVmStack(){Address = address, TransactionHash = hash});
             try
             {
                 var response = await Client.ReadDocumentAsync<CosmosTransactionVmStack>(uri);
@@ -33,17 +33,18 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task Remove(TransactionVmStack transactionVmStack)
+        public async Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
         {
-            var uri = CreateDocumentUri(transactionVmStack.TransactionHash);
+            var uri = CreateDocumentUri(new CosmosTransactionVmStack(){TransactionHash = hash});
             try
             {
-                await Client.DeleteDocumentAsync(uri);
+                var response = await Client.ReadDocumentAsync<CosmosTransactionVmStack>(uri);
+                return response.Document;
             }
             catch (DocumentClientException dEx)
             {
                 if (dEx.IsNotFound())
-                    return;
+                    return null;
 
                 throw;
             }

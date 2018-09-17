@@ -6,9 +6,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public class ContractRepositoryTests: IRepositoryTest
     {
-        private readonly IEntityContractRepository _repo;
+        private readonly IContractRepository _repo;
 
-        public ContractRepositoryTests(IEntityContractRepository repo)
+        public ContractRepositoryTests(IContractRepository repo)
         {
             this._repo = repo;
         }
@@ -28,12 +28,6 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                 From = "0xe6de16a66e5cd7270cc36a851818bc092884fe64",
                 TransactionHash = "0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e5"
             };
-
-            var existingContract = await _repo.FindByAddressAsync(contractAddress);
-            if (existingContract != null)
-            {
-                await _repo.RemoveAsync(existingContract);
-            }
 
             Assert.False(await _repo.ExistsAsync(contractAddress));
             Assert.False(_repo.IsCached(contractAddress));

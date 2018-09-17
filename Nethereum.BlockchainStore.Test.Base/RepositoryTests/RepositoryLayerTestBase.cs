@@ -6,9 +6,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public abstract class RepositoryLayerTestBase
     {
-        private readonly IBlockchainStoreEntityRepositoryFactory _repositoryFactory;
+        private readonly IBlockchainStoreRepositoryFactory _repositoryFactory;
 
-        protected RepositoryLayerTestBase(IBlockchainStoreEntityRepositoryFactory repositoryFactory)
+        protected RepositoryLayerTestBase(IBlockchainStoreRepositoryFactory repositoryFactory)
         {
             _repositoryFactory = repositoryFactory;
         }
@@ -16,31 +16,31 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
         [Fact]
         public virtual async Task BlockRepositoryTests()
         {
-            await new BlockRepositoryTests(_repositoryFactory.CreateEntityBlockRepository()).RunAsync();
+            await new BlockRepositoryTests(_repositoryFactory.CreateBlockRepository()).RunAsync();
         } 
 
         [Fact]
         public virtual async Task ContractRepositoryTests()
         {
-            await new ContractRepositoryTests(_repositoryFactory.CreateEntityContractRepository()).RunAsync();
+            await new ContractRepositoryTests(_repositoryFactory.CreateContractRepository()).RunAsync();
         } 
     
         [Fact]
         public virtual async Task TransactionRepositoryTests()
         {
-            await new TransactionRepositoryTests( _repositoryFactory.CreateEntityTransactionRepository()).RunAsync();
+            await new TransactionRepositoryTests( _repositoryFactory.CreateTransactionRepository()).RunAsync();
         } 
 
         [Fact]
         public virtual async Task TransactionLogRepositoryTests()
         {
-            await new TransactionLogRepositoryTests( _repositoryFactory.CreateEntityTransactionLogRepository()).RunAsync();
+            await new TransactionLogRepositoryTests( _repositoryFactory.CreateTransactionLogRepository()).RunAsync();
         } 
 
         [Fact]
         public virtual async Task TransactionLogVMStackTests()
         {
-            await new TransactionVMStackRepositoryTests(_repositoryFactory.CreateEntityTransactionVmStackRepository()).RunAsync();
+            await new TransactionVMStackRepositoryTests(_repositoryFactory.CreateTransactionVmStackRepository()).RunAsync();
         } 
     }
 }

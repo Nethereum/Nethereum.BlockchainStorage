@@ -9,13 +9,13 @@ using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
-    public class TransactionLogRepository : CosmosRepositoryBase, IEntityTransactionLogRepository
+    public class TransactionLogRepository : CosmosRepositoryBase, ITransactionLogRepository
     {
         public TransactionLogRepository(DocumentClient client, string databaseName) : base(client, databaseName, CosmosCollectionName.TransactionLogs)
         {
         }
 
-        public async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
         {
             var uri = CreateDocumentUri(new CosmosTransactionLog{TransactionHash = hash, LogIndex = idx});
             try

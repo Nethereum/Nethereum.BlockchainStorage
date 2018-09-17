@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity.Migrations;
 using System.Threading;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
@@ -8,7 +9,7 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
-    public class TransactionRepository : RepositoryBase, IEntityTransactionRepository
+    public class TransactionRepository : RepositoryBase, ITransactionRepository
     {
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
@@ -17,7 +18,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
 
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt receipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction, TransactionReceipt receipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
         {
             await _lock.WaitAsync();
             try
@@ -48,7 +49,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task UpsertAsync(Transaction transaction, TransactionReceipt receipt, bool failed, HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
+        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt receipt, bool failed, HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
         {
             await _lock.WaitAsync();
             try
@@ -78,13 +79,13 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        private async Task<BlockchainStore.Entities.Transaction> FindOrCreate(Transaction transaction, BlockchainDbContextBase context)
+        private async Task<Entities.Transaction> FindOrCreate(RPC.Eth.DTOs.Transaction transaction, BlockchainDbContextBase context)
         {
             return await context.Transactions.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash).ConfigureAwait(false)  ??
                      new BlockchainStore.Entities.Transaction();
         }
 
-        public async Task<BlockchainStore.Entities.Transaction> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        public async Task<ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
         {
             using (var context = _contextFactory.CreateContext())
             {

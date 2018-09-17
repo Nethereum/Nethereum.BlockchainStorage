@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
 {
-    public class CosmosRepositoryFactory : IBlockchainStoreEntityRepositoryFactory
+    public class CosmosRepositoryFactory : IBlockchainStoreRepositoryFactory
     {
         public static CosmosRepositoryFactory Create(IConfigurationRoot config, bool deleteAllExistingCollections = false)
         {       
@@ -105,40 +105,11 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
             }
         }
 
-        public IAddressTransactionRepository CreateAddressTransactionRepository()
-        {
-            return new AddressTransactionRepository(_client, _databaseName);
-        }
-
-        public IEntityBlockRepository CreateEntityBlockRepository()
-        {
-            return new BlockRepository(_client, _databaseName);
-        }
-
-        public IEntityContractRepository CreateEntityContractRepository()
-        {
-            return new ContractRepository(_client, _databaseName);
-        }
-
-        public IEntityTransactionLogRepository CreateEntityTransactionLogRepository()
-        {
-            return new TransactionLogRepository(_client, _databaseName);
-        }
-
-        public IEntityTransactionVMStackRepository CreateEntityTransactionVmStackRepository()
-        {
-            return new TransactionVMStackRepository(_client, _databaseName);
-        }
-
-        public IEntityTransactionRepository CreateEntityTransactionRepository()
-        {
-            return new TransactionRepository(_client, _databaseName);
-        }
-
-        public IBlockRepository CreateBlockRepository() => CreateEntityBlockRepository();
-        public IContractRepository CreateContractRepository() => CreateEntityContractRepository();
-        public ITransactionLogRepository CreateTransactionLogRepository() => CreateEntityTransactionLogRepository();
-        public ITransactionRepository CreateTransactionRepository() => CreateEntityTransactionRepository();
-        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => CreateEntityTransactionVmStackRepository();
+        public IAddressTransactionRepository CreateAddressTransactionRepository() => new AddressTransactionRepository(_client, _databaseName);
+        public IBlockRepository CreateBlockRepository() => new BlockRepository(_client, _databaseName);
+        public IContractRepository CreateContractRepository() => new ContractRepository(_client, _databaseName);
+        public ITransactionLogRepository CreateTransactionLogRepository() => new TransactionLogRepository(_client, _databaseName);
+        public ITransactionRepository CreateTransactionRepository() => new TransactionRepository(_client, _databaseName);
+        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => new TransactionVMStackRepository(_client, _databaseName);
     }
 }

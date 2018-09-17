@@ -7,13 +7,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
-    public class TransactionLogRepository : RepositoryBase, IEntityTransactionLogRepository
+    public class TransactionLogRepository : RepositoryBase, ITransactionLogRepository
     {
         public TransactionLogRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory)
         {
         }
 
-        public async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
         {
             using (var context = _contextFactory.CreateContext())
             {

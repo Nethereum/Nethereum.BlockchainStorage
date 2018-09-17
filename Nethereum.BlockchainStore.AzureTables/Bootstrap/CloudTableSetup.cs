@@ -8,7 +8,7 @@ using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 {
-    public class CloudTableSetup: IBlockchainStoreAzureTablesRepositoryFactory
+    public class CloudTableSetup: IBlockchainStoreRepositoryFactory
     {
         private readonly string prefix;
         private readonly string connectionString;
@@ -79,42 +79,12 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
             return table;
         }
 
-        public IAddressTransactionRepository CreateAddressTransactionRepository() => CreateAzureTablesAddressTransactionRepository();
-        public IBlockRepository CreateBlockRepository() => CreateAzureTablesBlockRepository();
-        public IContractRepository CreateContractRepository() => CreateAzureTablesContractRepository();
-        public ITransactionLogRepository CreateTransactionLogRepository() => CreateAzureTablesTransactionLogRepository();
-        public ITransactionRepository CreateTransactionRepository() => CreateAzureTablesTransactionRepository();
-        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => CreateAzureTablesTransactionVmStackRepository();
-
-        public IAzureTableAddressTransactionRepository CreateAzureTablesAddressTransactionRepository()
-        {
-            return new AddressTransactionRepository(GetTransactionsLogTable());
-        }
-
-        public IAzureTableBlockRepository CreateAzureTablesBlockRepository()
-        {
-            return new BlockRepository(GetBlocksTable(), GetCountersTable());
-        }
-
-        public IAzureTableContractRepository CreateAzureTablesContractRepository()
-        {
-            return new ContractRepository(GetContractsTable());
-        }
-
-        public IAzureTableTransactionLogRepository CreateAzureTablesTransactionLogRepository()
-        {
-            return new TransactionLogRepository(GetTransactionsLogTable());
-        }
-
-        public IAzureTableTransactionRepository CreateAzureTablesTransactionRepository()
-        {
-            return new TransactionRepository(GetTransactionsTable());
-        }
-
-        public IAzureTableTransactionVMStackRepository CreateAzureTablesTransactionVmStackRepository()
-        {
-            return new TransactionVMStackRepository(GetTransactionsVmStackTable());
-        }
+        public IAddressTransactionRepository CreateAddressTransactionRepository() => new AddressTransactionRepository(GetTransactionsLogTable());
+        public IBlockRepository CreateBlockRepository() => new BlockRepository(GetBlocksTable(), GetCountersTable());
+        public IContractRepository CreateContractRepository() => new ContractRepository(GetContractsTable());
+        public ITransactionLogRepository CreateTransactionLogRepository() => new TransactionLogRepository(GetTransactionsLogTable());
+        public ITransactionRepository CreateTransactionRepository() => new TransactionRepository(GetTransactionsTable());
+        public ITransactionVMStackRepository CreateTransactionVmStackRepository() => new TransactionVMStackRepository(GetTransactionsVmStackTable());
 
         public async Task DeleteAllTables()
         {

@@ -42,5 +42,12 @@ namespace Nethereum.BlockchainStore.EFCore
                 .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash);
         }
 
+        public static async Task<TransactionVmStack> FindByAddressAndTransactionHashAync(
+            this DbSet<TransactionVmStack> transactionVmStacks, string address, string transactionHash)
+        {
+            return await transactionVmStacks
+                .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.Address == address);
+        }
+
     }
 }

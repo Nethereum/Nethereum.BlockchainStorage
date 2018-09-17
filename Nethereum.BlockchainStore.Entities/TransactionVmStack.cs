@@ -1,9 +1,16 @@
-﻿namespace Nethereum.BlockchainStore.Entities
+﻿using Newtonsoft.Json.Linq;
+
+namespace Nethereum.BlockchainStore.Entities
 {
-    public class TransactionVmStack: TableRow
+    public class TransactionVmStack : TableRow, ITransactionVmStackView
     {
         public string Address { get;set; }
         public string TransactionHash { get; set; }
         public string StructLogs { get; set; }
+
+        public JArray GetStructLogs()
+        {
+            return string.IsNullOrEmpty(StructLogs) ? null : JArray.Parse(StructLogs);
+        }
     }
 }

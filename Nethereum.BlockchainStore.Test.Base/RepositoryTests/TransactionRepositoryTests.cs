@@ -14,10 +14,10 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 {
     public class TransactionRepositoryTests: IRepositoryTest
     {
-        static Random _random = new Random();
-        private readonly IEntityTransactionRepository _repo;
+        static readonly Random _random = new Random();
+        private readonly ITransactionRepository _repo;
 
-        public TransactionRepositoryTests(IEntityTransactionRepository repo)
+        public TransactionRepositoryTests(ITransactionRepository repo)
         {
             this._repo = repo;
         }
@@ -107,7 +107,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             return Utils.CreateBlockTimestamp();
         }
 
-        protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, TransactionBase storedTransaction)
+        protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, ITransactionView storedTransaction)
         {
             Assert.Equal(transaction.BlockHash, storedTransaction.BlockHash);
             Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);
@@ -115,7 +115,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             Assert.Equal((long)transaction.TransactionIndex.Value, storedTransaction.TransactionIndex);
             Assert.Equal(transaction.Value.Value.ToString(), storedTransaction.Value);
             Assert.Equal(transaction.To, storedTransaction.AddressTo);
-            Assert.Equal(newContractAddress, storedTransaction.NewContractAddress);
+            Assert.Equal(newContractAddress ?? string.Empty, storedTransaction.NewContractAddress ?? string.Empty);
             Assert.Equal(transaction.BlockNumber.Value.ToString(), storedTransaction.BlockNumber);
             Assert.Equal((long)transaction.Gas.Value, storedTransaction.Gas);
             Assert.Equal((long)transaction.GasPrice.Value, storedTransaction.GasPrice);

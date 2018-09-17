@@ -1,6 +1,6 @@
 ﻿namespace Nethereum.BlockchainStore.Entities
 {
-    public class Block : TableRow
+    public class Block : TableRow, IBlockView
     {
         public string BlockNumber { get; set; }
         public string Hash { get; set; }
@@ -14,6 +14,9 @@
         public long GasLimit { get;set; }
         public long GasUsed { get; set; }
         public long Timestamp { get; set; }
+
+        public long TimeStamp => Timestamp;
+
         public long TransactionCount { get;set; }
     }
 }

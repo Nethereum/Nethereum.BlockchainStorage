@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
@@ -11,6 +12,11 @@ namespace Nethereum.BlockchainStore.EF.Repositories
     public class AddressTransactionRepository : RepositoryBase,  IAddressTransactionRepository
     {
         public AddressTransactionRepository(IBlockchainDbContextFactory contextFactory):base(contextFactory){}
+
+        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
+        {
+            throw new System.NotImplementedException();
+        }
 
         public async Task UpsertAsync(
             RPC.Eth.DTOs.Transaction transaction, 

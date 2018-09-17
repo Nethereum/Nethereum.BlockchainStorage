@@ -8,7 +8,7 @@ using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
 {
-    public class ContractRepository : RepositoryBase, IEntityContractRepository
+    public class ContractRepository : RepositoryBase, IContractRepository
     {
         private readonly ConcurrentDictionary<string, Contract> _cachedContracts = new ConcurrentDictionary<string, Contract>();
 
@@ -68,25 +68,12 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             }
         }
 
-        public async Task<Contract> FindByAddressAsync(string contractAddress)
+        public async Task<IContractView> FindByAddressAsync(string contractAddress)
         {
             using (var ctx = _contextFactory.CreateContext())
             {
                 return await ctx.Contracts.FindByContractAddressAsync(contractAddress)
                     .ConfigureAwait(false);
-            }
-        }
-
-        public async Task RemoveAsync(Contract contract)
-        {
-            using (var ctx = _contextFactory.CreateContext())
-            {
-                var c = await ctx.Contracts.FindByContractAddressAsync(contract.Address).ConfigureAwait(false);
-                if (c != null)
-                {
-                    ctx.Contracts.Remove(c);
-                    await ctx.SaveChangesAsync().ConfigureAwait(false);
-                }
             }
         }
     }

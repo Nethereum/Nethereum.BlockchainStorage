@@ -7,10 +7,6 @@ namespace Nethereum.BlockchainStore.Repositories
     public interface ITransactionLogRepository
     {
         Task UpsertAsync(string transactionHash, long logIndex, JObject log);
-    }
-
-    public interface IEntityTransactionLogRepository: ITransactionLogRepository
-    {
-        Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(string hash, long idx);
+        Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx);
     }
 }
