@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite.RepositoryTests
@@ -21,10 +22,12 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite.RepositoryTests
             DeleteDatabase();
         }
 
-        private void DeleteDatabase()
+        private void DeleteDatabase(int attemptCount = 0)
         {
             try
             {
+                attemptCount++;
+
                 var configValues =
                     TestSqliteDbContextFactory.ConnectionString.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -37,6 +40,12 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite.RepositoryTests
             }
             catch
             {
+                if (attemptCount < 3)
+                {
+                    Thread.Sleep(1000);
+                    DeleteDatabase(attemptCount);
+                }
+
                 //ignore
             }
         }
