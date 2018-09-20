@@ -59,6 +59,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         public BlockMap()
         {
             AutoMap();
+            Map(b => b.Timestamp).Ignore();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,15 +11,16 @@ using NLog.Fluent;
 
 namespace Nethereum.BlockchainStore.Processing
 {
-    public class StorageProcessor
+    public class StorageProcessor: IDisposable
     {
         private const int MaxRetries = 3;
         private readonly Web3.Web3 _web3;
-        private readonly IBlockProcessor _procesor;
+        private readonly IBlockProcessor _processor;
         private readonly IContractRepository _contractRepository;
         private readonly IBlockRepository _blockRepository;
         private readonly WaitForBlockStrategy _waitForBlockStrategy;
         private bool _contractCacheInitialised = false;
+        private readonly List<object> _repositories = new List<object>();
 
         public StorageProcessor(string url, IBlockchainStoreRepositoryFactory repositoryFactory, bool postVm = false)
         {
@@ -26,11 +28,19 @@ namespace Nethereum.BlockchainStore.Processing
             _web3 = new Web3.Web3(url);
 
             _blockRepository = repositoryFactory.CreateBlockRepository();
+            _contractRepository = repositoryFactory.CreateContractRepository();
+
             var transactionRepository = repositoryFactory.CreateTransactionRepository();
             var addressTransactionRepository = repositoryFactory.CreateAddressTransactionRepository();
-            _contractRepository = repositoryFactory.CreateContractRepository();
             var logRepository = repositoryFactory.CreateTransactionLogRepository();
             var vmStackRepository = repositoryFactory.CreateTransactionVmStackRepository();
+
+            _repositories.Add(_blockRepository);
+            _repositories.Add(transactionRepository);
+            _repositories.Add(addressTransactionRepository);
+            _repositories.Add(_contractRepository);
+            _repositories.Add(logRepository);
+            _repositories.Add(vmStackRepository);
 
             var contractTransactionProcessor = new ContractTransactionProcessor(_web3, _contractRepository,
                 transactionRepository, addressTransactionRepository, vmStackRepository, logRepository);
@@ -42,11 +52,11 @@ namespace Nethereum.BlockchainStore.Processing
                 valueTrasactionProcessor, contractCreationTransactionProcessor);
 
             if (postVm)
-                _procesor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
+                _processor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
             else
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                _procesor = new BlockProcessor(_web3, _blockRepository, transactionProcessor);
+                _processor = new BlockProcessor(_web3, _blockRepository, transactionProcessor);
             }       
         }
 
@@ -106,7 +116,7 @@ namespace Nethereum.BlockchainStore.Processing
                 {
                     System.Console.WriteLine($"{DateTime.Now.ToString("s")}. Block: {startBlock}. Attempt: {retryNumber}");
 
-                    await _procesor.ProcessBlockAsync(startBlock.Value).ConfigureAwait(false);
+                    await _processor.ProcessBlockAsync(startBlock.Value).ConfigureAwait(false);
                     retryNumber = 0;
                     startBlock = startBlock + 1;
                 }
@@ -128,6 +138,7 @@ namespace Nethereum.BlockchainStore.Processing
                         }
                         else
                         {
+                            retryNumber = 0;
                             startBlock = startBlock + 1;
                             Log.Error().Exception(blockNotFoundException).Message("BlockNumber" + startBlock).Write();
                             System.Console.WriteLine($"Skipping block");
@@ -136,7 +147,7 @@ namespace Nethereum.BlockchainStore.Processing
                 }
                 catch (Exception ex)
                 {
-                    System.Console.WriteLine(ex.Message);
+                    System.Console.WriteLine(ex.Message + ". " + ex.InnerException?.Message);
 
                     if (ex.StackTrace.Contains("Only one usage of each socket address"))
                     {
@@ -152,6 +163,7 @@ namespace Nethereum.BlockchainStore.Processing
                         }
                         else
                         {
+                            retryNumber = 0;
                             startBlock = startBlock + 1;
                             Log.Error().Exception(ex).Message("BlockNumber" + startBlock).Write();
                             System.Console.WriteLine("ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
@@ -161,5 +173,42 @@ namespace Nethereum.BlockchainStore.Processing
 
             return true;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach (var repo in _repositories)
+                    {
+                        if(repo is IDisposable disposableRepo)
+                            disposableRepo.Dispose();
+                    }
+
+                    _repositories.Clear();
+                }
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~StorageProcessor() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

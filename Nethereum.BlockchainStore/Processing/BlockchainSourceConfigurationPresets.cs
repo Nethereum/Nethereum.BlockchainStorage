@@ -28,7 +28,60 @@ namespace Nethereum.BlockchainStore.Processing
         {
             var presetName = config["Blockchain"] ?? Default;
             var configuration = Get(presetName);
+
+            ApplyOverrides(config, configuration);
+
             return configuration;
+        }
+
+        private static void ApplyOverrides(IConfigurationRoot config, BlockchainSourceConfiguration configuration)
+        {
+            var minBlockNumber = Parse(config, "MinimumBlockNumber");
+            var fromBlock = Parse(config, "FromBlock");
+            var toBlock = Parse(config, "ToBlock");
+            var blockchainUrl = config["BlockchainUrl"];
+            var blockchainName = config["Blockchain"];
+            var postVm = ParseBool(config, "PostVm");
+            var processTransactionsInParallel = ParseBool(config, "ProcessBlockTransactionsInParallel");
+
+            if (minBlockNumber != null)
+                configuration.MinimumBlockNumber = minBlockNumber;
+
+            if (fromBlock != null)
+                configuration.FromBlock = fromBlock;
+
+            if (toBlock != null)
+                configuration.ToBlock = toBlock;
+
+            if (blockchainUrl != null)
+                configuration.BlockchainUrl = blockchainUrl;
+
+            if (blockchainName != null)
+                configuration.Name = blockchainName;
+
+            if (postVm != null)
+                configuration.PostVm = postVm.Value;
+
+            if (processTransactionsInParallel != null)
+                configuration.ProcessBlockTransactionsInParallel = processTransactionsInParallel.Value;
+        }
+
+        public static long? Parse(IConfigurationRoot config, string name)
+        {
+            var configVal = config[name];
+
+            return string.IsNullOrEmpty(configVal)
+                ? (long?) null
+                : long.Parse(configVal);
+        }
+
+        public static bool? ParseBool(IConfigurationRoot config, string name)
+        {
+            var configVal = config[name];
+
+            return string.IsNullOrEmpty(configVal)
+                ? (bool?) null
+                : bool.Parse(configVal);
         }
 
         public static BlockchainSourceConfiguration Get(string name)

@@ -2,7 +2,7 @@
   "profiles": {
     "Nethereum.BlockchainStore.Sqlite.Console": {
       "commandName": "Project",
-      "commandLineArgs": "--Blockchain rinkeby --DbSchema rinkeby"
+      "commandLineArgs": "--Blockchain rinkeby --DbSchema rinkeby --FromBlock 3014873 --ToBlock 3015873"
     }
   }
 }

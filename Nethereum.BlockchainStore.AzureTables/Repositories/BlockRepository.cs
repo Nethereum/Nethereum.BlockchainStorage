@@ -76,7 +76,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             blockOutput.Hash = blockSource.BlockHash ?? string.Empty;
             blockOutput.ParentHash = blockSource.ParentHash ?? string.Empty;
             blockOutput.Miner = blockSource.Miner ?? string.Empty;
-            blockOutput.Nonce = string.IsNullOrEmpty(blockSource.Nonce) ? 0 : long.Parse(blockSource.Nonce);
+            blockOutput.Nonce = string.IsNullOrEmpty(blockSource.Nonce) ? 0 : (long)new HexBigInteger(blockSource.Nonce).Value;
             blockOutput.TransactionCount = blockSource.TransactionHashes.Length;
 
             return blockOutput;
