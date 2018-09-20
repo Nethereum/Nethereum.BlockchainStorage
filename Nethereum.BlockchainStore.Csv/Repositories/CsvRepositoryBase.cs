@@ -114,18 +114,11 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             _csvWriter?.Flush();
             _textWriter?.Flush();
 
-            if (_csvWriter != null)
-            {
-                _csvWriter.Flush();
-                _csvWriter.Dispose();
-                _csvWriter = null;
-            }
+            _csvWriter?.Dispose();
+            _csvWriter = null;
 
-            if (_textWriter != null)
-            {
-                _textWriter.Dispose();
-                _textWriter = null;
-            }
+            _textWriter?.Dispose();
+            _textWriter = null;
 
         }
 
