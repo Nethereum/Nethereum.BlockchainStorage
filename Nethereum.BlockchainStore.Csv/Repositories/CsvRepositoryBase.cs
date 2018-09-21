@@ -103,9 +103,27 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             }
             else
             {
+                LoadExistingRecordHashes();
                 _textWriter = File.AppendText(FilePath);
                 _csvWriter = new CsvWriter(_textWriter);
                 _csvWriter.Configuration.RegisterClassMap(CreateClassMap());
+            }
+        }
+
+        private void LoadExistingRecordHashes()
+        {
+            using (var reader = File.OpenText(FilePath))
+            {
+                using (var csvReader = new CsvReader(reader))
+                {
+                    csvReader.Configuration.HasHeaderRecord = true;
+                    csvReader.Configuration.RegisterClassMap(CreateClassMap());
+                    var entity = Activator.CreateInstance<TEntity>();
+                    foreach (var record in csvReader.EnumerateRecords(entity))
+                    {
+                        _savedEntityHashes.Add(CreateHash(record));
+                    }
+                }
             }
         }
 

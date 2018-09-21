@@ -70,12 +70,14 @@ namespace Nethereum.BlockchainStore
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(baseJsonFile, optional: true, reloadOnChange: false)
-                .AddJsonFile(environmentJsonFile, optional: true, reloadOnChange: false)
-                .AddEnvironmentVariables()
-                .AddCommandLine(args ?? new string[]{});
+                .AddJsonFile(environmentJsonFile, optional: true, reloadOnChange: false);
 
             if (userSecretsId != null && environment.Equals("development", StringComparison.InvariantCultureIgnoreCase))
                 builder.AddUserSecrets(userSecretsId);
+
+            builder
+                .AddEnvironmentVariables()
+                .AddCommandLine(args ?? new string[]{});
 
             return builder.Build();
         }

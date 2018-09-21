@@ -97,3 +97,67 @@ Finally after configuration we can execute the processing blocks as follows
     startBlock = startBlock + 1;           
   }
 ```
+## Processor Configuration
+For dot net core all configuration is derived in the following order.  Settings lower down the chain will override earlier settings.  
+This allows environmental variables and command line args to override base settings in configuration files.
+
+The environment is set differently from other configuration as it is read first because other settings may be dependant on it. 
+The environment "ASPNETCORE_ENVIRONMENT" is read by default from environmental variables and can be overriden by the command line.
+
+* appsettings.json
+* appsettings.{enviroment}.json
+* user secrets (only when environment is "development")
+* environmental variables
+* command line args
+
+### Storage Processor Configuration Settings
+The following settings are applicable to all storage processing regardless of the repository layer.
+
+When provided in the command line, ensure the argument is prefixed with "--".  The dashes should be ommitted when using other configuration sources (appsettings etc).
+
+* --ASPNETCORE_ENVIRONMENT
+  - Defines the environment the application is running in.
+  - User defined (e.g. "development", "CI", "staging").
+  - Default is blank.
+  - Use "development" if you require values from visual studio user secrets.
+* --Blockchain
+  - The name of the blockchain/client e.g. localhost, rinkeby, main.
+  - Default is localhost.
+* --MinimumBlockNumber
+  - A number dictating the lowest block number to process - instead of starting at 0.
+  - Useful when "FromBlock" has not neen specified.
+  - Default is 0.
+* --FromBlock
+  - The starting block number.
+  - Default is 0.
+* --ToBlock
+  - The end block number, ommit to continue processing indefinitely (storing new blocks as they appear).
+* --BlockchainUrl 
+  - The url of the ethereum client - e.g. http://localhost:8545.  
+  - If using Infura this URL should include the access key e.g. "https://rinkeby.infura.io/v3/{access_key}")
+* --PostVm 
+  - true/false.
+  - indicates if post VM processing is required.
+  - defaults to false.
+* --ProcessBlockTransactionsInParallel
+  - true/false
+  - Enables each transaction within a block in parallel.
+  - Defaults to true.
+
+### Azure Tables Configuration Settings
+
+User Secrets Id: Nethereum.BlockchainStore.AzureTables
+
+* --AzureStorageConnectionString  (the full azure connection string used for Azure storage - found in the Azure portal)
+
+### Cosmos Repository Configuration Settings
+
+User Secrets Id: Nethereum.BlockchainStore.CosmosCore.UserSecrets
+
+* --CosmosEndpointUri
+* --CosmosAccessKey
+* --CosmosDbTag 
+  - A tag appended to the default database name in Cosmos
+  - Allows the database name to differ between environments or block chain targets.
+  - Default database name is BlockchainStorage.
+  - Adding "Rinkeby" as a CosmosDbTag results in a database name - BlockchainStorageRinkeby.
