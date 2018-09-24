@@ -1,26 +1,32 @@
-using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
-using Wintellect.Azure.Storage.Table;
+using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
+using TransactionLog = Nethereum.BlockchainStore.AzureTables.Entities.TransactionLog;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class TransactionLogRepository : ITransactionLogRepository
+    public class TransactionLogRepository : AzureTableRepository<TransactionLog>, ITransactionLogRepository
     {
-        protected AzureTable Table { get; set; }
-
-        public TransactionLogRepository(CloudTable cloudTable)
+        public TransactionLogRepository(CloudTable table) : base(table)
         {
-            Table = new AzureTable(cloudTable);
+        }
+
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string transactionHash, long logIndex)
+        {
+            var operation = TableOperation.Retrieve<TransactionLog>(transactionHash, logIndex.ToString());
+            var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
+            return results.Result as TransactionLog;
         }
 
         public async Task UpsertAsync(string transactionHash, long logIndex,
             JObject log)
         {
-            var entity = TransactionLog.CreateTransactionLog(Table, transactionHash,
+            var entity = TransactionLog.CreateTransactionLog(transactionHash,
                 logIndex, log);
-            await entity.InsertOrReplaceAsync().ConfigureAwait(false);
+
+            await UpsertAsync(entity).ConfigureAwait(false);
         }
     }
 }

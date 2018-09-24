@@ -2,129 +2,35 @@ using System.Numerics;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect.Azure.Storage.Table;
 
-namespace Nethereum.BlockchainStore.Entities
+namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public abstract class TransactionBase : TableEntityBase
+    public abstract class TransactionBase : TableEntity
     {
-        public TransactionBase(AzureTable azureTable, DynamicTableEntity dynamicTableEntity = null)
-            : base(azureTable, dynamicTableEntity)
-        {
-        }
+        private static readonly long minusOne = (long) -1;
+        private static readonly long zero = (long) 0;
 
-        public string BlockHash
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
+        public string BlockHash { get; set; } = string.Empty;
         public abstract string Hash { get; set; }
-
-        public string AddressFrom
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public long TimeStamp
-        {
-            get { return Get(-1); }
-            set { Set(value); }
-        }
-
-        public long TransactionIndex
-        {
-            get { return Get(0); }
-            set { Set(value); }
-        }
-
-        public string Value
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
+        public string AddressFrom { get; set; } = string.Empty;
+        public long TimeStamp { get; set; } = minusOne;
+        public long TransactionIndex { get; set; } = zero;
+        public string Value { get; set; } = string.Empty;
         public abstract string AddressTo { get; set; }
         public abstract string BlockNumber { get; set; }
-
-        public long Gas
-        {
-            get { return Get(0); }
-            protected set { Set(value); }
-        }
-
-        public long GasPrice
-        {
-            get { return Get(0); }
-            protected set { Set(value); }
-        }
-
-        public string Input
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public long Nonce
-        {
-            get { return Get(0); }
-            set { Set(value); }
-        }
-
-        public bool Failed
-        {
-            get { return Get(false); }
-            set { Set(value); }
-        }
-
-        public string ReceiptHash
-        {
-            get { return Get(string.Empty); }
-            protected set { Set(value); }
-        }
-
-        public long GasUsed
-        {
-            get { return Get(0); }
-            protected set { Set(value); }
-        }
-
-        public long CumulativeGasUsed
-        {
-            get { return Get(0); }
-            protected set { Set(value); }
-        }
-
-        public bool HasLog
-        {
-            get { return Get(false); }
-            protected set { Set(value); }
-        }
-
-        public string Error
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public bool HasVmStack
-        {
-            get { return Get(false); }
-            set { Set(value); }
-        }
-
-        public string NewContractAddress
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public bool FailedCreateContract
-        {
-            get { return Get(false); }
-            set { Set(value); }
-        }
+        public long Gas { get; set; } = zero;
+        public long GasPrice { get; set; } = zero;
+        public string Input { get; set; } = string.Empty;
+        public long Nonce { get; set; } = zero;
+        public bool Failed { get; set; } = false;
+        public string ReceiptHash { get; set; } = string.Empty;
+        public long GasUsed { get; set; } = zero;
+        public long CumulativeGasUsed{ get; set; } = zero;
+        public bool HasLog { get; set; } = false;
+        public string Error{ get; set; } = string.Empty;
+        public bool HasVmStack{ get; set; } = false;
+        public string NewContractAddress{ get; set; } = string.Empty;
+        public bool FailedCreateContract{ get; set; } = false;
 
         public static TransactionBase CreateTransaction(
             TransactionBase transaction,
@@ -146,7 +52,7 @@ namespace Nethereum.BlockchainStore.Entities
             transaction.SetBlockNumber(transactionSource.BlockNumber);
             transaction.SetGas(transactionSource.Gas);
             transaction.SetGasPrice(transactionSource.GasPrice);
-            transaction.Input = transactionSource.Input ?? string.Empty;
+            transaction.Input = transactionSource.Input.RestrictToAzureTableStorageLimit(valIfTooLong: string.Empty);
             transaction.Nonce = (long) transactionSource.Nonce.Value;
             transaction.Failed = failed;
             transaction.SetGasUsed(transactionReceipt.GasUsed);

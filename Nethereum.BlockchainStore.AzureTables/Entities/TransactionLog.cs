@@ -1,65 +1,87 @@
+using System;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainStore.Entities;
 using Newtonsoft.Json.Linq;
-using Wintellect;
-using Wintellect.Azure.Storage.Table;
 
-namespace Nethereum.BlockchainStore.Entities
+namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public class TransactionLog : TableEntityBase
+    public class TransactionLog : TableEntity, ITransactionLogView
     {
-        public TransactionLog(AzureTable azureTable, DynamicTableEntity dynamicTableEntity = null)
-            : base(azureTable, dynamicTableEntity)
+        private string _topics = string.Empty;
+        private string _eventHash = string.Empty;
+        private string _indexVal1 = string.Empty;
+        private string _indexVal2 = string.Empty;
+        private string _indexVal3 = string.Empty;
+
+        public TransactionLog()
         {
+        }
+
+        public TransactionLog(string hash, long logIndex)
+        {
+            TransactionHash = hash;
+            LogIndex = logIndex;
         }
 
         public string TransactionHash
         {
-            get { return Get(string.Empty); }
-            set
-            {
-                PartitionKey = value.ToLowerInvariant().HtmlEncode();
-                Set(value);
-            }
+            get => PartitionKey;
+            set => PartitionKey = value.ToPartitionKey();
         }
 
         public long LogIndex
         {
-            get { return Get(0); }
-            set
-            {
-                RowKey = value.ToString();
-                Set(value);
-            }
-        }
+            get => long.Parse(RowKey);
+            set => RowKey = value.ToString().ToRowKey();
+        } 
 
-        public string Address
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
+        public string Address { get; set; } = string.Empty;
 
         public string Topics
         {
-            get { return Get(string.Empty); }
-            set { Set(value); }
+            get => _topics;
+            set
+            { 
+                _topics = value;  
+                SetValuesBasedOnTopics();
+            }
         }
 
-        public string Topic0
+        private void SetValuesBasedOnTopics()
         {
-            get { return Get(string.Empty); }
-            set { Set(value); }
+            _eventHash = string.Empty;
+            _indexVal1 = string.Empty;
+            _indexVal2 = string.Empty;
+            _indexVal3 = string.Empty;
+
+            var topics = string.IsNullOrEmpty(Topics) ? (JArray)null : JArray.Parse(Topics);
+
+            if (topics?.Count > 0)
+            {
+                _eventHash = topics[0].Value<string>();
+
+                if (topics.Count > 1)
+                    _indexVal1 = topics[1].Value<string>();
+
+                if (topics.Count > 2)
+                    _indexVal2 = topics[2].Value<string>();
+
+                if (topics.Count > 3)
+                    _indexVal3 = topics[3].Value<string>();
+            }            
         }
 
-        public string Data
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
+        public string Topic0 { get; set; } = string.Empty;
+        public string Data { get; set; } = string.Empty;
 
-        public static TransactionLog CreateTransactionLog(AzureTable logTable, string transactionHash, long logIndex,
-            JObject log)
+        public string EventHash => _eventHash;
+        public string IndexVal1 => _indexVal1;
+        public string IndexVal2 => _indexVal2;
+        public string IndexVal3 => _indexVal3;
+
+        public static TransactionLog CreateTransactionLog(string transactionHash, long logIndex, JObject log)
         {
-            var transactionLog = new TransactionLog(logTable) {TransactionHash = transactionHash, LogIndex = logIndex};
+            var transactionLog = new TransactionLog(transactionHash, logIndex);
             transactionLog.InitLog(log);
             return transactionLog;
         }
@@ -68,12 +90,14 @@ namespace Nethereum.BlockchainStore.Entities
         {
             Address = logObject["address"].Value<string>() ?? string.Empty;
             Data = logObject["data"].Value<string>() ?? string.Empty;
-            var topics = logObject["topics"] as JArray;
-            if (topics != null)
+
+            if (logObject["topics"] is JArray topics)
             {
                 Topics = topics.ToString();
                 if (topics.Count > 0)
+                {
                     Topic0 = topics[0].ToString();
+                }
             }
         }
     }

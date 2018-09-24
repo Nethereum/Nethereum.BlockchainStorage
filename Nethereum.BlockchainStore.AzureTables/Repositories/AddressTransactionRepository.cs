@@ -1,20 +1,25 @@
-using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainStore.AzureTables.Entities;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Wintellect.Azure.Storage.Table;
+using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class AddressTransactionRepository : IAddressTransactionRepository
+    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAddressTransactionRepository
     {
-        protected AzureTable Table { get; set; }
+        public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
 
-        public AddressTransactionRepository(CloudTable cloudTable)
+        public async Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
         {
-            Table = new AzureTable(cloudTable);
+            var partitionKey = addrees.ToPartitionKey();
+            var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);
+            var operation = TableOperation.Retrieve<AddressTransaction>(partitionKey, rowKey);
+            var results = await Table.ExecuteAsync(operation);
+            return results.Result as AddressTransaction;
         }
 
         public async Task UpsertAsync(Transaction transaction,
@@ -26,10 +31,11 @@ namespace Nethereum.BlockchainStore.Repositories
             bool hasVmStack = false,
             string newContractAddress = null)
         {
-            var entity = AddressTransaction.CreateAddressTransaction(Table, transaction,
+            var entity = AddressTransaction.CreateAddressTransaction(transaction,
                 transactionReceipt,
-                failedCreatingContract, blockTimestamp, null, null, false, newContractAddress);
-            await entity.InsertOrReplaceAsync().ConfigureAwait(false);
+                failedCreatingContract, blockTimestamp, address, error, hasVmStack, newContractAddress);
+
+            var result = await UpsertAsync(entity);
         }
     }
 }

@@ -1,7 +1,7 @@
-using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
@@ -56,7 +56,15 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
         public bool IsTransactionForContractCreation(Transaction transaction, TransactionReceipt transactionReceipt)
         {
-            return string.IsNullOrEmpty(transaction.To) && !string.IsNullOrEmpty(GetContractAddress(transactionReceipt));
+            return IsAddressEmpty(transaction.To) && !string.IsNullOrEmpty(GetContractAddress(transactionReceipt));
+        }
+
+        private bool IsAddressEmpty(string address)
+        {
+            if(string.IsNullOrEmpty(address))
+                return true;
+
+            return address == "0x0";
         }
 
         private string GetContractAddress(TransactionReceipt transactionReceipt)

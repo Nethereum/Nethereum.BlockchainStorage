@@ -7,19 +7,19 @@ namespace Nethereum.BlockchainStore.Processing.Console
     {
         private static readonly string prefix = "Morden";
 
-        private static readonly string connectionString =
-            "DefaultEndpointsProtocol=https;AccountName=XX;AccountKey=XXX";
+        private static readonly string connectionString = "<put your azure table connection string here>";
 
         private static void Main(string[] args)
         {
-            //string url = "http://localhost:8045";
+            //string url = "http://localhost:8545";
             //int start = 500599;
             //int end = 1000000;
             //bool postVm = true;
 
-            var url = args[0];
-            var start = Convert.ToInt32(args[1]);
-            var end = Convert.ToInt32(args[2]);
+            var url = args?.Length == 0 ? "http://localhost:8545" : args[0];
+            var start = args?.Length > 1 ? Convert.ToInt32(args[1]) : 0;
+            var end = args?.Length > 2 ? Convert.ToInt32(args[2]) : 1000000;
+
             var postVm = false;
             if (args.Length > 3)
                 if (args[3].ToLower() == "postvm")

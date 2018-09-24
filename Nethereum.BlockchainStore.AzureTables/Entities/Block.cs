@@ -1,99 +1,40 @@
-using System.Numerics;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.Hex.HexTypes;
-using Wintellect;
-using Wintellect.Azure.Storage.Table;
+using System.Numerics;
+using Nethereum.BlockchainStore.Entities;
 
-namespace Nethereum.BlockchainStore.Entities
+namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public class Block : TableEntityBase
+    public class Block : TableEntity, IBlockView
     {
-        public Block(AzureTable at, DynamicTableEntity dte = null) : base(at, dte)
+        public Block()
         {
+        }
+
+        public Block(string blockNumber)
+        {
+            BlockNumber = blockNumber;
             RowKey = string.Empty;
         }
 
         public string BlockNumber
         {
-            get { return Get(string.Empty); }
-            set
-            {
-                PartitionKey = value.ToLowerInvariant().HtmlEncode();
-                Set(value);
-            }
+            get => PartitionKey;
+            set => PartitionKey = value.ToPartitionKey();
         }
 
-        public string Hash
-        {
-            get { return Get(string.Empty); }
-            set { Set(value); }
-        }
-
-        public string ParentHash
-        {
-            get { return Get(string.Empty); }
-            set { Set(value, "ParentHash"); }
-        }
-
-        public string Nonce
-        {
-            get { return Get(string.Empty, "Nonce"); }
-            set { Set(value, "Nonce"); }
-        }
-
-        public string ExtraData
-        {
-            get { return Get(string.Empty, "ExtraData"); }
-            set { Set(value, "ExtraData"); }
-        }
-
-        public long Difficulty
-        {
-            get { return Get(0, "Difficulty"); }
-            set { Set(value, "Difficulty"); }
-        }
-
-        public long TotalDifficulty
-        {
-            get { return Get(0, "TotalDifficulty"); }
-            set { Set(value, "TotalDifficulty"); }
-        }
-
-        public long Size
-        {
-            get { return Get(0, "Size"); }
-            set { Set(value, "Size"); }
-        }
-
-        public string Miner
-        {
-            get { return Get(string.Empty, "Miner"); }
-            set { Set(value, "Miner"); }
-        }
-
-        public long GasLimit
-        {
-            get { return Get(0, "GasLimit"); }
-            set { Set(value, "GasLimit"); }
-        }
-
-        public long GasUsed
-        {
-            get { return Get(0, "GasUsed"); }
-            set { Set(value, "GasUsed"); }
-        }
-
-        public long TimeStamp
-        {
-            get { return Get(0, "TimeStamp"); }
-            set { Set(value, "TimeStamp"); }
-        }
-
-        public long TransactionCount
-        {
-            get { return Get(0); }
-            set { Set(value); }
-        }
+        public string Hash { get; set; } = string.Empty;
+        public string ParentHash { get; set; } = string.Empty;
+        public long Nonce { get; set; } = 0;
+        public string ExtraData { get; set; } = string.Empty;
+        public long Difficulty { get; set; } = 0;
+        public long TotalDifficulty { get; set; } = 0;
+        public long Size { get; set; } = 0;
+        public string Miner { get; set; } = string.Empty;
+        public long GasLimit { get; set; } = 0;
+        public long GasUsed { get; set; } = 0;
+        public long TimeStamp { get; set; } = 0;
+        public long TransactionCount { get; set; } = 0;
 
         public void SetBlockNumber(HexBigInteger blockNumber)
         {
