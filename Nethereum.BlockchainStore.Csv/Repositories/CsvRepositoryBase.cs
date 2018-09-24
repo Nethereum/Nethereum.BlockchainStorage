@@ -15,8 +15,10 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
     public abstract class CsvRepositoryBase<TEntity>: IDisposable where TEntity: TableRow
     {
         private TextWriter _textWriter;
-        private CsvHelper.CsvWriter _csvWriter;
+        private CsvWriter _csvWriter;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
+        private readonly HashSet<string> _savedEntityHashes = new HashSet<string>();
+        private readonly Sha3Keccack _hasher = new Sha3Keccack();
 
         //hack - rather than store a last row index
         private long _rowIndex = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -48,9 +50,6 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         }
 
         protected abstract ClassMap<TEntity> CreateClassMap();
-
-        private HashSet<string> _savedEntityHashes = new HashSet<string>();
-        private Sha3Keccack _hasher = new Sha3Keccack();
         
         private string CreateHash(TEntity entity)
         {
@@ -95,8 +94,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             if (!File.Exists(FilePath))
             {
                 _textWriter = File.CreateText(FilePath);
-                _csvWriter = new CsvWriter(_textWriter);
-                _csvWriter.Configuration.RegisterClassMap(CreateClassMap());
+                _csvWriter = CreateCsvWriter(_textWriter);
                 _csvWriter.WriteHeader<TEntity>();
                 _csvWriter.NextRecord();
                 _csvWriter.Flush();
@@ -105,26 +103,23 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             {
                 LoadExistingRecordHashes();
                 _textWriter = File.AppendText(FilePath);
-                _csvWriter = new CsvWriter(_textWriter);
-                _csvWriter.Configuration.RegisterClassMap(CreateClassMap());
+                _csvWriter = CreateCsvWriter(_textWriter);
             }
+        }
+
+        private CsvWriter CreateCsvWriter(TextWriter textWriter)
+        {
+            var csvWriter = new CsvWriter(textWriter);
+            csvWriter.Configuration.RegisterClassMap(CreateClassMap());
+            return csvWriter;
         }
 
         private void LoadExistingRecordHashes()
         {
-            using (var reader = File.OpenText(FilePath))
+            Enumerate(entity =>
             {
-                using (var csvReader = new CsvReader(reader))
-                {
-                    csvReader.Configuration.HasHeaderRecord = true;
-                    csvReader.Configuration.RegisterClassMap(CreateClassMap());
-                    var entity = Activator.CreateInstance<TEntity>();
-                    foreach (var record in csvReader.EnumerateRecords(entity))
-                    {
-                        _savedEntityHashes.Add(CreateHash(record));
-                    }
-                }
-            }
+                _savedEntityHashes.Add(CreateHash(entity));
+            });
         }
 
         protected void CloseWriter()
@@ -147,19 +142,14 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
                 await _lock.WaitAsync();
                 CloseWriter();
 
-                return await Task.Run(() =>
+                TEntity row = null;
+                WithCsvReader((csvReader) =>
                 {
-                    using (var reader = File.OpenText(FilePath))
-                    {
-                        using (var csvReader = new CsvReader(reader))
-                        {
-                            csvReader.Configuration.HasHeaderRecord = true;
-                            csvReader.Configuration.RegisterClassMap(CreateClassMap());
-                            var entity = Activator.CreateInstance<TEntity>();
-                            return csvReader.EnumerateRecords(entity).FirstOrDefault(criteria);
-                        }
-                    }
+                    var entity = Activator.CreateInstance<TEntity>();
+                    row = csvReader.EnumerateRecords(entity).FirstOrDefault(criteria);
                 });
+
+                return row;
             }
             finally
             {
@@ -177,24 +167,37 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
 
                 await Task.Run(() =>
                 {
-                    using (var reader = File.OpenText(FilePath))
-                    {
-                        using (var csvReader = new CsvReader(reader))
-                        {
-                            csvReader.Configuration.HasHeaderRecord = true;
-                            csvReader.Configuration.RegisterClassMap(CreateClassMap());
-                            var entity = Activator.CreateInstance<TEntity>();
-                            foreach (var record in csvReader.EnumerateRecords(entity))
-                            {
-                                rowAction(record);
-                            }
-                        }
-                    }
+                    Enumerate(rowAction);
                 });
             }
             finally
             {
                 _lock.Release();
+            }
+        }
+
+        private void Enumerate(Action<TEntity> rowAction)
+        {
+            WithCsvReader((csvReader) =>
+            {
+                var entity = Activator.CreateInstance<TEntity>();
+                foreach (var record in csvReader.EnumerateRecords(entity))
+                {
+                    rowAction(record);
+                }
+            });
+        }
+
+        private void WithCsvReader(Action<CsvReader> readerAction)
+        {
+            using (var reader = File.OpenText(FilePath))
+            {
+                using (var csvReader = new CsvReader(reader))
+                {
+                    csvReader.Configuration.HasHeaderRecord = true;
+                    csvReader.Configuration.RegisterClassMap(CreateClassMap());
+                    readerAction(csvReader);
+                }
             }
         }
 
