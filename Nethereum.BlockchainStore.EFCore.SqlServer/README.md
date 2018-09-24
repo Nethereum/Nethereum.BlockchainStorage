@@ -26,3 +26,4 @@ A DB user is created for each schema and allocated permissions only to that sche
 		* run DbInitialCreate.bat
 * Apply default DB roles and permissions
 	* use BlockchainStorage - run 02 CreateAndApplyDbRoles.sql
+* Apply the scripts relating to the schemas you require (e.g. SqlServerBlockchainDbContext_dbo.sql, SqlServerBlockchainDbContext_rinkeby.sql etc)
