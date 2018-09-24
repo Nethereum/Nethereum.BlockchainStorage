@@ -221,3 +221,8 @@ A DB user is created for each schema and allocated permissions only to that sche
 	* 02 CreateAndApplyDbRoles.sql (ensure it is run against the correct database)
 * Apply the scripts relating to the schemas you require (e.g. SqlServerBlockchainDbContext_dbo.sql, SqlServerBlockchainDbContext_rinkeby.sql etc)
 
+### Sql Server and Sqlite (Full Framework) Configuration
+
+For an example - check out the App.config in the "Nethereum.BlockchainStore.EF.Tests" project. 
+(Not relevant to dot net core!) 
+
