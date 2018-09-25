@@ -1,0 +1,5 @@
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="buildConf/Version.props" />
+  <Import Project="buildConf/Frameworks.props" />
+  <Import Project="buildConf/Generic.props" />
+</Project>
