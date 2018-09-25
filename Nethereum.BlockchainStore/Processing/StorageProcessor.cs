@@ -149,25 +149,16 @@ namespace Nethereum.BlockchainStore.Processing
                 {
                     System.Console.WriteLine(ex.Message + ". " + ex.InnerException?.Message);
 
-                    if (ex.StackTrace.Contains("Only one usage of each socket address"))
+                    if (retryNumber != MaxRetries)
                     {
-                        Thread.Sleep(1000);
-                        System.Console.WriteLine("SOCKET ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
-                        await ExecuteAsync(startBlock, endBlock).ConfigureAwait(false);
+                        await ExecuteAsync(startBlock, endBlock, retryNumber + 1).ConfigureAwait(false);
                     }
                     else
                     {
-                        if (retryNumber != MaxRetries)
-                        {
-                            await ExecuteAsync(startBlock, endBlock, retryNumber + 1).ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            retryNumber = 0;
-                            startBlock = startBlock + 1;
-                            Log.Error().Exception(ex).Message("BlockNumber" + startBlock).Write();
-                            System.Console.WriteLine("ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
-                        }
+                        retryNumber = 0;
+                        startBlock = startBlock + 1;
+                        Log.Error().Exception(ex).Message("BlockNumber" + startBlock).Write();
+                        System.Console.WriteLine("ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
                     }
                 }
 
