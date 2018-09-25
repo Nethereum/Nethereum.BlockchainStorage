@@ -1,5 +1,4 @@
-﻿using System;
-using Nethereum.BlockchainStore.AzureTables.Bootstrap;
+﻿using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
 
 namespace Nethereum.BlockchainStore.AzureTables.Core.Console
