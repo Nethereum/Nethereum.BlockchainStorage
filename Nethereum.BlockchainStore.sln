@@ -46,8 +46,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureTableStorage", "AzureT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Utils", "Nethereum.BlockchainStore.Utils\Nethereum.BlockchainStore.Utils.csproj", "{E96A862F-A912-4FBB-8B73-1E1B0B16D588}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.AzureTables.Console", "Nethereum.BlockchainStore.AzureTables.Console\Nethereum.BlockchainStore.AzureTables.Console.csproj", "{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CosmosCore", "CosmosCore", "{60286D0D-6F09-4FF0-B51D-C3822CA107A0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.CosmosCore", "Nethereum.BlockchainStore.CosmosCore\Nethereum.BlockchainStore.CosmosCore.csproj", "{128CD31E-0D08-401F-BEA0-11D48226D328}"
@@ -64,11 +62,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSV", "CSV", "{2C2CECA5-279F-43E2-8992-EFA805A0C879}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Csv", "Nethereum.BlockchainStore.Csv\Nethereum.BlockchainStore.Csv.csproj", "{A4ED4886-27E7-41B7-A567-95F995035AEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Csv", "Nethereum.BlockchainStore.Csv\Nethereum.BlockchainStore.Csv.csproj", "{A4ED4886-27E7-41B7-A567-95F995035AEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Csv.Tests", "Nethereum.BlockchainStore.Csv.Tests\Nethereum.BlockchainStore.Csv.Tests.csproj", "{492A1A17-E628-4F4D-9EFA-73DF9825F714}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Csv.Tests", "Nethereum.BlockchainStore.Csv.Tests\Nethereum.BlockchainStore.Csv.Tests.csproj", "{492A1A17-E628-4F4D-9EFA-73DF9825F714}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Csv.Console", "Nethereum.BlockchainStore.Csv.Console\Nethereum.BlockchainStore.Csv.Console.csproj", "{5719837D-DEED-462E-B62A-D9DB88E639EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Csv.Console", "Nethereum.BlockchainStore.Csv.Console\Nethereum.BlockchainStore.Csv.Console.csproj", "{5719837D-DEED-462E-B62A-D9DB88E639EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -140,10 +138,6 @@ Global
 		{E96A862F-A912-4FBB-8B73-1E1B0B16D588}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E96A862F-A912-4FBB-8B73-1E1B0B16D588}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E96A862F-A912-4FBB-8B73-1E1B0B16D588}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{128CD31E-0D08-401F-BEA0-11D48226D328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{128CD31E-0D08-401F-BEA0-11D48226D328}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{128CD31E-0D08-401F-BEA0-11D48226D328}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -197,7 +191,6 @@ Global
 		{7542D79D-CB1C-44D5-8065-B310DAF73B5F} = {DB94E59A-6469-49BC-8629-6174990EE133}
 		{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8} = {DB94E59A-6469-49BC-8629-6174990EE133}
 		{DB173474-84AB-496F-A062-7A00C6C6B3B6} = {DB94E59A-6469-49BC-8629-6174990EE133}
-		{FE892411-92C2-4D58-9C5A-2EA1FE51DBFE} = {94A26589-358C-4D9E-AF7D-BCF4476A804E}
 		{128CD31E-0D08-401F-BEA0-11D48226D328} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
 		{8584ADF4-90D9-435B-AEDB-CE2B8DA1FFEB} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
 		{77117972-3913-4E17-B027-EF05EEDBCB8B} = {60286D0D-6F09-4FF0-B51D-C3822CA107A0}
