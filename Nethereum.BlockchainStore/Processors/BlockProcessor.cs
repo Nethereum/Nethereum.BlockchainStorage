@@ -39,14 +39,15 @@ namespace Nethereum.BlockchainStore.Repositories
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
 
-            if (await _blockFilters.IgnoreAsync(block)) return;
+            if (await _blockFilters.IsMatchAsync(block))
+            {
+                await _blockRepository.UpsertBlockAsync(block);
 
-            await _blockRepository.UpsertBlockAsync(block);
-
-            if (ProcessTransactionsInParallel)
-                await ProcessTransactionsMultiThreaded(block);
-            else
-                await ProcessTransactions(block);
+                if (ProcessTransactionsInParallel)
+                    await ProcessTransactionsMultiThreaded(block);
+                else
+                    await ProcessTransactions(block);
+            }
         }
 
         protected async Task ProcessTransactions(BlockWithTransactionHashes block)
