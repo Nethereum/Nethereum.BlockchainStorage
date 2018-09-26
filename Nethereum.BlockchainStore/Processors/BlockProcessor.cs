@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainStore.Repositories
             _blockFilters = new List<IBlockFilter>(blockFilters ?? new IBlockFilter[0]);
         }
 
-        public IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
+        protected IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
         protected ITransactionProcessor TransactionProcessor { get; set; }
 
         public virtual async Task ProcessBlockAsync(long blockNumber)

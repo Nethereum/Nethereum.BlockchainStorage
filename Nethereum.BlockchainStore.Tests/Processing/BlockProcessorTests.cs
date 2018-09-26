@@ -8,6 +8,7 @@ using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Processing;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
@@ -123,11 +124,31 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 .Setup(p => p.GetBlockWithTransactionsHashesByNumber(9))
                 .ReturnsAsync(stubBlock);
 
+            //execute
             await blockProcessor.ProcessBlockAsync(blockNumber);
+
+            //assert
+            _mockBlockRepository.Verify(b => b.UpsertBlockAsync(stubBlock), Times.Never);
 
             _mockTransactionProcessor
                 .Verify(t => t.ProcessTransactionAsync(It.IsAny<String>(), It.IsAny<BlockWithTransactionHashes>()), Times.Never);
 
+        }
+
+        [Fact]
+        public async Task ProcessBlock_WhenBlockProxyReturnsNull_ThrowsBlockNotFoundException()
+        {
+            //setup
+            const long blockNumber = 9;
+
+            BlockProcessor blockProcessor = CreateBlockProcessor();
+
+            _mockBlockProxy
+                .Setup(p => p.GetBlockWithTransactionsHashesByNumber(9))
+                .ReturnsAsync((BlockWithTransactionHashes)null);
+
+            //execute
+            await Assert.ThrowsAsync<BlockNotFoundException>(async () => await blockProcessor.ProcessBlockAsync(blockNumber));
         }
 
         private BlockProcessor CreateBlockProcessor()
