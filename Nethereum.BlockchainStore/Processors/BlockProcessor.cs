@@ -4,6 +4,7 @@ using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Repositories
@@ -11,17 +12,20 @@ namespace Nethereum.BlockchainStore.Repositories
     public class BlockProcessor : IBlockProcessor
     {
         private readonly IBlockRepository _blockRepository;
+        private readonly List<IBlockFilter> _blockFilters;
 
         public static bool ProcessTransactionsInParallel { get; set; } = true;
 
         public BlockProcessor(Web3.Web3 web3, 
             IBlockRepository blockRepository,
-            ITransactionProcessor transactionProcessor
+            ITransactionProcessor transactionProcessor, 
+            IEnumerable<IBlockFilter> blockFilters = null
            )
         {
             _blockRepository = blockRepository;
             TransactionProcessor = transactionProcessor;
             Web3 = web3;
+            _blockFilters = new List<IBlockFilter>(blockFilters ?? new IBlockFilter[0]);
         }
 
         protected Web3.Web3 Web3 { get; set; }
@@ -33,6 +37,11 @@ namespace Nethereum.BlockchainStore.Repositories
 
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
+
+            if(_blockFilters.Any() && !_blockFilters.Any(b => b.IsMatch(block)))
+            {
+                return;
+            }
 
             await _blockRepository.UpsertBlockAsync(block);
 

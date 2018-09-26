@@ -22,7 +22,12 @@ namespace Nethereum.BlockchainStore.Processing
         private bool _contractCacheInitialised = false;
         private readonly List<object> _repositories = new List<object>();
 
-        public StorageProcessor(string url, IBlockchainStoreRepositoryFactory repositoryFactory, bool postVm = false)
+        public StorageProcessor(
+            string url, 
+            IBlockchainStoreRepositoryFactory repositoryFactory, 
+            bool postVm = false,
+            FilterContainer filterContainer = null
+            )
         {
             _waitForBlockStrategy = new WaitForBlockStrategy();
             _web3 = new Web3.Web3(url);
@@ -49,14 +54,14 @@ namespace Nethereum.BlockchainStore.Processing
             var valueTrasactionProcessor = new ValueTransactionProcessor(transactionRepository,
                 addressTransactionRepository);
             var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
-                valueTrasactionProcessor, contractCreationTransactionProcessor);
+                valueTrasactionProcessor, contractCreationTransactionProcessor, filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
 
             if (postVm)
                 _processor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
             else
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                _processor = new BlockProcessor(_web3, _blockRepository, transactionProcessor);
+                _processor = new BlockProcessor(_web3, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
             }       
         }
 

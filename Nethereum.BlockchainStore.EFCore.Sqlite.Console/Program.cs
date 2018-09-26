@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainStore.Processing;
+using Nethereum.BlockchainStore.Processors.Transactions;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite.Console
 {
@@ -10,7 +11,12 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite.Console
             var blockchainSourceConfiguration = BlockchainSourceConfigurationPresets.Get(appConfig);
             var contextFactory = new SqliteBlockchainDbContextFactory(appConfig.GetBlockchainStorageConnectionString());
             var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
-            return ProcessorConsole.Execute(repositoryFactory, blockchainSourceConfiguration).Result;
+
+            var filterContainer = new FilterContainer(
+                new TransactionFilter(t => t.Value.Value > 0),
+                new TransactionReceiptFilter(t => !string.IsNullOrEmpty(t.ContractAddress)));
+
+            return ProcessorConsole.Execute(repositoryFactory, blockchainSourceConfiguration, filterContainer).Result;
         }
     }
 }

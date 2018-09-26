@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -8,13 +10,23 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly IContractTransactionProcessor _contractTransactionProcessor;
         private readonly IValueTransactionProcessor _valueTransactionProcessor;
         private readonly IContractCreationTransactionProcessor _contractCreationTransactionProcessor;
+        private readonly List<ITransactionFilter> _transactionFilters;
+        private readonly List<ITransactionReceiptFilter> _transactionReceiptFilters;
 
-        public TransactionProcessor(Web3.Web3 web3, IContractTransactionProcessor contractTransactionProcessor, IValueTransactionProcessor valueTransactionProcessor, IContractCreationTransactionProcessor contractCreationTransactionProcessor)
+        public TransactionProcessor(
+            Web3.Web3 web3, 
+            IContractTransactionProcessor contractTransactionProcessor, 
+            IValueTransactionProcessor valueTransactionProcessor, 
+            IContractCreationTransactionProcessor contractCreationTransactionProcessor,
+            IEnumerable<ITransactionFilter> transactionFilters = null,
+            IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null)
         {
             _contractTransactionProcessor = contractTransactionProcessor;
             _valueTransactionProcessor = valueTransactionProcessor;
             _contractCreationTransactionProcessor = contractCreationTransactionProcessor;
             Web3 = web3;
+            _transactionFilters = new List<ITransactionFilter>(transactionFilters ?? new ITransactionFilter[0]);
+            _transactionReceiptFilters = new List<ITransactionReceiptFilter>(transactionReceiptFilters ?? new ITransactionReceiptFilter[0]);
         }
 
         protected Web3.Web3 Web3 { get; }
@@ -22,8 +34,13 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         public virtual async Task ProcessTransactionAsync(string transactionHash, BlockWithTransactionHashes block)
         {
             var transactionSource = await GetTransaction(transactionHash).ConfigureAwait(false);
+
+            if (_transactionFilters.Ignore(transactionSource)) return;
+
             var transactionReceipt = await GetTransactionReceipt(transactionHash).ConfigureAwait(false);
 
+            if (_transactionReceiptFilters.Ignore(transactionReceipt)) return;
+            
             if (_contractCreationTransactionProcessor.IsTransactionForContractCreation(transactionSource, transactionReceipt))
             {
                 if (EnabledContractCreationProcessing)

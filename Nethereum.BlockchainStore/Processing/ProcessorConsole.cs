@@ -9,9 +9,13 @@ namespace Nethereum.BlockchainStore.Processing
     {
         private static StorageProcessor _proc;
 
-        public static async Task<int> Execute(IBlockchainStoreRepositoryFactory repositoryFactory, BlockchainSourceConfiguration configuration)
+        public static async Task<int> Execute(
+            IBlockchainStoreRepositoryFactory repositoryFactory, 
+            BlockchainSourceConfiguration configuration,
+            FilterContainer filterContainer = null)
         {
-            using(_proc = new StorageProcessor(configuration.BlockchainUrl, repositoryFactory, configuration.PostVm)
+            using(_proc = new StorageProcessor(
+                configuration.BlockchainUrl, repositoryFactory, configuration.PostVm, filterContainer)
             {
                 MinimumBlockNumber = configuration.MinimumBlockNumber,
                 ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel
