@@ -7,6 +7,7 @@ using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.PostProcessors;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainStore.Web3Abstractions;
 using NLog.Fluent;
 
 namespace Nethereum.BlockchainStore.Processing
@@ -47,6 +48,8 @@ namespace Nethereum.BlockchainStore.Processing
             _repositories.Add(logRepository);
             _repositories.Add(vmStackRepository);
 
+            var web3Wrapper = new Web3Wrapper(_web3);
+
             var contractTransactionProcessor = new ContractTransactionProcessor(_web3, _contractRepository,
                 transactionRepository, addressTransactionRepository, vmStackRepository, logRepository, filterContainer?.TransactionLogFilters);
 
@@ -60,11 +63,11 @@ namespace Nethereum.BlockchainStore.Processing
                 valueTransactionProcessor, contractCreationTransactionProcessor, filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
 
             if (postVm)
-                _processor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
+                _processor = new BlockVmPostProcessor(web3Wrapper, _blockRepository, transactionProcessor);
             else
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                _processor = new BlockProcessor(_web3, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
+                _processor = new BlockProcessor(web3Wrapper, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
             }       
         }
 

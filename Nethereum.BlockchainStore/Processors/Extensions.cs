@@ -28,7 +28,7 @@ namespace Nethereum.BlockchainStore.Processors
 
         public static bool IsAnEmptyAddress(this string address)
         {
-            if(string.IsNullOrEmpty(address))
+            if(string.IsNullOrWhiteSpace(address))
                 return true;
 
             return address == "0x0";

@@ -6,6 +6,7 @@ using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Web3Abstractions;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -16,24 +17,24 @@ namespace Nethereum.BlockchainStore.Repositories
 
         public static bool ProcessTransactionsInParallel { get; set; } = true;
 
-        public BlockProcessor(Web3.Web3 web3, 
+        public BlockProcessor(IGetBlockWithTransactionHashesByNumber blockProxy, 
             IBlockRepository blockRepository,
             ITransactionProcessor transactionProcessor, 
             IEnumerable<IBlockFilter> blockFilters = null
            )
         {
+            BlockProxy = blockProxy;
             _blockRepository = blockRepository;
             TransactionProcessor = transactionProcessor;
-            Web3 = web3;
             _blockFilters = new List<IBlockFilter>(blockFilters ?? new IBlockFilter[0]);
         }
 
-        protected Web3.Web3 Web3 { get; set; }
+        public IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
         protected ITransactionProcessor TransactionProcessor { get; set; }
 
         public virtual async Task ProcessBlockAsync(long blockNumber)
         {
-            var block = await GetBlockWithTransactionHashesAsync(blockNumber);
+            var block = await BlockProxy.GetBlockWithTransactionsHashesByNumber(blockNumber);
 
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
@@ -68,13 +69,5 @@ namespace Nethereum.BlockchainStore.Repositories
             await Task.WhenAll(txTasks);
         }
 
-        protected async Task<BlockWithTransactionHashes> GetBlockWithTransactionHashesAsync(long blockNumber)
-        {
-            var block =
-                await
-                    Web3.Eth.Blocks.GetBlockWithTransactionsHashesByNumber.SendRequestAsync(
-                        new HexBigInteger(blockNumber)).ConfigureAwait(false);
-            return block;
-        }
     }
 }

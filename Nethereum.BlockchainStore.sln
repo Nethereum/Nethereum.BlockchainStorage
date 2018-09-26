@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.Sqlite", "Nethereum.BlockchainStore.EF.Sqlite\Nethereum.BlockchainStore.EF.Sqlite.csproj", "{0D487C6E-7AD7-4F92-BDB7-AE6F1609628B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.Sqlite.Console", "Nethereum.BlockchainStore.EF.Sqlite.Console\Nethereum.BlockchainStore.EF.Sqlite.Console.csproj", "{7542D79D-CB1C-44D5-8065-B310DAF73B5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.Sqlite.Console", "Nethereum.BlockchainStore.EF.Sqlite.Console\Nethereum.BlockchainStore.EF.Sqlite.Console.csproj", "{7542D79D-CB1C-44D5-8065-B310DAF73B5F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.Tests", "Nethereum.BlockchainStore.EF.Tests\Nethereum.BlockchainStore.EF.Tests.csproj", "{850EA3FC-4D2B-4C3C-8FA6-95D95B89D8E8}"
 EndProject
@@ -67,6 +67,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Csv.Tests", "Nethereum.BlockchainStore.Csv.Tests\Nethereum.BlockchainStore.Csv.Tests.csproj", "{492A1A17-E628-4F4D-9EFA-73DF9825F714}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Csv.Console", "Nethereum.BlockchainStore.Csv.Console\Nethereum.BlockchainStore.Csv.Console.csproj", "{5719837D-DEED-462E-B62A-D9DB88E639EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Tests", "Nethereum.BlockchainStore.Tests\Nethereum.BlockchainStore.Tests.csproj", "{963D66C5-D451-4537-A758-68CF1F3527F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -174,6 +176,10 @@ Global
 		{5719837D-DEED-462E-B62A-D9DB88E639EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5719837D-DEED-462E-B62A-D9DB88E639EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5719837D-DEED-462E-B62A-D9DB88E639EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{963D66C5-D451-4537-A758-68CF1F3527F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{963D66C5-D451-4537-A758-68CF1F3527F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{963D66C5-D451-4537-A758-68CF1F3527F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{963D66C5-D451-4537-A758-68CF1F3527F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
