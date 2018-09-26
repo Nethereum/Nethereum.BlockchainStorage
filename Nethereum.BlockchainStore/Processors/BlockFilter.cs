@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Processors
 {
     public class BlockFilter : Filter<BlockWithTransactionHashes>, IBlockFilter
     {
-        public BlockFilter(Func<Block, bool> matchFunc) : base(matchFunc)
+        public BlockFilter(Func<BlockWithTransactionHashes, Task<bool>> matchFunc) : base(matchFunc)
         {
         }
     }

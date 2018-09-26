@@ -2,8 +2,7 @@
 
 namespace Nethereum.BlockchainStore.Processors
 {
-    public interface IBlockFilter
+    public interface IBlockFilter: IFilter<BlockWithTransactionHashes>
     {
-        bool IsMatch(BlockWithTransactionHashes block);
     }
 }

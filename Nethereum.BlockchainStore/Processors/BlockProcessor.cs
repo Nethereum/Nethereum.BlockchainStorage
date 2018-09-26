@@ -38,10 +38,7 @@ namespace Nethereum.BlockchainStore.Repositories
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
 
-            if(_blockFilters.Any() && !_blockFilters.Any(b => b.IsMatch(block)))
-            {
-                return;
-            }
+            if (await _blockFilters.IgnoreAsync(block)) return;
 
             await _blockRepository.UpsertBlockAsync(block);
 

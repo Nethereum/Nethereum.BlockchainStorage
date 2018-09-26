@@ -18,12 +18,16 @@ namespace Nethereum.BlockchainStore.Processing
         {
         }
 
+        public FilterContainer(ITransactionLogFilter transactionLogFilter):this(null, null, null, transactionLogFilter)
+        {
+        }
+
         public FilterContainer(ITransactionFilter transactionFilter, ITransactionReceiptFilter transactionReceiptFilter):this(null, transactionFilter, transactionReceiptFilter)
         {
                 
         }
 
-        public FilterContainer(IBlockFilter blockFilter, ITransactionFilter transactionFilter, ITransactionReceiptFilter transactionReceiptFilter = null)
+        public FilterContainer(IBlockFilter blockFilter, ITransactionFilter transactionFilter, ITransactionReceiptFilter transactionReceiptFilter = null, ITransactionLogFilter transactionLogFilter = null)
         {
             if (blockFilter != null)
             {
@@ -45,20 +49,30 @@ namespace Nethereum.BlockchainStore.Processing
                 transactionReceiptFilters.Add(transactionReceiptFilter);
                 TransactionReceiptFilters = transactionReceiptFilters;
             }
+
+            if (transactionLogFilter != null)
+            {
+                var transactionLogFilters = new List<ITransactionLogFilter>(1);
+                transactionLogFilters.Add(transactionLogFilter);
+                TransactionLogFilters = transactionLogFilters;
+            }
         }
 
         public FilterContainer(            
             IEnumerable<IBlockFilter> blockFilters = null,
             IEnumerable<ITransactionFilter> transactionFilters = null,
-            IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null)
+            IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null,
+            IEnumerable<ITransactionLogFilter> transactionLogFilters = null)
         {
             BlockFilters = blockFilters;
             TransactionFilters = transactionFilters;
             TransactionReceiptFilters = transactionReceiptFilters;
+            TransactionLogFilters = transactionLogFilters;
         }
 
         public IEnumerable<IBlockFilter> BlockFilters { get; }
         public IEnumerable<ITransactionFilter> TransactionFilters { get; }
         public IEnumerable<ITransactionReceiptFilter> TransactionReceiptFilters { get; }
+        public IEnumerable<ITransactionLogFilter> TransactionLogFilters { get; }
     }
 }

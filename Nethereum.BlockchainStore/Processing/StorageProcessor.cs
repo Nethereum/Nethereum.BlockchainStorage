@@ -48,13 +48,16 @@ namespace Nethereum.BlockchainStore.Processing
             _repositories.Add(vmStackRepository);
 
             var contractTransactionProcessor = new ContractTransactionProcessor(_web3, _contractRepository,
-                transactionRepository, addressTransactionRepository, vmStackRepository, logRepository);
+                transactionRepository, addressTransactionRepository, vmStackRepository, logRepository, filterContainer?.TransactionLogFilters);
+
             var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(_web3, _contractRepository,
                 transactionRepository, addressTransactionRepository);
-            var valueTrasactionProcessor = new ValueTransactionProcessor(transactionRepository,
+
+            var valueTransactionProcessor = new ValueTransactionProcessor(transactionRepository,
                 addressTransactionRepository);
+
             var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
-                valueTrasactionProcessor, contractCreationTransactionProcessor, filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
+                valueTransactionProcessor, contractCreationTransactionProcessor, filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
 
             if (postVm)
                 _processor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);

@@ -35,11 +35,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         {
             var transactionSource = await GetTransaction(transactionHash).ConfigureAwait(false);
 
-            if (_transactionFilters.Ignore(transactionSource)) return;
+            if (await _transactionFilters.IgnoreAsync(transactionSource)) return;
 
             var transactionReceipt = await GetTransactionReceipt(transactionHash).ConfigureAwait(false);
 
-            if (_transactionReceiptFilters.Ignore(transactionReceipt)) return;
+            if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
             
             if (_contractCreationTransactionProcessor.IsTransactionForContractCreation(transactionSource, transactionReceipt))
             {

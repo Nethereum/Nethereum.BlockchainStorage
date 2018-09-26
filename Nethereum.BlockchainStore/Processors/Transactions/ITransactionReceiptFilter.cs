@@ -2,8 +2,7 @@
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
-    public interface ITransactionReceiptFilter
+    public interface ITransactionReceiptFilter: IFilter<TransactionReceipt>
     {
-        bool IsMatch(TransactionReceipt transactionReceipt);
     }
 }

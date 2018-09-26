@@ -16,6 +16,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly IAddressTransactionRepository _addressTransactionRepository;
         private readonly ITransactionVMStackRepository _transactionVmStackRepository;
         private readonly ITransactionLogRepository _transactionLogRepository;
+
+        private IEnumerable<ITransactionLogFilter> _transactionLogFilters;
         //protected VmStackErrorChecker VmStackErrorChecker { get; set; }
         protected Web3.Web3 Web3 { get; set; }
 
@@ -24,7 +26,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                           ITransactionRepository transactionRepository, 
                           IAddressTransactionRepository addressTransactionRepository,
                           ITransactionVMStackRepository transactionVmStackRepository,
-                          ITransactionLogRepository transactionLogRepository)
+                          ITransactionLogRepository transactionLogRepository,
+                          IEnumerable<ITransactionLogFilter> transactionLogFilters = null
+                                )
         {
             Web3 = web3;
             _contractRepository = contractRepository;
@@ -32,7 +36,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             _addressTransactionRepository = addressTransactionRepository;
             _transactionVmStackRepository = transactionVmStackRepository;
             _transactionLogRepository = transactionLogRepository;
-           // VmStackErrorChecker = new VmStackErrorChecker();
+            _transactionLogFilters = transactionLogFilters;
+            // VmStackErrorChecker = new VmStackErrorChecker();
         }
 
         public async Task<bool> IsTransactionForContractAsync(Transaction transaction)
@@ -86,8 +91,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
             for (var i = 0; i < logs.Count; i++)
             {
-                var log = logs[i] as JObject;
-                if (log != null)
+                if (logs[i] is JObject log)
                 {
                     var logAddress = log["address"].Value<string>();
 
@@ -101,16 +105,19 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                                 logAddress, error, hasStackTrace);
                     }
 
-                    await _transactionLogRepository.UpsertAsync(transactionHash,
-                        i, log);
-                    
+                    if (await _transactionLogFilters.IsMatchAsync(log))
+                    {
+                        await _transactionLogRepository.UpsertAsync(transactionHash,
+                            i, log);
+                    }
+
                 }
             }
         }
 
-        protected async Task<JObject> GetTransactionVmStack(string transactionHash)
+        protected Task<JObject> GetTransactionVmStack(string transactionHash)
         {
-            return null;
+            return Task.FromResult((JObject)null);
             //return
             //    await
             //        Web3.DebugGeth.TraceTransaction.SendRequestAsync(transactionHash,

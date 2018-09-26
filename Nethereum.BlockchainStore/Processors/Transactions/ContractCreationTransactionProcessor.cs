@@ -27,7 +27,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         {
             if (!IsTransactionForContractCreation(transaction, transactionReceipt)) return;
 
-            var contractAddress = GetContractAddress(transactionReceipt);
+            var contractAddress = transactionReceipt.ContractAddress;
             var code = await GetCode(contractAddress).ConfigureAwait(false);
             var failedCreatingContract = HasFailedToCreateContract(code);
 
@@ -56,20 +56,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
         public bool IsTransactionForContractCreation(Transaction transaction, TransactionReceipt transactionReceipt)
         {
-            return IsAddressEmpty(transaction.To) && !string.IsNullOrEmpty(GetContractAddress(transactionReceipt));
+            return transaction.To.IsAnEmptyAddress() && transactionReceipt.ContractAddress.IsNotAnEmptyAddress();
         }
 
-        private bool IsAddressEmpty(string address)
-        {
-            if(string.IsNullOrEmpty(address))
-                return true;
-
-            return address == "0x0";
-        }
-
-        private string GetContractAddress(TransactionReceipt transactionReceipt)
-        {
-            return transactionReceipt.ContractAddress;
-        }
     }
 }

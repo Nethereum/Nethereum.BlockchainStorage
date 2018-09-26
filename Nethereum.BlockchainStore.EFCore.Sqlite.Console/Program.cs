@@ -13,8 +13,8 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite.Console
             var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
 
             var filterContainer = new FilterContainer(
-                new TransactionFilter(t => t.Value.Value > 0),
-                new TransactionReceiptFilter(t => !string.IsNullOrEmpty(t.ContractAddress)));
+                TransactionFilter.ValueGreaterThanZero(),
+                TransactionReceiptFilter.OnlyNewContracts());
 
             return ProcessorConsole.Execute(repositoryFactory, blockchainSourceConfiguration, filterContainer).Result;
         }
