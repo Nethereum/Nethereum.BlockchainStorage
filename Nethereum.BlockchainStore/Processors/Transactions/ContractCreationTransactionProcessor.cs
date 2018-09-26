@@ -56,7 +56,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
         public bool IsTransactionForContractCreation(Transaction transaction, TransactionReceipt transactionReceipt)
         {
-            return transaction.To.IsAnEmptyAddress() && transactionReceipt.ContractAddress.IsNotAnEmptyAddress();
+            return transaction.IsForContractCreation(transactionReceipt);
         }
 
     }

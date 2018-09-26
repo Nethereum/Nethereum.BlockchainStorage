@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Processors
 {
@@ -14,12 +15,11 @@ namespace Nethereum.BlockchainStore.Processors
 
         public static async Task<bool> IsMatchAsync<T>(this IEnumerable<IFilter<T>> filters, T item)
         {
-            if (!filters.Any()) return true;
+            if (filters == null || !filters.Any()) return true;
 
             foreach (var filter in filters)
             {
-                var match = await filter.IsMatchAsync(item);
-                if (match) return true;
+                if(await filter.IsMatchAsync(item)) return true;
             }
 
             return false;
@@ -36,6 +36,11 @@ namespace Nethereum.BlockchainStore.Processors
         public static bool IsNotAnEmptyAddress(this string address)
         {
             return !address.IsAnEmptyAddress();
+        }
+
+        public static bool IsForContractCreation(this Transaction transaction, TransactionReceipt transactionReceipt)
+        {
+            return transaction.To.IsAnEmptyAddress() && transactionReceipt.ContractAddress.IsNotAnEmptyAddress();
         }
     }
 }
