@@ -15,6 +15,7 @@ namespace Nethereum.BlockchainStore.Processors
 
         public static async Task<bool> IsMatchAsync<T>(this IEnumerable<IFilter<T>> filters, T item)
         {
+            //match everything if we have no filters
             if (filters == null || !filters.Any()) return true;
 
             foreach (var filter in filters)
