@@ -8,6 +8,7 @@ using Nethereum.BlockchainStore.Processors.PostProcessors;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.BlockchainStore.Web3Abstractions;
+using Nethereum.Geth;
 using NLog.Fluent;
 
 namespace Nethereum.BlockchainStore.Processing
@@ -27,11 +28,12 @@ namespace Nethereum.BlockchainStore.Processing
             string url, 
             IBlockchainStoreRepositoryFactory repositoryFactory, 
             bool postVm = false,
-            FilterContainer filterContainer = null
+            FilterContainer filterContainer = null,
+            bool useGeth = false
             )
         {
             _waitForBlockStrategy = new WaitForBlockStrategy();
-            _web3 = new Web3.Web3(url);
+            _web3 = useGeth ? new Web3Geth(url) : new Web3.Web3(url);
 
             _blockRepository = repositoryFactory.CreateBlockRepository();
             _contractRepository = repositoryFactory.CreateContractRepository();
@@ -49,8 +51,9 @@ namespace Nethereum.BlockchainStore.Processing
             _repositories.Add(vmStackRepository);
 
             var web3Wrapper = new Web3Wrapper(_web3);
+            var vmStackErrorChecker = new VmStackErrorCheckerWrapper();
 
-            var contractTransactionProcessor = new ContractTransactionProcessor(_web3, _contractRepository,
+            var contractTransactionProcessor = new ContractTransactionProcessor(web3Wrapper, vmStackErrorChecker, _contractRepository,
                 transactionRepository, addressTransactionRepository, vmStackRepository, logRepository, filterContainer?.TransactionLogFilters);
 
             var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(web3Wrapper, _contractRepository,

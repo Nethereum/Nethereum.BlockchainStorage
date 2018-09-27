@@ -1,13 +1,17 @@
 ﻿using System.Threading.Tasks;
+using Nethereum.Geth;
+using Nethereum.Geth.RPC.Debug.DTOs;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.Web3Abstractions
 {
     public class Web3Wrapper: 
         IGetBlockWithTransactionHashesByNumber,
         ITransactionProxy,
-        IGetCode
+        IGetCode,
+        IGetTransactionVMStack
     {
         public Web3Wrapper(Web3.Web3 web3)
         {
@@ -38,6 +42,15 @@ namespace Nethereum.BlockchainStore.Web3Abstractions
         public async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
         {
             return await Web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(txnHash).ConfigureAwait(false);
+        }
+
+        public async Task<JObject> GetTransactionVmStack(string transactionHash)
+        {
+            if(Web3 is Web3Geth web3Geth)
+                return await web3Geth.Debug.TraceTransaction.SendRequestAsync(transactionHash, 
+                    new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = true});
+
+            return null;
         }
     }
 }

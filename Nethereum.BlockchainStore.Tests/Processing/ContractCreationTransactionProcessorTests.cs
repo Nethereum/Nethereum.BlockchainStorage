@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
