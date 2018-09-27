@@ -53,7 +53,7 @@ namespace Nethereum.BlockchainStore.Processing
             var contractTransactionProcessor = new ContractTransactionProcessor(_web3, _contractRepository,
                 transactionRepository, addressTransactionRepository, vmStackRepository, logRepository, filterContainer?.TransactionLogFilters);
 
-            var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(_web3, _contractRepository,
+            var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(web3Wrapper, _contractRepository,
                 transactionRepository, addressTransactionRepository);
 
             var valueTransactionProcessor = new ValueTransactionProcessor(transactionRepository,

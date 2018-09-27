@@ -7,17 +7,17 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public class TransactionProcessor : ITransactionProcessor
     {
-        protected readonly ITransactionProxy TransactionProxy;
-        private readonly IContractTransactionProcessor _contractTransactionProcessor;
         private readonly IValueTransactionProcessor _valueTransactionProcessor;
         private readonly IContractCreationTransactionProcessor _contractCreationTransactionProcessor;
         private readonly List<ITransactionFilter> _transactionFilters;
         private readonly List<ITransactionReceiptFilter> _transactionReceiptFilters;
 
+        protected readonly ITransactionProxy TransactionProxy;
+
         public bool EnabledContractCreationProcessing { get; set; } = true;
         public bool EnabledContractProcessing { get; set; } = true;
         public bool EnabledValueProcessing { get; set; } = true;
-        public IContractTransactionProcessor ContractTransactionProcessor => _contractTransactionProcessor;
+        public IContractTransactionProcessor ContractTransactionProcessor { get; }
 
         public TransactionProcessor(
             ITransactionProxy transactionProxy, 
@@ -28,7 +28,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null)
         {
             TransactionProxy = transactionProxy;
-            _contractTransactionProcessor = contractTransactionProcessor;
+            ContractTransactionProcessor = contractTransactionProcessor;
             _valueTransactionProcessor = valueTransactionProcessor;
             _contractCreationTransactionProcessor = contractCreationTransactionProcessor;
             _transactionFilters = new List<ITransactionFilter>(transactionFilters ?? new ITransactionFilter[0]);
@@ -37,11 +37,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
        
         public virtual async Task ProcessTransactionAsync(string transactionHash, BlockWithTransactionHashes block)
         {
-            var transactionSource = await GetTransaction(transactionHash).ConfigureAwait(false);
+            var transactionSource = await TransactionProxy.GetTransactionByHash(transactionHash).ConfigureAwait(false);
 
             if (await _transactionFilters.IgnoreAsync(transactionSource)) return;
 
-            var transactionReceipt = await GetTransactionReceipt(transactionHash).ConfigureAwait(false);
+            var transactionReceipt = await TransactionProxy.GetTransactionReceipt(transactionHash).ConfigureAwait(false);
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
             
@@ -56,12 +56,12 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             }
             else
             {
-                if (await _contractTransactionProcessor.IsTransactionForContractAsync(transactionSource))
+                if (await ContractTransactionProcessor.IsTransactionForContractAsync(transactionSource))
                 {
                     if (EnabledContractProcessing)
                     {
                         await
-                            _contractTransactionProcessor.ProcessTransactionAsync(transactionSource, transactionReceipt,
+                            ContractTransactionProcessor.ProcessTransactionAsync(transactionSource, transactionReceipt,
                                 block.Timestamp).ConfigureAwait(false);
                     }
                 }
@@ -74,14 +74,5 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             }
         }
 
-        protected virtual async Task<Transaction> GetTransaction(string txnHash)
-        {
-            return await TransactionProxy.GetTransactionByHash(txnHash).ConfigureAwait(false);
-        }
-
-        protected virtual async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
-        {
-            return await TransactionProxy.GetTransactionReceipt(txnHash).ConfigureAwait(false);
-        }
     }
 }

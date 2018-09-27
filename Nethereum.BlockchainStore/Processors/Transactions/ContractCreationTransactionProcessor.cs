@@ -2,33 +2,34 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Web3Abstractions;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public class ContractCreationTransactionProcessor : IContractCreationTransactionProcessor
     {
-        private readonly Web3.Web3 _web3;
+        private readonly IGetCode _getCodeProxy;
         private readonly IContractRepository _contractRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAddressTransactionRepository _addressTransactionRepository;
 
 
         public ContractCreationTransactionProcessor(
-          Web3.Web3 web3, IContractRepository contractRepository, ITransactionRepository transactionRepository, IAddressTransactionRepository addressTransactionRepository)
+          IGetCode getCodeProxy, IContractRepository contractRepository, ITransactionRepository transactionRepository, IAddressTransactionRepository addressTransactionRepository)
         {
-            _web3 = web3;
+            _getCodeProxy = getCodeProxy;
             _contractRepository = contractRepository;
             _transactionRepository = transactionRepository;
             _addressTransactionRepository = addressTransactionRepository;
         }
 
-        public async Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp)
+        public virtual async Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp)
         {
             if (!transaction.IsForContractCreation(transactionReceipt)) return;
 
             var contractAddress = transactionReceipt.ContractAddress;
-            var code = await GetCode(contractAddress).ConfigureAwait(false);
+            var code = await _getCodeProxy.GetCode(contractAddress).ConfigureAwait(false);
             var failedCreatingContract = HasFailedToCreateContract(code);
 
             if (!failedCreatingContract)
@@ -44,12 +45,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 failedCreatingContract, blockTimestamp, null, null, false, contractAddress);
         }
 
-        public async Task<string> GetCode(string contractAddres)
-        {
-            return await _web3.Eth.GetCode.SendRequestAsync(contractAddres).ConfigureAwait(false);
-        }
-
-        public bool HasFailedToCreateContract(string code)
+        protected virtual bool HasFailedToCreateContract(string code)
         {
             return (code == null) || (code == "0x");
         }
