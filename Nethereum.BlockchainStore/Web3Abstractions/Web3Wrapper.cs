@@ -4,7 +4,9 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Web3Abstractions
 {
-    public class Web3Wrapper: IGetBlockWithTransactionHashesByNumber
+    public class Web3Wrapper: 
+        IGetBlockWithTransactionHashesByNumber,
+        ITransactionProxy
     {
         public Web3Wrapper(Web3.Web3 web3)
         {
@@ -20,6 +22,16 @@ namespace Nethereum.BlockchainStore.Web3Abstractions
                     Web3.Eth.Blocks.GetBlockWithTransactionsHashesByNumber.SendRequestAsync(
                         new HexBigInteger(blockNumber)).ConfigureAwait(false);
             return block;
+        }
+
+        public async Task<Transaction> GetTransactionByHash(string txnHash)
+        {
+            return await Web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(txnHash).ConfigureAwait(false);
+        }
+
+        public async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
+        {
+            return await Web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(txnHash).ConfigureAwait(false);
         }
     }
 }

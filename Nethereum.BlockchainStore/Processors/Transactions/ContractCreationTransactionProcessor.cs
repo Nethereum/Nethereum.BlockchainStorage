@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
         public async Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp)
         {
-            if (!IsTransactionForContractCreation(transaction, transactionReceipt)) return;
+            if (!transaction.IsForContractCreation(transactionReceipt)) return;
 
             var contractAddress = transactionReceipt.ContractAddress;
             var code = await GetCode(contractAddress).ConfigureAwait(false);
@@ -54,10 +54,6 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             return (code == null) || (code == "0x");
         }
 
-        public bool IsTransactionForContractCreation(Transaction transaction, TransactionReceipt transactionReceipt)
-        {
-            return transaction.IsForContractCreation(transactionReceipt);
-        }
 
     }
 }

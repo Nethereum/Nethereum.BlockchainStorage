@@ -1,35 +1,39 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.RPC.Eth.DTOs;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public class TransactionProcessor : ITransactionProcessor
     {
+        protected readonly ITransactionProxy TransactionProxy;
         private readonly IContractTransactionProcessor _contractTransactionProcessor;
         private readonly IValueTransactionProcessor _valueTransactionProcessor;
         private readonly IContractCreationTransactionProcessor _contractCreationTransactionProcessor;
         private readonly List<ITransactionFilter> _transactionFilters;
         private readonly List<ITransactionReceiptFilter> _transactionReceiptFilters;
 
+        public bool EnabledContractCreationProcessing { get; set; } = true;
+        public bool EnabledContractProcessing { get; set; } = true;
+        public bool EnabledValueProcessing { get; set; } = true;
+        public IContractTransactionProcessor ContractTransactionProcessor => _contractTransactionProcessor;
+
         public TransactionProcessor(
-            Web3.Web3 web3, 
+            ITransactionProxy transactionProxy, 
             IContractTransactionProcessor contractTransactionProcessor, 
             IValueTransactionProcessor valueTransactionProcessor, 
             IContractCreationTransactionProcessor contractCreationTransactionProcessor,
             IEnumerable<ITransactionFilter> transactionFilters = null,
             IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null)
         {
+            TransactionProxy = transactionProxy;
             _contractTransactionProcessor = contractTransactionProcessor;
             _valueTransactionProcessor = valueTransactionProcessor;
             _contractCreationTransactionProcessor = contractCreationTransactionProcessor;
-            Web3 = web3;
             _transactionFilters = new List<ITransactionFilter>(transactionFilters ?? new ITransactionFilter[0]);
             _transactionReceiptFilters = new List<ITransactionReceiptFilter>(transactionReceiptFilters ?? new ITransactionReceiptFilter[0]);
         }
-
-        protected Web3.Web3 Web3 { get; }
        
         public virtual async Task ProcessTransactionAsync(string transactionHash, BlockWithTransactionHashes block)
         {
@@ -41,7 +45,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
             
-            if (_contractCreationTransactionProcessor.IsTransactionForContractCreation(transactionSource, transactionReceipt))
+            if ( transactionSource.IsForContractCreation(transactionReceipt))
             {
                 if (EnabledContractCreationProcessing)
                 {
@@ -52,7 +56,6 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             }
             else
             {
-
                 if (await _contractTransactionProcessor.IsTransactionForContractAsync(transactionSource))
                 {
                     if (EnabledContractProcessing)
@@ -71,19 +74,14 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             }
         }
 
-        public bool EnabledContractCreationProcessing { get; set; } = true;
-        public bool EnabledContractProcessing { get; set; } = true;
-        public bool EnabledValueProcessing { get; set; } = true;
-        public IContractTransactionProcessor ContractTransactionProcessor => _contractTransactionProcessor;
-
-        public async Task<Transaction> GetTransaction(string txnHash)
+        protected virtual async Task<Transaction> GetTransaction(string txnHash)
         {
-            return await Web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(txnHash).ConfigureAwait(false);
+            return await TransactionProxy.GetTransactionByHash(txnHash).ConfigureAwait(false);
         }
 
-        public async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
+        protected virtual async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
         {
-            return await Web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(txnHash).ConfigureAwait(false);
+            return await TransactionProxy.GetTransactionReceipt(txnHash).ConfigureAwait(false);
         }
     }
 }

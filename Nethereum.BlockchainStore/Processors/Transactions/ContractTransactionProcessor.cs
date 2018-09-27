@@ -42,7 +42,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
         public async Task<bool> IsTransactionForContractAsync(Transaction transaction)
         {
-            if (transaction.To == null) return false;
+            if (transaction.To.IsAnEmptyAddress()) return false;
             return await _contractRepository.ExistsAsync(transaction.To).ConfigureAwait(false);
         }
 

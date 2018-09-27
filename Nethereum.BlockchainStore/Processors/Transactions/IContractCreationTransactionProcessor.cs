@@ -6,7 +6,6 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public interface IContractCreationTransactionProcessor
     {
-        bool IsTransactionForContractCreation(Transaction transaction, TransactionReceipt transactionReceipt);
         Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp);
     }
 }
