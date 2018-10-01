@@ -277,6 +277,57 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             VerifyLogsHaveBeenSentToRepo(transaction, logAddresses, argsPassedToLogRepo);
         }
 
+        [Fact]
+        public async Task ProcessTransactionAsync_WhenStackTraceContainsAnError_ItIsTreatedAsAnError()
+        {
+            var transaction = new Transaction { To = "0x1009b29f2094457d3dba62d1953efea58176ba27"};
+            var receipt = new TransactionReceipt();
+
+            var logAddresses = new string[] {"address1", "address2"};
+
+            receipt.Logs = JArray.FromObject(logAddresses.Select(a => new {address = a}));
+
+            JObject vmStack = new JObject();
+            const string EmptyVmStackError = "";
+            
+            _vmStackProxy.Setup(p => p.GetTransactionVmStack(transaction.TransactionHash)).ReturnsAsync(vmStack);
+            _vmStackErrorChecker.Setup(e => e.GetError(vmStack)).Returns(EmptyVmStackError);
+
+            _transactionVmStackRepository
+                .Setup(r => r.UpsertAsync(transaction.TransactionHash, transaction.To, vmStack))
+                .Returns(Task.CompletedTask);
+
+            const bool hasError = false;
+            const bool hasStackTrace = true;
+
+            _transactionRepository
+                .Setup(r => r.UpsertAsync(transaction, receipt, hasError, _blockTimestamp, hasStackTrace, EmptyVmStackError))
+                .Returns(Task.CompletedTask);
+
+            foreach (var address in new []{transaction.To}.Concat(logAddresses))
+            {
+                _addressTransactionRepository.Setup(r =>
+                        r.UpsertAsync(transaction, receipt, hasError, _blockTimestamp, address, EmptyVmStackError,
+                            hasStackTrace, null))
+                    .Returns(Task.CompletedTask);
+            }
+
+            List<Tuple<string, long, JObject>> argsPassedToLogRepo = MockTransactionLogRepo();
+
+            var processor = CreateProcessor();
+
+            //execute
+            await processor.ProcessTransactionAsync(transaction, receipt, _blockTimestamp);
+
+            //assert
+            _transactionVmStackRepository.VerifyAll();
+            _transactionRepository.VerifyAll();
+            _addressTransactionRepository.VerifyAll();
+            _transactionLogRepository.VerifyAll();
+
+            VerifyLogsHaveBeenSentToRepo(transaction, logAddresses, argsPassedToLogRepo);
+        }
+
         private static void VerifyLogsHaveBeenSentToRepo(Transaction transaction, string[] logAddresses, List<Tuple<string, long, JObject>> argsPassedToLogRepo)
         {
             Assert.Equal(logAddresses.Length, argsPassedToLogRepo.Count);
