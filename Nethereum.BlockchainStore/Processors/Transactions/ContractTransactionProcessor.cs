@@ -98,7 +98,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             for (var i = 0; i < logs.Count; i++)
             {
                 if (logs[i] is JObject log)
-                {
+                { 
                     var logAddress = log["address"].Value<string>();
 
                     if (!addressesAdded.Contains(logAddress))
@@ -107,8 +107,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
                         await
                             _addressTransactionRepository.UpsertAsync(transaction, transactionReceipt, hasError,
-                                blockTimestamp,
-                                logAddress, error, hasStackTrace);
+                                blockTimestamp, logAddress, error, hasStackTrace);
                     }
 
                     if (await _transactionLogFilters.IsMatchAsync(log))
