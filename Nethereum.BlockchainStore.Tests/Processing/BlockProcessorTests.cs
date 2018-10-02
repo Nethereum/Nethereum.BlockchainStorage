@@ -108,7 +108,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         [Fact]
         public async Task ProcessBlock_IgnoresBlocksWhereFilterDoesNotMatch()
         {
-            var blockNumberGreaterThan10Filter = new BlockFilter(b => Task.FromResult(b.Number.Value > 10));
+            var blockNumberGreaterThan10Filter = new BlockFilter(
+                b => Task.FromResult(b.Number.Value > 10));
+
             _blockFilters.Add(blockNumberGreaterThan10Filter);
 
             BlockProcessor blockProcessor = CreateBlockProcessor();
@@ -131,7 +133,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             _mockBlockRepository.Verify(b => b.UpsertBlockAsync(stubBlock), Times.Never);
 
             _mockTransactionProcessor
-                .Verify(t => t.ProcessTransactionAsync(It.IsAny<String>(), It.IsAny<BlockWithTransactionHashes>()), Times.Never);
+                .Verify(t => t.ProcessTransactionAsync(
+                    It.IsAny<String>(), It.IsAny<BlockWithTransactionHashes>()), Times.Never);
 
         }
 
@@ -148,12 +151,17 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 .ReturnsAsync((BlockWithTransactionHashes)null);
 
             //execute
-            await Assert.ThrowsAsync<BlockNotFoundException>(async () => await blockProcessor.ProcessBlockAsync(blockNumber));
+            await Assert.ThrowsAsync<BlockNotFoundException>(
+                async () => await blockProcessor.ProcessBlockAsync(blockNumber));
         }
 
         private BlockProcessor CreateBlockProcessor()
         {
-            return new BlockProcessor(_mockBlockProxy.Object, _mockBlockRepository.Object, _mockTransactionProcessor.Object, _blockFilters);
+            return new BlockProcessor(
+                _mockBlockProxy.Object, 
+                _mockBlockRepository.Object, 
+                _mockTransactionProcessor.Object, 
+                _blockFilters);
         }
     }
 }

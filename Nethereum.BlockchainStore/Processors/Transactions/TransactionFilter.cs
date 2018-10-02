@@ -10,6 +10,10 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         {
         }
 
+        public TransactionFilter(Func<Transaction, bool> condition) : base(condition)
+        {
+        }
+
         public static TransactionFilter ValueGreaterThanZero()
         {
             return new TransactionFilter(tx => Task.FromResult(tx.Value.Value > 0));

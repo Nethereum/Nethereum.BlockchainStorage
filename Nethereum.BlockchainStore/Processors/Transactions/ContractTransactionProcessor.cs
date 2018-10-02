@@ -26,12 +26,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
           IGetTransactionVMStack vmStackProxy, 
           IVmStackErrorChecker vmStackErrorChecker,
           IContractRepository contractRepository, 
-                          ITransactionRepository transactionRepository, 
-                          IAddressTransactionRepository addressTransactionRepository,
-                          ITransactionVMStackRepository transactionVmStackRepository,
-                          ITransactionLogRepository transactionLogRepository,
-                          IEnumerable<ITransactionLogFilter> transactionLogFilters = null
-                                )
+          ITransactionRepository transactionRepository, 
+          IAddressTransactionRepository addressTransactionRepository,
+          ITransactionVMStackRepository transactionVmStackRepository,
+          ITransactionLogRepository transactionLogRepository,
+          IEnumerable<ITransactionLogFilter> transactionLogFilters = null)
         {
             _vmStackProxy = vmStackProxy;
             _vmStackErrorChecker = vmStackErrorChecker;
@@ -46,12 +45,16 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         public async Task<bool> IsTransactionForContractAsync(Transaction transaction)
         {
             if (transaction.To.IsAnEmptyAddress()) return false;
-            return await _contractRepository.ExistsAsync(transaction.To).ConfigureAwait(false);
+            return await _contractRepository.ExistsAsync(transaction.To)
+                .ConfigureAwait(false);
         }
 
         public bool EnabledVmProcessing { get; set; } = true;
 
-        public async Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp)
+        public async Task ProcessTransactionAsync(
+            Transaction transaction, 
+            TransactionReceipt transactionReceipt, 
+            HexBigInteger blockTimestamp)
         {
             var transactionHash = transaction.TransactionHash;
             var hasStackTrace = false;
@@ -63,7 +66,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             {
                 try
                 {
-                    stackTrace = await _vmStackProxy.GetTransactionVmStack(transactionHash).ConfigureAwait(false);
+                    stackTrace = await _vmStackProxy
+                        .GetTransactionVmStack(transactionHash)
+                        .ConfigureAwait(false);
                 }
                 catch
                 {
@@ -76,24 +81,27 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                     error = _vmStackErrorChecker.GetError(stackTrace);
                     hasError = !string.IsNullOrEmpty(error);
                     hasStackTrace = true;
-                    await _transactionVmStackRepository.UpsertAsync(transactionHash, transaction.To, stackTrace);
+                    await _transactionVmStackRepository.UpsertAsync
+                        (transactionHash, transaction.To, stackTrace);
                 }
             }
 
 
-            await _transactionRepository.UpsertAsync(transaction,
-                transactionReceipt,
+            await _transactionRepository.UpsertAsync(
+                transaction, transactionReceipt,
                 hasError, blockTimestamp, hasStackTrace, error);
 
             await
-                _addressTransactionRepository.UpsertAsync(transaction, transactionReceipt, hasError, blockTimestamp,
+                _addressTransactionRepository.UpsertAsync(
+                    transaction, transactionReceipt, hasError, blockTimestamp,
                     transaction.To, error, hasStackTrace);
 
             if (transactionReceipt.Logs == null) return;
 
             var logs = transactionReceipt.Logs;
 
-            var addressesAdded = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase){transaction.To};
+            var addressesAdded = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
+                {transaction.To};
 
             for (var i = 0; i < logs.Count; i++)
             {
@@ -106,7 +114,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                         addressesAdded.Add(logAddress);
 
                         await
-                            _addressTransactionRepository.UpsertAsync(transaction, transactionReceipt, hasError,
+                            _addressTransactionRepository.UpsertAsync(
+                                transaction, transactionReceipt, hasError,
                                 blockTimestamp, logAddress, error, hasStackTrace);
                     }
 

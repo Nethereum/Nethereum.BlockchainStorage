@@ -10,7 +10,13 @@ namespace Nethereum.BlockchainStore.Processors
             Condition = condition;
         }
 
-        public Func<T, Task<bool>> Condition { get; }
+        public Filter(Func<T, bool> condition)
+        {
+            Condition = new Func<T, Task<bool>>(
+                item => Task.FromResult(condition(item)));
+        }
+        
+        private Func<T, Task<bool>> Condition { get; }
 
         public virtual async Task<bool> IsMatchAsync(T item)
         {

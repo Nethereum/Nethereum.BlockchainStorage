@@ -7,13 +7,15 @@ namespace Nethereum.BlockchainStore.Processors
 {
     public static class Extensions
     {
-        public static async Task<bool> IgnoreAsync<T>(this IEnumerable<IFilter<T>> filters, T item)
+        public static async Task<bool> IgnoreAsync<T>(
+            this IEnumerable<IFilter<T>> filters, T item)
         {
             var match = await filters.IsMatchAsync(item);
             return !match;
         }
 
-        public static async Task<bool> IsMatchAsync<T>(this IEnumerable<IFilter<T>> filters, T item)
+        public static async Task<bool> IsMatchAsync<T>(
+            this IEnumerable<IFilter<T>> filters, T item)
         {
             //match everything if we have no filters
             if (filters == null || !filters.Any()) return true;
@@ -39,9 +41,11 @@ namespace Nethereum.BlockchainStore.Processors
             return !address.IsAnEmptyAddress();
         }
 
-        public static bool IsForContractCreation(this Transaction transaction, TransactionReceipt transactionReceipt)
+        public static bool IsForContractCreation(
+            this Transaction transaction, TransactionReceipt transactionReceipt)
         {
-            return transaction.To.IsAnEmptyAddress() && transactionReceipt.ContractAddress.IsNotAnEmptyAddress();
+            return transaction.To.IsAnEmptyAddress() && 
+                   transactionReceipt.ContractAddress.IsNotAnEmptyAddress();
         }
     }
 }

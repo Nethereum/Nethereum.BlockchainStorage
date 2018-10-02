@@ -14,12 +14,14 @@ namespace Nethereum.BlockchainStore.Processing
     {
         private const int MaxRetries = 3;
         private readonly IWeb3Wrapper _web3;
-        private readonly IBlockProcessor _processor;
+        private readonly IBlockProcessor _blockProcessor;
         private readonly IContractRepository _contractRepository;
         private readonly IBlockRepository _blockRepository;
         private readonly WaitForNextBlockStrategy _waitForNextBlockStrategy;
         private bool _contractCacheInitialised = false;
         private readonly List<object> _repositories = new List<object>();
+
+        public long? MinimumBlockNumber { get; set; }
 
         public StorageProcessor(
             IWeb3Wrapper web3, 
@@ -48,24 +50,32 @@ namespace Nethereum.BlockchainStore.Processing
 
             var vmStackErrorChecker = new VmStackErrorCheckerWrapper();
 
-            var contractTransactionProcessor = new ContractTransactionProcessor(_web3, vmStackErrorChecker, _contractRepository,
-                transactionRepository, addressTransactionRepository, vmStackRepository, logRepository, filterContainer?.TransactionLogFilters);
+            var contractTransactionProcessor = new ContractTransactionProcessor(
+                _web3, vmStackErrorChecker, _contractRepository,
+                transactionRepository, addressTransactionRepository, vmStackRepository, 
+                logRepository, filterContainer?.TransactionLogFilters);
 
-            var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(_web3, _contractRepository,
+            var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(
+                _web3, _contractRepository,
                 transactionRepository, addressTransactionRepository);
 
-            var valueTransactionProcessor = new ValueTransactionProcessor(transactionRepository,
+            var valueTransactionProcessor = new ValueTransactionProcessor(
+                transactionRepository,
                 addressTransactionRepository);
 
-            var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
-                valueTransactionProcessor, contractCreationTransactionProcessor, filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
+            var transactionProcessor = new TransactionProcessor(
+                _web3, contractTransactionProcessor,
+                valueTransactionProcessor, contractCreationTransactionProcessor, 
+                filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
 
             if (postVm)
-                _processor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
+                _blockProcessor = new BlockVmPostProcessor(
+                    _web3, _blockRepository, transactionProcessor);
             else
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                _processor = new BlockProcessor(_web3, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
+                _blockProcessor = new BlockProcessor(
+                    _web3, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
             }       
         }
 
@@ -78,11 +88,7 @@ namespace Nethereum.BlockchainStore.Processing
             }
         }
 
-        public bool ProcessTransactionsInParallel
-        {
-            get => BlockProcessor.ProcessTransactionsInParallel;
-            set => BlockProcessor.ProcessTransactionsInParallel = value;
-        }
+        public bool ProcessTransactionsInParallel { get; set; }
 
         /// <summary>
         /// Allow the processor to resume from where it left off
@@ -96,13 +102,13 @@ namespace Nethereum.BlockchainStore.Processing
                 return MinimumBlockNumber.Value;
 
             return blockNumber;
-
         }
 
-        public long? MinimumBlockNumber { get; set; }
-
-        public async Task<bool> ExecuteAsync(long? startBlock, long? endBlock, int retryNumber = 0)
+        public async Task<bool> ExecuteAsync(
+            long? startBlock, long? endBlock, int retryNumber = 0)
         {
+            _blockProcessor.ProcessTransactionsInParallel = ProcessTransactionsInParallel;
+
             startBlock = startBlock ?? await GetStartingBlockNumber();
             endBlock = endBlock ?? long.MaxValue;
             bool runContinuously = endBlock == long.MaxValue;
@@ -112,9 +118,10 @@ namespace Nethereum.BlockchainStore.Processing
             while (startBlock <= endBlock)
                 try
                 {
-                    System.Console.WriteLine($"{DateTime.Now.ToString("s")}. Block: {startBlock}. Attempt: {retryNumber}");
+                    System.Console.WriteLine(
+                        $"{DateTime.Now.ToString("s")}. Block: {startBlock}. Attempt: {retryNumber}");
 
-                    await _processor.ProcessBlockAsync(startBlock.Value).ConfigureAwait(false);
+                    await _blockProcessor.ProcessBlockAsync(startBlock.Value).ConfigureAwait(false);
                     retryNumber = 0;
                     startBlock = startBlock + 1;
                 }
@@ -132,31 +139,37 @@ namespace Nethereum.BlockchainStore.Processing
                     {
                         if (retryNumber != MaxRetries)
                         {
-                            await ExecuteAsync(startBlock, endBlock, retryNumber + 1).ConfigureAwait(false);
+                            await ExecuteAsync(startBlock, endBlock, retryNumber + 1)
+                                .ConfigureAwait(false);
                         }
                         else
                         {
                             retryNumber = 0;
                             startBlock = startBlock + 1;
-                            Log.Error().Exception(blockNotFoundException).Message("BlockNumber" + startBlock).Write();
+                            Log.Error().Exception(blockNotFoundException)
+                                .Message("BlockNumber" + startBlock).Write();
                             System.Console.WriteLine($"Skipping block");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    System.Console.WriteLine(ex.Message + ". " + ex.InnerException?.Message);
+                    System.Console.WriteLine(
+                        ex.Message + ". " + ex.InnerException?.Message);
 
                     if (retryNumber != MaxRetries)
                     {
-                        await ExecuteAsync(startBlock, endBlock, retryNumber + 1).ConfigureAwait(false);
+                        await ExecuteAsync(startBlock, endBlock, retryNumber + 1)
+                            .ConfigureAwait(false);
                     }
                     else
                     {
                         retryNumber = 0;
                         startBlock = startBlock + 1;
-                        Log.Error().Exception(ex).Message("BlockNumber" + startBlock).Write();
-                        System.Console.WriteLine("ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
+                        Log.Error().Exception(ex).Message(
+                            "BlockNumber" + startBlock).Write();
+                        System.Console.WriteLine(
+                            "ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
                     }
                 }
 

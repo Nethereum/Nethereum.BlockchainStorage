@@ -11,13 +11,18 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAddressTransactionRepository _addressTransactionRepository;
 
-        public ValueTransactionProcessor(ITransactionRepository transactionRepository, IAddressTransactionRepository addressTransactionRepository)
+        public ValueTransactionProcessor(
+            ITransactionRepository transactionRepository, 
+            IAddressTransactionRepository addressTransactionRepository)
         {
             _transactionRepository = transactionRepository;
             _addressTransactionRepository = addressTransactionRepository;
         }
 
-        public async Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp)
+        public async Task ProcessTransactionAsync(
+            Transaction transaction, 
+            TransactionReceipt transactionReceipt, 
+            HexBigInteger blockTimestamp)
         {
             await _transactionRepository.UpsertAsync(
                 transaction, transactionReceipt, false, blockTimestamp)

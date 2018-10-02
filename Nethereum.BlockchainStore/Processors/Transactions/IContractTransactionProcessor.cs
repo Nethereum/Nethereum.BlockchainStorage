@@ -8,7 +8,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
     {
         Task<bool> IsTransactionForContractAsync(Transaction transaction);
 
-        Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt,
+        Task ProcessTransactionAsync(
+            Transaction transaction, 
+            TransactionReceipt transactionReceipt,
             HexBigInteger blockTimestamp);
 
         bool EnabledVmProcessing { get; set; }

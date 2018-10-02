@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
 {
-    public partial class ExtensionTests
+    public class ExtensionTests
     {
         [Theory]
         [InlineData("0x0")]
@@ -71,7 +71,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         public async Task Filters_IsMatchAsync_WhenAFilterMatches_ReturnsTrue()
         {
             var filters = new List<IFilter<TestFilterItem>>();
-            var emptyValueFilter = new Filter<TestFilterItem>(i => Task.FromResult(string.IsNullOrEmpty(i.Value)));
+            var emptyValueFilter = new Filter<TestFilterItem>(
+                i => Task.FromResult(string.IsNullOrEmpty(i.Value)));
+
             filters.Add(emptyValueFilter);
             var item = new TestFilterItem {Value = string.Empty};
             Assert.True(await filters.IsMatchAsync(item));
@@ -82,9 +84,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         public async Task Filters_IsMatchAsync_WhenAnyFilterMatches_ReturnsTrue()
         {
             var filters = new List<IFilter<TestFilterItem>>();
-            var emptyValueFilter = new Filter<TestFilterItem>(i => Task.FromResult(string.IsNullOrEmpty(i.Value)));
+            var emptyValueFilter = new Filter<TestFilterItem>(
+                i => Task.FromResult(string.IsNullOrEmpty(i.Value)));
+
             filters.Add(emptyValueFilter);
-            var valueEqualsNethereumFilter = new Filter<TestFilterItem>(i => Task.FromResult(i.Value == "Nethereum"));
+            var valueEqualsNethereumFilter = new Filter<TestFilterItem>(
+                i => Task.FromResult(i.Value == "Nethereum"));
+
             filters.Add(valueEqualsNethereumFilter);
 
             var item = new TestFilterItem {Value = "Nethereum"};
@@ -96,7 +102,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         public async Task Filters_IsMatchAsync_WhenNoFilterMatch_ReturnsFalse()
         {
             var filters = new List<IFilter<TestFilterItem>>();
-            var noEmptyValuesFilter = new Filter<TestFilterItem>(i => Task.FromResult(string.IsNullOrEmpty(i.Value)));
+            var noEmptyValuesFilter = new Filter<TestFilterItem>(
+                i => Task.FromResult(string.IsNullOrEmpty(i.Value)));
+
             filters.Add(noEmptyValuesFilter);
             var item = new TestFilterItem {Value = "Not Empty"};
             Assert.False(await filters.IsMatchAsync(item));

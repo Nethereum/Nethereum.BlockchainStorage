@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.Repositories
         private readonly IBlockRepository _blockRepository;
         private readonly List<IBlockFilter> _blockFilters;
 
-        public static bool ProcessTransactionsInParallel { get; set; } = true;
+        public bool ProcessTransactionsInParallel { get; set; } = true;
 
         public BlockProcessor(
             IGetBlockWithTransactionHashesByNumber blockProxy, 

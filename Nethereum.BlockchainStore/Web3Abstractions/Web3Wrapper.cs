@@ -16,7 +16,8 @@ namespace Nethereum.BlockchainStore.Web3Abstractions
 
         private Web3.Web3 Web3 { get; }
 
-        public async Task<BlockWithTransactionHashes> GetBlockWithTransactionsHashesByNumber(long blockNumber)
+        public async Task<BlockWithTransactionHashes> GetBlockWithTransactionsHashesByNumber
+            (long blockNumber)
         {
             var block =
                 await
@@ -27,24 +28,33 @@ namespace Nethereum.BlockchainStore.Web3Abstractions
 
         public async Task<string> GetCode(string address)
         {
-            return await Web3.Eth.GetCode.SendRequestAsync(address).ConfigureAwait(false);
+            return await Web3.Eth.GetCode.SendRequestAsync(address)
+                .ConfigureAwait(false);
         }
 
         public async Task<Transaction> GetTransactionByHash(string txnHash)
         {
-            return await Web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(txnHash).ConfigureAwait(false);
+            return await Web3.Eth.Transactions.GetTransactionByHash
+                .SendRequestAsync(txnHash)
+                .ConfigureAwait(false);
         }
 
         public async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
         {
-            return await Web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(txnHash).ConfigureAwait(false);
+            return await Web3.Eth.Transactions.
+                GetTransactionReceipt.
+                SendRequestAsync(txnHash).
+                ConfigureAwait(false);
         }
 
         public async Task<JObject> GetTransactionVmStack(string transactionHash)
         {
             if(Web3 is Web3Geth web3Geth)
-                return await web3Geth.Debug.TraceTransaction.SendRequestAsync(transactionHash, 
-                    new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = true});
+                return await web3Geth.Debug.
+                    TraceTransaction.
+                    SendRequestAsync(
+                        transactionHash, 
+                        new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = true});
 
             return null;
         }

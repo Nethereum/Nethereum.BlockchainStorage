@@ -39,14 +39,19 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         }
 
         [Fact]
-        public async Task ProcessTransactionAsync_Processes_ContractCreationTransactions()
+        public async Task EnabledContractCreationProcessing_DefaultsToTrue()
         {
             var txProcessor = CreateTransactionProcessor();
             Assert.True(txProcessor.EnabledContractCreationProcessing);
+        }
 
+        [Fact]
+        public async Task ProcessTransactionAsync_Processes_ContractCreationTransactions()
+        {
+            var txProcessor = CreateTransactionProcessor();
             var (stubTransaction, stubTransactionReceipt) = CreateContractCreationTransaction();
 
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             _mockContractCreationTransactionProcessor.Setup(p =>
                 p.ProcessTransactionAsync(stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp))
@@ -68,7 +73,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             var (stubTransaction, stubTransactionReceipt) = CreateContractCreationTransaction();
 
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             await txProcessor.ProcessTransactionAsync(TxHash, _blockWithTransactionHashes);
 
@@ -84,7 +89,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             _transactionFilters.Add(mockTxFilter.Object);
 
             var txProcessor = CreateTransactionProcessor();
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             await txProcessor.ProcessTransactionAsync(TxHash, _blockWithTransactionHashes);
 
@@ -100,7 +105,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             _transactionReceiptFilters.Add(mockTxFilter.Object);
 
             var txProcessor = CreateTransactionProcessor();
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             await txProcessor.ProcessTransactionAsync(TxHash, _blockWithTransactionHashes);
 
@@ -115,7 +120,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             var (stubTransaction, stubTransactionReceipt) = CreateContractTransaction();
 
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             _mockContractTransactionProcessor.Setup(p => p.IsTransactionForContractAsync(stubTransaction))
                 .ReturnsAsync(true);
@@ -140,7 +145,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             var (stubTransaction, stubTransactionReceipt) = CreateContractTransaction();
 
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             _mockContractTransactionProcessor.Setup(p => p.IsTransactionForContractAsync(stubTransaction))
                 .ReturnsAsync(true);
@@ -158,13 +163,14 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             var (stubTransaction, stubTransactionReceipt) = CreateValueTransaction();
 
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
             _mockContractTransactionProcessor.Setup(p => p.IsTransactionForContractAsync(stubTransaction))
                 .ReturnsAsync(false);
 
             _mockValueTransactionProcessor.Setup(p =>
-                    p.ProcessTransactionAsync(stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp))
+                    p.ProcessTransactionAsync(
+                        stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp))
                 .Returns(Task.CompletedTask);
 
             await txProcessor.ProcessTransactionAsync(TxHash, _blockWithTransactionHashes);
@@ -183,9 +189,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             var (stubTransaction, stubTransactionReceipt) = CreateValueTransaction();
 
-            MockProxyCalls(stubTransaction, stubTransactionReceipt);
+            MockGetTransactionAndReceiptCalls(stubTransaction, stubTransactionReceipt);
 
-            _mockContractTransactionProcessor.Setup(p => p.IsTransactionForContractAsync(stubTransaction))
+            _mockContractTransactionProcessor.Setup(
+                    p => p.IsTransactionForContractAsync(stubTransaction))
                 .ReturnsAsync(false);
 
             await txProcessor.ProcessTransactionAsync(TxHash, _blockWithTransactionHashes);
@@ -193,7 +200,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             VerifyNothingWasProcessed(stubTransaction, stubTransactionReceipt);
         }
 
-        private void VerifyNothingWasProcessed(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
+        private void VerifyNothingWasProcessed
+            (Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
             VerifyContractTransactionWasNotProcessed(stubTransaction, stubTransactionReceipt);
 
@@ -202,24 +210,30 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             VerifyValueTransactionWasNotProcessed(stubTransaction, stubTransactionReceipt);
         }
 
-        private void VerifyValueTransactionWasNotProcessed(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
+        private void VerifyValueTransactionWasNotProcessed(
+            Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
             _mockValueTransactionProcessor.Verify(p =>
-                    p.ProcessTransactionAsync(stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp),
+                    p.ProcessTransactionAsync(
+                        stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp),
                 Times.Never);
         }
 
-        private void VerifyContractCreationTransactionWasNotProcessed(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
+        private void VerifyContractCreationTransactionWasNotProcessed(
+            Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
             _mockContractCreationTransactionProcessor.Verify(p =>
-                    p.ProcessTransactionAsync(stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp),
+                    p.ProcessTransactionAsync(
+                        stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp),
                 Times.Never);
         }
 
-        private void VerifyContractTransactionWasNotProcessed(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
+        private void VerifyContractTransactionWasNotProcessed(
+            Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
             _mockContractTransactionProcessor.Verify(p =>
-                    p.ProcessTransactionAsync(stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp),
+                    p.ProcessTransactionAsync(
+                        stubTransaction, stubTransactionReceipt, _blockWithTransactionHashes.Timestamp),
                 Times.Never);
         }
 
@@ -233,18 +247,24 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         private (Transaction tx, TransactionReceipt receipt) CreateContractCreationTransaction()
         {
             var stubTransaction = new Transaction { To = string.Empty};
-            var stubTransactionReceipt = new TransactionReceipt{ContractAddress = "0x1009b29f2094457d3dba62d1953efea58176ba27"};
+            var stubTransactionReceipt = new TransactionReceipt
+            {
+                ContractAddress = "0x1009b29f2094457d3dba62d1953efea58176ba27"
+            };
             return (stubTransaction, stubTransactionReceipt);
         }
 
         private (Transaction tx, TransactionReceipt receipt) CreateContractTransaction()
         {
             var stubTransaction = new Transaction { To = "0x1009b29f2094457d3dba62d1953efea58176ba27"};
-            var stubTransactionReceipt = new TransactionReceipt{ContractAddress = "0x1009b29f2094457d3dba62d1953efea58176ba27"};
+            var stubTransactionReceipt = new TransactionReceipt
+            {
+                ContractAddress = "0x1009b29f2094457d3dba62d1953efea58176ba27"
+            };
             return (stubTransaction, stubTransactionReceipt);
         }
 
-        private void MockProxyCalls(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
+        private void MockGetTransactionAndReceiptCalls(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
             _mockTransactionProxy.Setup(p => p.GetTransactionByHash(TxHash)).ReturnsAsync(stubTransaction);
             _mockTransactionProxy.Setup(p => p.GetTransactionReceipt(TxHash)).ReturnsAsync(stubTransactionReceipt);

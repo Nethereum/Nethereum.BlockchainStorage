@@ -17,7 +17,9 @@ namespace Nethereum.BlockchainStore.Processing
             FilterContainer filterContainer = null,
             bool useGeth = false)
         {
-            IWeb3Wrapper web3 = new Web3Wrapper(useGeth ? new Web3Geth(configuration.BlockchainUrl) : new Web3.Web3(configuration.BlockchainUrl));
+            IWeb3Wrapper web3 = new Web3Wrapper(
+                useGeth ? new Web3Geth(configuration.BlockchainUrl) 
+                    : new Web3.Web3(configuration.BlockchainUrl));
 
             using(_proc = new StorageProcessor(
                 web3, repositoryFactory, configuration.PostVm, filterContainer)
@@ -35,7 +37,8 @@ namespace Nethereum.BlockchainStore.Processing
 
                 var stopWatch = Stopwatch.StartNew();
 
-                var result = await _proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock).ConfigureAwait(false);
+                var result = await _proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock)
+                    .ConfigureAwait(false);
 
                 System.Console.WriteLine("Duration: " + stopWatch.Elapsed);
 

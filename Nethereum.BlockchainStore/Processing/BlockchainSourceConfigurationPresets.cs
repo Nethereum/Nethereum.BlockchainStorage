@@ -8,7 +8,8 @@ namespace Nethereum.BlockchainStore.Processing
     {
         public static string Default { get; } = "localhost";
 
-        public static Dictionary<string, BlockchainSourceConfiguration> All = new Dictionary<string, BlockchainSourceConfiguration>
+        public static Dictionary<string, BlockchainSourceConfiguration> All = 
+            new Dictionary<string, BlockchainSourceConfiguration>
         {
             {
                 "localhost",
@@ -34,7 +35,8 @@ namespace Nethereum.BlockchainStore.Processing
             return configuration;
         }
 
-        private static void ApplyOverrides(IConfigurationRoot config, BlockchainSourceConfiguration configuration)
+        private static void ApplyOverrides(
+            IConfigurationRoot config, BlockchainSourceConfiguration configuration)
         {
             var minBlockNumber = Parse(config, "MinimumBlockNumber");
             var fromBlock = Parse(config, "FromBlock");
@@ -42,7 +44,8 @@ namespace Nethereum.BlockchainStore.Processing
             var blockchainUrl = config["BlockchainUrl"];
             var blockchainName = config["Blockchain"];
             var postVm = ParseBool(config, "PostVm");
-            var processTransactionsInParallel = ParseBool(config, "ProcessBlockTransactionsInParallel");
+            var processTransactionsInParallel = 
+                ParseBool(config, "ProcessBlockTransactionsInParallel");
 
             if (minBlockNumber != null)
                 configuration.MinimumBlockNumber = minBlockNumber;
@@ -63,7 +66,8 @@ namespace Nethereum.BlockchainStore.Processing
                 configuration.PostVm = postVm.Value;
 
             if (processTransactionsInParallel != null)
-                configuration.ProcessBlockTransactionsInParallel = processTransactionsInParallel.Value;
+                configuration.ProcessBlockTransactionsInParallel = 
+                    processTransactionsInParallel.Value;
         }
 
         public static long? Parse(IConfigurationRoot config, string name)

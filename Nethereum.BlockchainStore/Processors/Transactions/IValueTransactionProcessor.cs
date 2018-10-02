@@ -6,6 +6,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public interface IValueTransactionProcessor
     {
-        Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp);
+        Task ProcessTransactionAsync(
+            Transaction transaction, 
+            TransactionReceipt transactionReceipt, 
+            HexBigInteger blockTimestamp);
     }
 }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using Nethereum.RPC.Eth.Blocks;
-using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Web3Abstractions
 {

@@ -9,5 +9,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         public TransactionLogFilter(Func<JObject, Task<bool>> condition) : base(condition)
         {
         }
+
+        public TransactionLogFilter(Func<JObject, bool> condition) : base(condition)
+        {
+        }
     }
 }

@@ -14,9 +14,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAddressTransactionRepository _addressTransactionRepository;
 
-
         public ContractCreationTransactionProcessor(
-          IGetCode getCodeProxy, IContractRepository contractRepository, ITransactionRepository transactionRepository, IAddressTransactionRepository addressTransactionRepository)
+          IGetCode getCodeProxy, 
+          IContractRepository contractRepository, 
+          ITransactionRepository transactionRepository, 
+          IAddressTransactionRepository addressTransactionRepository)
         {
             _getCodeProxy = getCodeProxy;
             _contractRepository = contractRepository;
@@ -24,7 +26,10 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             _addressTransactionRepository = addressTransactionRepository;
         }
 
-        public virtual async Task ProcessTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, HexBigInteger blockTimestamp)
+        public virtual async Task ProcessTransactionAsync(
+            Transaction transaction, 
+            TransactionReceipt transactionReceipt, 
+            HexBigInteger blockTimestamp)
         {
             if (!transaction.IsForContractCreation(transactionReceipt)) return;
 
@@ -33,9 +38,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             var failedCreatingContract = HasFailedToCreateContract(code);
 
             if (!failedCreatingContract)
-                await _contractRepository.UpsertAsync(contractAddress, code, transaction).ConfigureAwait(false);
+                await _contractRepository.UpsertAsync(contractAddress, code, transaction)
+                    .ConfigureAwait(false);
 
-            await _transactionRepository.UpsertAsync(contractAddress, code,
+            await _transactionRepository.UpsertAsync(
+                contractAddress, code,
                 transaction, transactionReceipt,
                 failedCreatingContract, blockTimestamp);
 
