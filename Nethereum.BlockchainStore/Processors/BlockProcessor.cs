@@ -1,12 +1,10 @@
 ﻿using Nethereum.BlockchainStore.Processing;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.Transactions;
-using Nethereum.Hex.HexTypes;
+using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Web3Abstractions;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -17,7 +15,8 @@ namespace Nethereum.BlockchainStore.Repositories
 
         public static bool ProcessTransactionsInParallel { get; set; } = true;
 
-        public BlockProcessor(IGetBlockWithTransactionHashesByNumber blockProxy, 
+        public BlockProcessor(
+            IGetBlockWithTransactionHashesByNumber blockProxy, 
             IBlockRepository blockRepository,
             ITransactionProcessor transactionProcessor, 
             IEnumerable<IBlockFilter> blockFilters = null

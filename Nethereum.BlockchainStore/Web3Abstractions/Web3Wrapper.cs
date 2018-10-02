@@ -7,11 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.Web3Abstractions
 {
-    public class Web3Wrapper: 
-        IGetBlockWithTransactionHashesByNumber,
-        ITransactionProxy,
-        IGetCode,
-        IGetTransactionVMStack
+    public class Web3Wrapper: IWeb3Wrapper
     {
         public Web3Wrapper(Web3.Web3 web3)
         {

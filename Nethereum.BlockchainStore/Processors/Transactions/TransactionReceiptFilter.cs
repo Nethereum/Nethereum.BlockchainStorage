@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public class TransactionReceiptFilter : Filter<TransactionReceipt>, ITransactionReceiptFilter
     {
-        public TransactionReceiptFilter(Func<TransactionReceipt, Task<bool>> matchFunc) : base(matchFunc)
+        public TransactionReceiptFilter(Func<TransactionReceipt, Task<bool>> condition) : base(condition)
         {
         }
 

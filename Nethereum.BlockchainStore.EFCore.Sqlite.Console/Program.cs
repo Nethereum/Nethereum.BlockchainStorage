@@ -16,7 +16,9 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite.Console
                 TransactionFilter.ValueGreaterThanZero(),
                 TransactionReceiptFilter.OnlyNewContracts());
 
-            return ProcessorConsole.Execute(repositoryFactory, blockchainSourceConfiguration, filterContainer).Result;
+            blockchainSourceConfiguration.PostVm = true;
+
+            return ProcessorConsole.Execute(repositoryFactory, blockchainSourceConfiguration, filterContainer ,useGeth: true).Result;
         }
     }
 }

@@ -1,39 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Processors;
+﻿using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.PostProcessors;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.BlockchainStore.Web3Abstractions;
-using Nethereum.Geth;
 using NLog.Fluent;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processing
 {
     public class StorageProcessor: IDisposable
     {
         private const int MaxRetries = 3;
-        private readonly Web3.Web3 _web3;
+        private readonly IWeb3Wrapper _web3;
         private readonly IBlockProcessor _processor;
         private readonly IContractRepository _contractRepository;
         private readonly IBlockRepository _blockRepository;
-        private readonly WaitForBlockStrategy _waitForBlockStrategy;
+        private readonly WaitForNextBlockStrategy _waitForNextBlockStrategy;
         private bool _contractCacheInitialised = false;
         private readonly List<object> _repositories = new List<object>();
 
         public StorageProcessor(
-            string url, 
+            IWeb3Wrapper web3, 
             IBlockchainStoreRepositoryFactory repositoryFactory, 
             bool postVm = false,
-            FilterContainer filterContainer = null,
-            bool useGeth = false
+            FilterContainer filterContainer = null
             )
         {
-            _waitForBlockStrategy = new WaitForBlockStrategy();
-            _web3 = useGeth ? new Web3Geth(url) : new Web3.Web3(url);
+            _waitForNextBlockStrategy = new WaitForNextBlockStrategy();
+            _web3 = web3;
 
             _blockRepository = repositoryFactory.CreateBlockRepository();
             _contractRepository = repositoryFactory.CreateContractRepository();
@@ -50,27 +46,26 @@ namespace Nethereum.BlockchainStore.Processing
             _repositories.Add(logRepository);
             _repositories.Add(vmStackRepository);
 
-            var web3Wrapper = new Web3Wrapper(_web3);
             var vmStackErrorChecker = new VmStackErrorCheckerWrapper();
 
-            var contractTransactionProcessor = new ContractTransactionProcessor(web3Wrapper, vmStackErrorChecker, _contractRepository,
+            var contractTransactionProcessor = new ContractTransactionProcessor(_web3, vmStackErrorChecker, _contractRepository,
                 transactionRepository, addressTransactionRepository, vmStackRepository, logRepository, filterContainer?.TransactionLogFilters);
 
-            var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(web3Wrapper, _contractRepository,
+            var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(_web3, _contractRepository,
                 transactionRepository, addressTransactionRepository);
 
             var valueTransactionProcessor = new ValueTransactionProcessor(transactionRepository,
                 addressTransactionRepository);
 
-            var transactionProcessor = new TransactionProcessor(web3Wrapper, contractTransactionProcessor,
+            var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
                 valueTransactionProcessor, contractCreationTransactionProcessor, filterContainer?.TransactionFilters, filterContainer?.TransactionReceiptFilters);
 
             if (postVm)
-                _processor = new BlockVmPostProcessor(web3Wrapper, _blockRepository, transactionProcessor);
+                _processor = new BlockVmPostProcessor(_web3, _blockRepository, transactionProcessor);
             else
             {
                 transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                _processor = new BlockProcessor(web3Wrapper, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
+                _processor = new BlockProcessor(_web3, _blockRepository, transactionProcessor, filterContainer?.BlockFilters);
             }       
         }
 
@@ -87,17 +82,6 @@ namespace Nethereum.BlockchainStore.Processing
         {
             get => BlockProcessor.ProcessTransactionsInParallel;
             set => BlockProcessor.ProcessTransactionsInParallel = value;
-        }
-
-        public class WaitForBlockStrategy
-        {
-            private int[] waitIntervals = {1000, 2000, 5000, 10000, 15000};
-
-            public async Task Apply(int retryCount)
-            {
-                var intervalMs = retryCount >= waitIntervals.Length ? waitIntervals.Last() : waitIntervals[retryCount];
-                await Task.Delay(intervalMs);
-            }
         }
 
         /// <summary>
@@ -141,7 +125,7 @@ namespace Nethereum.BlockchainStore.Processing
                     if (runContinuously)
                     {
                         System.Console.WriteLine("Waiting for block...");
-                        await _waitForBlockStrategy.Apply(retryNumber);
+                        await _waitForNextBlockStrategy.Apply(retryNumber);
                         await ExecuteAsync(startBlock, endBlock, retryNumber + 1);
                     }
                     else

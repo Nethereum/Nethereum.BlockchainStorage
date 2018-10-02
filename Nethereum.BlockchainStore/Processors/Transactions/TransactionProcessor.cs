@@ -50,8 +50,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 if (EnabledContractCreationProcessing)
                 {
                     await
-                        _contractCreationTransactionProcessor.ProcessTransactionAsync(transactionSource, transactionReceipt,
-                            block.Timestamp).ConfigureAwait(false);
+                        _contractCreationTransactionProcessor.ProcessTransactionAsync(
+                            transactionSource, transactionReceipt, block.Timestamp)
+                            .ConfigureAwait(false);
                 }
             }
             else
@@ -61,15 +62,17 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                     if (EnabledContractProcessing)
                     {
                         await
-                            ContractTransactionProcessor.ProcessTransactionAsync(transactionSource, transactionReceipt,
-                                block.Timestamp).ConfigureAwait(false);
+                            ContractTransactionProcessor.ProcessTransactionAsync(
+                                transactionSource, transactionReceipt, block.Timestamp)
+                                .ConfigureAwait(false);
                     }
                 }
                 else if (EnabledValueProcessing)
                 {
                     await
-                        _valueTransactionProcessor.ProcessTransactionAsync(transactionSource, transactionReceipt,
-                            block.Timestamp).ConfigureAwait(false);
+                        _valueTransactionProcessor.ProcessTransactionAsync(
+                            transactionSource, transactionReceipt, block.Timestamp)
+                            .ConfigureAwait(false);
                 }
             }
         }

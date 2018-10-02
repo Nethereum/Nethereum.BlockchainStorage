@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly ITransactionVMStackRepository _transactionVmStackRepository;
         private readonly ITransactionLogRepository _transactionLogRepository;
 
-        private IEnumerable<ITransactionLogFilter> _transactionLogFilters;
+        private readonly IEnumerable<ITransactionLogFilter> _transactionLogFilters;
 
         public ContractTransactionProcessor(
           IGetTransactionVMStack vmStackProxy, 

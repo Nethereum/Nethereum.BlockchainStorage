@@ -5,16 +5,16 @@ namespace Nethereum.BlockchainStore.Processors
 {
     public class Filter<T>: IFilter<T>
     {
-        public Filter(Func<T, Task<bool>> matchFunc)
+        public Filter(Func<T, Task<bool>> condition)
         {
-            MatchFunc = matchFunc;
+            Condition = condition;
         }
 
-        public Func<T, Task<bool>> MatchFunc { get; }
+        public Func<T, Task<bool>> Condition { get; }
 
         public virtual async Task<bool> IsMatchAsync(T item)
         {
-            return await MatchFunc(item);
+            return await Condition(item);
         }
     }
 }

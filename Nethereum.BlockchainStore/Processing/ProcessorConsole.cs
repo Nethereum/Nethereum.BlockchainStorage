@@ -2,6 +2,8 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Web3Abstractions;
+using Nethereum.Geth;
 
 namespace Nethereum.BlockchainStore.Processing
 {
@@ -12,10 +14,13 @@ namespace Nethereum.BlockchainStore.Processing
         public static async Task<int> Execute(
             IBlockchainStoreRepositoryFactory repositoryFactory, 
             BlockchainSourceConfiguration configuration,
-            FilterContainer filterContainer = null)
+            FilterContainer filterContainer = null,
+            bool useGeth = false)
         {
+            IWeb3Wrapper web3 = new Web3Wrapper(useGeth ? new Web3Geth(configuration.BlockchainUrl) : new Web3.Web3(configuration.BlockchainUrl));
+
             using(_proc = new StorageProcessor(
-                configuration.BlockchainUrl, repositoryFactory, configuration.PostVm, filterContainer)
+                web3, repositoryFactory, configuration.PostVm, filterContainer)
             {
                 MinimumBlockNumber = configuration.MinimumBlockNumber,
                 ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel
