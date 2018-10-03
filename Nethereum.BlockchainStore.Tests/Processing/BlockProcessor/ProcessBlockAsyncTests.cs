@@ -1,11 +1,11 @@
 ﻿using Moq;
-using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainStore.Processing;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Processing;
 using Xunit;
+using IBlockFilter = Nethereum.BlockchainStore.Processors.IBlockFilter;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 {
@@ -66,15 +66,15 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             [Fact]
             public async Task ProcessesBlocksWhichMatchFilter()
             {
-                var mockBlockFilter = new Mock<IBlockFilter>();
-                mockBlockFilter.Setup(b => b.IsMatchAsync(_stubBlock)).ReturnsAsync(true);
-                BlockFilters.Add(mockBlockFilter.Object);
+                var matchingBlockFilter = new Mock<IBlockFilter>();
+                matchingBlockFilter.Setup(b => b.IsMatchAsync(_stubBlock)).ReturnsAsync(true);
+                BlockFilters.Add(matchingBlockFilter.Object);
 
                 //execute
                 await BlockProcessor.ProcessBlockAsync(BlockNumber);
 
                 //assert
-                mockBlockFilter.Verify(b => b.IsMatchAsync(_stubBlock), Times.Once);
+                matchingBlockFilter.Verify(b => b.IsMatchAsync(_stubBlock), Times.Once);
 
                 MockBlockRepository.Verify(b => b.UpsertBlockAsync(_stubBlock), Times.Once);
 
@@ -89,15 +89,16 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             [Fact]
             public async Task IgnoresBlocksWhereFilterDoesNotMatch()
             {
-                var blockNumberGreaterThan10Filter = new BlockFilter(
-                    b => Task.FromResult(b.Number.Value > 10));
-
-                BlockFilters.Add(blockNumberGreaterThan10Filter);
+                var nonMatchingFilter = new Moq.Mock<IBlockFilter>();
+                nonMatchingFilter.Setup(b => b.IsMatchAsync(_stubBlock)).ReturnsAsync(false);
+                BlockFilters.Add(nonMatchingFilter.Object);
 
                 //execute
                 await BlockProcessor.ProcessBlockAsync(BlockNumber);
 
                 //assert
+                nonMatchingFilter.Verify(b => b.IsMatchAsync(_stubBlock), Times.Once);
+
                 MockBlockRepository.Verify(b => b.UpsertBlockAsync(_stubBlock), Times.Never);
 
                 MockTransactionProcessor
