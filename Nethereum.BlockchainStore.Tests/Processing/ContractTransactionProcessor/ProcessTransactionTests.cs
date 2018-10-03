@@ -61,8 +61,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             _hasError = true;
             _hasStackTrace = false;
 
-            var gas = new HexBigInteger(10);
-            _transaction.Gas = gas;
+            _transaction.Gas = new HexBigInteger(10);
             _receipt.GasUsed = _transaction.Gas;
 
             MockExceptionFromGetTransactionVmStack();

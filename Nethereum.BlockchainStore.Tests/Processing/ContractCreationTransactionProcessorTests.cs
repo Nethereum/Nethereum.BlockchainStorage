@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 transaction, receipt, _blockTimestamp);
 
             VerifyNothingWasProcessed(transaction, receipt);
-        }
+        }  
 
         [Fact]
         public async Task ProcessTransactionAsync_ProcessesValidTransaction()
