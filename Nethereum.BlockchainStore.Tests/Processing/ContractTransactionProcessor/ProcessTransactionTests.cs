@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             InitProcessor();
 
             //execute
-            await CallProcessTransactionAsync();
+            await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
             VerifyVmStackUpsert();
@@ -48,7 +48,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             InitProcessor();
 
             //execute
-            await CallProcessTransactionAsync();
+            await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
             VerifyNoLogsHaveBeenUpserted();
@@ -73,7 +73,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             InitProcessor();
 
             //execute
-            await CallProcessTransactionAsync();
+            await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
             VerifyTransactionUpsert();
@@ -97,7 +97,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             InitProcessor();
             //execute
-            await CallProcessTransactionAsync();
+            await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
             VerifyVmStackUpsert();
@@ -117,7 +117,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             InitProcessor(enableVmStackProcessing: false);
 
             //execute
-            await CallProcessTransactionAsync();
+            await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
             VerifyVmStackInfoHasNotBeenProcessed();

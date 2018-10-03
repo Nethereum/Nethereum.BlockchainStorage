@@ -93,11 +93,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
                 }
             }
 
-            protected async Task CallProcessTransactionAsync()
-            {
-                await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
-            }
-
             protected void AddFilterWhichDoesNotMatchAnyLog()
             {
                 _transactionLogFilters.Add(new TransactionLogFilter((log) => Task.FromResult(false)));

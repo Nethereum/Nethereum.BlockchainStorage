@@ -11,7 +11,10 @@ namespace Nethereum.BlockchainStore.Repositories
     public class BlockProcessor : IBlockProcessor
     {
         private readonly IBlockRepository _blockRepository;
-        private readonly List<IBlockFilter> _blockFilters;
+        private readonly IEnumerable<IBlockFilter> _blockFilters;
+
+        protected IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
+        protected ITransactionProcessor TransactionProcessor { get; set; }
 
         public bool ProcessTransactionsInParallel { get; set; } = true;
 
@@ -25,11 +28,8 @@ namespace Nethereum.BlockchainStore.Repositories
             BlockProxy = blockProxy;
             _blockRepository = blockRepository;
             TransactionProcessor = transactionProcessor;
-            _blockFilters = new List<IBlockFilter>(blockFilters ?? new IBlockFilter[0]);
+            _blockFilters = blockFilters ?? new IBlockFilter[0];
         }
-
-        protected IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
-        protected ITransactionProcessor TransactionProcessor { get; set; }
 
         public virtual async Task ProcessBlockAsync(long blockNumber)
         {
@@ -52,9 +52,7 @@ namespace Nethereum.BlockchainStore.Repositories
         protected async Task ProcessTransactions(BlockWithTransactionHashes block)
         {
             foreach (var txnHash in block.TransactionHashes)
-            {
                 await TransactionProcessor.ProcessTransactionAsync(txnHash, block);
-            }
         }
 
         protected async Task ProcessTransactionsMultiThreaded(BlockWithTransactionHashes block)

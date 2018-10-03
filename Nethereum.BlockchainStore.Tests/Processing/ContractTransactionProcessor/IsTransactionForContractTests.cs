@@ -11,10 +11,11 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             [InlineData("")]
             [InlineData(null)]
             [InlineData("0x")]
-            public async Task WhenToAddressEmpty_ReturnsFalse(string toAddress)
+            public async Task WhenToAddressIsEmpty_ReturnsFalse(string toAddress)
             {
                 _transaction.To = toAddress;
                 InitProcessor();
+
                 Assert.False(await _processor.IsTransactionForContractAsync(_transaction));
             }
 
@@ -23,7 +24,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             {
                 _transaction.To = "0x1009b29f2094457d3dba62d1953efea58176ba27";
                 InitProcessor();
-
                 _contractRepository.Setup(r => r.ExistsAsync(_transaction.To)).ReturnsAsync(false);
 
                 Assert.False(await _processor.IsTransactionForContractAsync(_transaction));
@@ -34,7 +34,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             {
                 _transaction.To = "0x1009b29f2094457d3dba62d1953efea58176ba27";
                 InitProcessor();
-
                 _contractRepository.Setup(r => r.ExistsAsync(_transaction.To)).ReturnsAsync(true);
 
                 Assert.True(await _processor.IsTransactionForContractAsync(_transaction));
