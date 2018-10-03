@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
     {
         public AddressTransactionRepository(IBlockchainDbContextFactory contextFactory):base(contextFactory){}
 
-        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
+        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
             throw new System.NotImplementedException();
         }

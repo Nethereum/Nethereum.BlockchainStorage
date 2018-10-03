@@ -4,6 +4,7 @@ using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.BlockchainStore.Web3Abstractions;
 using System.Collections.Generic;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -13,11 +14,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
     {
         protected readonly Mock<IGetTransactionVMStack> _vmStackProxy = new Mock<IGetTransactionVMStack>();
         protected readonly Mock<IVmStackErrorChecker> _vmStackErrorChecker = new Mock<IVmStackErrorChecker>();
-        protected readonly Mock<IContractRepository> _contractRepository = new Mock<IContractRepository>();
-        protected readonly Mock<ITransactionRepository> _transactionRepository = new Mock<ITransactionRepository>();
-        protected readonly Mock<IAddressTransactionRepository> _addressTransactionRepository = new Mock<IAddressTransactionRepository>();
-        protected readonly Mock<ITransactionVMStackRepository> _transactionVmStackRepository = new Mock<ITransactionVMStackRepository>();
-        protected readonly Mock<ITransactionLogRepository> _transactionLogRepository = new Mock<ITransactionLogRepository>();
+        protected readonly Mock<IContractHandler> _contractHandler = new Mock<IContractHandler>();
+        protected readonly Mock<ITransactionHandler> _transactionHandler = new Mock<ITransactionHandler>();
+        protected readonly Mock<ITransactionVMStackHandler> _transactionVmStackHandler = new Mock<ITransactionVMStackHandler>();
+        protected readonly Mock<ITransactionLogHandler> _transactionLogHandler = new Mock<ITransactionLogHandler>();
         protected readonly HexBigInteger _blockTimestamp = new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         
 
@@ -31,11 +31,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             _processor = new ContractTransactionProcessor(
                 _vmStackProxy.Object, 
                 _vmStackErrorChecker.Object,
-                _contractRepository.Object, 
-                _transactionRepository.Object, 
-                _addressTransactionRepository.Object, 
-                _transactionVmStackRepository.Object, 
-                _transactionLogRepository.Object, 
+                _contractHandler.Object, 
+                _transactionHandler.Object, 
+                _transactionVmStackHandler.Object, 
+                _transactionLogHandler.Object, 
                 _transactionLogFilters);
 
             _processor.EnabledVmProcessing = enableVmStackProcessing;

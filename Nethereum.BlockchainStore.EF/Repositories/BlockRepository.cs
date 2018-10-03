@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Block = Nethereum.BlockchainStore.Entities.Block;
@@ -25,7 +26,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task<long> GetMaxBlockNumber()
+        public async Task<long> GetMaxBlockNumberAsync()
         {
             using (var context = _contextFactory.CreateContext())
             {

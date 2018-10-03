@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Block = Nethereum.BlockchainStore.AzureTables.Entities.Block;
@@ -82,7 +83,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return blockOutput;
         }
 
-        public async Task<long> GetMaxBlockNumber()
+        public async Task<long> GetMaxBlockNumberAsync()
         {
             await _lock.WaitAsync();
             try

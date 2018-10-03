@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Web3Abstractions;
 
@@ -6,7 +7,7 @@ namespace Nethereum.BlockchainStore.Processors.PostProcessors
 {
     public class BlockVmPostProcessor : BlockPostProcessor
     {
-        public BlockVmPostProcessor(IGetBlockWithTransactionHashesByNumber blockProxy, IBlockRepository blockRepository, ITransactionProcessor transactionProcessor) : base(blockProxy, blockRepository, transactionProcessor)
+        public BlockVmPostProcessor(IGetBlockWithTransactionHashesByNumber blockProxy, IBlockHandler blockHandler, ITransactionProcessor transactionProcessor) : base(blockProxy, blockHandler, transactionProcessor)
         {
         }
 

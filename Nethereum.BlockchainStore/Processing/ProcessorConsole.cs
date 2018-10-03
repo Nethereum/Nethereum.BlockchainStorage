@@ -9,7 +9,7 @@ namespace Nethereum.BlockchainStore.Processing
 {
     public class ProcessorConsole
     {
-        private static StorageProcessor _proc;
+        private static PersistenceStrategy _strategy;
 
         public static async Task<int> Execute(
             IBlockchainStoreRepositoryFactory repositoryFactory, 
@@ -18,26 +18,32 @@ namespace Nethereum.BlockchainStore.Processing
             bool useGeth = false)
         {
             IWeb3Wrapper web3 = new Web3Wrapper(
-                useGeth ? new Web3Geth(configuration.BlockchainUrl) 
+                useGeth 
+                    ? new Web3Geth(configuration.BlockchainUrl) 
                     : new Web3.Web3(configuration.BlockchainUrl));
 
-            using(_proc = new StorageProcessor(
-                web3, repositoryFactory, configuration.PostVm, filterContainer)
+            using (_strategy = new PersistenceStrategy(repositoryFactory, filterContainer))
             {
-                MinimumBlockNumber = configuration.MinimumBlockNumber,
-                ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel
-            })
-            {
+                var blockProcessor = new BlockProcessorFactory()
+                    .Create(web3, new VmStackErrorCheckerWrapper(), _strategy, configuration.PostVm);
+
+                blockProcessor.ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel;
+
+                var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor)
+                {
+                    MinimumBlockNumber = configuration.MinimumBlockNumber
+                };
+                
                 //this should not really be necessary
                 //but without it, when the process is killed early, some csv records where not being flushed
                 AppDomain.CurrentDomain.ProcessExit += (s, e) =>
                 {
-                    _proc?.Dispose();
+                    _strategy?.Dispose();
                 };
 
                 var stopWatch = Stopwatch.StartNew();
 
-                var result = await _proc.ExecuteAsync(configuration.FromBlock, configuration.ToBlock)
+                var result = await blockchainProcessor.ExecuteAsync(configuration.FromBlock, configuration.ToBlock)
                     .ConfigureAwait(false);
 
                 System.Console.WriteLine("Duration: " + stopWatch.Elapsed);
@@ -47,6 +53,7 @@ namespace Nethereum.BlockchainStore.Processing
                 System.Console.ReadLine();
 
                 return result ? 0 : 1;
+                
             }
         }
     }

@@ -39,7 +39,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         }
 
         [Fact]
-        public async Task EnabledContractCreationProcessing_DefaultsToTrue()
+        public void EnabledContractCreationProcessing_DefaultsToTrue()
         {
             var txProcessor = CreateTransactionProcessor();
             Assert.True(txProcessor.EnabledContractCreationProcessing);

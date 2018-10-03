@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Moq;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
@@ -11,40 +12,25 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 {
     public class ValueTransactionProcessorTests
     {
-        private readonly Mock<ITransactionRepository> _mockTransactionRepository = new Mock<ITransactionRepository>();
-        private readonly Mock<IAddressTransactionRepository> _mockAddressTransactionRepository = new Mock<IAddressTransactionRepository>();
+        private readonly Mock<ITransactionHandler> _mockTransactionRepository = new Mock<ITransactionHandler>();
         private readonly HexBigInteger _blockTimestamp = new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         private readonly Transaction _transaction = new Transaction { To = "0x1009b29f2094457d3dba62d1953efea58176ba27" };
         private readonly TransactionReceipt _transactionReceipt = new TransactionReceipt();
 
         private ValueTransactionProcessor CreateProcessor()
         {
-            return new ValueTransactionProcessor(_mockTransactionRepository.Object, _mockAddressTransactionRepository.Object);
+            return new ValueTransactionProcessor(_mockTransactionRepository.Object);
         }
 
         [Fact]
-        public async Task ProcessTransactionAsync_Calls_TransactionRepo()
+        public async Task ProcessTransactionAsync_InvokesTransactionHandler()
         {
             var processor = CreateProcessor();
 
             await processor.ProcessTransactionAsync(_transaction, _transactionReceipt, _blockTimestamp);
 
             _mockTransactionRepository
-                .Verify(r => r.UpsertAsync(_transaction, _transactionReceipt, false, _blockTimestamp, false, null), 
-                    Times.Once);
-
-        }
-
-        [Fact]
-        public async Task ProcessTransactionAsync_Calls_AddressTransactionRepo()
-        {
-
-            var processor = CreateProcessor();
-
-            await processor.ProcessTransactionAsync(_transaction, _transactionReceipt, _blockTimestamp);
-
-            _mockAddressTransactionRepository
-                .Verify(r => r.UpsertAsync(_transaction, _transactionReceipt, false, _blockTimestamp, _transaction.To, null, false, null), 
+                .Verify(r => r.HandleTransactionAsync(_transaction, _transactionReceipt, false, _blockTimestamp, null, false), 
                     Times.Once);
 
         }

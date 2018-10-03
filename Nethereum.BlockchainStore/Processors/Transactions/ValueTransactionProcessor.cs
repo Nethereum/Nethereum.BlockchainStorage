@@ -1,22 +1,19 @@
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public class ValueTransactionProcessor : IValueTransactionProcessor
     {
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly IAddressTransactionRepository _addressTransactionRepository;
+        private readonly ITransactionHandler _transactionHandler;
 
         public ValueTransactionProcessor(
-            ITransactionRepository transactionRepository, 
-            IAddressTransactionRepository addressTransactionRepository)
+            ITransactionHandler transactionHandler)
         {
-            _transactionRepository = transactionRepository;
-            _addressTransactionRepository = addressTransactionRepository;
+            _transactionHandler = transactionHandler;
         }
 
         public async Task ProcessTransactionAsync(
@@ -24,12 +21,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             TransactionReceipt transactionReceipt, 
             HexBigInteger blockTimestamp)
         {
-            await _transactionRepository.UpsertAsync(
-                transaction, transactionReceipt, false, blockTimestamp)
-                .ConfigureAwait(false);
 
-            await _addressTransactionRepository.UpsertAsync(
-                transaction, transactionReceipt, false, blockTimestamp, transaction.To)
+            await _transactionHandler.HandleTransactionAsync(
+                    transaction, transactionReceipt, false, blockTimestamp)
                 .ConfigureAwait(false);
         }
     }

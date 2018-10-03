@@ -8,7 +8,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
 {
     public class AddressTransactionRepository : IAddressTransactionRepository
     {
-        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
+        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
             return Task.FromResult((ITransactionView) null);
         }

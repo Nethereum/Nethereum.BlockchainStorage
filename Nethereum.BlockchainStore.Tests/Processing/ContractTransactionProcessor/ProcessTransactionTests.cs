@@ -18,14 +18,14 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
         {
             MockGetVmStack(_vmStack);
             MockGetErrorFromVmStack(_vmStack, _error);
-            MockVmStackUpsert(_vmStack);
-            MockTransactionUpsert(_hasError, _hasStackTrace, _error);
-            MockAddressTransactionUpsert(_hasError, _hasStackTrace, _error);
-            MockTransactionLogUpserts();
+            MockHandleVmStack(_vmStack);
+            MockHandleTransaction(_hasError, _hasStackTrace, _error);
+            MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
+            MockHandleTransactionLog();
         }
 
         [Fact]
-        public async Task Upserts_VmStack_Transactions_Logs()
+        public async Task Invokes_Handlers_For_VmStack_Transactions_And_Logs()
         {
             SetUpMocks();
             InitProcessor();
@@ -34,14 +34,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
-            VerifyVmStackUpsert();
-            VerifyTransactionUpsert();
-            VerifyAddressTransactionUpsert();
-            VerifyTxLogUpserts();
+            EnsureHandleVmStackWasInvoked();
+            EnsureHandleTransactionWasInvoked();
+            EnsureHandleTxLogWasInvoked();
         }
 
         [Fact]
-        public async Task WhenLogDoesNotMatchFilter_TheLogIsNotUpserted()
+        public async Task When_Log_Does_Not_Match_Filter_Handle_Log_Is_Not_Invoked()
         {
             SetUpMocks();
             AddFilterWhichDoesNotMatchAnyLog();
@@ -51,11 +50,11 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
-            VerifyNoLogsHaveBeenUpserted();
+            EnsureHandleTxLogWasNotInvoked();
         }
 
         [Fact]
-        public async Task WhenGetVmStackThrows_And_TxGasEqualsReceiptGas_AnErrorIsAssumed()
+        public async Task When_Get_VmStack_Throws_And_Tx_Gas_Equals_Receipt_Gas_An_Error_Is_Assumed()
         {
             _error = "";
             _hasError = true;
@@ -65,9 +64,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             _receipt.GasUsed = _transaction.Gas;
 
             MockExceptionFromGetTransactionVmStack();
-            MockTransactionUpsert(_hasError, _hasStackTrace, _error);
-            MockAddressTransactionUpsert(_hasError, _hasStackTrace, _error);
-            MockTransactionLogUpserts();
+            MockHandleTransaction(_hasError, _hasStackTrace, _error);
+            MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
+            MockHandleTransactionLog();
 
             InitProcessor();
 
@@ -75,13 +74,12 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
-            VerifyTransactionUpsert();
-            VerifyAddressTransactionUpsert();
-            VerifyTxLogUpserts();
+            EnsureHandleTransactionWasInvoked();
+            EnsureHandleTxLogWasInvoked();
         }
 
         [Fact]
-        public async Task WhenStackTraceContainsAnError_ItIsTreatedAsAnError()
+        public async Task When_Stack_Trace_Contains_An_Error_It_Is_Treated_As_An_Error()
         {
             _error = "Bad Error";
             _hasError = true;
@@ -89,24 +87,23 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             MockGetVmStack(_vmStack);
             MockGetErrorFromVmStack(_vmStack, _error);
-            MockVmStackUpsert(_vmStack);
-            MockTransactionUpsert(_hasError, _hasStackTrace, _error);
-            MockAddressTransactionUpsert(_hasError, _hasStackTrace, _error);
-            MockTransactionLogUpserts();
+            MockHandleVmStack(_vmStack);
+            MockHandleTransaction(_hasError, _hasStackTrace, _error);
+            MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
+            MockHandleTransactionLog();
 
             InitProcessor();
             //execute
             await _processor.ProcessTransactionAsync(_transaction, _receipt, _blockTimestamp);
 
             //assert
-            VerifyVmStackUpsert();
-            VerifyTransactionUpsert();
-            VerifyAddressTransactionUpsert();
-            VerifyTxLogUpserts();
+            EnsureHandleVmStackWasInvoked();
+            EnsureHandleTransactionWasInvoked();
+            EnsureHandleTxLogWasInvoked();
         }
 
         [Fact]
-        public async Task WhenVmProcessingIsNotEnabled_NoVmStackProcessingOccurs()
+        public async Task When_Vm_Processing_Is_Not_Enabled_No_Vm_Stack_Processing_Occurs()
         {
             _error = "";
             _hasError = false;
@@ -120,9 +117,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             //assert
             VerifyVmStackInfoHasNotBeenProcessed();
-            VerifyTransactionUpsert();
-            VerifyAddressTransactionUpsert();
-            VerifyTxLogUpserts();
+            EnsureHandleTransactionWasInvoked();
+            EnsureHandleTxLogWasInvoked();
         }
     }
 

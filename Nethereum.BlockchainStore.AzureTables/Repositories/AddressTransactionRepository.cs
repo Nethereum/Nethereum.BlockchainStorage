@@ -13,9 +13,9 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
     {
         public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
 
-        public async Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
+        public async Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
-            var partitionKey = addrees.ToPartitionKey();
+            var partitionKey = address.ToPartitionKey();
             var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);
             var operation = TableOperation.Retrieve<AddressTransaction>(partitionKey, rowKey);
             var results = await Table.ExecuteAsync(operation);

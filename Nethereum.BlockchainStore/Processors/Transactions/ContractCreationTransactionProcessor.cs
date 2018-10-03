@@ -1,8 +1,8 @@
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainStore.Handlers;
+using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Web3Abstractions;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
@@ -10,20 +10,17 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
     public class ContractCreationTransactionProcessor : IContractCreationTransactionProcessor
     {
         private readonly IGetCode _getCodeProxy;
-        private readonly IContractRepository _contractRepository;
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly IAddressTransactionRepository _addressTransactionRepository;
+        private readonly IContractHandler _contractHandler;
+        private readonly ITransactionHandler _transactionHandler;
 
         public ContractCreationTransactionProcessor(
           IGetCode getCodeProxy, 
-          IContractRepository contractRepository, 
-          ITransactionRepository transactionRepository, 
-          IAddressTransactionRepository addressTransactionRepository)
+          IContractHandler contractHandler, 
+          ITransactionHandler transactionHandler)
         {
             _getCodeProxy = getCodeProxy;
-            _contractRepository = contractRepository;
-            _transactionRepository = transactionRepository;
-            _addressTransactionRepository = addressTransactionRepository;
+            _contractHandler = contractHandler;
+            _transactionHandler = transactionHandler;
         }
 
         public virtual async Task ProcessTransactionAsync(
@@ -38,18 +35,13 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             var failedCreatingContract = HasFailedToCreateContract(code);
 
             if (!failedCreatingContract)
-                await _contractRepository.UpsertAsync(contractAddress, code, transaction)
+                await _contractHandler.HandleAsync(contractAddress, code, transaction)
                     .ConfigureAwait(false);
 
-            await _transactionRepository.UpsertAsync(
+            await _transactionHandler.HandleContractCreationTransactionAsync(
                 contractAddress, code,
                 transaction, transactionReceipt,
                 failedCreatingContract, blockTimestamp);
-
-            await _addressTransactionRepository.UpsertAsync(
-                transaction,
-                transactionReceipt,
-                failedCreatingContract, blockTimestamp, null, null, false, contractAddress);
         }
 
         protected virtual bool HasFailedToCreateContract(string code)

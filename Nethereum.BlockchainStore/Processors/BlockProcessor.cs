@@ -5,12 +5,13 @@ using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Handlers;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
     public class BlockProcessor : IBlockProcessor
     {
-        private readonly IBlockRepository _blockRepository;
+        private readonly IBlockHandler _blockHandler;
         private readonly IEnumerable<IBlockFilter> _blockFilters;
 
         protected IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
@@ -20,13 +21,13 @@ namespace Nethereum.BlockchainStore.Repositories
 
         public BlockProcessor(
             IGetBlockWithTransactionHashesByNumber blockProxy, 
-            IBlockRepository blockRepository,
+            IBlockHandler blockHandler,
             ITransactionProcessor transactionProcessor, 
             IEnumerable<IBlockFilter> blockFilters = null
            )
         {
             BlockProxy = blockProxy;
-            _blockRepository = blockRepository;
+            _blockHandler = blockHandler;
             TransactionProcessor = transactionProcessor;
             _blockFilters = blockFilters ?? new IBlockFilter[0];
         }
@@ -40,7 +41,7 @@ namespace Nethereum.BlockchainStore.Repositories
 
             if (await _blockFilters.IsMatchAsync(block))
             {
-                await _blockRepository.UpsertBlockAsync(block);
+                await _blockHandler.HandleAsync(block);
 
                 if (ProcessTransactionsInParallel)
                     await ProcessTransactionsMultiThreaded(block);

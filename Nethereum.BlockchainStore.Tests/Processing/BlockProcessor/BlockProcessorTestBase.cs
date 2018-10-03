@@ -4,6 +4,7 @@ using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.BlockchainStore.Web3Abstractions;
 using System.Collections.Generic;
+using Nethereum.BlockchainStore.Handlers;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 {
@@ -11,7 +12,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
     {
         protected internal const long BlockNumber = 9;
         protected readonly Mock<IGetBlockWithTransactionHashesByNumber> MockBlockProxy;
-        protected readonly Mock<IBlockRepository> MockBlockRepository;
+        protected readonly Mock<IBlockHandler> MockBlockHandler;
         protected readonly Mock<ITransactionProcessor> MockTransactionProcessor;
         protected readonly List<IBlockFilter> BlockFilters;
         protected readonly BlockProcessor BlockProcessor;
@@ -19,12 +20,12 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
         public BlockProcessorTestBase()
         {
             MockBlockProxy = new Mock<IGetBlockWithTransactionHashesByNumber>();
-            MockBlockRepository = new Mock<IBlockRepository>();
+            MockBlockHandler = new Mock<IBlockHandler>();
             MockTransactionProcessor = new Mock<ITransactionProcessor>();
             BlockFilters = new List<IBlockFilter>();
             BlockProcessor = new BlockProcessor(
                 MockBlockProxy.Object,
-                MockBlockRepository.Object,
+                MockBlockHandler.Object,
                 MockTransactionProcessor.Object,
                 BlockFilters);
         }

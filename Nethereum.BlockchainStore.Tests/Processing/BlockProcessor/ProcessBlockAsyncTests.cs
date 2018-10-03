@@ -47,13 +47,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             }
 
             [Fact]
-            public async Task PersistsBlockAndCallsTransactionProcessor()
+            public async Task Invokes_BlockHandler_And_TransactionProcessor()
             {
                 //execute
                 await BlockProcessor.ProcessBlockAsync(BlockNumber);
 
                 //assert
-                MockBlockRepository.Verify(b => b.UpsertBlockAsync(_stubBlock), Times.Once);
+                MockBlockHandler.Verify(b => b.HandleAsync(_stubBlock), Times.Once);
 
                 foreach (var txHash in _stubBlock.TransactionHashes)
                 {
@@ -64,7 +64,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             }
 
             [Fact]
-            public async Task ProcessesBlocksWhichMatchFilter()
+            public async Task Processes_Blocks_Which_Match_Filter()
             {
                 var matchingBlockFilter = new Mock<IBlockFilter>();
                 matchingBlockFilter.Setup(b => b.IsMatchAsync(_stubBlock)).ReturnsAsync(true);
@@ -76,7 +76,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
                 //assert
                 matchingBlockFilter.Verify(b => b.IsMatchAsync(_stubBlock), Times.Once);
 
-                MockBlockRepository.Verify(b => b.UpsertBlockAsync(_stubBlock), Times.Once);
+                MockBlockHandler.Verify(b => b.HandleAsync(_stubBlock), Times.Once);
 
                 foreach (var txHash in _stubBlock.TransactionHashes)
                 {
@@ -87,7 +87,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             }
 
             [Fact]
-            public async Task IgnoresBlocksWhereFilterDoesNotMatch()
+            public async Task When_Filter_Does_Not_Match_Ignores_Block()
             {
                 var nonMatchingFilter = new Moq.Mock<IBlockFilter>();
                 nonMatchingFilter.Setup(b => b.IsMatchAsync(_stubBlock)).ReturnsAsync(false);
@@ -99,7 +99,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
                 //assert
                 nonMatchingFilter.Verify(b => b.IsMatchAsync(_stubBlock), Times.Once);
 
-                MockBlockRepository.Verify(b => b.UpsertBlockAsync(_stubBlock), Times.Never);
+                MockBlockHandler.Verify(b => b.HandleAsync(_stubBlock), Times.Never);
 
                 MockTransactionProcessor
                     .Verify(t => t.ProcessTransactionAsync(

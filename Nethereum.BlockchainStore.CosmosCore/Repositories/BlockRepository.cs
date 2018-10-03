@@ -8,6 +8,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -34,7 +35,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task<long> GetMaxBlockNumber()
+        public async Task<long> GetMaxBlockNumberAsync()
         {
             var countQuery = await Client.CreateDocumentQuery<CosmosBlock>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName)).CountAsync();
