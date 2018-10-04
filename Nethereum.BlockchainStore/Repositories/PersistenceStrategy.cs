@@ -11,11 +11,21 @@ namespace Nethereum.BlockchainStore.Repositories
     {   
         private readonly IContractRepository _contractRepository;
         private readonly IBlockRepository _blockRepository;
+        private readonly IWaitStrategy _waitStrategy;
+
         private readonly List<object> _repositories = new List<object>();
 
-        public PersistenceStrategy(IBlockchainStoreRepositoryFactory repositoryFactory, FilterContainer filters)
+        public PersistenceStrategy(
+            IBlockchainStoreRepositoryFactory repositoryFactory, 
+            FilterContainer filters,
+            IWaitStrategy waitStrategy = null,
+            int maxRetries = 3,
+            long minimumBlockNumber = 0)
         {
+            MinimumBlockNumber = minimumBlockNumber;
+            MaxRetries = maxRetries;
             Filters = filters;
+            _waitStrategy = waitStrategy ?? new WaitStrategy();
             _blockRepository = repositoryFactory.CreateBlockRepository();
             _contractRepository = repositoryFactory.CreateContractRepository();
 
@@ -36,7 +46,12 @@ namespace Nethereum.BlockchainStore.Repositories
             ContractHandler = new ContractHandler(_contractRepository);
             TransactionVmStackHandler = new TransactionVMStackHandler(vmStackRepository);
             TransactionLogHandler = new TransactionLogHandler(logRepository);
+
+            _waitStrategy = new WaitStrategy();
         }
+
+        public long MinimumBlockNumber { get; }
+        public int MaxRetries { get; }
 
         public IBlockHandler BlockHandler { get; }
         public ITransactionHandler TransactionHandler { get; }
@@ -46,7 +61,7 @@ namespace Nethereum.BlockchainStore.Repositories
 
         public FilterContainer Filters { get; }
 
-        public async Task<long> GetMaxBlockNumberAsync()
+        public async Task<long> GetLastBlockProcessedAsync()
         {
             return await _blockRepository.GetMaxBlockNumberAsync().ConfigureAwait(false);
         }
@@ -54,6 +69,16 @@ namespace Nethereum.BlockchainStore.Repositories
         public async Task FillContractCacheAsync()
         {
             await _contractRepository.FillCache().ConfigureAwait(false);
+        }
+
+        public async Task WaitForNextBlock(int retryNumber)
+        {
+            await _waitStrategy.Apply(retryNumber);
+        }
+
+        public async Task PauseFollowingAnError(int retryNumber)
+        {
+            await _waitStrategy.Apply(retryNumber);
         }
 
         #region IDisposable Support
@@ -95,6 +120,7 @@ namespace Nethereum.BlockchainStore.Repositories
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

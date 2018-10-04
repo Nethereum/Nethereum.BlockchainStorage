@@ -13,7 +13,11 @@ namespace Nethereum.BlockchainStore.Processors
         ITransactionLogHandler TransactionLogHandler { get; }
         ITransactionVMStackHandler TransactionVmStackHandler { get; }
         IContractHandler ContractHandler { get; }
-        Task<long> GetMaxBlockNumberAsync();
+        Task<long> GetLastBlockProcessedAsync();
         Task FillContractCacheAsync();
+        Task WaitForNextBlock(int retryNumber);
+        Task PauseFollowingAnError(int retryNumber);
+        int MaxRetries { get; }
+        long MinimumBlockNumber { get; }
     }
 }

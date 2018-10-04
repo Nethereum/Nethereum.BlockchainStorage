@@ -22,17 +22,15 @@ namespace Nethereum.BlockchainStore.Processing
                     ? new Web3Geth(configuration.BlockchainUrl) 
                     : new Web3.Web3(configuration.BlockchainUrl));
 
-            using (_strategy = new PersistenceStrategy(repositoryFactory, filterContainer))
+            using (_strategy = new PersistenceStrategy(
+                repositoryFactory, filterContainer, minimumBlockNumber: configuration.MinimumBlockNumber ?? 0))
             {
                 var blockProcessor = new BlockProcessorFactory()
                     .Create(web3, new VmStackErrorCheckerWrapper(), _strategy, configuration.PostVm);
 
                 blockProcessor.ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel;
 
-                var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor)
-                {
-                    MinimumBlockNumber = configuration.MinimumBlockNumber
-                };
+                var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor);
                 
                 //this should not really be necessary
                 //but without it, when the process is killed early, some csv records where not being flushed

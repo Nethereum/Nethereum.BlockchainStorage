@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processing
 {
-    public class WaitForNextBlockStrategy
+    public class WaitStrategy : IWaitStrategy
     {
         private int[] waitIntervals = {1000, 2000, 5000, 10000, 15000};
 

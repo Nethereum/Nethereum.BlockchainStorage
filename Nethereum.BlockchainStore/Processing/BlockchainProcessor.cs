@@ -1,37 +1,23 @@
 ﻿using Nethereum.BlockchainStore.Processors;
 using NLog.Fluent;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processing
 {
     public class BlockchainProcessor
     {
-        private const int MaxRetries = 3;
         private readonly IBlockchainProcessingStrategy _strategy;
         private readonly IBlockProcessor _blockProcessor;
-        private readonly WaitForNextBlockStrategy _waitForNextBlockStrategy;
-        private bool _contractCacheInitialised = false;
-
-        public long? MinimumBlockNumber { get; set; }
 
         public BlockchainProcessor(
             IBlockchainProcessingStrategy strategy, 
             IBlockProcessor blockProcessor
             )
         {
-            _waitForNextBlockStrategy = new WaitForNextBlockStrategy();
             this._strategy = strategy;
             this._blockProcessor = blockProcessor;
-        }
-
-        private async Task InitContractCache()
-        {
-            if (!_contractCacheInitialised)
-            {
-                await _strategy.FillContractCacheAsync().ConfigureAwait(false);
-                _contractCacheInitialised = true;
-            }
         }
 
         /// <summary>
@@ -39,11 +25,11 @@ namespace Nethereum.BlockchainStore.Processing
         /// </summary>
         private async Task<long> GetStartingBlockNumber()
         {
-            var blockNumber = await _strategy.GetMaxBlockNumberAsync();
+            var blockNumber = await _strategy.GetLastBlockProcessedAsync();
             blockNumber = blockNumber <= 0 ? 0 : blockNumber - 1;
 
-            if (MinimumBlockNumber.HasValue && MinimumBlockNumber > blockNumber)
-                return MinimumBlockNumber.Value;
+            if (_strategy.MinimumBlockNumber > blockNumber)
+                return _strategy.MinimumBlockNumber;
 
             return blockNumber;
         }
@@ -51,22 +37,35 @@ namespace Nethereum.BlockchainStore.Processing
         public async Task<bool> ExecuteAsync(
             long? startBlock, long? endBlock)
         {
+            return await ExecuteAsync(startBlock, endBlock, new CancellationToken());
+        }
+
+        public async Task<bool> ExecuteAsync(
+            long? startBlock, long? endBlock, CancellationToken cancellationToken)
+        {
+
             startBlock = startBlock ?? await GetStartingBlockNumber();
             endBlock = endBlock ?? long.MaxValue;
 
-            await InitContractCache();
+            if (startBlock.Value > endBlock.Value)
+                return false;
 
-            return await InternalExecuteAsync(startBlock.Value, endBlock.Value);
+            await _strategy.FillContractCacheAsync().ConfigureAwait(false);
+
+            return await InternalExecuteAsync(startBlock.Value, endBlock.Value, cancellationToken);
         }
 
         private async Task<bool> InternalExecuteAsync(
-            long startBlock, long endBlock, int retryNumber = 0)
+            long startBlock, long endBlock, CancellationToken cancellationToken, int retryNumber = 0)
         {
             bool runContinuously = endBlock == long.MaxValue;
-           
+
             while (startBlock <= endBlock)
+            {
                 try
                 {
+                    if (cancellationToken.IsCancellationRequested) return false;
+
                     System.Console.WriteLine(
                         $"{DateTime.Now.ToString("s")}. Block: {startBlock}. Attempt: {retryNumber}");
 
@@ -81,46 +80,44 @@ namespace Nethereum.BlockchainStore.Processing
                     if (runContinuously)
                     {
                         System.Console.WriteLine("Waiting for block...");
-                        await _waitForNextBlockStrategy.Apply(retryNumber);
-                        await InternalExecuteAsync(startBlock, endBlock, retryNumber + 1);
+                        await _strategy.WaitForNextBlock(retryNumber);
+                        return await InternalExecuteAsync(startBlock, endBlock, cancellationToken, retryNumber + 1);
                     }
-                    else
+
+                    if (retryNumber != _strategy.MaxRetries)
                     {
-                        if (retryNumber != MaxRetries)
-                        {
-                            await InternalExecuteAsync(startBlock, endBlock, retryNumber + 1)
-                                .ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            retryNumber = 0;
-                            startBlock = startBlock + 1;
-                            Log.Error().Exception(blockNotFoundException)
-                                .Message("BlockNumber" + startBlock).Write();
-                            System.Console.WriteLine($"Skipping block");
-                        }
+                        await _strategy.PauseFollowingAnError(retryNumber);
+                        return await InternalExecuteAsync(startBlock, endBlock, cancellationToken, retryNumber + 1)
+                            .ConfigureAwait(false);
                     }
+
+                    retryNumber = 0;
+                    startBlock = startBlock + 1;
+                    Log.Error().Exception(blockNotFoundException)
+                        .Message("BlockNumber" + startBlock).Write();
+                    System.Console.WriteLine($"Skipping block");
+                    
                 }
                 catch (Exception ex)
                 {
                     System.Console.WriteLine(
                         ex.Message + ". " + ex.InnerException?.Message);
 
-                    if (retryNumber != MaxRetries)
+                    if (retryNumber != _strategy.MaxRetries)
                     {
-                        await InternalExecuteAsync(startBlock, endBlock, retryNumber + 1)
+                        await _strategy.PauseFollowingAnError(retryNumber);
+                        return await InternalExecuteAsync(startBlock, endBlock, cancellationToken, retryNumber + 1)
                             .ConfigureAwait(false);
                     }
-                    else
-                    {
-                        retryNumber = 0;
-                        startBlock = startBlock + 1;
-                        Log.Error().Exception(ex).Message(
-                            "BlockNumber" + startBlock).Write();
-                        System.Console.WriteLine(
-                            "ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
-                    }
+ 
+                    retryNumber = 0;
+                    startBlock = startBlock + 1;
+                    Log.Error().Exception(ex).Message(
+                        "BlockNumber" + startBlock).Write();
+                    System.Console.WriteLine(
+                        "ERROR:" + startBlock + " " + DateTime.Now.ToString("s"));
                 }
+            }
 
             return true;
         }
