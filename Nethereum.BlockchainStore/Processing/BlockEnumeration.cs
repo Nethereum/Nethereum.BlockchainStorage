@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainStore.Processing
             int maxRetries,
             CancellationToken cancellationToken,
             long startBlock,
-            long? endBlock
+            long? endBlock = null
             )
         {
             _processBlock = processBlock;
