@@ -9,10 +9,17 @@ namespace Nethereum.BlockchainStore.Processing
     public interface IBlockProcessorFactory
     {
         IBlockProcessor Create(IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, IBlockchainProcessingStrategy strategy, bool postVm = false);
+        IBlockProcessor Create(IWeb3Wrapper web3, IBlockchainProcessingStrategy strategy, bool postVm = false);
     }
 
     public class BlockProcessorFactory : IBlockProcessorFactory
     {
+        public IBlockProcessor Create(IWeb3Wrapper web3,
+            IBlockchainProcessingStrategy strategy, bool postVm = false)
+        {
+            return Create(web3, new VmStackErrorCheckerWrapper(), strategy, postVm);
+        }
+
         public IBlockProcessor Create(IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, IBlockchainProcessingStrategy strategy, bool postVm = false)
         {
             var contractTransactionProcessor = new ContractTransactionProcessor(

@@ -10,7 +10,9 @@ namespace Nethereum.BlockchainStore.Repositories
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAddressTransactionRepository _addressTransactionRepository;
 
-        public TransactionHandler(ITransactionRepository transactionRepository, IAddressTransactionRepository addressTransactionRepository)
+        public TransactionHandler(
+            ITransactionRepository transactionRepository, 
+            IAddressTransactionRepository addressTransactionRepository = null)
         {
             this._transactionRepository = transactionRepository;
             this._addressTransactionRepository = addressTransactionRepository;

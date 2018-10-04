@@ -1,9 +1,8 @@
-﻿using System;
-using Nethereum.BlockchainStore.Handlers;
+﻿using Nethereum.BlockchainStore.Handlers;
+using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Processing;
 
-namespace Nethereum.BlockchainStore.Processors
+namespace Nethereum.BlockchainStore.Processing
 {
     public interface IBlockchainProcessingStrategy: IDisposable
     {

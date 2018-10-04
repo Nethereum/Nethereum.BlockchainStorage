@@ -18,5 +18,10 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         {
             return new TransactionFilter(tx => Task.FromResult(tx.Value.Value > 0));
         }
+
+        public static TransactionFilter To(string toAddress)
+        {
+            return new TransactionFilter((t) => t.To?.Equals(toAddress, StringComparison.InvariantCultureIgnoreCase) ?? false);
+        }
     }
 }
