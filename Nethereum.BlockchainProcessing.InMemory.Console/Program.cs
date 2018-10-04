@@ -1,6 +1,8 @@
 ﻿using Nethereum.BlockchainStore;
 using Nethereum.BlockchainStore.Processing;
+using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Web3Abstractions;
+using Nethereum.Signer;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
@@ -11,11 +13,17 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             System.Console.WriteLine(string.Join(" ", args));
 
             var appConfig = ConfigurationUtils.Build(args);
-            var targetBlockchain = BlockchainSourceConfigurationPresets.Get(appConfig);
+            var targetBlockchain = BlockchainSourceConfigurationFactory.Get(appConfig);
 
             System.Console.WriteLine($"Target Blockchain: {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
 
             var filters = new FilterContainer();
+
+            //new TransactionFilter((tx) => tx.Value.Value > 0 && tx.From == "<some address>");
+            //TransactionFilter.FromAndTo();
+            //TransactionFilter.To()
+            //TransactionFilter.ValueGreaterThanZero()
+            //TransactionReceiptFilter.OnlyNewContracts()
 
             var strategy =
                 new SampleInMemoryProcessor.InMemoryProcessingStrategy(

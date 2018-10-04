@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Core.Console
         public static int Main(string[] args)
         {
             var appConfig = ConfigurationUtils.Build(args, userSecretsId: "Nethereum.BlockchainStore.AzureTables");
-            var configuration = BlockchainSourceConfigurationPresets.Get(appConfig);
+            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
 
             var connectionString = appConfig[ConnectionStringKey];
 

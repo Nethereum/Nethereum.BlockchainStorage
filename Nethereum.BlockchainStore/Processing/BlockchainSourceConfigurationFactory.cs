@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Nethereum.BlockchainStore.Processing
 {
-    public static class BlockchainSourceConfigurationPresets
+    public static class BlockchainSourceConfigurationFactory
     {
         public static string Default { get; } = "localhost";
 
