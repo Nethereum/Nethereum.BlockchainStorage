@@ -17,6 +17,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             var filters = new FilterContainer();
 
+            //Filter Examples
             //new TransactionFilter((tx) => tx.Value.Value > 0 && tx.From == "<some address>");
             //TransactionFilter.FromAndTo();
             //TransactionFilter.To()
@@ -25,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             var strategy =
                 new SampleInMemoryProcessor.InMemoryProcessingStrategy(
-                    (msg) => System.Console.WriteLine(msg),
+                    System.Console.WriteLine,
                     filters);
 
             var web3 = new Web3Wrapper(targetBlockchain.BlockchainUrl);
