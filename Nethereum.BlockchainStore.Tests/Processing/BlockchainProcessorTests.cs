@@ -130,7 +130,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 }
 
                 [Fact]
-                public async Task When_A_Block_Is_Not_Found_Will_Ask_Strategy_To_Wait_For_Next_Block()
+                public async Task When_A_Block_Is_Not_Found_Will_Ask_Strategy_To_Wait_For_Next_Block_Until_Cancelled()
                 {
                     var cancellationTokenSource = new CancellationTokenSource();
 
