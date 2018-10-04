@@ -1,8 +1,6 @@
 ﻿using Nethereum.BlockchainStore;
 using Nethereum.BlockchainStore.Processing;
-using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Web3Abstractions;
-using Nethereum.Signer;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {

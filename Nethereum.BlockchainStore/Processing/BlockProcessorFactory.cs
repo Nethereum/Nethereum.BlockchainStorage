@@ -14,7 +14,9 @@ namespace Nethereum.BlockchainStore.Processing
             return Create(web3, new VmStackErrorCheckerWrapper(), strategy, postVm);
         }
 
-        public IBlockProcessor Create(IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, IBlockchainProcessingStrategy strategy, bool postVm = false)
+        public IBlockProcessor Create(
+            IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, 
+            IBlockchainProcessingStrategy strategy, bool postVm = false)
         {
             var contractTransactionProcessor = new ContractTransactionProcessor(
                 web3, vmStackErrorChecker, strategy.ContractHandler,

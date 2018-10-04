@@ -10,18 +10,18 @@ namespace Nethereum.BlockchainStore.Processing
 {
     public class SampleInMemoryProcessor
     {
-        public class InMemoryHandlerBase
+        public abstract class InMemoryHandlerBase
         {
-            private readonly Action<string> logAction;
+            private readonly Action<string> _logAction;
 
             protected virtual void Log(string message)
             {
-                logAction(message);
+                _logAction(message);
             }
 
             protected InMemoryHandlerBase(Action<string> logAction)
             {
-                this.logAction = logAction;
+                this._logAction = logAction;
             }
         }
 
