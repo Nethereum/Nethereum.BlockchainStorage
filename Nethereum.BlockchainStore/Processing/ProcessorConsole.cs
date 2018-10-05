@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Common.Logging;
 using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.Geth;
 
@@ -15,7 +16,8 @@ namespace Nethereum.BlockchainStore.Processing
             IBlockchainStoreRepositoryFactory repositoryFactory, 
             BlockchainSourceConfiguration configuration,
             FilterContainer filterContainer = null,
-            bool useGeth = false)
+            bool useGeth = false,
+            ILog log = null)
         {
             IWeb3Wrapper web3 = new Web3Wrapper(
                 useGeth 
@@ -30,7 +32,7 @@ namespace Nethereum.BlockchainStore.Processing
 
                 blockProcessor.ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel;
 
-                var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor);
+                var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor, log);
                 
                 //this should not really be necessary
                 //but without it, when the process is killed early, some csv records where not being flushed

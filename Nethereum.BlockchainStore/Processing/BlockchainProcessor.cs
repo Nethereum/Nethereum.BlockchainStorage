@@ -1,6 +1,7 @@
 ﻿using Nethereum.BlockchainStore.Processors;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 
 namespace Nethereum.BlockchainStore.Processing
 {
@@ -8,14 +9,17 @@ namespace Nethereum.BlockchainStore.Processing
     {
         private readonly IBlockchainProcessingStrategy _strategy;
         private readonly IBlockProcessor _blockProcessor;
+        private readonly ILog _log;
 
         public BlockchainProcessor(
             IBlockchainProcessingStrategy strategy, 
-            IBlockProcessor blockProcessor
+            IBlockProcessor blockProcessor,
+            ILog log = null
             )
         {
             this._strategy = strategy;
             this._blockProcessor = blockProcessor;
+            this._log = log;
         }
 
         /// <summary>
@@ -55,7 +59,8 @@ namespace Nethereum.BlockchainStore.Processing
                     _strategy.MaxRetries,
                     cancellationToken,
                     startBlock.Value, 
-                    endBlock
+                    endBlock,
+                    _log
                     )
                 .ExecuteAsync().ConfigureAwait(false);
         }

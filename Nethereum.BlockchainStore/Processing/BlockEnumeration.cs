@@ -1,11 +1,10 @@
-﻿using NLog.Fluent;
+﻿using Common.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processing
 {
-
     public class BlockEnumeration
     {
         private readonly Func<long, Task> _processBlock;
@@ -19,6 +18,8 @@ namespace Nethereum.BlockchainStore.Processing
         private long _currentBlock;
         private int _retryNumber;
 
+        private readonly ILog _log;
+
         public BlockEnumeration(
             Func<long, Task> processBlock,
             Func<int, Task> waitForBlockAvailability,
@@ -26,7 +27,8 @@ namespace Nethereum.BlockchainStore.Processing
             int maxRetries,
             CancellationToken cancellationToken,
             long startBlock,
-            long? endBlock = null
+            long? endBlock = null,
+            ILog log = null
             )
         {
             _processBlock = processBlock;
@@ -37,6 +39,7 @@ namespace Nethereum.BlockchainStore.Processing
             _runContinuously = endBlock == null;
             _endBlock = endBlock ?? long.MaxValue;
             _cancellationToken = cancellationToken;
+            _log = log;
         }
 
         public async Task<bool> ExecuteAsync()
@@ -81,14 +84,14 @@ namespace Nethereum.BlockchainStore.Processing
             return true;
         }
 
-        private static void LogBlockSkipped()
+        private void LogBlockSkipped()
         {
-            System.Console.WriteLine($"Skipping block");
+            _log?.Warn($"Skipping block {_currentBlock}");
         }
 
         private async Task<bool> WaitForNextBlockAndRetry()
         {
-            System.Console.WriteLine("Waiting for block...");
+            _log?.Info($"Waiting for block {_currentBlock}...");
             await _waitForBlockAvailability(_retryNumber);
             _retryNumber++;
             return await ExecuteAsync().ConfigureAwait(false);
@@ -96,14 +99,12 @@ namespace Nethereum.BlockchainStore.Processing
 
         private void LogError(Exception exception)
         {
-            System.Console.WriteLine(exception.Message);
-
-            Log.Error().Exception(exception)
-                .Message("BlockNumber" + _currentBlock).Write();
+            _log?.Error($"Block: {_currentBlock}.  {exception.Message}", exception);
         }
 
         private async Task<bool> PauseAndRetry()
         {
+            _log?.Info($"Pausing before next process Attempt.  Block: {_currentBlock}, Attempt: {_retryNumber}.");
             await _pauseFollowingAnError(_retryNumber);
             _retryNumber++;
             return await ExecuteAsync().ConfigureAwait(false);
@@ -122,8 +123,7 @@ namespace Nethereum.BlockchainStore.Processing
 
         private void LogProcessBlockAttempt()
         {
-            System.Console.WriteLine(
-                $"{DateTime.Now.ToString("s")}. Block: {_currentBlock}. Attempt: {_retryNumber}");
+            _log?.Info($"Block Process Attempt.  Block: {_currentBlock}, Attempt: {_retryNumber}.");
         }
     }
 
