@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainStore.Processing
         public IEnumerable<ITransactionReceiptFilter> TransactionReceiptFilters { get; }
         public IEnumerable<ITransactionLogFilter> TransactionLogFilters { get; }
 
-        public FilterContainer(            
+        public FilterContainer(
             IEnumerable<IBlockFilter> blockFilters = null,
             IEnumerable<ITransactionFilter> transactionFilters = null,
             IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null,
@@ -24,65 +24,66 @@ namespace Nethereum.BlockchainStore.Processing
         }
 
         public FilterContainer(IBlockFilter blockFilter)
-            :this(blockFilter, null)
+            : this(blockFilter, null)
         {
         }
 
         public FilterContainer(ITransactionFilter transactionFilter)
-            :this(null, transactionFilter)
+            : this(null, transactionFilter)
         {
         }
 
         public FilterContainer(ITransactionReceiptFilter transactionReceiptFilter)
-            :this(null, null, transactionReceiptFilter)
+            : this(null, null, transactionReceiptFilter)
         {
         }
 
         public FilterContainer(ITransactionLogFilter transactionLogFilter)
-            :this(null, null, null, transactionLogFilter)
+            : this(null, null, null, transactionLogFilter)
         {
         }
 
         public FilterContainer(
-            ITransactionFilter transactionFilter, 
+            ITransactionFilter transactionFilter,
             ITransactionReceiptFilter transactionReceiptFilter)
-            :this(null, transactionFilter, transactionReceiptFilter)
+            : this(null, transactionFilter, transactionReceiptFilter)
         {
-                
+
         }
 
         public FilterContainer(
-            IBlockFilter blockFilter, 
-            ITransactionFilter transactionFilter, 
-            ITransactionReceiptFilter transactionReceiptFilter = null, 
+            IBlockFilter blockFilter,
+            ITransactionFilter transactionFilter,
+            ITransactionReceiptFilter transactionReceiptFilter = null,
             ITransactionLogFilter transactionLogFilter = null)
         {
             if (blockFilter != null)
             {
-                var blockFilters = new List<IBlockFilter>(1);
-                blockFilters.Add(blockFilter);
-                BlockFilters = blockFilters;
+                BlockFilters = new List<IBlockFilter>(1) { blockFilter }; ;
             }
 
             if (transactionFilter != null)
             {
-                var transactionFilters = new List<ITransactionFilter>(1);
-                transactionFilters.Add(transactionFilter);
-                TransactionFilters = transactionFilters;
+                TransactionFilters = new List<ITransactionFilter>(1)
+                    {
+                        transactionFilter
+                    };
             }
 
             if (transactionReceiptFilter != null)
             {
-                var transactionReceiptFilters = new List<ITransactionReceiptFilter>(1);
-                transactionReceiptFilters.Add(transactionReceiptFilter);
-                TransactionReceiptFilters = transactionReceiptFilters;
+                TransactionReceiptFilters = new List<ITransactionReceiptFilter>(1)
+                    {
+                        transactionReceiptFilter
+                    };
             }
 
             if (transactionLogFilter != null)
             {
-                var transactionLogFilters = new List<ITransactionLogFilter>(1);
-                transactionLogFilters.Add(transactionLogFilter);
-                TransactionLogFilters = transactionLogFilters;
+                TransactionLogFilters = new List<ITransactionLogFilter>(1)
+                    {
+                        transactionLogFilter
+                    };
             }
         }
 

@@ -7,7 +7,10 @@ namespace Nethereum.BlockchainStore.Csv.Console
     {
         static int Main(string[] args)
         {
-            var appConfig = ConfigurationUtils.Build(args, userSecretsId: "Nethereum.BlockchainStore.CosmosCore.UserSecrets");
+            var appConfig = ConfigurationUtils
+                .Build(args, userSecretsId: "Nethereum.BlockchainStore.CosmosCore.UserSecrets")
+                .AddConsoleLogging();
+
             var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
             var outputPath = appConfig["CsvOutputPath"];
             var repositoryFactory = new CsvBlockchainStoreRepositoryFactory(outputPath);

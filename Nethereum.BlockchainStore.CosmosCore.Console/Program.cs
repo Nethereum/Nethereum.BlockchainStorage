@@ -8,7 +8,10 @@ namespace Nethereum.BlockchainStore.CosmosCore.Console
     {
         static int Main(string[] args)
         {
-            var appConfig = ConfigurationUtils.Build(args, userSecretsId: "Nethereum.BlockchainStore.CosmosCore.UserSecrets");
+            var appConfig = ConfigurationUtils
+                .Build(args, userSecretsId: "Nethereum.BlockchainStore.CosmosCore.UserSecrets")
+                .AddConsoleLogging();
+
             var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
             var repositoryFactory = CosmosRepositoryFactory.Create(appConfig);
             return ProcessorConsole.Execute(repositoryFactory, configuration).Result;

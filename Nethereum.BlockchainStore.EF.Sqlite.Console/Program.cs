@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainStore.EF.Sqlite.Console
     {
         public static int Main(string[] args)
         {
-            var appConfig = ConfigurationUtils.Build(args);
+            var appConfig = ConfigurationUtils.Build(args).AddConsoleLogging();
             var contextFactory = new SqliteBlockchainDbContextFactory("BlockchainDbContext");
             var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
             var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Nethereum.BlockchainStore
 {
@@ -81,5 +82,18 @@ namespace Nethereum.BlockchainStore
 
             return builder.Build();
         }
+
+        public static IConfigurationRoot AddConsoleLogging(this IConfigurationRoot config)
+        {
+            ApplicationLogging.LoggerFactory.AddConsole(includeScopes: true);
+            return config;
+        }
+    }
+
+    public static class ApplicationLogging
+    {
+        public static ILoggerFactory LoggerFactory {get;} = new LoggerFactory();
+        public static ILogger CreateLogger<T>() =>
+            LoggerFactory.CreateLogger<T>();
     }
 }

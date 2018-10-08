@@ -10,7 +10,8 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
         {
             System.Console.WriteLine(string.Join(" ", args));
 
-            var appConfig = ConfigurationUtils.Build(args);
+            var appConfig = ConfigurationUtils.Build(args).AddConsoleLogging();
+
             var targetBlockchain = BlockchainSourceConfigurationFactory.Get(appConfig);
 
             System.Console.WriteLine($"Target Blockchain: {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
