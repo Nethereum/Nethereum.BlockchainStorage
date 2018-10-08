@@ -7,4 +7,12 @@ namespace Nethereum.BlockchainStore.Handlers
     {
         Task HandleAsync(string transactionHash, string address, JObject stackTrace);
     }
+
+    public class NullTransactionVMStackHandler : ITransactionVMStackHandler
+    {
+        public Task HandleAsync(string transactionHash, string address, JObject stackTrace)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }

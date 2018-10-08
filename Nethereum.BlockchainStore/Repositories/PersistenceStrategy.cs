@@ -1,6 +1,5 @@
 ﻿using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processing;
-using Nethereum.BlockchainStore.Processors;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

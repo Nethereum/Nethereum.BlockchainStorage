@@ -7,4 +7,12 @@ namespace Nethereum.BlockchainStore.Handlers
     {
         Task HandleAsync(string transactionHash, long logIndex, JObject log);
     }
+
+    public class NullTransactionLogHandler : ITransactionLogHandler
+    {
+        public Task HandleAsync(string transactionHash, long logIndex, JObject log)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }

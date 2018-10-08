@@ -22,4 +22,22 @@ namespace Nethereum.BlockchainStore.Handlers
             bool hasVmStack = false);
 
     }
+
+    public class NullTransactionHandler : ITransactionHandler
+    {
+        public Task HandleAddressTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task HandleContractCreationTransactionAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task HandleTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, HexBigInteger blockTimestamp, string error = null, bool hasVmStack = false)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }

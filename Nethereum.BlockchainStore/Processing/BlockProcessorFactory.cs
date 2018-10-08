@@ -9,14 +9,14 @@ namespace Nethereum.BlockchainStore.Processing
     public class BlockProcessorFactory : IBlockProcessorFactory
     {
         public IBlockProcessor Create(IWeb3Wrapper web3,
-            IBlockchainProcessingStrategy strategy, bool postVm = false)
+            IBlockchainProcessingStrategy strategy, bool postVm = false, bool processTransactionsInParallel = true)
         {
             return Create(web3, new VmStackErrorCheckerWrapper(), strategy, postVm);
         }
 
         public IBlockProcessor Create(
             IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, 
-            IBlockchainProcessingStrategy strategy, bool postVm = false)
+            IBlockchainProcessingStrategy strategy, bool postVm = false, bool processTransactionsInParallel = true)
         {
             var contractTransactionProcessor = new ContractTransactionProcessor(
                 web3, vmStackErrorChecker, strategy.ContractHandler,
@@ -37,13 +37,17 @@ namespace Nethereum.BlockchainStore.Processing
 
             if (postVm)
                 return new BlockVmPostProcessor(
-                    web3, strategy.BlockHandler, transactionProcessor);
-            else
+                    web3, strategy.BlockHandler, transactionProcessor)
+                {
+                    ProcessTransactionsInParallel = processTransactionsInParallel
+                };
+
+            transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
+            return new BlockProcessor(
+                web3, strategy.BlockHandler, transactionProcessor, strategy.Filters?.BlockFilters)
             {
-                transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
-                return new BlockProcessor(
-                    web3, strategy.BlockHandler, transactionProcessor, strategy.Filters?.BlockFilters);
-            }  
+                ProcessTransactionsInParallel = processTransactionsInParallel
+            };
         }
     }
 }

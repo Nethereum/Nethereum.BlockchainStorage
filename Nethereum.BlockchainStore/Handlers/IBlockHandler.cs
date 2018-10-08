@@ -7,4 +7,12 @@ namespace Nethereum.BlockchainStore.Handlers
     {
         Task HandleAsync(BlockWithTransactionHashes block);
     }
+
+    public class NullBlockHandler : IBlockHandler
+    {
+        public Task HandleAsync(BlockWithTransactionHashes block)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }
