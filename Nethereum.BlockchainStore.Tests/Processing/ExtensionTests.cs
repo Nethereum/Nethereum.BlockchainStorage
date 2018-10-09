@@ -1,8 +1,10 @@
 using Nethereum.BlockchainStore.Processors;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using BigInteger = System.Numerics.BigInteger;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
 {
@@ -109,6 +111,20 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             var item = new TestFilterItem {Value = "Not Empty"};
             Assert.False(await filters.IsMatchAsync(item));
             Assert.True(await filters.IgnoreAsync(item));
+        }
+
+        [Fact]
+        public void TransactionReceipt_Succeeded_When_Status_Is_One_Returns_True()
+        {
+            Assert.True(new TransactionReceipt {Status = new HexBigInteger(BigInteger.One)}.Succeeded());
+            Assert.False(new TransactionReceipt {Status = new HexBigInteger(BigInteger.Zero)}.Succeeded());
+        }
+
+        [Fact]
+        public void TransactionReceipt_Failed_When_Status_Is_Not_One_Returns_True()
+        {
+            Assert.False(new TransactionReceipt {Status = new HexBigInteger(BigInteger.One)}.Failed());
+            Assert.True(new TransactionReceipt {Status = new HexBigInteger(BigInteger.Zero)}.Failed());
         }
     }
 }

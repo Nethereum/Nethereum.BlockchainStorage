@@ -88,6 +88,16 @@ namespace Nethereum.BlockchainStore
             ApplicationLogging.LoggerFactory.AddConsole(includeScopes: true);
             return config;
         }
+
+        public static string GetOrThrow(this IConfigurationRoot config, string key)
+        {
+            var val = config[key];
+
+            if(string.IsNullOrEmpty(val))
+                throw CreateKeyNotFoundException(key);
+
+            return val;
+        }
     }
 
     public static class ApplicationLogging

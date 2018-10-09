@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
         protected readonly List<ITransactionLogFilter> _transactionLogFilters = new List<ITransactionLogFilter>();
         protected readonly Transaction _transaction = new Transaction { To = "0x1009b29f2094457d3dba62d1953efea58176ba27"};
-        protected readonly TransactionReceipt _receipt = new TransactionReceipt();
+        protected readonly TransactionReceipt _receipt = new TransactionReceipt {Status = new HexBigInteger(1)};
         protected ContractTransactionProcessor _processor;
 
         protected void InitProcessor(bool enableVmStackProcessing = true)

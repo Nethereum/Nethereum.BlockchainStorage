@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.ABI.Util;
 using Nethereum.BlockchainStore.Handlers;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
@@ -58,7 +59,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             var hasStackTrace = false;
             JObject stackTrace = null;
             var error = string.Empty;
-            var hasError = false;
+            var hasError = transactionReceipt.Failed();
 
             if (EnabledVmProcessing)
             {
@@ -70,8 +71,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 }
                 catch
                 {
-                    if (transaction.Gas == transactionReceipt.GasUsed)
-                        hasError = true;
+
                 }
 
                 if (stackTrace != null)

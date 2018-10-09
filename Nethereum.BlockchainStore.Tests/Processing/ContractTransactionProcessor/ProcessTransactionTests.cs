@@ -54,14 +54,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
         }
 
         [Fact]
-        public async Task When_Get_VmStack_Throws_And_Tx_Gas_Equals_Receipt_Gas_An_Error_Is_Assumed()
+        public async Task When_Receipt_Status_Does_Not_Equal_One_An_Error_Has_Occurred()
         {
             _error = "";
             _hasError = true;
             _hasStackTrace = false;
 
-            _transaction.Gas = new HexBigInteger(10);
-            _receipt.GasUsed = _transaction.Gas;
+            _receipt.Status = new HexBigInteger(0);
 
             MockExceptionFromGetTransactionVmStack();
             MockHandleTransaction(_hasError, _hasStackTrace, _error);

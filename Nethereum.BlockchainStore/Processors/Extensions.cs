@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -46,6 +47,16 @@ namespace Nethereum.BlockchainStore.Processors
         {
             return transaction.To.IsAnEmptyAddress() && 
                    transactionReceipt.ContractAddress.IsNotAnEmptyAddress();
+        }
+
+        public static bool Succeeded(this TransactionReceipt receipt)
+        {
+            return receipt.Status.Value == BigInteger.One;
+        }
+
+        public static bool Failed(this TransactionReceipt receipt)
+        {
+            return !receipt.Succeeded();
         }
     }
 }
