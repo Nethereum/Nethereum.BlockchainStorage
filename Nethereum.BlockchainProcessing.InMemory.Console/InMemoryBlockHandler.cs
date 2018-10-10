@@ -2,6 +2,7 @@
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.Processing
 {
@@ -11,9 +12,9 @@ namespace Nethereum.BlockchainStore.Processing
         {
         }
 
-        public Task HandleAsync(BlockWithTransactionHashes block)
+        public Task HandleAsync(Block block)
         {
-            Log($"Block: {block.Number.Value}");
+            Log($"Block: {block.Number.Value}. Txn Count: {block.TransactionCount()}");
             return Task.CompletedTask;
         }
     }

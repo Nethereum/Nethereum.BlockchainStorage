@@ -100,7 +100,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             private void EnsureContractHandlerWasNotInvoked(Transaction transaction)
             {
                 _contractHandler
-                    .Verify(r => r.HandleAsync(It.IsAny<string>(), It.IsAny<string>(), transaction),
+                    .Verify(r => r.HandleAsync(new ContractTransaction(It.IsAny<string>(), It.IsAny<string>(), transaction)),
                         Times.Never);
             }
 
@@ -117,13 +117,11 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         Times.Never);
 
                 _contractHandler
-                    .Verify(r => r.HandleAsync(
-                            It.IsAny<string>(), It.IsAny<string>(), transaction),
+                    .Verify(r => r.HandleAsync(It.IsAny<ContractTransaction>()),
                         Times.Never);
 
                 _transactionHandler
-                    .Verify(r => r.HandleContractCreationTransactionAsync(receipt.ContractAddress, It.IsAny<string>(),
-                            transaction, receipt, It.IsAny<bool>(), _blockTimestamp)
+                    .Verify(r => r.HandleContractCreationTransactionAsync(It.IsAny<ContractCreationTransaction>())
                         , Times.Never);
             }
 
@@ -131,15 +129,27 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 bool failedContractCreation = false)
             {
                 _transactionHandler
-                    .Setup(r => r.HandleContractCreationTransactionAsync(
-                        receipt.ContractAddress, code, transaction, receipt, failedContractCreation, _blockTimestamp))
+                    .Setup(r => r.HandleContractCreationTransactionAsync( It.IsAny<ContractCreationTransaction>()))
+                    .Callback<ContractCreationTransaction>((ct) =>
+                    {
+                        Assert.Equal(transaction, ct.Transaction);
+                        Assert.Equal(receipt, ct.TransactionReceipt);
+                        Assert.Equal(code, ct.Code);
+                        Assert.Equal(failedContractCreation, ct.FailedCreatingContract);
+                    })
                     .Returns(Task.CompletedTask).Verifiable();
             }
 
             private void MockHandleContract(Transaction transaction, TransactionReceipt receipt, string code)
             {
                 _contractHandler
-                    .Setup(r => r.HandleAsync(receipt.ContractAddress, code, transaction))
+                    .Setup(r => r.HandleAsync(It.IsAny<ContractTransaction>()))
+                    .Callback<ContractTransaction>((ct) =>
+                    {
+                        Assert.Equal(transaction, ct.Transaction);
+                        Assert.Equal(code, ct.Code);
+                        Assert.Equal(ct.ContractAddress, receipt.ContractAddress);
+                    })
                     .Returns(Task.CompletedTask).Verifiable();
             }
 

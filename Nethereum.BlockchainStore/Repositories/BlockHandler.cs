@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.Repositories
             this._blockRepository = blockRepository;
         }
 
-        public async Task HandleAsync(BlockWithTransactionHashes block)
+        public async Task HandleAsync(Block block)
         {
             await _blockRepository.UpsertBlockAsync(block);
         }

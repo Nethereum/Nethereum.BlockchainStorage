@@ -12,21 +12,21 @@ namespace Nethereum.BlockchainStore.Processing
         {
         }
 
-        public Task HandleAddressTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false)
+        public Task HandleAddressTransactionAsync(AddressTransactionWithReceipt addressTransactionWithReceipt)
         {
-            Log($"[AddressTransaction] Block:{transaction.BlockNumber.Value}, Index:{transaction.TransactionIndex.Value}, Hash:{transaction.TransactionHash}, Address:{address}, From:{transaction.From}, To:{transaction.To}");
+            Log($"[AddressTransaction] Block:{addressTransactionWithReceipt.Transaction.BlockNumber.Value}, Index:{addressTransactionWithReceipt.Transaction.TransactionIndex.Value}, Hash:{addressTransactionWithReceipt.Transaction.TransactionHash}, Address:{addressTransactionWithReceipt.Address}, From:{addressTransactionWithReceipt.Transaction.From}, To:{addressTransactionWithReceipt.Transaction.To}");
             return Task.CompletedTask;
         }
 
-        public Task HandleContractCreationTransactionAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
         {
-            Log($"[ContractCreation] Block:{transaction.BlockNumber.Value}, Index:{transaction.TransactionIndex.Value}, Hash:{transaction.TransactionHash}, Contract:{contractAddress}, From:{transaction.From}, To:{transaction.To}");
+            Log($"[ContractCreation] Block:{contractCreationTransaction.Transaction.BlockNumber.Value}, Index:{contractCreationTransaction.Transaction.TransactionIndex.Value}, Hash:{contractCreationTransaction.Transaction.TransactionHash}, Contract:{contractCreationTransaction.ContractAddress}, From:{contractCreationTransaction.Transaction.From}, To:{contractCreationTransaction.Transaction.To}");
             return Task.CompletedTask;
         }
 
-        public Task HandleTransactionAsync(Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, HexBigInteger blockTimestamp, string error = null, bool hasVmStack = false)
+        public Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
         {
-            Log($"[Transaction] Block:{transaction.BlockNumber.Value}, Index:{transaction.TransactionIndex.Value}, Hash:{transaction.TransactionHash}, From:{transaction.From}, To:{transaction.To}");
+            Log($"[Transaction] Block:{transactionWithReceipt.Transaction.BlockNumber.Value}, Index:{transactionWithReceipt.Transaction.TransactionIndex.Value}, Hash:{transactionWithReceipt.Transaction.TransactionHash}, From:{transactionWithReceipt.Transaction.From}, To:{transactionWithReceipt.Transaction.To}");
             return Task.CompletedTask;
         }
     }

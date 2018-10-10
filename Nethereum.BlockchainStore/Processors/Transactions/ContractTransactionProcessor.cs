@@ -81,13 +81,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                     hasStackTrace = true;
 
                     await _transactionVmStackHandler.HandleAsync
-                        (transactionHash, transaction.To, stackTrace);
+                        (new TransactionVmStack(transactionHash, transaction.To, stackTrace));
                 }
             }
 
-            await _transactionHandler.HandleTransactionAsync(
-                transaction, transactionReceipt, hasError, blockTimestamp,
-                error, hasStackTrace);
+            await _transactionHandler.HandleTransactionAsync(new TransactionWithReceipt(transaction, transactionReceipt, hasError, blockTimestamp, error, hasStackTrace));
 
             if (transactionReceipt.Logs == null) return;
 
@@ -107,14 +105,12 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                         addressesAdded.Add(logAddress);
 
                         await
-                            _transactionHandler.HandleAddressTransactionAsync(
-                                transaction, transactionReceipt, hasError,
-                                blockTimestamp, logAddress, error, hasStackTrace);
+                            _transactionHandler.HandleAddressTransactionAsync(new AddressTransactionWithReceipt(transaction, transactionReceipt, hasError, blockTimestamp, logAddress, error, hasStackTrace));
                     }
 
                     if (await _transactionLogFilters.IsMatchAsync(log))
                     {
-                        await _transactionLogHandler.HandleAsync(transactionHash, i, log);
+                        await _transactionLogHandler.HandleAsync(new TransactionLog(transactionHash, i, log));
                     }
 
                 }

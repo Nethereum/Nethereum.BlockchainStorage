@@ -2,7 +2,7 @@
 
 namespace Nethereum.BlockchainStore.Processors
 {
-    public interface IBlockFilter: IFilter<BlockWithTransactionHashes>
+    public interface IBlockFilter: IFilter<Block>
     {
     }
 }

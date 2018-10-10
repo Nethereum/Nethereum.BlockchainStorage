@@ -39,14 +39,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 transactionReceiptFilters ?? new ITransactionReceiptFilter[0]);
         }
        
-        public virtual async Task ProcessTransactionAsync(string transactionHash, BlockWithTransactionHashes block)
+        public virtual async Task ProcessTransactionAsync(Block block, Transaction transactionSource)
         {
-            var transactionSource = await TransactionProxy.GetTransactionByHash(transactionHash)
-                .ConfigureAwait(false);
-
             if (await _transactionFilters.IgnoreAsync(transactionSource)) return;
 
-            var transactionReceipt = await TransactionProxy.GetTransactionReceipt(transactionHash)
+            var transactionReceipt = await TransactionProxy.GetTransactionReceipt(transactionSource.TransactionHash)
                 .ConfigureAwait(false);
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;

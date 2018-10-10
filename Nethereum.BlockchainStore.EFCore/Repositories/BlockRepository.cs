@@ -1,11 +1,9 @@
-﻿using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
@@ -33,7 +31,7 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             }
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
+        public async Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source)
         {
             using (var context = _contextFactory.CreateContext())
             {

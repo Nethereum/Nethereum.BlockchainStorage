@@ -30,7 +30,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             await processor.ProcessTransactionAsync(_transaction, _transactionReceipt, _blockTimestamp);
 
             _mockTransactionRepository
-                .Verify(r => r.HandleTransactionAsync(_transaction, _transactionReceipt, false, _blockTimestamp, null, false), 
+                .Verify(r => r.HandleTransactionAsync(It.IsAny<TransactionWithReceipt>()), 
                     Times.Once);
 
         }

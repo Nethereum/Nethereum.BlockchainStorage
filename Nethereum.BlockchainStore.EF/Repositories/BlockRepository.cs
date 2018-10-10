@@ -35,7 +35,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
+        public async Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source)
         {
             using (var context = _contextFactory.CreateContext())
             {

@@ -39,7 +39,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return maxBlock;
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
+        public async Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source)
         {
             var block = new Block();
             block.Map(source);

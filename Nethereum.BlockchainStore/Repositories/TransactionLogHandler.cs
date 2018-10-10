@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Handlers;
-using Newtonsoft.Json.Linq;
+﻿using Nethereum.BlockchainStore.Handlers;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -10,12 +9,13 @@ namespace Nethereum.BlockchainStore.Repositories
 
         public TransactionLogHandler(ITransactionLogRepository transactionLogRepository)
         {
-            this._transactionLogRepository = transactionLogRepository;
+            _transactionLogRepository = transactionLogRepository;
         }
 
-        public async Task HandleAsync(string transactionHash, long logIndex, JObject log)
+        public async Task HandleAsync(TransactionLog transactionLog)
         {
-            await _transactionLogRepository.UpsertAsync(transactionHash, logIndex, log);
+            await _transactionLogRepository.UpsertAsync(
+                transactionLog.TransactionHash, transactionLog.LogIndex, transactionLog.Log);
         }
     }
 }

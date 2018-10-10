@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Handlers;
-using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
+﻿using Nethereum.BlockchainStore.Handlers;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -18,48 +16,43 @@ namespace Nethereum.BlockchainStore.Repositories
             this._addressTransactionRepository = addressTransactionRepository;
         }
 
-        public async Task HandleContractCreationTransactionAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, 
-            bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public async Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
         {
             await _transactionRepository.UpsertAsync(
-                contractAddress, code, transaction, transactionReceipt, failedCreatingContract, blockTimestamp);
+                contractCreationTransaction.ContractAddress, contractCreationTransaction.Code, contractCreationTransaction.Transaction, contractCreationTransaction.TransactionReceipt, contractCreationTransaction.FailedCreatingContract, contractCreationTransaction.BlockTimestamp);
 
             if (_addressTransactionRepository != null)
             {
                 await _addressTransactionRepository.UpsertAsync(
-                    transaction,
-                    transactionReceipt,
-                    failedCreatingContract, blockTimestamp, null, null, false, contractAddress);
+                    contractCreationTransaction.Transaction,
+                    contractCreationTransaction.TransactionReceipt,
+                    contractCreationTransaction.FailedCreatingContract, contractCreationTransaction.BlockTimestamp, null, null, false, contractCreationTransaction.ContractAddress);
             }
         }
 
-        public async Task HandleAddressTransactionAsync(
-            Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, HexBigInteger blockTimestamp, 
-            string address, string error = null, bool hasVmStack = false)
+        public async Task HandleAddressTransactionAsync(AddressTransactionWithReceipt addressTransactionWithReceipt)
         {
             if (_addressTransactionRepository != null)
             {
                 await
                     _addressTransactionRepository.UpsertAsync(
-                        transaction, transactionReceipt, hasError, blockTimestamp,
-                        address, error, hasVmStack);
+                        addressTransactionWithReceipt.Transaction, addressTransactionWithReceipt.TransactionReceipt, addressTransactionWithReceipt.HasError, addressTransactionWithReceipt.BlockTimestamp,
+                        addressTransactionWithReceipt.Address, addressTransactionWithReceipt.Error, addressTransactionWithReceipt.HasVmStack);
             }
         }
 
-        public async Task HandleTransactionAsync(
-            Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, 
-            HexBigInteger blockTimestamp, string error = null, bool hasVmStack = false)
+        public async Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
         {
             await
                 _transactionRepository.UpsertAsync(
-                    transaction, transactionReceipt, hasError, blockTimestamp, hasVmStack, error);
+                    transactionWithReceipt.Transaction, transactionWithReceipt.TransactionReceipt, transactionWithReceipt.HasError, transactionWithReceipt.BlockTimestamp, transactionWithReceipt.HasVmStack, transactionWithReceipt.Error);
 
             if (_addressTransactionRepository != null)
             {
                 await
                     _addressTransactionRepository.UpsertAsync(
-                        transaction, transactionReceipt, hasError, blockTimestamp,
-                        transaction.To, error, hasVmStack);
+                        transactionWithReceipt.Transaction, transactionWithReceipt.TransactionReceipt, transactionWithReceipt.HasError, transactionWithReceipt.BlockTimestamp,
+                        transactionWithReceipt.Transaction.To, transactionWithReceipt.Error, transactionWithReceipt.HasVmStack);
             }
         }
     }

@@ -11,9 +11,9 @@ namespace Nethereum.BlockchainStore.Processing
         {
         }
 
-        public Task HandleAsync(string transactionHash, string address, JObject stackTrace)
+        public Task HandleAsync(TransactionVmStack transactionVmStack)
         {
-            Log($"[TransactionVmStack] Hash:{transactionHash}, Address:{address}");
+            Log($"[TransactionVmStack] Hash:{transactionVmStack.TransactionHash}, Address:{transactionVmStack.Address}");
             return Task.CompletedTask;
         }
     }

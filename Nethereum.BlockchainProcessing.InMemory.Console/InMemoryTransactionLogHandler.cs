@@ -11,9 +11,9 @@ namespace Nethereum.BlockchainStore.Processing
         {
         }
 
-        public Task HandleAsync(string transactionHash, long logIndex, JObject log)
+        public Task HandleAsync(TransactionLog transactionLog)
         {
-            Log($"[TransactionLog] Hash:{transactionHash}, Index:{logIndex}, Address:{log["address"]}");
+            Log($"[TransactionLog] Hash:{transactionLog.TransactionHash}, Index:{transactionLog.LogIndex}, Address:{transactionLog.Log["address"]}");
             return Task.CompletedTask;
         }
     }

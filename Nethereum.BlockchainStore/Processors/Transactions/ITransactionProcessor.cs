@@ -5,7 +5,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public interface ITransactionProcessor
     {
-        Task ProcessTransactionAsync(string transactionHash, BlockWithTransactionHashes block);
+        Task ProcessTransactionAsync(Block block, Transaction transaction);
         bool EnabledContractCreationProcessing { get; set; }
         bool EnabledContractProcessing { get; set; }
         bool EnabledValueProcessing { get; set; }

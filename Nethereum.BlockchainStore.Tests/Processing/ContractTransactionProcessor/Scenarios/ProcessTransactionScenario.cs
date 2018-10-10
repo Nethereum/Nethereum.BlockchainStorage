@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Handlers;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests.Scenarios
@@ -13,9 +14,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
         {
             protected readonly string[] logAddresses = new [] { "address1", "address2" };
 
-            protected readonly List<Tuple<string, long, JObject>> argsPassedToLogRepo = new List<Tuple<string, long, JObject>>();
+            protected readonly List<TransactionLog> argsPassedToLogRepo = new List<TransactionLog>();
             
-
             protected ProcessTransactionScenario()
             {
                  _receipt.Logs = JArray.FromObject(logAddresses.Select(a => new {address = a}));
@@ -35,33 +35,43 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             protected void MockHandleVmStack(JObject vmStack)
             {
                 _transactionVmStackHandler
-                    .Setup(r => r.HandleAsync(_transaction.TransactionHash, _transaction.To, vmStack))
+                    .Setup(r => r.HandleAsync(It.IsAny<TransactionVmStack>()))
+                    .Callback<TransactionVmStack>(s => Assert.Equal(vmStack, s.StackTrace))
                     .Returns(Task.CompletedTask);
             }
 
             protected void MockHandleTransaction(bool hasError, bool hasStackTrace, string error)
             {
                 _transactionHandler
-                    .Setup(r => r.HandleTransactionAsync(_transaction, _receipt, hasError, _blockTimestamp, error, hasStackTrace))
+                    .Setup(r => r.HandleTransactionAsync(It.IsAny<TransactionWithReceipt>()))
+                    .Callback<TransactionWithReceipt>(t =>
+                    {
+                        Assert.Equal(hasError, t.HasError);
+                        Assert.Equal(hasStackTrace, t.HasVmStack);
+                        Assert.Equal(error, t.Error);
+                    })
                     .Returns(Task.CompletedTask);
             }
 
             protected void MockHandleAddressTransaction(bool hasError, bool hasStackTrace, string error)
             {
-                foreach (var address in logAddresses)
-                {
-                    _transactionHandler.Setup(r =>
-                            r.HandleAddressTransactionAsync(_transaction, _receipt, hasError, _blockTimestamp, address, error,
-                                hasStackTrace))
-                        .Returns(Task.CompletedTask);
-                }
+                _transactionHandler.Setup(r =>
+                        r.HandleAddressTransactionAsync(It.IsAny<AddressTransactionWithReceipt>()))
+                    .Callback<AddressTransactionWithReceipt>(t =>
+                    {
+                        Assert.Equal(hasError, t.HasError);
+                        Assert.Equal(hasStackTrace, t.HasVmStack);
+                        Assert.Equal(error, t.Error);
+                        Assert.Contains(logAddresses, a => a == t.Address);
+                    })
+                    .Returns(Task.CompletedTask);
             }
 
             protected void MockHandleTransactionLog()
             {
                 _transactionLogHandler
-                    .Setup(r => r.HandleAsync(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<JObject>()))
-                    .Callback<string, long, JObject>((txnHash, idx, log) => { argsPassedToLogRepo.Add(new Tuple<string, long, JObject>(txnHash, idx, log)); })
+                    .Setup(r => r.HandleAsync(It.IsAny<TransactionLog>()))
+                    .Callback<TransactionLog>((log) => { argsPassedToLogRepo.Add(log); })
                     .Returns(Task.CompletedTask);
             }
 
@@ -81,10 +91,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
                 for (var logIdx = 0; logIdx < 2; logIdx++)
                 {
-                    var args = argsPassedToLogRepo.FirstOrDefault(a => a.Item2 == logIdx);
+                    var args = argsPassedToLogRepo.FirstOrDefault(a => a.LogIndex == logIdx);
                     Assert.NotNull(args);
-                    Assert.Equal(logAddresses[logIdx], args.Item3["address"]);
-                    Assert.Equal(_transaction.TransactionHash, args.Item1);
+                    Assert.Equal(logAddresses[logIdx], args.Address);
+                    Assert.Equal(_transaction.TransactionHash, args.TransactionHash);
                 }
             }
 
@@ -103,7 +113,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
                 _vmStackProxy.Verify(p => p.GetTransactionVmStack(It.IsAny<string>()), Times.Never);
                 _vmStackErrorChecker.Verify(e => e.GetError(It.IsAny<JObject>()), Times.Never());
                 _transactionVmStackHandler
-                    .Verify(r => r.HandleAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<JObject>()), Times.Never);
+                    .Verify(r => r.HandleAsync(It.IsAny<TransactionVmStack>()), Times.Never);
             }
 
             protected void MockExceptionFromGetTransactionVmStack()

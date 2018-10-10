@@ -13,9 +13,9 @@ namespace Nethereum.BlockchainStore.Repositories
             this._transactionVmStackRepository = transactionVmStackRepository;
         }
 
-        public async Task HandleAsync(string transactionHash, string address, JObject stackTrace)
+        public async Task HandleAsync(TransactionVmStack transactionVmStack)
         {
-            await _transactionVmStackRepository.UpsertAsync(transactionHash, address, stackTrace);
+            await _transactionVmStackRepository.UpsertAsync(transactionVmStack.TransactionHash, transactionVmStack.Address, transactionVmStack.StackTrace);
         }
     }
 }

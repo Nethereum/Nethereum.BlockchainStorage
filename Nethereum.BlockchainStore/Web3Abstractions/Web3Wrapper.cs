@@ -19,12 +19,12 @@ namespace Nethereum.BlockchainStore.Web3Abstractions
 
         private Web3.Web3 Web3 { get; }
 
-        public async Task<BlockWithTransactionHashes> GetBlockWithTransactionsHashesByNumber
+        public async Task<BlockWithTransactions> GetBlockWithTransactionsAsync
             (long blockNumber)
         {
             var block =
                 await
-                    Web3.Eth.Blocks.GetBlockWithTransactionsHashesByNumber.SendRequestAsync(
+                    Web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(
                         new HexBigInteger(blockNumber)).ConfigureAwait(false);
             return block;
         }

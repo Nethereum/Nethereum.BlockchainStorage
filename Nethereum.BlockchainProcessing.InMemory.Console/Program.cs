@@ -40,7 +40,9 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             var web3 = new Web3Wrapper(targetBlockchain.BlockchainUrl);
 
             var blockProcessorFactory = new BlockProcessorFactory();
-            var blockProcessor = blockProcessorFactory.Create(web3, strategy, processTransactionsInParallel: false);
+            var blockProcessor = blockProcessorFactory.Create(
+                web3, strategy, processTransactionsInParallel: false);
+
             var blockchainProcessor = new BlockchainProcessor(strategy, blockProcessor);
 
             blockchainProcessor.ExecuteAsync

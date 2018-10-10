@@ -2,7 +2,6 @@
 using Nethereum.BlockchainStore.Processing;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System;
 using System.Threading.Tasks;
 using Xunit;
 using IBlockFilter = Nethereum.BlockchainStore.Processors.IBlockFilter;
@@ -18,8 +17,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             {
                 //setup
                 MockBlockProxy
-                    .Setup(p => p.GetBlockWithTransactionsHashesByNumber(BlockNumber))
-                    .ReturnsAsync((BlockWithTransactionHashes) null);
+                    .Setup(p => p.GetBlockWithTransactionsAsync(BlockNumber))
+                    .ReturnsAsync((BlockWithTransactions) null);
 
                 //execute
                 await Assert.ThrowsAsync<BlockNotFoundException>(
@@ -31,18 +30,22 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
         {
             const string TxHash1 = "0xc185cc7b9f7862255b82fd41be561fdc94d030567d0b41292008095bf31c39b9";
             const string TxHash2 = "0x8cb49adf5d0db2f85b092bb39366f108a68d29fffa177d172f838ba551842fd3";
-            private readonly BlockWithTransactionHashes _stubBlock;
+            private readonly BlockWithTransactions _stubBlock;
 
             public WhenBlockIsNotNull()
             {
-                _stubBlock = new BlockWithTransactionHashes
+                _stubBlock = new BlockWithTransactions
                 {
                     Number = new HexBigInteger(BlockNumber),
-                    TransactionHashes = new[] { TxHash1, TxHash2 }
+                    Transactions = new[]
+                    {
+                        new Transaction{TransactionHash = TxHash1},
+                        new Transaction{TransactionHash = TxHash2}
+                    }
                 };
 
                 MockBlockProxy
-                    .Setup(p => p.GetBlockWithTransactionsHashesByNumber(BlockNumber))
+                    .Setup(p => p.GetBlockWithTransactionsAsync(BlockNumber))
                     .ReturnsAsync(_stubBlock);
             }
 
@@ -55,10 +58,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
                 //assert
                 MockBlockHandler.Verify(b => b.HandleAsync(_stubBlock), Times.Once);
 
-                foreach (var txHash in _stubBlock.TransactionHashes)
+                foreach (var txn in _stubBlock.Transactions)
                 {
                     MockTransactionProcessor
-                        .Verify(t => t.ProcessTransactionAsync(txHash, _stubBlock), Times.Once);
+                        .Verify(t => t.ProcessTransactionAsync(_stubBlock, txn), Times.Once);
                 }
 
             }
@@ -78,10 +81,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 
                 MockBlockHandler.Verify(b => b.HandleAsync(_stubBlock), Times.Once);
 
-                foreach (var txHash in _stubBlock.TransactionHashes)
+                foreach (var txn in _stubBlock.Transactions)
                 {
                     MockTransactionProcessor
-                        .Verify(t => t.ProcessTransactionAsync(txHash, _stubBlock), Times.Once);
+                        .Verify(t => t.ProcessTransactionAsync( _stubBlock, txn), Times.Once);
                 }
 
             }
@@ -103,7 +106,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 
                 MockTransactionProcessor
                     .Verify(t => t.ProcessTransactionAsync(
-                        It.IsAny<String>(), It.IsAny<BlockWithTransactionHashes>()), Times.Never);
+                        It.IsAny<Block>(), It.IsAny<Transaction>()), Times.Never);
 
             }
         }

@@ -25,10 +25,10 @@ namespace Nethereum.BlockchainStore.Processing
             return Task.FromResult(isCached);
         }
 
-        public Task HandleAsync(string contractAddress, string code, Transaction transaction)
+        public Task HandleAsync(ContractTransaction contractTransaction)
         {
-            Log($"[Contract Add] Block:{transaction.BlockNumber.Value}, Hash:{transaction.TransactionHash}, Contract:{contractAddress}, Sender:{transaction.From}");
-            _cachedContracts.Add(contractAddress);
+            Log($"[Contract Add] Block:{contractTransaction.Transaction.BlockNumber.Value}, Hash:{contractTransaction.Transaction.TransactionHash}, Contract:{contractTransaction.ContractAddress}, Sender:{contractTransaction.Transaction.From}");
+            _cachedContracts.Add(contractTransaction.ContractAddress);
             return Task.CompletedTask;
         }
     }

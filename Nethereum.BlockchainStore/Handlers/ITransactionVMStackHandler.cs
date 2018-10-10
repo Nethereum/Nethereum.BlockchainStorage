@@ -3,16 +3,22 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Handlers
 {
-    public interface ITransactionVMStackHandler
+    public class TransactionVmStack
     {
-        Task HandleAsync(string transactionHash, string address, JObject stackTrace);
+        public TransactionVmStack(string transactionHash, string address, JObject stackTrace)
+        {
+            TransactionHash = transactionHash;
+            Address = address;
+            StackTrace = stackTrace;
+        }
+
+        public string TransactionHash { get; private set; }
+        public string Address { get; private set; }
+        public JObject StackTrace { get; private set; }
     }
 
-    public class NullTransactionVMStackHandler : ITransactionVMStackHandler
+    public interface ITransactionVMStackHandler
     {
-        public Task HandleAsync(string transactionHash, string address, JObject stackTrace)
-        {
-            return Task.CompletedTask;
-        }
+        Task HandleAsync(TransactionVmStack transactionVmStack);
     }
 }

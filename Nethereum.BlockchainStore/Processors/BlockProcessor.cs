@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainStore.Repositories
 
         public virtual async Task ProcessBlockAsync(long blockNumber)
         {
-            var block = await BlockProxy.GetBlockWithTransactionsHashesByNumber(blockNumber);
+            var block = await BlockProxy.GetBlockWithTransactionsAsync(blockNumber);
 
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
@@ -50,18 +50,18 @@ namespace Nethereum.BlockchainStore.Repositories
             }
         }
 
-        protected async Task ProcessTransactions(BlockWithTransactionHashes block)
+        protected async Task ProcessTransactions(BlockWithTransactions block)
         {
-            foreach (var txnHash in block.TransactionHashes)
-                await TransactionProcessor.ProcessTransactionAsync(txnHash, block);
+            foreach (var txn in block.Transactions)
+                await TransactionProcessor.ProcessTransactionAsync(block, txn);
         }
 
-        protected async Task ProcessTransactionsMultiThreaded(BlockWithTransactionHashes block)
+        protected async Task ProcessTransactionsMultiThreaded(BlockWithTransactions block)
         {
-            var txTasks = new List<Task>(block.TransactionHashes.Length);
-            foreach (var txnHash in block.TransactionHashes)
+            var txTasks = new List<Task>(block.Transactions.Length);
+            foreach (var txn in block.Transactions)
             {
-                var task = TransactionProcessor.ProcessTransactionAsync(txnHash, block);
+                var task = TransactionProcessor.ProcessTransactionAsync(block, txn);
                 txTasks.Add(task);
             }
 

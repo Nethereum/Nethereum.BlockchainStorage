@@ -3,12 +3,11 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -59,7 +58,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             return 0;
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
+        public async Task UpsertBlockAsync(Block source)
         {
             var block = new CosmosBlock { };
             block.Map(source);

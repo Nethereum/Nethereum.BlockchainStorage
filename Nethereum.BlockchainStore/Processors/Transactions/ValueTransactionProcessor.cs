@@ -22,8 +22,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             HexBigInteger blockTimestamp)
         {
 
-            await _transactionHandler.HandleTransactionAsync(
-                    transaction, transactionReceipt, false, blockTimestamp)
+            await _transactionHandler.HandleTransactionAsync(new TransactionWithReceipt(transaction, transactionReceipt, false, blockTimestamp))
                 .ConfigureAwait(false);
         }
     }
