@@ -33,7 +33,8 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
                 TransactionHandler = new InMemoryTransactionHandler(System.Console.WriteLine),
                 TransactionLogHandler = new InMemoryTransactionLogHandler(System.Console.WriteLine),
                 TransactionVmStackHandler = new InMemoryTransactionVmStackHandler(System.Console.WriteLine),
-                ContractHandler = new InMemoryContractHandler(System.Console.WriteLine)
+                ContractHandler = new InMemoryContractHandler(System.Console.WriteLine),
+                MinimumBlockConfirmations = 6
             };
 
             var web3 = new Web3Wrapper(targetBlockchain.BlockchainUrl);
@@ -43,7 +44,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             var blockchainProcessor = new BlockchainProcessor(strategy, blockProcessor);
 
             blockchainProcessor.ExecuteAsync
-                (targetBlockchain.MinimumBlockNumber, targetBlockchain.ToBlock)
+                (targetBlockchain.FromBlock, targetBlockchain.ToBlock)
                 .Wait();
         }
     }

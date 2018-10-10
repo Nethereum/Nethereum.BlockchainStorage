@@ -19,10 +19,12 @@ namespace Nethereum.BlockchainStore.Repositories
             FilterContainer filters,
             IWaitStrategy waitStrategy = null,
             int maxRetries = 3,
-            long minimumBlockNumber = 0)
+            long minimumBlockNumber = 0,
+            int minimumBlockConfirmations = 6)
         {
             MinimumBlockNumber = minimumBlockNumber;
             MaxRetries = maxRetries;
+            MinimumBlockConfirmations = minimumBlockConfirmations;
             Filters = filters;
             _waitStrategy = waitStrategy ?? new WaitStrategy();
             _blockRepository = repositoryFactory.CreateBlockRepository();
@@ -59,6 +61,8 @@ namespace Nethereum.BlockchainStore.Repositories
         public IContractHandler ContractHandler { get; }
 
         public FilterContainer Filters { get; }
+
+        public int MinimumBlockConfirmations { get; }
 
         public async Task<long> GetLastBlockProcessedAsync()
         {

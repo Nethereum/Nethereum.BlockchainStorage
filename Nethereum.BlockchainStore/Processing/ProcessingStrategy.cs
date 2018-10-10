@@ -14,6 +14,8 @@ namespace Nethereum.BlockchainStore.Processing
         public virtual int MaxRetries => 3;
         public virtual long MinimumBlockNumber => 0;
 
+        public int MinimumBlockConfirmations { get; set; } = 0;
+
         protected readonly IWaitStrategy WaitStrategy = new WaitStrategy();
 
         public virtual void Dispose() { }

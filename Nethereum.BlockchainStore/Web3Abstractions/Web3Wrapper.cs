@@ -35,6 +35,12 @@ namespace Nethereum.BlockchainStore.Web3Abstractions
                 .ConfigureAwait(false);
         }
 
+        public async Task<long> GetMaxBlockNumberAsync()
+        {
+            var blockNumber = await Web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+            return (long)blockNumber.Value;
+        }
+
         public async Task<Transaction> GetTransactionByHash(string txnHash)
         {
             return await Web3.Eth.Transactions.GetTransactionByHash

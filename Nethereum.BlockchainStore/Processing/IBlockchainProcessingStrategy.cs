@@ -18,5 +18,6 @@ namespace Nethereum.BlockchainStore.Processing
         Task PauseFollowingAnError(int retryNumber);
         int MaxRetries { get; }
         long MinimumBlockNumber { get; }
+        int MinimumBlockConfirmations { get; }
     }
 }

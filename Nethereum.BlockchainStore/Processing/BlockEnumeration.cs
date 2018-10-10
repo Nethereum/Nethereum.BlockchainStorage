@@ -11,10 +11,13 @@ namespace Nethereum.BlockchainStore.Processing
         private readonly Func<long, Task> _processBlock;
         private readonly Func<int, Task> _waitForBlockAvailability;
         private readonly Func<int, Task> _pauseFollowingAnError;
+        private readonly Func<Task<long>> getMaxBlockNumber;
+        private readonly int minimumBlockConfirmations;
         private readonly long _endBlock;
         private readonly CancellationToken _cancellationToken;
         private readonly int _maxRetries;
         private readonly bool _runContinuously;
+        private long? _maxBlockNumber;
 
         private long _currentBlock;
         private int _retryNumber;
@@ -25,6 +28,8 @@ namespace Nethereum.BlockchainStore.Processing
             Func<long, Task> processBlock,
             Func<int, Task> waitForBlockAvailability,
             Func<int, Task> pauseFollowingAnError,
+            Func<Task<long>> getMaxBlockNumber,
+            int minimumBlockConfirmations,
             int maxRetries,
             CancellationToken cancellationToken,
             long startBlock,
@@ -34,6 +39,8 @@ namespace Nethereum.BlockchainStore.Processing
             _processBlock = processBlock;
             _waitForBlockAvailability = waitForBlockAvailability;
             _pauseFollowingAnError = pauseFollowingAnError;
+            this.getMaxBlockNumber = getMaxBlockNumber;
+            this.minimumBlockConfirmations = minimumBlockConfirmations;
             _maxRetries = maxRetries;
             _currentBlock = startBlock;
             _runContinuously = endBlock == null;
@@ -48,6 +55,8 @@ namespace Nethereum.BlockchainStore.Processing
                 try
                 {
                     if (_cancellationToken.IsCancellationRequested) return false;
+
+                    await WaitForBlockConfirmations();
 
                     LogProcessBlockAttempt();
 
@@ -81,6 +90,28 @@ namespace Nethereum.BlockchainStore.Processing
             }
 
             return true;
+        }
+
+        private async Task WaitForBlockConfirmations()
+        {
+            if (minimumBlockConfirmations < 1) return;
+
+            if (_maxBlockNumber == null)
+                await RefreshMaxBlockNumber();
+
+            int retryNumber = 0;
+            while ((_maxBlockNumber - _currentBlock) < minimumBlockConfirmations)
+            {
+                _log.LogInformation($"Waiting for current block ({_currentBlock}) to be more than {minimumBlockConfirmations} confirmations behind the max block on the chain ({_maxBlockNumber})");
+                await _waitForBlockAvailability(retryNumber);
+                retryNumber++;
+                await RefreshMaxBlockNumber();
+            }
+        }
+
+        private async Task RefreshMaxBlockNumber()
+        {
+            _maxBlockNumber = await getMaxBlockNumber();
         }
 
         private void LogBlockSkipped()

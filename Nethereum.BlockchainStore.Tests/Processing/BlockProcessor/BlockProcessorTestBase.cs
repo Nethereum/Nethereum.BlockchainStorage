@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
     public class BlockProcessorTestBase
     {
         protected internal const long BlockNumber = 9;
-        protected readonly Mock<IGetBlockWithTransactionHashesByNumber> MockBlockProxy;
+        protected readonly Mock<IBlockProxy> MockBlockProxy;
         protected readonly Mock<IBlockHandler> MockBlockHandler;
         protected readonly Mock<ITransactionProcessor> MockTransactionProcessor;
         protected readonly List<IBlockFilter> BlockFilters;
@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 
         public BlockProcessorTestBase()
         {
-            MockBlockProxy = new Mock<IGetBlockWithTransactionHashesByNumber>();
+            MockBlockProxy = new Mock<IBlockProxy>();
             MockBlockHandler = new Mock<IBlockHandler>();
             MockTransactionProcessor = new Mock<ITransactionProcessor>();
             BlockFilters = new List<IBlockFilter>();

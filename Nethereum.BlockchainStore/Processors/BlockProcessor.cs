@@ -14,13 +14,13 @@ namespace Nethereum.BlockchainStore.Repositories
         private readonly IBlockHandler _blockHandler;
         private readonly IEnumerable<IBlockFilter> _blockFilters;
 
-        protected IGetBlockWithTransactionHashesByNumber BlockProxy { get; }
+        protected IBlockProxy BlockProxy { get; }
         protected ITransactionProcessor TransactionProcessor { get; set; }
 
         public bool ProcessTransactionsInParallel { get; set; } = true;
 
         public BlockProcessor(
-            IGetBlockWithTransactionHashesByNumber blockProxy, 
+            IBlockProxy blockProxy, 
             IBlockHandler blockHandler,
             ITransactionProcessor transactionProcessor, 
             IEnumerable<IBlockFilter> blockFilters = null
@@ -68,5 +68,9 @@ namespace Nethereum.BlockchainStore.Repositories
             await Task.WhenAll(txTasks);
         }
 
+        public async Task<long> GetMaxBlockNumberAsync()
+        {
+            return await BlockProxy.GetMaxBlockNumberAsync();
+        }
     }
 }

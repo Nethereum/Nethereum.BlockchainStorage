@@ -8,7 +8,7 @@ namespace Nethereum.BlockchainStore.Processors.PostProcessors
 {
     public class BlockPostProcessor : BlockProcessor
     {
-        public BlockPostProcessor(IGetBlockWithTransactionHashesByNumber blockProxy, IBlockHandler blockHandler, ITransactionProcessor transactionProcessor) : base(blockProxy, blockHandler, transactionProcessor)
+        public BlockPostProcessor(IBlockProxy blockProxy, IBlockHandler blockHandler, ITransactionProcessor transactionProcessor) : base(blockProxy, blockHandler, transactionProcessor)
         {
         }
 

@@ -6,5 +6,7 @@ namespace Nethereum.BlockchainStore.Processors
     {
         bool ProcessTransactionsInParallel { get;set; }
         Task ProcessBlockAsync(long blockNumber);
+
+        Task<long> GetMaxBlockNumberAsync();
     }
 }

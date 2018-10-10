@@ -1,7 +1,7 @@
 ﻿namespace Nethereum.BlockchainStore.Web3Abstractions
 {
     public interface IWeb3Wrapper:         
-        IGetBlockWithTransactionHashesByNumber,
+        IBlockProxy,
         ITransactionProxy,
         IGetCode,
         IGetTransactionVMStack

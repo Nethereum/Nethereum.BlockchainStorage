@@ -1,11 +1,9 @@
 ﻿using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainStore.Web3Abstractions;
+using Nethereum.Geth;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Common.Logging;
-using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainStore.Web3Abstractions;
-using Nethereum.Geth;
 
 namespace Nethereum.BlockchainStore.Processing
 {
@@ -28,9 +26,11 @@ namespace Nethereum.BlockchainStore.Processing
                 repositoryFactory, filterContainer, minimumBlockNumber: configuration.MinimumBlockNumber ?? 0))
             {
                 var blockProcessor = new BlockProcessorFactory()
-                    .Create(web3, new VmStackErrorCheckerWrapper(), _strategy, configuration.PostVm);
-
-                blockProcessor.ProcessTransactionsInParallel = configuration.ProcessBlockTransactionsInParallel;
+                    .Create(
+                        web3, 
+                        _strategy, 
+                        configuration.PostVm,
+                        configuration.ProcessBlockTransactionsInParallel);
 
                 var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor);
                 

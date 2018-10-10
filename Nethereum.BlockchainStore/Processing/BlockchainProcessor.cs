@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using Nethereum.BlockchainStore.Processors;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,11 +57,14 @@ namespace Nethereum.BlockchainStore.Processing
             _log.LogInformation("Begin FillContractCacheAsync");
             await _strategy.FillContractCacheAsync().ConfigureAwait(false);
 
+
             _log.LogInformation("Begin BlockEnumeration");
             return await new BlockEnumeration(
                     (blkNumber) => _blockProcessor.ProcessBlockAsync(blkNumber), 
                     (retryNum) => _strategy.WaitForNextBlock(retryNum),
                     (retryNum) => _strategy.PauseFollowingAnError(retryNum), 
+                    () => _blockProcessor.GetMaxBlockNumberAsync(),
+                    _strategy.MinimumBlockConfirmations,
                     _strategy.MaxRetries,
                     cancellationToken,
                     startBlock.Value, 
