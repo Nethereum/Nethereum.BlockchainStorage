@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
             foreach (var transactionLog in receipt.GetTransactionLogs())
             {
-                if (await _filters.IsMatchAsync(transactionLog.Log))
+                if (await _filters.IsMatchAsync(transactionLog))
                 {
                     await _transactionLogHandler.HandleAsync(transactionLog);
                 }

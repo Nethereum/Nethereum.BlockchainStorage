@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Nethereum.BlockchainStore.Handlers;
+using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
-    public interface ITransactionLogFilter: IFilter<JObject>{}
+    public interface ITransactionLogFilter: IFilter<TransactionLog>{}
 }

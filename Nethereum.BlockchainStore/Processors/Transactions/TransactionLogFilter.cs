@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Nethereum.BlockchainStore.Handlers;
 using System;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
-    public class TransactionLogFilter : Filter<JObject>, ITransactionLogFilter
+    public class TransactionLogFilter : Filter<TransactionLog>, ITransactionLogFilter
     {
-        public TransactionLogFilter(Func<JObject, Task<bool>> condition) : base(condition)
+        public TransactionLogFilter(Func<TransactionLog, Task<bool>> condition) : base(condition)
         {
         }
 
-        public TransactionLogFilter(Func<JObject, bool> condition) : base(condition)
+        public TransactionLogFilter(Func<TransactionLog, bool> condition) : base(condition)
         {
         }
     }
