@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.Repositories
             HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, 
             string newContractAddress = null);
 
-        Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(
+        Task<IAddressTransactionView> FindAsync(
             string address, HexBigInteger blockNumber, string transactionHash);
     }
 }

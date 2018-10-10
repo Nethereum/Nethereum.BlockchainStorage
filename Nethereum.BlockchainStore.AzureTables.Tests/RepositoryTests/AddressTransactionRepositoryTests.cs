@@ -1,12 +1,10 @@
-﻿using Nethereum.BlockchainStore.AzureTables.Entities;
-using Nethereum.BlockchainStore.AzureTables.Repositories;
+﻿using Nethereum.BlockchainStore.AzureTables.Repositories;
+using Nethereum.BlockchainStore.Entities;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Xunit;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
@@ -16,11 +14,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
     public class AddressTransactionRepositoryTests
     {
         static readonly Random _random = new Random();
-        private readonly IAddressTransactionRepository _repo;
+        private readonly AddressTransactionRepository _repo;
 
         public AddressTransactionRepositoryTests(AzureTablesFixture fixture)
         {
-            this._repo = fixture.Factory.CreateAddressTransactionRepository();
+            this._repo = fixture.Factory.CreateAddressTransactionRepository() as AddressTransactionRepository;
         }
 
         [Fact]
@@ -40,6 +38,12 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
 
             Assert.NotNull(storedTransaction);
             EnsureCorrectStoredValues(transaction, receipt, blockTimestamp, address, error, null, hasVmStack, storedTransaction);
+
+            var txView = await _repo.FindAsync(address, transaction.BlockNumber, transaction.TransactionHash);
+
+            Assert.Equal(address, txView.Address);
+            Assert.Equal(storedTransaction.BlockNumber, txView.BlockNumber);
+            Assert.Equal(storedTransaction.Hash, txView.Hash);
         }
 
         protected static HexBigInteger CreateBlockTimestamp()

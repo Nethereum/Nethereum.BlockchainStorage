@@ -57,7 +57,22 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                 if(repo is IDisposable dispRep)
                     dispRep.Dispose();
             }
-        } 
+        }
+
+        [Fact]
+        public virtual async Task AddressTransactionRepositoryTests()
+        {
+            var repo = _repositoryFactory.CreateAddressTransactionRepository();
+            try
+            {
+                await new AddressTransactionRepositoryTests(repo).RunAsync();
+            }
+            finally
+            {
+                if(repo is IDisposable dispRep)
+                    dispRep.Dispose();
+            }
+        }
 
         [Fact]
         public virtual async Task TransactionLogRepositoryTests()

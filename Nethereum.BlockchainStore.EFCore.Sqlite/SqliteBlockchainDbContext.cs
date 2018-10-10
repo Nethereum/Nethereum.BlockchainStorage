@@ -15,6 +15,7 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite
 
         public SqliteBlockchainDbContext(string connectionString)
         {
+            EntityBuilderExtensions.ColumnTypeForUnlimitedText = "TEXT";
             _connectionString = connectionString;
         }
 

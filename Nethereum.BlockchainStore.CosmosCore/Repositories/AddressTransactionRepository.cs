@@ -4,6 +4,9 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Nethereum.BlockchainStore.CosmosCore.Entities;
+using Nethereum.BlockchainStore.Entities.Mapping;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -13,14 +16,33 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string address, HexBigInteger blockNumber, string transactionHash)
+        public async Task<IAddressTransactionView> FindAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
-            throw new System.NotImplementedException();
+            var uri = CreateDocumentUri(
+                new CosmosAddressTransaction()
+                {
+                    Address = address, Hash = transactionHash, BlockNumber = blockNumber.Value.ToString()
+                });
+            try
+            {
+                var response = await Client.ReadDocumentAsync<CosmosAddressTransaction>(uri);
+                return response.Document;
+            }
+            catch (DocumentClientException dEx)
+            {
+                if (dEx.IsNotFound())
+                    return null;
+
+                throw;
+            }
         }
 
-        public Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null)
+        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null)
         {
-            return Task.CompletedTask;
+            var tx = new CosmosAddressTransaction();
+            tx.Map(transaction, address);
+            tx.UpdateRowDates();
+            await UpsertDocumentAsync(tx);
         }
     }
 }

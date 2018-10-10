@@ -7,20 +7,54 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nethereum.BlockchainStore.EFCore.SqlServer;
 
-namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockchainDbContext_kovanMigrations
+namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockchainDbContext_localhostMigrations
 {
-    [DbContext(typeof(SqlServerBlockchainDbContext_kovan))]
-    [Migration("20180817152404_InitialCreate")]
+    [DbContext(typeof(SqlServerBlockchainDbContext_localhost))]
+    [Migration("20181010105726_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("kovan")
+                .HasDefaultSchema("localhost")
                 .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.AddressTransaction", b =>
+                {
+                    b.Property<int>("RowIndex")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(43);
+
+                    b.Property<string>("BlockNumber")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasMaxLength(67);
+
+                    b.Property<DateTime?>("RowCreated");
+
+                    b.Property<DateTime?>("RowUpdated");
+
+                    b.HasKey("RowIndex");
+
+                    b.HasIndex("Address");
+
+                    b.HasIndex("Hash");
+
+                    b.HasIndex("BlockNumber", "Hash", "Address")
+                        .IsUnique();
+
+                    b.ToTable("AddressTransactions");
+                });
 
             modelBuilder.Entity("Nethereum.BlockchainStore.Entities.Block", b =>
                 {

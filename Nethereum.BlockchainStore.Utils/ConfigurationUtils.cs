@@ -44,8 +44,11 @@ namespace Nethereum.BlockchainStore
         {
             string path = FindAppSettingsDirectory(appSettingsFileName);
 
+            if (path == null && File.Exists(Path.Combine(Environment.CurrentDirectory, appSettingsFileName)))
+                path = Environment.CurrentDirectory;
+
             if(path == null)
-                throw new Exception("Failed to find the appsettings.json file.  Please ensure it is in somewhere within the path of the executable.");
+                throw new Exception($"Failed to find the appsettings.json file.  Please ensure it is in somewhere within the path of the executable.  Working Directory: {Environment.CurrentDirectory}");
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(path)

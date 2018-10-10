@@ -6,6 +6,7 @@ using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
+using AddressTransaction = Nethereum.BlockchainStore.AzureTables.Entities.AddressTransaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
@@ -15,11 +16,12 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 
         public async Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
-            var partitionKey = address.ToPartitionKey();
-            var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);
-            var operation = TableOperation.Retrieve<AddressTransaction>(partitionKey, rowKey);
-            var results = await Table.ExecuteAsync(operation);
-            return results.Result as AddressTransaction;
+            return await FindAddressTransactionAsync(address, blockNumber, transactionHash);
+        }
+
+        public async Task<IAddressTransactionView> FindAsync(string address, HexBigInteger blockNumber, string transactionHash)
+        {
+            return await FindAddressTransactionAsync(address, blockNumber, transactionHash);
         }
 
         public async Task UpsertAsync(Transaction transaction,
@@ -35,7 +37,16 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
                 transactionReceipt,
                 failedCreatingContract, blockTimestamp, address, error, hasVmStack, newContractAddress);
 
-            var result = await UpsertAsync(entity);
+            await UpsertAsync(entity);
+        }
+
+        private async Task<AddressTransaction> FindAddressTransactionAsync(string address, HexBigInteger blockNumber, string transactionHash)
+        {
+            var partitionKey = address.ToPartitionKey();
+            var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);
+            var operation = TableOperation.Retrieve<AddressTransaction>(partitionKey, rowKey);
+            var results = await Table.ExecuteAsync(operation);
+            return results.Result as AddressTransaction;
         }
     }
 }

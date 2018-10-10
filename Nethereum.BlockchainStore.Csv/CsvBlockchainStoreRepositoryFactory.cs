@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.Csv
 
         public IAddressTransactionRepository CreateAddressTransactionRepository()
         {
-            return new AddressTransactionRepository();
+            return new AddressTransactionRepository(_csvFolderPath);
         }
 
         public IBlockRepository CreateBlockRepository()

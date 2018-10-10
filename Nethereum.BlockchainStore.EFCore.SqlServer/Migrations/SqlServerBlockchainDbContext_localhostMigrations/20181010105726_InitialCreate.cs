@@ -2,18 +2,36 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
+namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockchainDbContext_localhostMigrations
 {
     public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "dbo");
+                name: "localhost");
+
+            migrationBuilder.CreateTable(
+                name: "AddressTransactions",
+                schema: "localhost",
+                columns: table => new
+                {
+                    RowIndex = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    RowCreated = table.Column<DateTime>(nullable: true),
+                    RowUpdated = table.Column<DateTime>(nullable: true),
+                    BlockNumber = table.Column<string>(maxLength: 100, nullable: false),
+                    Hash = table.Column<string>(maxLength: 67, nullable: false),
+                    Address = table.Column<string>(maxLength: 43, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AddressTransactions", x => x.RowIndex);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Blocks",
-                schema: "dbo",
+                schema: "localhost",
                 columns: table => new
                 {
                     RowIndex = table.Column<int>(nullable: false)
@@ -41,7 +59,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Contracts",
-                schema: "dbo",
+                schema: "localhost",
                 columns: table => new
                 {
                     RowIndex = table.Column<int>(nullable: false)
@@ -62,7 +80,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
             migrationBuilder.CreateTable(
                 name: "TransactionLogs",
-                schema: "dbo",
+                schema: "localhost",
                 columns: table => new
                 {
                     RowIndex = table.Column<int>(nullable: false)
@@ -85,7 +103,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
             migrationBuilder.CreateTable(
                 name: "TransactionLogVmStacks",
-                schema: "dbo",
+                schema: "localhost",
                 columns: table => new
                 {
                     RowIndex = table.Column<int>(nullable: false)
@@ -103,7 +121,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Transactions",
-                schema: "dbo",
+                schema: "localhost",
                 columns: table => new
                 {
                     RowIndex = table.Column<int>(nullable: false)
@@ -138,100 +156,119 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AddressTransactions_Address",
+                schema: "localhost",
+                table: "AddressTransactions",
+                column: "Address");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AddressTransactions_Hash",
+                schema: "localhost",
+                table: "AddressTransactions",
+                column: "Hash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AddressTransactions_BlockNumber_Hash_Address",
+                schema: "localhost",
+                table: "AddressTransactions",
+                columns: new[] { "BlockNumber", "Hash", "Address" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Blocks_BlockNumber_Hash",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Blocks",
                 columns: new[] { "BlockNumber", "Hash" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Contracts_Address",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Contracts",
                 column: "Address");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Contracts_Name",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Contracts",
                 column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogs_Address",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogs",
                 column: "Address");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogs_EventHash",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogs",
                 column: "EventHash");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogs_IndexVal1",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogs",
                 column: "IndexVal1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogs_IndexVal2",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogs",
                 column: "IndexVal2");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogs_IndexVal3",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogs",
                 column: "IndexVal3");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogs_TransactionHash_LogIndex",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogs",
                 columns: new[] { "TransactionHash", "LogIndex" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogVmStacks_Address",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogVmStacks",
                 column: "Address");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionLogVmStacks_TransactionHash",
-                schema: "dbo",
+                schema: "localhost",
                 table: "TransactionLogVmStacks",
                 column: "TransactionHash");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_AddressFrom",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Transactions",
                 column: "AddressFrom");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_AddressTo",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Transactions",
                 column: "AddressTo");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_Hash",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Transactions",
                 column: "Hash");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_NewContractAddress",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Transactions",
                 column: "NewContractAddress");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_BlockNumber_Hash",
-                schema: "dbo",
+                schema: "localhost",
                 table: "Transactions",
                 columns: new[] { "BlockNumber", "Hash" },
                 unique: true);
@@ -240,24 +277,28 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AddressTransactions",
+                schema: "localhost");
+
+            migrationBuilder.DropTable(
                 name: "Blocks",
-                schema: "dbo");
+                schema: "localhost");
 
             migrationBuilder.DropTable(
                 name: "Contracts",
-                schema: "dbo");
+                schema: "localhost");
 
             migrationBuilder.DropTable(
                 name: "TransactionLogs",
-                schema: "dbo");
+                schema: "localhost");
 
             migrationBuilder.DropTable(
                 name: "TransactionLogVmStacks",
-                schema: "dbo");
+                schema: "localhost");
 
             migrationBuilder.DropTable(
                 name: "Transactions",
-                schema: "dbo");
+                schema: "localhost");
         }
     }
 }
