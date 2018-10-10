@@ -18,10 +18,14 @@ namespace Nethereum.BlockchainStore.Processing
             IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, 
             IBlockchainProcessingStrategy strategy, bool postVm = false, bool processTransactionsInParallel = true)
         {
+
+            var transactionLogProcessor = new TransactionLogProcessor(
+                strategy.Filters?.TransactionLogFilters,
+                strategy.TransactionLogHandler);
+
             var contractTransactionProcessor = new ContractTransactionProcessor(
                 web3, vmStackErrorChecker, strategy.ContractHandler,
-                strategy.TransactionHandler, strategy.TransactionVmStackHandler, 
-                strategy.TransactionLogHandler, strategy.Filters?.TransactionLogFilters);
+                strategy.TransactionHandler, strategy.TransactionVmStackHandler);
 
             var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(
                 web3, strategy.ContractHandler,
@@ -31,9 +35,13 @@ namespace Nethereum.BlockchainStore.Processing
                 strategy.TransactionHandler);
 
             var transactionProcessor = new TransactionProcessor(
-                web3, contractTransactionProcessor,
-                valueTransactionProcessor, contractCreationTransactionProcessor, 
-                strategy.Filters?.TransactionFilters, strategy.Filters?.TransactionReceiptFilters);
+                web3, 
+                contractTransactionProcessor,
+                valueTransactionProcessor, 
+                contractCreationTransactionProcessor, 
+                transactionLogProcessor,
+                strategy.Filters?.TransactionFilters, 
+                strategy.Filters?.TransactionReceiptFilters);
 
             if (postVm)
                 return new BlockVmPostProcessor(

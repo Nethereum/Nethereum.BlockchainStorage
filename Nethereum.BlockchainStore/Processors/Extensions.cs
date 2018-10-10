@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.RPC.Eth.DTOs;
+using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.Processors
 {
@@ -57,6 +59,18 @@ namespace Nethereum.BlockchainStore.Processors
         public static bool Failed(this TransactionReceipt receipt)
         {
             return !receipt.Succeeded();
+        }
+
+        public static IEnumerable<TransactionLog> GetTransactionLogs(this TransactionReceipt receipt)
+        {
+            for (var i = 0; i < receipt.Logs.Count; i++)
+            {
+                if (receipt.Logs[i] is JObject log)
+                { 
+                    yield return
+                            new TransactionLog(receipt.TransactionHash, i, log);
+                }
+            }
         }
     }
 }

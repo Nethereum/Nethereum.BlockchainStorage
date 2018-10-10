@@ -9,6 +9,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
     {
         private readonly IValueTransactionProcessor _valueTransactionProcessor;
         private readonly IContractCreationTransactionProcessor _contractCreationTransactionProcessor;
+        private readonly ITransactionLogProcessor _transactionLogProcessor;
         private readonly List<ITransactionFilter> _transactionFilters;
         private readonly List<ITransactionReceiptFilter> _transactionReceiptFilters;
 
@@ -24,6 +25,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             IContractTransactionProcessor contractTransactionProcessor, 
             IValueTransactionProcessor valueTransactionProcessor, 
             IContractCreationTransactionProcessor contractCreationTransactionProcessor,
+            ITransactionLogProcessor transactionLogProcessor,
             IEnumerable<ITransactionFilter> transactionFilters = null,
             IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null)
         {
@@ -31,7 +33,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             ContractTransactionProcessor = contractTransactionProcessor;
             _valueTransactionProcessor = valueTransactionProcessor;
             _contractCreationTransactionProcessor = contractCreationTransactionProcessor;
-
+            _transactionLogProcessor = transactionLogProcessor;
             _transactionFilters = new List<ITransactionFilter>(
                 transactionFilters ?? new ITransactionFilter[0]);
 
@@ -47,6 +49,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 .ConfigureAwait(false);
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
+
+            await _transactionLogProcessor.ProcessAsync(transactionReceipt);
             
             if ( transactionSource.IsForContractCreation(transactionReceipt))
             {

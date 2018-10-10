@@ -1,12 +1,11 @@
-﻿using System;
-using Moq;
+﻿using Moq;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Web3Abstractions;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
@@ -18,6 +17,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         readonly Mock<IContractTransactionProcessor> _mockContractTransactionProcessor = new Mock<IContractTransactionProcessor>();
         readonly Mock<IValueTransactionProcessor> _mockValueTransactionProcessor = new Mock<IValueTransactionProcessor>();
         readonly Mock<IContractCreationTransactionProcessor> _mockContractCreationTransactionProcessor = new Mock<IContractCreationTransactionProcessor>();
+        readonly Mock<ITransactionLogProcessor> _mockTransactionLogProcessor = new Mock<ITransactionLogProcessor>();
         readonly List<ITransactionFilter> _transactionFilters = new List<ITransactionFilter>();
         readonly List<ITransactionReceiptFilter> _transactionReceiptFilters = new List<ITransactionReceiptFilter>();
 
@@ -34,6 +34,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 _mockContractTransactionProcessor.Object,
                 _mockValueTransactionProcessor.Object,
                 _mockContractCreationTransactionProcessor.Object,
+                _mockTransactionLogProcessor.Object,
                 _transactionFilters,
                 _transactionReceiptFilters);
         }
@@ -62,6 +63,43 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             _mockContractCreationTransactionProcessor.VerifyAll();
             VerifyContractTransactionWasNotProcessed(stubTransaction, stubTransactionReceipt);
             VerifyValueTransactionWasNotProcessed(stubTransaction, stubTransactionReceipt);
+        }
+
+        [Fact]
+        public async Task ProcessTransactionAsync_Processes_TransactionLogs()
+        {
+            var txProcessor = CreateTransactionProcessor();
+            var (stubTransaction, stubTransactionReceipt) = CreateValueTransaction();
+
+            MockGetReceiptCalls(stubTransaction, stubTransactionReceipt);
+            MockHandleTransactionLog(stubTransactionReceipt);
+
+            await txProcessor.ProcessTransactionAsync(_block, stubTransaction );
+
+            _mockTransactionLogProcessor.VerifyAll();
+        }
+
+        [Fact]
+        public async Task ProcessTransactionAsync_WhenTxDoesNotMatchFilter_IgnoresLogs()
+        {
+            var (stubTransaction, stubTransactionReceipt) = CreateValueTransaction();
+
+            CreateFilterToRejectTransaction(stubTransaction);
+
+            var txProcessor = CreateTransactionProcessor();
+
+            MockGetReceiptCalls(stubTransaction, stubTransactionReceipt);
+
+            await txProcessor.ProcessTransactionAsync(_block, stubTransaction);
+
+            VerifyTransactionLogProcessorWasNotCalled();
+        }
+
+        private void CreateFilterToRejectTransaction(Transaction stubTransaction)
+        {
+            var mockTxFilter = new Mock<ITransactionFilter>();
+            mockTxFilter.Setup(f => f.IsMatchAsync(stubTransaction)).ReturnsAsync(false);
+            _transactionFilters.Add(mockTxFilter.Object);
         }
 
         [Fact]
@@ -272,6 +310,19 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         private void MockGetReceiptCalls(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
             _mockTransactionProxy.Setup(p => p.GetTransactionReceipt(stubTransaction.TransactionHash)).ReturnsAsync(stubTransactionReceipt);
+        }
+
+        protected void MockHandleTransactionLog(TransactionReceipt receipt)
+        {
+            _mockTransactionLogProcessor
+                .Setup(p => p.ProcessAsync(receipt))
+                .Returns(Task.CompletedTask);
+        }
+
+        private void VerifyTransactionLogProcessorWasNotCalled()
+        {
+            _mockTransactionLogProcessor
+                .Verify(p => p.ProcessAsync(It.IsAny<TransactionReceipt>()), Times.Never);
         }
     }
 }

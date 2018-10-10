@@ -67,14 +67,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
                     .Returns(Task.CompletedTask);
             }
 
-            protected void MockHandleTransactionLog()
-            {
-                _transactionLogHandler
-                    .Setup(r => r.HandleAsync(It.IsAny<TransactionLog>()))
-                    .Callback<TransactionLog>((log) => { argsPassedToLogRepo.Add(log); })
-                    .Returns(Task.CompletedTask);
-            }
-
             protected void EnsureHandleTransactionWasInvoked()
             {
                 _transactionHandler.VerifyAll();
@@ -83,19 +75,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             protected void EnsureHandleVmStackWasInvoked()
             {
                 _transactionVmStackHandler.VerifyAll();
-            }
-
-            protected void EnsureHandleTxLogWasInvoked()
-            {
-                Assert.Equal(logAddresses.Length, argsPassedToLogRepo.Count);
-
-                for (var logIdx = 0; logIdx < 2; logIdx++)
-                {
-                    var args = argsPassedToLogRepo.FirstOrDefault(a => a.LogIndex == logIdx);
-                    Assert.NotNull(args);
-                    Assert.Equal(logAddresses[logIdx], args.Address);
-                    Assert.Equal(_transaction.TransactionHash, args.TransactionHash);
-                }
             }
 
             protected void AddFilterWhichDoesNotMatchAnyLog()

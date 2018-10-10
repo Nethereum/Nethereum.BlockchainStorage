@@ -1,4 +1,4 @@
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Web3Abstractions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
@@ -6,8 +6,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.ABI.Util;
-using Nethereum.BlockchainStore.Handlers;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
@@ -19,26 +17,19 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly IContractHandler _contractHandler;
         private readonly ITransactionHandler _transactionHandler;
         private readonly ITransactionVMStackHandler _transactionVmStackHandler;
-        private readonly ITransactionLogHandler _transactionLogHandler;
-
-        private readonly IEnumerable<ITransactionLogFilter> _transactionLogFilters;
 
         public ContractTransactionProcessor(
           IGetTransactionVMStack vmStackProxy, 
           IVmStackErrorChecker vmStackErrorChecker,
           IContractHandler contractHandler,
           ITransactionHandler transactionHandler, 
-          ITransactionVMStackHandler transactionVmStackHandler,
-          ITransactionLogHandler transactionLogHandler,
-          IEnumerable<ITransactionLogFilter> transactionLogFilters = null)
+          ITransactionVMStackHandler transactionVmStackHandler)
         {
             _vmStackProxy = vmStackProxy;
             _vmStackErrorChecker = vmStackErrorChecker;
             _contractHandler = contractHandler;
             _transactionHandler = transactionHandler;
             _transactionVmStackHandler = transactionVmStackHandler;
-            _transactionLogHandler = transactionLogHandler;
-            _transactionLogFilters = transactionLogFilters;
         }
 
         public async Task<bool> IsTransactionForContractAsync(Transaction transaction)
@@ -105,14 +96,16 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                         addressesAdded.Add(logAddress);
 
                         await
-                            _transactionHandler.HandleAddressTransactionAsync(new AddressTransactionWithReceipt(transaction, transactionReceipt, hasError, blockTimestamp, logAddress, error, hasStackTrace));
+                            _transactionHandler.HandleAddressTransactionAsync(
+                                new AddressTransactionWithReceipt(
+                                    transaction, 
+                                    transactionReceipt, 
+                                    hasError, 
+                                    blockTimestamp, 
+                                    logAddress, 
+                                    error, 
+                                    hasStackTrace));
                     }
-
-                    if (await _transactionLogFilters.IsMatchAsync(log))
-                    {
-                        await _transactionLogHandler.HandleAsync(new TransactionLog(transactionHash, i, log));
-                    }
-
                 }
             }
         }

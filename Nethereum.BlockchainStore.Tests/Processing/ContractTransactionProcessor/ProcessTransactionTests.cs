@@ -21,7 +21,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             MockHandleVmStack(_vmStack);
             MockHandleTransaction(_hasError, _hasStackTrace, _error);
             MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
-            MockHandleTransactionLog();
         }
 
         [Fact]
@@ -36,7 +35,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             //assert
             EnsureHandleVmStackWasInvoked();
             EnsureHandleTransactionWasInvoked();
-            EnsureHandleTxLogWasInvoked();
         }
 
         [Fact]
@@ -65,7 +63,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             MockExceptionFromGetTransactionVmStack();
             MockHandleTransaction(_hasError, _hasStackTrace, _error);
             MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
-            MockHandleTransactionLog();
 
             InitProcessor();
 
@@ -74,7 +71,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             //assert
             EnsureHandleTransactionWasInvoked();
-            EnsureHandleTxLogWasInvoked();
         }
 
         [Fact]
@@ -89,7 +85,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             MockHandleVmStack(_vmStack);
             MockHandleTransaction(_hasError, _hasStackTrace, _error);
             MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
-            MockHandleTransactionLog();
 
             InitProcessor();
             //execute
@@ -98,7 +93,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             //assert
             EnsureHandleVmStackWasInvoked();
             EnsureHandleTransactionWasInvoked();
-            EnsureHandleTxLogWasInvoked();
         }
 
         [Fact]
@@ -117,7 +111,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             //assert
             VerifyVmStackInfoHasNotBeenProcessed();
             EnsureHandleTransactionWasInvoked();
-            EnsureHandleTxLogWasInvoked();
         }
     }
 

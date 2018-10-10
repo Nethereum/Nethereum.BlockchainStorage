@@ -17,7 +17,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
         protected readonly Mock<IContractHandler> _contractHandler = new Mock<IContractHandler>();
         protected readonly Mock<ITransactionHandler> _transactionHandler = new Mock<ITransactionHandler>();
         protected readonly Mock<ITransactionVMStackHandler> _transactionVmStackHandler = new Mock<ITransactionVMStackHandler>();
-        protected readonly Mock<ITransactionLogHandler> _transactionLogHandler = new Mock<ITransactionLogHandler>();
         protected readonly HexBigInteger _blockTimestamp = new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         
 
@@ -33,9 +32,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
                 _vmStackErrorChecker.Object,
                 _contractHandler.Object, 
                 _transactionHandler.Object, 
-                _transactionVmStackHandler.Object, 
-                _transactionLogHandler.Object, 
-                _transactionLogFilters);
+                _transactionVmStackHandler.Object);
 
             _processor.EnabledVmProcessing = enableVmStackProcessing;
         }

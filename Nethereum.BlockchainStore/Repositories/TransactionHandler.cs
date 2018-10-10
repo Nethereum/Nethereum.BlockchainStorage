@@ -26,7 +26,8 @@ namespace Nethereum.BlockchainStore.Repositories
                 await _addressTransactionRepository.UpsertAsync(
                     contractCreationTransaction.Transaction,
                     contractCreationTransaction.TransactionReceipt,
-                    contractCreationTransaction.FailedCreatingContract, contractCreationTransaction.BlockTimestamp, null, null, false, contractCreationTransaction.ContractAddress);
+                    contractCreationTransaction.FailedCreatingContract, contractCreationTransaction.BlockTimestamp, 
+                    contractCreationTransaction.Transaction.From, null, false, contractCreationTransaction.ContractAddress);
             }
         }
 
