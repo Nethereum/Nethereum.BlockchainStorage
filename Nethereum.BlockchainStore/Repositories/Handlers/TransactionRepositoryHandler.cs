@@ -33,7 +33,8 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
                 tx.Transaction, 
                 tx.TransactionReceipt, 
                 tx.FailedCreatingContract,
-                tx.BlockTimestamp);
+                tx.BlockTimestamp,
+                contractAddress: tx.ContractAddress ?? tx.TransactionReceipt.ContractAddress);
         }
 
         public async Task HandleTransactionAsync(TransactionWithReceipt tx)
@@ -62,7 +63,8 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
             bool hasError,
             HexBigInteger blockTimestamp, 
             string error = null, 
-            bool hasVmStack = false)
+            bool hasVmStack = false,
+            string contractAddress = null)
         {
             if (_addressTransactionRepository == null) return;
 
@@ -76,7 +78,7 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
                     address, 
                     error, 
                     hasVmStack, 
-                    receipt.ContractAddress);
+                    contractAddress ?? receipt.ContractAddress);
             }
 
         }

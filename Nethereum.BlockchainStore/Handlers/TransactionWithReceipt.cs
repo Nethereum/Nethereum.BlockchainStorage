@@ -7,6 +7,11 @@ namespace Nethereum.BlockchainStore.Handlers
 {
     public class TransactionWithReceipt
     {
+        public TransactionWithReceipt()
+        {
+            
+        }
+
         public TransactionWithReceipt(Transaction transaction, TransactionReceipt transactionReceipt, bool hasError, HexBigInteger blockTimestamp, string error = null, bool hasVmStack = false)
         {
             Transaction = transaction;
