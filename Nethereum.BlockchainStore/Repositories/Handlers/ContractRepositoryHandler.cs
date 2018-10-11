@@ -1,16 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Handlers;
-using Nethereum.RPC.Eth.DTOs;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
-    public class ContractHandler : IContractHandler
+    public class ContractRepositoryHandler : IContractHandler
     {
         private readonly IContractRepository _contractRepository;
 
-        public ContractHandler(IContractRepository contractRepository)
+        public ContractRepositoryHandler(IContractRepository contractRepository)
         {
-            this._contractRepository = contractRepository;
+            _contractRepository = contractRepository;
         }
 
         public async Task<bool> ExistsAsync(string contractAddress)

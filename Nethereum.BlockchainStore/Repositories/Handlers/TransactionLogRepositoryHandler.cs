@@ -1,13 +1,13 @@
-﻿using Nethereum.BlockchainStore.Handlers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Handlers;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
-    public class TransactionLogHandler : ITransactionLogHandler
+    public class TransactionLogRepositoryHandler : ITransactionLogHandler
     {
         private readonly ITransactionLogRepository _transactionLogRepository;
 
-        public TransactionLogHandler(ITransactionLogRepository transactionLogRepository)
+        public TransactionLogRepositoryHandler(ITransactionLogRepository transactionLogRepository)
         {
             _transactionLogRepository = transactionLogRepository;
         }

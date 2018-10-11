@@ -3,6 +3,7 @@ using Nethereum.BlockchainStore.Processing;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Repositories.Handlers;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -42,11 +43,11 @@ namespace Nethereum.BlockchainStore.Repositories
             _repositories.Add(logRepository);
             _repositories.Add(vmStackRepository);
 
-            BlockHandler = new BlockHandler(_blockRepository);
-            TransactionHandler = new TransactionHandler(transactionRepository, addressTransactionRepository);
-            ContractHandler = new ContractHandler(_contractRepository);
-            TransactionVmStackHandler = new TransactionVMStackHandler(vmStackRepository);
-            TransactionLogHandler = new TransactionLogHandler(logRepository);
+            BlockHandler = new BlockRepositoryHandler(_blockRepository);
+            TransactionHandler = new TransactionRepositoryHandler(transactionRepository, addressTransactionRepository);
+            ContractHandler = new ContractRepositoryHandler(_contractRepository);
+            TransactionVmStackHandler = new TransactionVMStackRepositoryHandler(vmStackRepository);
+            TransactionLogHandler = new TransactionLogRepositoryHandler(logRepository);
 
             _waitStrategy = new WaitStrategy();
         }

@@ -2,15 +2,15 @@
 using Nethereum.BlockchainStore.Handlers;
 using Nethereum.RPC.Eth.DTOs;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
-    public class BlockHandler : IBlockHandler
+    public class BlockRepositoryHandler : IBlockHandler
     {
         private readonly IBlockRepository _blockRepository;
 
-        public BlockHandler(IBlockRepository blockRepository)
+        public BlockRepositoryHandler(IBlockRepository blockRepository)
         {
-            this._blockRepository = blockRepository;
+            _blockRepository = blockRepository;
         }
 
         public async Task HandleAsync(Block block)

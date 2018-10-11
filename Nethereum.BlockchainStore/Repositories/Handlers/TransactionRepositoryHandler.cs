@@ -1,17 +1,17 @@
-﻿using Nethereum.BlockchainStore.Handlers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
-    public class TransactionHandler : ITransactionHandler
+    public class TransactionRepositoryHandler : ITransactionHandler
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAddressTransactionRepository _addressTransactionRepository;
 
-        public TransactionHandler(
+        public TransactionRepositoryHandler(
             ITransactionRepository transactionRepository, 
             IAddressTransactionRepository addressTransactionRepository = null)
         {

@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Handlers;
-using Newtonsoft.Json.Linq;
 
-namespace Nethereum.BlockchainStore.Repositories
+namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
-    public class TransactionVMStackHandler : ITransactionVMStackHandler
+    public class TransactionVMStackRepositoryHandler : ITransactionVMStackHandler
     {
         private readonly ITransactionVMStackRepository _transactionVmStackRepository;
 
-        public TransactionVMStackHandler(ITransactionVMStackRepository transactionVmStackRepository)
+        public TransactionVMStackRepositoryHandler(ITransactionVMStackRepository transactionVmStackRepository)
         {
             this._transactionVmStackRepository = transactionVmStackRepository;
         }
