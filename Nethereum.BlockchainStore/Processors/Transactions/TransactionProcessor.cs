@@ -45,44 +45,57 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         {
             if (await _transactionFilters.IgnoreAsync(transactionSource)) return;
 
-            var transactionReceipt = await TransactionProxy.GetTransactionReceipt(transactionSource.TransactionHash)
+            var transactionReceipt = await TransactionProxy
+                .GetTransactionReceipt(transactionSource.TransactionHash)
                 .ConfigureAwait(false);
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
 
             await _transactionLogProcessor.ProcessAsync(transactionReceipt);
-            
-            if ( transactionSource.IsForContractCreation(transactionReceipt))
+
+            if (transactionSource.IsForContractCreation(transactionReceipt))
             {
-                if (EnabledContractCreationProcessing)
-                {
-                    await
-                        _contractCreationTransactionProcessor.ProcessTransactionAsync(
-                            transactionSource, transactionReceipt, block.Timestamp)
-                            .ConfigureAwait(false);
-                }
+                await ProcessContractCreation(block, transactionSource, transactionReceipt);
+                return;
             }
-            else
+
+            if (await ContractTransactionProcessor.IsTransactionForContractAsync(transactionSource))
             {
-                if (await ContractTransactionProcessor.IsTransactionForContractAsync(transactionSource))
-                {
-                    if (EnabledContractProcessing)
-                    {
-                        await
-                            ContractTransactionProcessor.ProcessTransactionAsync(
-                                transactionSource, transactionReceipt, block.Timestamp)
-                                .ConfigureAwait(false);
-                    }
-                }
-                else if (EnabledValueProcessing)
-                {
-                    await
-                        _valueTransactionProcessor.ProcessTransactionAsync(
-                            transactionSource, transactionReceipt, block.Timestamp)
-                            .ConfigureAwait(false);
-                }
+                await ProcessContractTransaction(block, transactionSource, transactionReceipt);
+                return;
             }
+
+            await ProcessValueTransaction(block, transactionSource, transactionReceipt);
         }
 
+        private async Task ProcessValueTransaction(Block block, Transaction transactionSource, TransactionReceipt transactionReceipt)
+        {
+            if (!EnabledValueProcessing) return;
+
+            await
+                _valueTransactionProcessor.ProcessTransactionAsync(
+                        transactionSource, transactionReceipt, block.Timestamp)
+                    .ConfigureAwait(false);
+        }
+
+        private async Task ProcessContractTransaction(Block block, Transaction transactionSource, TransactionReceipt transactionReceipt)
+        {
+            if (!EnabledContractProcessing) return;
+
+            await
+                ContractTransactionProcessor.ProcessTransactionAsync(
+                        transactionSource, transactionReceipt, block.Timestamp)
+                    .ConfigureAwait(false);
+        }
+
+        private async Task ProcessContractCreation(Block block, Transaction transactionSource, TransactionReceipt transactionReceipt)
+        {
+            if (!EnabledContractCreationProcessing) return;
+
+            await
+                _contractCreationTransactionProcessor.ProcessTransactionAsync(
+                        transactionSource, transactionReceipt, block.Timestamp)
+                    .ConfigureAwait(false);
+        }
     }
 }

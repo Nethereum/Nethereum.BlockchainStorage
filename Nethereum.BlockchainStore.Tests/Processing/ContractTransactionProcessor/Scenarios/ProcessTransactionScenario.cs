@@ -53,20 +53,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
                     .Returns(Task.CompletedTask);
             }
 
-            protected void MockHandleAddressTransaction(bool hasError, bool hasStackTrace, string error)
-            {
-                _transactionHandler.Setup(r =>
-                        r.HandleAddressTransactionAsync(It.IsAny<AddressTransactionWithReceipt>()))
-                    .Callback<AddressTransactionWithReceipt>(t =>
-                    {
-                        Assert.Equal(hasError, t.HasError);
-                        Assert.Equal(hasStackTrace, t.HasVmStack);
-                        Assert.Equal(error, t.Error);
-                        Assert.Contains(logAddresses, a => a == t.Address);
-                    })
-                    .Returns(Task.CompletedTask);
-            }
-
             protected void EnsureHandleTransactionWasInvoked()
             {
                 _transactionHandler.VerifyAll();

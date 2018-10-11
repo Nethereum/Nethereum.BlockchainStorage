@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Handlers;
 using Nethereum.RPC.Eth.DTOs;
@@ -63,7 +65,7 @@ namespace Nethereum.BlockchainStore.Processors
 
         public static IEnumerable<TransactionLog> GetTransactionLogs(this TransactionReceipt receipt)
         {
-            for (var i = 0; i < receipt.Logs.Count; i++)
+            for (var i = 0; i < receipt.Logs?.Count; i++)
             {
                 if (receipt.Logs[i] is JObject log)
                 { 
@@ -71,6 +73,30 @@ namespace Nethereum.BlockchainStore.Processors
                             new TransactionLog(receipt.TransactionHash, i, log);
                 }
             }
+        }
+
+        public static string[] GetAllRelatedAddresses(this Transaction tx, TransactionReceipt receipt)
+        {
+            if (tx == null || receipt == null)
+                return Array.Empty<string>();
+
+            var uniqueAddresses = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) 
+                {tx.From};
+
+            if (tx.To.IsNotAnEmptyAddress()) 
+                uniqueAddresses.Add(tx.To);
+
+            if (receipt.ContractAddress.IsNotAnEmptyAddress()) 
+                uniqueAddresses.Add(receipt.ContractAddress);
+
+            foreach (var log in receipt.GetTransactionLogs())
+            {
+                if (log.Address.IsNotAnEmptyAddress())
+                    uniqueAddresses.Add(log.Address);
+            }
+
+            return uniqueAddresses.ToArray();
+
         }
     }
 }

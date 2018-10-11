@@ -1,4 +1,5 @@
-﻿using Nethereum.Hex.HexTypes;
+﻿using Nethereum.BlockchainStore.Processors;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Handlers
@@ -21,5 +22,10 @@ namespace Nethereum.BlockchainStore.Handlers
         public TransactionReceipt TransactionReceipt { get; private set; }
         public bool FailedCreatingContract { get; private set; }
         public HexBigInteger BlockTimestamp { get; private set; }
+
+        public string[] GetAllRelatedAddresses()
+        {
+            return Transaction.GetAllRelatedAddresses(TransactionReceipt);
+        }
     }
 }

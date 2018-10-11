@@ -28,13 +28,14 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
         protected void InitProcessor(bool enableVmStackProcessing = true)
         {
             _processor = new ContractTransactionProcessor(
-                _vmStackProxy.Object, 
+                _vmStackProxy.Object,
                 _vmStackErrorChecker.Object,
-                _contractHandler.Object, 
-                _transactionHandler.Object, 
-                _transactionVmStackHandler.Object);
-
-            _processor.EnabledVmProcessing = enableVmStackProcessing;
+                _contractHandler.Object,
+                _transactionHandler.Object,
+                _transactionVmStackHandler.Object)
+            {
+                EnabledVmProcessing = enableVmStackProcessing
+            };
         }
     }
 }

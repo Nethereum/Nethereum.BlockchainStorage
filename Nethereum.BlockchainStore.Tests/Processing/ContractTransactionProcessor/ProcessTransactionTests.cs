@@ -20,7 +20,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             MockGetErrorFromVmStack(_vmStack, _error);
             MockHandleVmStack(_vmStack);
             MockHandleTransaction(_hasError, _hasStackTrace, _error);
-            MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
         }
 
         [Fact]
@@ -62,7 +61,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             MockExceptionFromGetTransactionVmStack();
             MockHandleTransaction(_hasError, _hasStackTrace, _error);
-            MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
 
             InitProcessor();
 
@@ -84,7 +82,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             MockGetErrorFromVmStack(_vmStack, _error);
             MockHandleVmStack(_vmStack);
             MockHandleTransaction(_hasError, _hasStackTrace, _error);
-            MockHandleAddressTransaction(_hasError, _hasStackTrace, _error);
 
             InitProcessor();
             //execute

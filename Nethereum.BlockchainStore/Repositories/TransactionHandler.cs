@@ -1,5 +1,8 @@
 ﻿using Nethereum.BlockchainStore.Handlers;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Processors;
+using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Repositories
 {
@@ -12,49 +15,70 @@ namespace Nethereum.BlockchainStore.Repositories
             ITransactionRepository transactionRepository, 
             IAddressTransactionRepository addressTransactionRepository = null)
         {
-            this._transactionRepository = transactionRepository;
-            this._addressTransactionRepository = addressTransactionRepository;
+            _transactionRepository = transactionRepository;
+            _addressTransactionRepository = addressTransactionRepository;
         }
 
-        public async Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
+        public async Task HandleContractCreationTransactionAsync(ContractCreationTransaction tx)
         {
             await _transactionRepository.UpsertAsync(
-                contractCreationTransaction.ContractAddress, contractCreationTransaction.Code, contractCreationTransaction.Transaction, contractCreationTransaction.TransactionReceipt, contractCreationTransaction.FailedCreatingContract, contractCreationTransaction.BlockTimestamp);
+                tx.ContractAddress, 
+                tx.Code, 
+                tx.Transaction, 
+                tx.TransactionReceipt, 
+                tx.FailedCreatingContract, 
+                tx.BlockTimestamp);
 
-            if (_addressTransactionRepository != null)
-            {
-                await _addressTransactionRepository.UpsertAsync(
-                    contractCreationTransaction.Transaction,
-                    contractCreationTransaction.TransactionReceipt,
-                    contractCreationTransaction.FailedCreatingContract, contractCreationTransaction.BlockTimestamp, 
-                    contractCreationTransaction.Transaction.From, null, false, contractCreationTransaction.ContractAddress);
-            }
+            await UpsertAddressTransactions(
+                tx.Transaction, 
+                tx.TransactionReceipt, 
+                tx.FailedCreatingContract,
+                tx.BlockTimestamp);
         }
 
-        public async Task HandleAddressTransactionAsync(AddressTransactionWithReceipt addressTransactionWithReceipt)
-        {
-            if (_addressTransactionRepository != null)
-            {
-                await
-                    _addressTransactionRepository.UpsertAsync(
-                        addressTransactionWithReceipt.Transaction, addressTransactionWithReceipt.TransactionReceipt, addressTransactionWithReceipt.HasError, addressTransactionWithReceipt.BlockTimestamp,
-                        addressTransactionWithReceipt.Address, addressTransactionWithReceipt.Error, addressTransactionWithReceipt.HasVmStack);
-            }
-        }
-
-        public async Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
+        public async Task HandleTransactionAsync(TransactionWithReceipt tx)
         {
             await
                 _transactionRepository.UpsertAsync(
-                    transactionWithReceipt.Transaction, transactionWithReceipt.TransactionReceipt, transactionWithReceipt.HasError, transactionWithReceipt.BlockTimestamp, transactionWithReceipt.HasVmStack, transactionWithReceipt.Error);
+                    tx.Transaction, 
+                    tx.TransactionReceipt, 
+                    tx.HasError, 
+                    tx.BlockTimestamp, 
+                    tx.HasVmStack, 
+                    tx.Error);
 
-            if (_addressTransactionRepository != null)
+                await UpsertAddressTransactions(
+                    tx.Transaction, 
+                    tx.TransactionReceipt, 
+                    tx.HasError,
+                    tx.BlockTimestamp,
+                    tx.Error,
+                    tx.HasVmStack);
+        }
+
+        private async Task UpsertAddressTransactions(
+            Transaction tx, 
+            TransactionReceipt receipt,
+            bool hasError,
+            HexBigInteger blockTimestamp, 
+            string error = null, 
+            bool hasVmStack = false)
+        {
+            if (_addressTransactionRepository == null) return;
+
+            foreach (var address in tx.GetAllRelatedAddresses(receipt))
             {
-                await
-                    _addressTransactionRepository.UpsertAsync(
-                        transactionWithReceipt.Transaction, transactionWithReceipt.TransactionReceipt, transactionWithReceipt.HasError, transactionWithReceipt.BlockTimestamp,
-                        transactionWithReceipt.Transaction.To, transactionWithReceipt.Error, transactionWithReceipt.HasVmStack);
+                await _addressTransactionRepository.UpsertAsync(
+                    tx,
+                    receipt,
+                    hasError, 
+                    blockTimestamp, 
+                    address, 
+                    error, 
+                    hasVmStack, 
+                    receipt.ContractAddress);
             }
+
         }
     }
 }

@@ -76,38 +76,15 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 }
             }
 
-            await _transactionHandler.HandleTransactionAsync(new TransactionWithReceipt(transaction, transactionReceipt, hasError, blockTimestamp, error, hasStackTrace));
+            await _transactionHandler.HandleTransactionAsync(
+                new TransactionWithReceipt(
+                    transaction, 
+                    transactionReceipt, 
+                    hasError, 
+                    blockTimestamp, 
+                    error, 
+                    hasStackTrace));
 
-            if (transactionReceipt.Logs == null) return;
-
-            var logs = transactionReceipt.Logs;
-
-            var addressesAdded = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
-                {transaction.To};
-
-            for (var i = 0; i < logs.Count; i++)
-            {
-                if (logs[i] is JObject log)
-                { 
-                    var logAddress = log["address"].Value<string>();
-
-                    if (!addressesAdded.Contains(logAddress))
-                    {
-                        addressesAdded.Add(logAddress);
-
-                        await
-                            _transactionHandler.HandleAddressTransactionAsync(
-                                new AddressTransactionWithReceipt(
-                                    transaction, 
-                                    transactionReceipt, 
-                                    hasError, 
-                                    blockTimestamp, 
-                                    logAddress, 
-                                    error, 
-                                    hasStackTrace));
-                    }
-                }
-            }
         }
     }
 }

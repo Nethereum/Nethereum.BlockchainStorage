@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Nethereum.RPC.Eth.DTOs;
+﻿using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Repositories
 {

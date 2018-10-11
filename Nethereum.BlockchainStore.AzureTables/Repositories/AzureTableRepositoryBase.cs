@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return result.Result;
         }
 
-        protected string CreatePartionKeyFilterCondition(string partitionKey)
+        protected string CreatePartitionKeyFilterCondition(string partitionKey)
         {
             return TableQuery.GenerateFilterCondition("PartitionKey",
                 QueryComparisons.Equal, partitionKey);

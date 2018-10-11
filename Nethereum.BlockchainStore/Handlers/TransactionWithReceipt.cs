@@ -1,4 +1,6 @@
-﻿using Nethereum.Hex.HexTypes;
+﻿using System;
+using Nethereum.BlockchainStore.Processors;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Handlers
@@ -21,5 +23,10 @@ namespace Nethereum.BlockchainStore.Handlers
         public HexBigInteger BlockTimestamp { get; private set; }
         public string Error { get; private set; }
         public bool HasVmStack { get; private set; }
+
+        public string[] GetAllRelatedAddresses()
+        {
+            return Transaction.GetAllRelatedAddresses(TransactionReceipt);
+        }
     }
 }
