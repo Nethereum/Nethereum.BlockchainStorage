@@ -9,12 +9,15 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
 
         public TransactionVMStackRepositoryHandler(ITransactionVMStackRepository transactionVmStackRepository)
         {
-            this._transactionVmStackRepository = transactionVmStackRepository;
+            _transactionVmStackRepository = transactionVmStackRepository;
         }
 
         public async Task HandleAsync(TransactionVmStack transactionVmStack)
         {
-            await _transactionVmStackRepository.UpsertAsync(transactionVmStack.TransactionHash, transactionVmStack.Address, transactionVmStack.StackTrace);
+            await _transactionVmStackRepository.UpsertAsync(
+                transactionVmStack.TransactionHash, 
+                transactionVmStack.Address, 
+                transactionVmStack.StackTrace);
         }
     }
 }

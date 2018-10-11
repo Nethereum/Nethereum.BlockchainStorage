@@ -77,7 +77,7 @@ namespace Nethereum.BlockchainStore.Processors
 
         public static string[] GetAllRelatedAddresses(this Transaction tx, TransactionReceipt receipt)
         {
-            if (tx == null || receipt == null)
+            if (tx == null)
                 return Array.Empty<string>();
 
             var uniqueAddresses = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) 
@@ -86,13 +86,16 @@ namespace Nethereum.BlockchainStore.Processors
             if (tx.To.IsNotAnEmptyAddress()) 
                 uniqueAddresses.Add(tx.To);
 
-            if (receipt.ContractAddress.IsNotAnEmptyAddress()) 
-                uniqueAddresses.Add(receipt.ContractAddress);
-
-            foreach (var log in receipt.GetTransactionLogs())
+            if (receipt != null)
             {
-                if (log.Address.IsNotAnEmptyAddress())
-                    uniqueAddresses.Add(log.Address);
+                if (receipt.ContractAddress.IsNotAnEmptyAddress())
+                    uniqueAddresses.Add(receipt.ContractAddress);
+
+                foreach (var log in receipt.GetTransactionLogs())
+                {
+                    if (log.Address.IsNotAnEmptyAddress())
+                        uniqueAddresses.Add(log.Address);
+                }
             }
 
             return uniqueAddresses.ToArray();

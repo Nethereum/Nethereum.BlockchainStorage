@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
@@ -68,7 +69,16 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
         {
             if (_addressTransactionRepository == null) return;
 
-            foreach (var address in tx.GetAllRelatedAddresses(receipt))
+            var relatedAddresses = tx.GetAllRelatedAddresses(receipt);
+
+            if (receipt.ContractAddress != contractAddress && contractAddress.IsNotAnEmptyAddress())
+            {
+                relatedAddresses = relatedAddresses.Concat(new [] {contractAddress})
+                    .Distinct()
+                    .ToArray();
+            }
+
+            foreach (var address in relatedAddresses)
             {
                 await _addressTransactionRepository.UpsertAsync(
                     tx,

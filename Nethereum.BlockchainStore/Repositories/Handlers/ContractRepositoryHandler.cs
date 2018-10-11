@@ -17,9 +17,12 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
             return await _contractRepository.ExistsAsync(contractAddress);
         }
 
-        public async Task HandleAsync(ContractTransaction contractTransaction)
+        public async Task HandleAsync(ContractTransaction tx)
         {
-            await _contractRepository.UpsertAsync(contractTransaction.ContractAddress, contractTransaction.Code, contractTransaction.Transaction);
+            await _contractRepository.UpsertAsync(
+                tx.ContractAddress, 
+                tx.Code, 
+                tx.Transaction);
         }
     }
 }

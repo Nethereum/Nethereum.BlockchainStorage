@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainStore.Processing
 
         public int MinimumBlockConfirmations { get; set; } = 0;
 
-        protected readonly IWaitStrategy WaitStrategy = new WaitStrategy();
+        protected virtual IWaitStrategy WaitStrategy { get; set; } = new WaitStrategy();
 
         public virtual void Dispose() { }
 

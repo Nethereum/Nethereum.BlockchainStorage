@@ -1,8 +1,7 @@
-﻿using Common.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Nethereum.BlockchainStore.Processing
 {
@@ -11,8 +10,8 @@ namespace Nethereum.BlockchainStore.Processing
         private readonly Func<long, Task> _processBlock;
         private readonly Func<int, Task> _waitForBlockAvailability;
         private readonly Func<int, Task> _pauseFollowingAnError;
-        private readonly Func<Task<long>> getMaxBlockNumber;
-        private readonly int minimumBlockConfirmations;
+        private readonly Func<Task<long>> _getMaxBlockNumber;
+        private readonly int _minimumBlockConfirmations;
         private readonly long _endBlock;
         private readonly CancellationToken _cancellationToken;
         private readonly int _maxRetries;
@@ -39,8 +38,8 @@ namespace Nethereum.BlockchainStore.Processing
             _processBlock = processBlock;
             _waitForBlockAvailability = waitForBlockAvailability;
             _pauseFollowingAnError = pauseFollowingAnError;
-            this.getMaxBlockNumber = getMaxBlockNumber;
-            this.minimumBlockConfirmations = minimumBlockConfirmations;
+            _getMaxBlockNumber = getMaxBlockNumber;
+            _minimumBlockConfirmations = minimumBlockConfirmations;
             _maxRetries = maxRetries;
             _currentBlock = startBlock;
             _runContinuously = endBlock == null;
@@ -94,15 +93,15 @@ namespace Nethereum.BlockchainStore.Processing
 
         private async Task WaitForBlockConfirmations()
         {
-            if (minimumBlockConfirmations < 1) return;
+            if (_minimumBlockConfirmations < 1) return;
 
             if (_maxBlockNumber == null)
                 await RefreshMaxBlockNumber();
 
             int retryNumber = 0;
-            while ((_maxBlockNumber - _currentBlock) < minimumBlockConfirmations)
+            while ((_maxBlockNumber - _currentBlock) < _minimumBlockConfirmations)
             {
-                _log.LogInformation($"Waiting for current block ({_currentBlock}) to be more than {minimumBlockConfirmations} confirmations behind the max block on the chain ({_maxBlockNumber})");
+                _log.LogInformation($"Waiting for current block ({_currentBlock}) to be more than {_minimumBlockConfirmations} confirmations behind the max block on the chain ({_maxBlockNumber})");
                 await _waitForBlockAvailability(retryNumber);
                 retryNumber++;
                 await RefreshMaxBlockNumber();
@@ -111,7 +110,7 @@ namespace Nethereum.BlockchainStore.Processing
 
         private async Task RefreshMaxBlockNumber()
         {
-            _maxBlockNumber = await getMaxBlockNumber();
+            _maxBlockNumber = await _getMaxBlockNumber();
         }
 
         private void LogBlockSkipped()

@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
                 TransactionLogHandler = new InMemoryTransactionLogHandler(System.Console.WriteLine),
                 TransactionVmStackHandler = new InMemoryTransactionVmStackHandler(System.Console.WriteLine),
                 ContractHandler = new InMemoryContractHandler(System.Console.WriteLine),
-                MinimumBlockConfirmations = 6
+                MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
             };
 
             var web3 = new Web3Wrapper(targetBlockchain.BlockchainUrl);

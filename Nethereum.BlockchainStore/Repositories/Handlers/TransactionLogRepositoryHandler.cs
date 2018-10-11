@@ -12,10 +12,10 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
             _transactionLogRepository = transactionLogRepository;
         }
 
-        public async Task HandleAsync(TransactionLog transactionLog)
+        public async Task HandleAsync(TransactionLog txLog)
         {
             await _transactionLogRepository.UpsertAsync(
-                transactionLog.TransactionHash, transactionLog.LogIndex, transactionLog.Log);
+                txLog.TransactionHash, txLog.LogIndex, txLog.Log);
         }
     }
 }
