@@ -10,10 +10,12 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly IEnumerable<ITransactionLogFilter> _filters;
         private readonly ITransactionLogHandler _transactionLogHandler;
 
-        public TransactionLogProcessor(IEnumerable<ITransactionLogFilter> filters, ITransactionLogHandler transactionLogHandler)
+        public TransactionLogProcessor(
+            IEnumerable<ITransactionLogFilter> filters, 
+            ITransactionLogHandler transactionLogHandler)
         {
             _filters = filters;
-            this._transactionLogHandler = transactionLogHandler;
+            _transactionLogHandler = transactionLogHandler;
         }
 
         public async Task ProcessAsync(TransactionReceipt receipt)
