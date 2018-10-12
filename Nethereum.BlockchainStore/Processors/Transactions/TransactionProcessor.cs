@@ -51,7 +51,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
 
-            await _transactionLogProcessor.ProcessAsync(transactionReceipt);
+            await _transactionLogProcessor.ProcessAsync(transactionSource, transactionReceipt);
 
             if (transactionSource.IsForContractCreation(transactionReceipt))
             {

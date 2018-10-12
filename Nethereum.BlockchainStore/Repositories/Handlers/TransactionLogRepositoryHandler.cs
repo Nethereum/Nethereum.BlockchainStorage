@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Handlers;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
@@ -12,10 +13,10 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
             _transactionLogRepository = transactionLogRepository;
         }
 
-        public async Task HandleAsync(TransactionLog txLog)
+        public async Task HandleAsync(TransactionLogWrapper txLog)
         {
             await _transactionLogRepository.UpsertAsync(
-                txLog.TransactionHash, txLog.LogIndex, txLog.Log);
+                txLog.Log);
         }
     }
 }

@@ -5,6 +5,6 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 {
     public interface ITransactionLogProcessor
     {
-        Task ProcessAsync(TransactionReceipt receipt);
+        Task ProcessAsync(Transaction transaction, TransactionReceipt receipt);
     }
 }

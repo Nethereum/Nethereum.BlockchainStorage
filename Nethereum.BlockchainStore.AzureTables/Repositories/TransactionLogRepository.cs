@@ -3,6 +3,7 @@ using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
+using Nethereum.RPC.Eth.DTOs;
 using TransactionLog = Nethereum.BlockchainStore.AzureTables.Entities.TransactionLog;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
@@ -20,11 +21,9 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return results.Result as TransactionLog;
         }
 
-        public async Task UpsertAsync(string transactionHash, long logIndex,
-            JObject log)
+        public async Task UpsertAsync(Log log)
         {
-            var entity = TransactionLog.CreateTransactionLog(transactionHash,
-                logIndex, log);
+            var entity = TransactionLog.CreateTransactionLog(log);
 
             await UpsertAsync(entity).ConfigureAwait(false);
         }

@@ -18,11 +18,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             _transactionLogHandler = transactionLogHandler;
         }
 
-        public async Task ProcessAsync(TransactionReceipt receipt)
+        public async Task ProcessAsync(Transaction transaction, TransactionReceipt receipt)
         {
             if (receipt?.Logs == null) return;
 
-            foreach (var transactionLog in receipt.GetTransactionLogs())
+            foreach (var transactionLog in transaction.GetTransactionLogs(receipt))
             {
                 if (await _filters.IsMatchAsync(transactionLog))
                 {

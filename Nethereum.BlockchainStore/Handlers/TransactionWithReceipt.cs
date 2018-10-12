@@ -1,7 +1,12 @@
 ﻿using System;
 using Nethereum.BlockchainStore.Processors;
+using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Collections.Generic;
+using System.Linq;
+using Nethereum.ABI.Model;
+using Nethereum.Hex.HexConvertors.Extensions;
 
 namespace Nethereum.BlockchainStore.Handlers
 {
@@ -31,7 +36,46 @@ namespace Nethereum.BlockchainStore.Handlers
 
         public string[] GetAllRelatedAddresses()
         {
-            return Transaction.GetAllRelatedAddresses(TransactionReceipt);
+            return Transaction?.GetAllRelatedAddresses(TransactionReceipt);
+        }
+
+        public Log[] Logs()
+        {
+            return Transaction?.GetTransactionLogs(TransactionReceipt).Select(l => l.Log).ToArray();
+        }
+
+        public List<EventLog<T>> GetEvents<T>(Event eventHandler) where T : new()
+        {
+            return eventHandler.DecodeAllEventsForEvent<T>(Logs());
+        }
+
+        public bool HasLogs()
+        {
+            return TransactionReceipt?.Logs?.Count > 0;
+        }
+
+        public FunctionABI GetFunction(Contract contract)
+        {
+            var inputFunctionSignature = Transaction.Input.Substring(0, 10);
+
+            FunctionABI functionAbi = null;
+
+            foreach (var func in contract.ContractBuilder.ContractABI.Functions)
+            {
+                var funcSig = func.Sha3Signature.EnsureHexPrefix();
+                if (funcSig.Equals(inputFunctionSignature, StringComparison.InvariantCultureIgnoreCase))
+                    functionAbi = func;
+            }
+
+            return functionAbi;
+        }
+    }
+
+    public static class FunctionAbiExtensions{
+
+        public static string NameAndParameters(this FunctionABI functionAbi)
+        {
+            return $"{functionAbi.Name}({string.Join(",", functionAbi.InputParameters.Select(p => p.ABIType.CanonicalName))})";
         }
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "Nethereum.BlockchainProcessing.InMemory.Console": {
       "commandName": "Project",
-      "commandLineArgs": "--Blockchain rinkeby --FromBlock 3137143"
+      "commandLineArgs": "--Blockchain rinkeby --FromBlock  3146967"
     }
   }
 }

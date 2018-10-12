@@ -15,5 +15,11 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             return new TransactionReceiptFilter(
                 receipt => Task.FromResult(!string.IsNullOrEmpty(receipt.ContractAddress)));
         }
+
+        public static TransactionReceiptFilter ContractCreated(string contractAddress)
+        {
+            return new TransactionReceiptFilter(
+                receipt => Task.FromResult(receipt.ContractAddress != null && receipt.ContractAddress.Equals(contractAddress, StringComparison.InvariantCultureIgnoreCase)));
+        }
     }
 }

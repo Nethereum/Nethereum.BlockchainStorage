@@ -4,7 +4,7 @@ namespace Nethereum.BlockchainStore.Handlers
 {
     public class NullTransactionLogHandler : ITransactionLogHandler
     {
-        public Task HandleAsync(TransactionLog transactionLog)
+        public Task HandleAsync(TransactionLogWrapper transactionLog)
         {
             return Task.CompletedTask;
         }

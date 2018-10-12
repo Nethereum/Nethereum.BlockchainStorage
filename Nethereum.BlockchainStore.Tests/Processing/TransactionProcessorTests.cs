@@ -72,7 +72,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             var (stubTransaction, stubTransactionReceipt) = CreateValueTransaction();
 
             MockGetReceiptCalls(stubTransaction, stubTransactionReceipt);
-            MockHandleTransactionLog(stubTransactionReceipt);
+            MockHandleTransactionLog(stubTransaction, stubTransactionReceipt);
 
             await txProcessor.ProcessTransactionAsync(_block, stubTransaction );
 
@@ -312,17 +312,17 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             _mockTransactionProxy.Setup(p => p.GetTransactionReceipt(stubTransaction.TransactionHash)).ReturnsAsync(stubTransactionReceipt);
         }
 
-        protected void MockHandleTransactionLog(TransactionReceipt receipt)
+        protected void MockHandleTransactionLog(Transaction tx, TransactionReceipt receipt)
         {
             _mockTransactionLogProcessor
-                .Setup(p => p.ProcessAsync(receipt))
+                .Setup(p => p.ProcessAsync(tx, receipt))
                 .Returns(Task.CompletedTask);
         }
 
         private void VerifyTransactionLogProcessorWasNotCalled()
         {
             _mockTransactionLogProcessor
-                .Verify(p => p.ProcessAsync(It.IsAny<TransactionReceipt>()), Times.Never);
+                .Verify(p => p.ProcessAsync(It.IsAny<Transaction>(), It.IsAny<TransactionReceipt>()), Times.Never);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.Entities;
+using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
@@ -79,26 +80,21 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public string IndexVal2 => _indexVal2;
         public string IndexVal3 => _indexVal3;
 
-        public static TransactionLog CreateTransactionLog(string transactionHash, long logIndex, JObject log)
+        public static TransactionLog CreateTransactionLog(Log log)
         {
-            var transactionLog = new TransactionLog(transactionHash, logIndex);
+            var transactionLog = new TransactionLog(log.TransactionHash, (long)log.LogIndex.Value);
             transactionLog.InitLog(log);
             return transactionLog;
         }
 
-        public void InitLog(JObject logObject)
+        public void InitLog(Log log)
         {
-            Address = logObject["address"].Value<string>() ?? string.Empty;
-            Data = logObject["data"].Value<string>() ?? string.Empty;
+            Address = log?.Address;
+            Data = log?.Data;
+            Topic0 = log?.EventSignature;
 
-            if (logObject["topics"] is JArray topics)
-            {
-                Topics = topics.ToString();
-                if (topics.Count > 0)
-                {
-                    Topic0 = topics[0].ToString();
-                }
-            }
+            if(log?.Topics != null)
+                Topics = JArray.FromObject(log.Topics).ToString();
         }
     }
 }

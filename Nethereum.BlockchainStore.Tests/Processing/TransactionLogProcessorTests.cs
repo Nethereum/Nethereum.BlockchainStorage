@@ -26,13 +26,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
         public class ProcessAsync : TransactionLogProcessorTests
         {
-            List<TransactionLog> _logsSentToHandler = new List<TransactionLog>();
+            List<TransactionLogWrapper> _logsSentToHandler = new List<TransactionLogWrapper>();
 
             public ProcessAsync()
             {
                 _mockHandler
-                    .Setup(h => h.HandleAsync(It.IsAny<TransactionLog>()))
-                    .Callback<TransactionLog>(l => { _logsSentToHandler.Add(l); })
+                    .Setup(h => h.HandleAsync(It.IsAny<TransactionLogWrapper>()))
+                    .Callback<TransactionLogWrapper>(l => { _logsSentToHandler.Add(l); })
                     .Returns(Task.CompletedTask);
             }
 
@@ -40,7 +40,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             public async Task When_Logs_Are_Null_Will_Not_Throw()
             {
                 var receipt = new TransactionReceipt {Logs = null};
-                await _processor.ProcessAsync(receipt);
+                var tx = new Transaction();
+                await _processor.ProcessAsync(tx, receipt);
                 Assert.Empty(_logsSentToHandler);
             }
 
@@ -50,6 +51,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 const string LogAddress1 = "0x1009b29f2094457d3dba62d1953efea58176ba27";
                 const string LogAddress2 = "0x2009b29f2094457d3dba62d1953efea58176ba27";
 
+                var tx = new Transaction();
                 var receipt = new TransactionReceipt
                 {
                     Logs = new JArray(
@@ -58,7 +60,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         )
                 };
 
-                await _processor.ProcessAsync(receipt);
+                await _processor.ProcessAsync(tx, receipt);
 
                 Assert.Equal(2, _logsSentToHandler.Count);
                 Assert.Contains(_logsSentToHandler, item => item.Address == LogAddress1);
@@ -74,6 +76,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 var filter = new TransactionLogFilter(f => f.Address == LogAddressToMatch);
                 _filters.Add(filter);
 
+                var tx = new Transaction();
                 var receipt = new TransactionReceipt
                 {
                     Logs = new JArray(
@@ -82,7 +85,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     )
                 };
 
-                await _processor.ProcessAsync(receipt);
+                await _processor.ProcessAsync(tx, receipt);
 
                 Assert.Single(_logsSentToHandler);
                 Assert.Contains(_logsSentToHandler, item => item.Address == LogAddressToMatch);

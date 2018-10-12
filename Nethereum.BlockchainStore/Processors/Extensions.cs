@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Handlers;
 using Nethereum.RPC.Eth.DTOs;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.Processors
@@ -63,14 +64,16 @@ namespace Nethereum.BlockchainStore.Processors
             return !receipt.Succeeded();
         }
 
-        public static IEnumerable<TransactionLog> GetTransactionLogs(this TransactionReceipt receipt)
+        public static IEnumerable<TransactionLogWrapper> GetTransactionLogs(this Transaction transaction, TransactionReceipt receipt)
         {
             for (var i = 0; i < receipt.Logs?.Count; i++)
             {
                 if (receipt.Logs[i] is JObject log)
-                { 
+                {
+                    var typedLog = log.ToObject<Log>();
+
                     yield return
-                            new TransactionLog(receipt.TransactionHash, i, log);
+                            new TransactionLogWrapper(transaction, receipt, typedLog);
                 }
             }
         }
@@ -91,7 +94,7 @@ namespace Nethereum.BlockchainStore.Processors
                 if (receipt.ContractAddress.IsNotAnEmptyAddress())
                     uniqueAddresses.Add(receipt.ContractAddress);
 
-                foreach (var log in receipt.GetTransactionLogs())
+                foreach (var log in tx.GetTransactionLogs(receipt))
                 {
                     if (log.Address.IsNotAnEmptyAddress())
                         uniqueAddresses.Add(log.Address);
