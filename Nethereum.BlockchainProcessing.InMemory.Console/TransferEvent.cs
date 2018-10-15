@@ -10,6 +10,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
          * Solidity Excerpt
          * event Transfer(address indexed _from, address indexed _to, uint256 indexed _value);
         */
+        [Event("Transfer")]
         public class TransferEvent
         {
             [Parameter("address", "_from", 1, true)]

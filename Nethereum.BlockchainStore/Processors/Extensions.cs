@@ -1,16 +1,11 @@
-﻿using System;
+﻿using Nethereum.BlockchainStore.Handlers;
+using Nethereum.RPC.Eth.DTOs;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Nethereum.ABI.Model;
-using Nethereum.BlockchainStore.Handlers;
-using Nethereum.Contracts;
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RPC.Eth.DTOs;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.Processors
 {
@@ -106,39 +101,6 @@ namespace Nethereum.BlockchainStore.Processors
 
             return uniqueAddresses.ToArray();
 
-        }
-
-        public static List<EventLog<T>> GetEvents<T>(this Transaction transaction, TransactionReceipt receipt, Event eventHandler) where T : new()
-        {
-            var logs = transaction.GetTransactionLogs(receipt).Select(l => l.Log).ToArray();
-            return eventHandler.DecodeAllEventsForEvent<T>(logs);
-        }
-
-        public static string NameAndParameters(this FunctionABI functionAbi)
-        {
-            return $"{functionAbi.Name}({string.Join(",", functionAbi.InputParameters.Select(p => p.ABIType.CanonicalName))})";
-        }
-
-        public static FunctionABI FindFunction(this Transaction transaction, Contract contract)
-        {
-            return contract.FindFunctionBySignature(transaction.Input);
-        }
-
-        public static FunctionABI FindFunctionBySignature(this Contract contract, string sha3Signature)
-        {
-            if (sha3Signature == null || sha3Signature.Length < 10) return null;
-
-            var inputFunctionSignature = sha3Signature.Substring(0, 10);
-            FunctionABI functionAbi = null;
-
-            foreach (var func in contract.ContractBuilder.ContractABI.Functions)
-            {
-                var funcSig = func.Sha3Signature.EnsureHexPrefix();
-                if (funcSig.Equals(inputFunctionSignature, StringComparison.InvariantCultureIgnoreCase))
-                    functionAbi = func;
-            }
-
-            return functionAbi;
         }
 
         public static bool HasLogs(this TransactionReceipt receipt)

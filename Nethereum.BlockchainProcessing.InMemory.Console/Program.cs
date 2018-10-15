@@ -1,5 +1,4 @@
-﻿using System;
-using Nethereum.BlockchainStore;
+﻿using Nethereum.BlockchainStore;
 using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processing;
 using Nethereum.BlockchainStore.Processors.Transactions;
@@ -22,22 +21,24 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             var web3 = new Web3.Web3(targetBlockchain.BlockchainUrl);
             
-            //a contract definition for a known contract
-            var contract = web3.Eth.GetContract(Abi, ContractAddress);
-
             //only process transactions sent to our contract
             var knownContractAddressFilter = TransactionFilter.To(ContractAddress);
             var filters = new FilterContainer(knownContractAddressFilter);
-            //output the name of the function called by the transaction
-            var functionNamePrinter = new FunctionNamePrinter(contract);
-            //output the event args for the Transfer Event
-            var transferEventPrinter = new EventPrinter<TransferEvent>(contract, "Transfer");
+            
+            //for specific functions, output the name and arg values
+            var transactionRouter = new TransactionRouter();
+            transactionRouter.Add(new FunctionPrinter<BuyApprenticeFunction>());
+            transactionRouter.Add(new FunctionPrinter<OpenChestFunction>());
+
+            //for specific events, output the values
+            var transactionLogRouter = new TransactionLogRouter();
+            transactionLogRouter.Add(new EventPrinter<TransferEvent>());
 
             var strategy = new ProcessingStrategy
             {
                 Filters = filters,
-                TransactionHandler = functionNamePrinter,
-                TransactionLogHandler = transferEventPrinter,
+                TransactionHandler = transactionRouter,
+                TransactionLogHandler = transactionLogRouter,
                 MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
             };
 

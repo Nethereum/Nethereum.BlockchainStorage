@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="Nethereum.Web3" Version="2.5.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -13,6 +13,11 @@ namespace Nethereum.BlockchainStore.Handlers
             (Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)> _handlers = 
             new List<(Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)>();
 
+        public void Add(ITransactionLogHandler handler)
+        {
+            Map((log) => true, handler);
+        }
+
         public void Map(Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)
         {
             _handlers.Add((condition, handler));
@@ -40,11 +45,11 @@ namespace Nethereum.BlockchainStore.Handlers
 
         public async Task HandleAsync(TransactionLogWrapper transactionLog)
         {
-            foreach (var item in _handlers)
+            foreach (var (condition, handler) in _handlers)
             {
-                if (await item.condition(transactionLog))
+                if (await condition(transactionLog))
                 {
-                    await item.handler.HandleAsync(transactionLog);
+                    await handler.HandleAsync(transactionLog);
                 }                    
             }
         }

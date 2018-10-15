@@ -17,6 +17,10 @@ namespace Nethereum.BlockchainStore.Handlers
             (Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)> _contractCreationHandlers = 
             new List<(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)>();
 
+        public void Add(ITransactionHandler handler)
+        {
+            Map((txn) => true, handler);
+        }
 
         public void Map(Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)
         {
@@ -28,34 +32,34 @@ namespace Nethereum.BlockchainStore.Handlers
             Map(t => Task.FromResult(condition(t)), handler);
         }
 
-        public void Map(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)
+        public void MapContractCreation(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)
         {
             _contractCreationHandlers.Add((condition, handler));
         }
 
-        public void Map(Func<ContractCreationTransaction, bool> condition, ITransactionHandler handler)
+        public void MapContractCreation(Func<ContractCreationTransaction, bool> condition, ITransactionHandler handler)
         {
-            Map(t => Task.FromResult(condition(t)), handler);
+            MapContractCreation(t => Task.FromResult(condition(t)), handler);
         }
 
         public async Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
         {
-            foreach (var item in _contractCreationHandlers)
+            foreach (var (condition, handler) in _contractCreationHandlers)
             {
-                if (await item.condition(contractCreationTransaction))
+                if (await condition(contractCreationTransaction))
                 {
-                    await item.handler.HandleContractCreationTransactionAsync(contractCreationTransaction);
+                    await handler.HandleContractCreationTransactionAsync(contractCreationTransaction);
                 }
             }
         }
 
         public async Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
         {
-            foreach (var item in _handlers)
+            foreach (var (condition, handler) in _handlers)
             {
-                if (await item.condition(transactionWithReceipt))
+                if (await condition(transactionWithReceipt))
                 {
-                    await item.handler.HandleTransactionAsync(transactionWithReceipt);
+                    await handler.HandleTransactionAsync(transactionWithReceipt);
                 }
             }
         }

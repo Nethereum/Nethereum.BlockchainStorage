@@ -1,4 +1,5 @@
 ﻿using Nethereum.Contracts;
+using Nethereum.Contracts.Extensions;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Handlers
@@ -19,10 +20,14 @@ namespace Nethereum.BlockchainStore.Handlers
         public string Address => Log?.Address;
         public string EventSignature => Log?.EventSignature;
 
-        public T DecodeEvent<T>(Event eventHandler) where T: new()
+        public bool IsForEvent<TEvent>() where TEvent : new()
         {
-            return Log.DecodeEvent<T>(eventHandler);
+            return Log?.IsLogForEvent<TEvent>() ?? false;
         }
 
+        public EventLog<TEvent> Decode<TEvent>() where TEvent : new()
+        {
+            return Log?.DecodeEvent<TEvent>();
+        }
     }
 }

@@ -1,22 +1,24 @@
 ﻿using Nethereum.BlockchainStore.Handlers;
+using Nethereum.Contracts;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
-    public class EventPrinter<T>: ITransactionLogHandler where T: new()
+    public class EventPrinter<TEvent>: ITransactionLogHandler where TEvent: new()
     {
         private readonly string _eventName;
-        private readonly Contracts.Event _event;
 
-        public EventPrinter(Contracts.Contract contract, string eventName)
+        public EventPrinter()
         {
-            _eventName = eventName;
-            _event = contract.GetEvent(eventName);
+            _eventName = ABITypedRegistry.GetEvent<TEvent>().Name;
         }
 
         public Task HandleAsync(TransactionLogWrapper transactionLog)
         {
-            var eventValues = transactionLog.DecodeEvent<T>(_event);
+            if (!transactionLog.IsForEvent<TEvent>())
+                return Task.CompletedTask;
+
+            var eventValues = transactionLog.Decode<TEvent>();
             if (eventValues == null) return Task.CompletedTask;
 
             System.Console.WriteLine($"[EVENT]");

@@ -1,12 +1,8 @@
-﻿using System;
-using Nethereum.BlockchainStore.Processors;
+﻿using Nethereum.BlockchainStore.Processors;
 using Nethereum.Contracts;
+using Nethereum.Contracts.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System.Collections.Generic;
-using System.Linq;
-using Nethereum.ABI.Model;
-using Nethereum.Hex.HexConvertors.Extensions;
 
 namespace Nethereum.BlockchainStore.Handlers
 {
@@ -39,24 +35,20 @@ namespace Nethereum.BlockchainStore.Handlers
             return Transaction?.GetAllRelatedAddresses(TransactionReceipt);
         }
 
-        public List<EventLog<T>> GetEvents<T>(Event eventHandler) where T : new()
-        {
-            return Transaction?.GetEvents<T>(TransactionReceipt, eventHandler);
-        }
-
         public bool HasLogs()
         {
             return TransactionReceipt?.HasLogs() ?? false;
         }
 
-        public FunctionABI FindFunction(Contract contract)
+        public bool IsForFunction<TFunctionMessage>() where TFunctionMessage : FunctionMessage, new()
         {
-            return Transaction?.FindFunction(contract);
+            return Transaction?.IsTransactionForFunctionMessage<TFunctionMessage>() ?? false;
         }
 
-        public string GetFunctionCaption(Contract contract)
+        public TFunctionMessage Decode<TFunctionMessage>() where TFunctionMessage : FunctionMessage, new()
         {
-            return FindFunction(contract)?.NameAndParameters();
+            return Transaction?.DecodeTransactionToFunctionMessage<TFunctionMessage>();
         }
+
     }
 }
