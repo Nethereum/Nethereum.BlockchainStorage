@@ -39,43 +39,24 @@ namespace Nethereum.BlockchainStore.Handlers
             return Transaction?.GetAllRelatedAddresses(TransactionReceipt);
         }
 
-        public Log[] Logs()
-        {
-            return Transaction?.GetTransactionLogs(TransactionReceipt).Select(l => l.Log).ToArray();
-        }
-
         public List<EventLog<T>> GetEvents<T>(Event eventHandler) where T : new()
         {
-            return eventHandler.DecodeAllEventsForEvent<T>(Logs());
+            return Transaction?.GetEvents<T>(TransactionReceipt, eventHandler);
         }
 
         public bool HasLogs()
         {
-            return TransactionReceipt?.Logs?.Count > 0;
+            return TransactionReceipt?.HasLogs() ?? false;
         }
 
-        public FunctionABI GetFunction(Contract contract)
+        public FunctionABI FindFunction(Contract contract)
         {
-            var inputFunctionSignature = Transaction.Input.Substring(0, 10);
-
-            FunctionABI functionAbi = null;
-
-            foreach (var func in contract.ContractBuilder.ContractABI.Functions)
-            {
-                var funcSig = func.Sha3Signature.EnsureHexPrefix();
-                if (funcSig.Equals(inputFunctionSignature, StringComparison.InvariantCultureIgnoreCase))
-                    functionAbi = func;
-            }
-
-            return functionAbi;
+            return Transaction?.FindFunction(contract);
         }
-    }
 
-    public static class FunctionAbiExtensions{
-
-        public static string NameAndParameters(this FunctionABI functionAbi)
+        public string GetFunctionCaption(Contract contract)
         {
-            return $"{functionAbi.Name}({string.Join(",", functionAbi.InputParameters.Select(p => p.ABIType.CanonicalName))})";
+            return FindFunction(contract)?.NameAndParameters();
         }
     }
 }

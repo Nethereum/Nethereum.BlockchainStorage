@@ -6,12 +6,12 @@ namespace Nethereum.RPC.Eth.DTOs
 {
     public class Log: FilterLog
     {
-        public string EventSignature => GetIndexedTopic(0);
-        public string IndexedVal1 => GetIndexedTopic(1);
-        public string IndexedVal2 => GetIndexedTopic(2);
-        public string IndexedVal3 => GetIndexedTopic(3);
+        public string EventSignature => GetTopic(0);
+        public string IndexedVal1 => GetTopic(1);
+        public string IndexedVal2 => GetTopic(2);
+        public string IndexedVal3 => GetTopic(3);
 
-        private string GetIndexedTopic(int number)
+        private string GetTopic(int number)
         {
             if (Topics == null) return null;
 
