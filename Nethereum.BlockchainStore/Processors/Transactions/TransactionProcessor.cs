@@ -12,6 +12,7 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
         private readonly ITransactionLogProcessor _transactionLogProcessor;
         private readonly List<ITransactionFilter> _transactionFilters;
         private readonly List<ITransactionReceiptFilter> _transactionReceiptFilters;
+        private readonly List<ITransactionAndReceiptFilter> _transactionAndReceiptFilters;
 
         protected readonly ITransactionProxy TransactionProxy;
 
@@ -27,7 +28,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
             IContractCreationTransactionProcessor contractCreationTransactionProcessor,
             ITransactionLogProcessor transactionLogProcessor,
             IEnumerable<ITransactionFilter> transactionFilters = null,
-            IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null)
+            IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null,
+            IEnumerable<ITransactionAndReceiptFilter> transactionAndReceiptFilters = null)
         {
             TransactionProxy = transactionProxy;
             ContractTransactionProcessor = contractTransactionProcessor;
@@ -39,6 +41,9 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
 
             _transactionReceiptFilters = new List<ITransactionReceiptFilter>(
                 transactionReceiptFilters ?? new ITransactionReceiptFilter[0]);
+
+            _transactionAndReceiptFilters = new List<ITransactionAndReceiptFilter>(
+                transactionAndReceiptFilters ?? new ITransactionAndReceiptFilter[0]);
         }
        
         public virtual async Task ProcessTransactionAsync(Block block, Transaction transactionSource)
@@ -50,6 +55,8 @@ namespace Nethereum.BlockchainStore.Processors.Transactions
                 .ConfigureAwait(false);
 
             if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
+
+            if (await _transactionAndReceiptFilters.IgnoreAsync((transactionSource, transactionReceipt))) return;
 
             await _transactionLogProcessor.ProcessAsync(transactionSource, transactionReceipt);
 

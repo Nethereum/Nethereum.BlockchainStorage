@@ -20,6 +20,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         readonly Mock<ITransactionLogProcessor> _mockTransactionLogProcessor = new Mock<ITransactionLogProcessor>();
         readonly List<ITransactionFilter> _transactionFilters = new List<ITransactionFilter>();
         readonly List<ITransactionReceiptFilter> _transactionReceiptFilters = new List<ITransactionReceiptFilter>();
+        readonly List<ITransactionAndReceiptFilter> _transactionAndReceiptFilters = new List<ITransactionAndReceiptFilter>();
 
         private readonly BlockWithTransactions _block = new BlockWithTransactions
         {
@@ -36,7 +37,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 _mockContractCreationTransactionProcessor.Object,
                 _mockTransactionLogProcessor.Object,
                 _transactionFilters,
-                _transactionReceiptFilters);
+                _transactionReceiptFilters,
+                _transactionAndReceiptFilters);
         }
 
         [Fact]
@@ -148,6 +150,25 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             await txProcessor.ProcessTransactionAsync(_block, stubTransaction);
 
+
+            VerifyNothingWasProcessed(stubTransaction, stubTransactionReceipt);
+        }
+
+        [Fact]
+        public async Task ProcessTransactionAsync_WhenTxAndTxReceiptDoesNotMatchFilter_IgnoresTransaction()
+        {
+            var (stubTransaction, stubTransactionReceipt) = CreateContractCreationTransaction();
+            var mockTxFilter = new Mock<ITransactionAndReceiptFilter>();
+
+            var tuple = (stubTransaction, stubTransactionReceipt);
+
+            mockTxFilter.Setup(f => f.IsMatchAsync(tuple)).ReturnsAsync(false);
+            _transactionAndReceiptFilters.Add(mockTxFilter.Object);
+
+            var txProcessor = CreateTransactionProcessor();
+            MockGetReceiptCalls(stubTransaction, stubTransactionReceipt);
+
+            await txProcessor.ProcessTransactionAsync(_block, stubTransaction);
 
             VerifyNothingWasProcessed(stubTransaction, stubTransactionReceipt);
         }

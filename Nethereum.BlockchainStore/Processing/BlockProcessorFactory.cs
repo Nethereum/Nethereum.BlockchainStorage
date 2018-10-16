@@ -41,7 +41,8 @@ namespace Nethereum.BlockchainStore.Processing
                 contractCreationTransactionProcessor, 
                 transactionLogProcessor,
                 strategy.Filters?.TransactionFilters, 
-                strategy.Filters?.TransactionReceiptFilters);
+                strategy.Filters?.TransactionReceiptFilters,
+                strategy.Filters?.TransactionAndReceiptFilters);
 
             if (postVm)
                 return new BlockVmPostProcessor(

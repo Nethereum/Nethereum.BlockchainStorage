@@ -18,14 +18,12 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             var targetBlockchain = BlockchainSourceConfigurationFactory.Get(appConfig);
 
             System.Console.WriteLine($"Target Blockchain: {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
-
-            var web3 = new Web3.Web3(targetBlockchain.BlockchainUrl);
             
             //only process transactions sent to our contract
             var knownContractAddressFilter = TransactionFilter.To(ContractAddress);
             var filters = new FilterContainer(knownContractAddressFilter);
             
-            //for specific functions, output the name and arg values
+            //for specific functions, output the name and input arg values
             var transactionRouter = new TransactionRouter();
             transactionRouter.Add(new FunctionPrinter<BuyApprenticeFunction>());
             transactionRouter.Add(new FunctionPrinter<OpenChestFunction>());
@@ -42,7 +40,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
                 MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
             };
 
-            var web3Wrapper = new Web3Wrapper(web3);
+            var web3Wrapper = new Web3Wrapper(targetBlockchain.BlockchainUrl);
             var blockProcessorFactory = new BlockProcessorFactory();
             var blockProcessor = blockProcessorFactory.Create(
                 web3Wrapper, strategy, processTransactionsInParallel: false);

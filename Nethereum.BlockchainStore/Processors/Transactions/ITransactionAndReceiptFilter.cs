@@ -2,8 +2,7 @@
 
 namespace Nethereum.BlockchainStore.Processors.Transactions
 {
-    public interface ITransactionFilter: IFilter<Transaction>
+    public interface ITransactionAndReceiptFilter: IFilter<(Transaction, TransactionReceipt)>
     {
-
     }
 }

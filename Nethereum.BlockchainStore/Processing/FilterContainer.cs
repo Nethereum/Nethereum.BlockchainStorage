@@ -9,17 +9,20 @@ namespace Nethereum.BlockchainStore.Processing
         public IEnumerable<IBlockFilter> BlockFilters { get; }
         public IEnumerable<ITransactionFilter> TransactionFilters { get; }
         public IEnumerable<ITransactionReceiptFilter> TransactionReceiptFilters { get; }
+        public IEnumerable<ITransactionAndReceiptFilter> TransactionAndReceiptFilters { get; }
         public IEnumerable<ITransactionLogFilter> TransactionLogFilters { get; }
 
         public FilterContainer(
             IEnumerable<IBlockFilter> blockFilters = null,
             IEnumerable<ITransactionFilter> transactionFilters = null,
             IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null,
+            IEnumerable<ITransactionAndReceiptFilter> transactionAndReceiptFilters = null,
             IEnumerable<ITransactionLogFilter> transactionLogFilters = null)
         {
             BlockFilters = blockFilters;
             TransactionFilters = transactionFilters;
             TransactionReceiptFilters = transactionReceiptFilters;
+            TransactionAndReceiptFilters = transactionAndReceiptFilters;
             TransactionLogFilters = transactionLogFilters;
         }
 
@@ -38,8 +41,13 @@ namespace Nethereum.BlockchainStore.Processing
         {
         }
 
+        public FilterContainer(ITransactionAndReceiptFilter transactionAndReceiptFilter)
+            : this(null, null, null, transactionAndReceiptFilter)
+        {
+        }
+
         public FilterContainer(ITransactionLogFilter transactionLogFilter)
-            : this(null, null, null, transactionLogFilter)
+            : this(null, null, null, null, transactionLogFilter)
         {
         }
 
@@ -52,9 +60,10 @@ namespace Nethereum.BlockchainStore.Processing
         }
 
         public FilterContainer(
-            IBlockFilter blockFilter,
-            ITransactionFilter transactionFilter,
+            IBlockFilter blockFilter = null,
+            ITransactionFilter transactionFilter = null,
             ITransactionReceiptFilter transactionReceiptFilter = null,
+            ITransactionAndReceiptFilter transactionAndReceiptFilter = null,
             ITransactionLogFilter transactionLogFilter = null)
         {
             if (blockFilter != null)
@@ -76,6 +85,14 @@ namespace Nethereum.BlockchainStore.Processing
                     {
                         transactionReceiptFilter
                     };
+            }
+
+            if (transactionAndReceiptFilter != null)
+            {
+                TransactionAndReceiptFilters = new List<ITransactionAndReceiptFilter>(1)
+                {
+                    transactionAndReceiptFilter
+                };
             }
 
             if (transactionLogFilter != null)
