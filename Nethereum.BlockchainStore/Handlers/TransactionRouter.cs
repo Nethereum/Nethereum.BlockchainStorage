@@ -17,9 +17,14 @@ namespace Nethereum.BlockchainStore.Handlers
             (Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)> _contractCreationHandlers = 
             new List<(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)>();
 
-        public void Add(ITransactionHandler handler)
+        public void AddTransactionHandler(ITransactionHandler handler)
         {
             Map((txn) => true, handler);
+        }
+
+        public void AddContractCreationHandler(ITransactionHandler handler)
+        {
+            MapContractCreation((tx) => true, handler);
         }
 
         public void Map(Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)

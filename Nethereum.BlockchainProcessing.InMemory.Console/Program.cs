@@ -1,6 +1,8 @@
-﻿using Nethereum.BlockchainStore;
+﻿using System;
+using Nethereum.BlockchainStore;
 using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Processing;
+using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Processors.Transactions;
 using Nethereum.BlockchainStore.Web3Abstractions;
 
@@ -19,15 +21,15 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             System.Console.WriteLine($"Target Blockchain: {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
             
-            //only process transactions sent to our contract
-            var knownContractAddressFilter = TransactionFilter.To(ContractAddress);
-            var filters = new FilterContainer(knownContractAddressFilter);
+            //only process transactions that created or called our contract
+            var filters = new FilterContainer(TransactionAndReceiptFilter.CreatedOrCalledContract(ContractAddress));
             
             //for specific functions, output the name and input arg values
             var transactionRouter = new TransactionRouter();
-            transactionRouter.Add(new FunctionPrinter<BuyApprenticeFunction>());
-            transactionRouter.Add(new FunctionPrinter<OpenChestFunction>());
-
+            transactionRouter.AddContractCreationHandler(new ContractCreationPrinter<GlitchGoonsItemConstructor>());
+            transactionRouter.AddTransactionHandler(new FunctionPrinter<BuyApprenticeFunction>());
+            transactionRouter.AddTransactionHandler(new FunctionPrinter<OpenChestFunction>());
+            
             //for specific events, output the values
             var transactionLogRouter = new TransactionLogRouter();
             transactionLogRouter.Add(new EventPrinter<TransferEvent>());
