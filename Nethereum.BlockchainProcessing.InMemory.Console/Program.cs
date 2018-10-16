@@ -13,16 +13,20 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
         static void Main(string[] args)
         {
+            // This particular sample should be run with the following CLI args
+            // A random contract on the Rinkeby network was chosen as an example
+            // --Blockchain rinkeby --FromBlock   3146650
+
             System.Console.WriteLine("CLI args: " + string.Join(" ", args));
             var appConfig = ConfigurationUtils.Build(args).AddConsoleLogging();
             var targetBlockchain = BlockchainSourceConfigurationFactory.Get(appConfig);
 
-            System.Console.WriteLine($"Target Blockchain: {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
+            System.Console.WriteLine($"Target Node/Name (URL): {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
             
             //only process transactions that created or called our contract
-            var filters = new FilterContainer(TransactionAndReceiptFilter.CreatedOrCalledContract(ContractAddress));
+            var contractSpecificFilterBuilder = new ContractSpecificFilterBuilder(ContractAddress);
             
-            //for specific functions, output the name and input arg values
+            //for specific functions on our contract, output the name and input arg values
             var transactionRouter = new TransactionRouter();
             transactionRouter.AddContractCreationHandler(new ContractCreationPrinter<GlitchGoonsItemConstructor>());
             transactionRouter.AddTransactionHandler(new FunctionPrinter<BuyApprenticeFunction>());
@@ -34,7 +38,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             var strategy = new ProcessingStrategy
             {
-                Filters = filters,
+                Filters = contractSpecificFilterBuilder.FilterContainer,
                 TransactionHandler = transactionRouter,
                 TransactionLogHandler = transactionLogRouter,
                 MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
@@ -50,6 +54,11 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             blockchainProcessor.ExecuteAsync
                 (targetBlockchain.FromBlock, targetBlockchain.ToBlock)
                 .Wait();
+
+            System.Console.WriteLine($"Contracts Created: {transactionRouter.ContractsCreated}");
+            System.Console.WriteLine($"Transactions Handled: {transactionRouter.TransactionsHandled}");
+
+            System.Console.ReadLine();
         }
 
     }

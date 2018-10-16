@@ -60,6 +60,15 @@ namespace Nethereum.BlockchainProcessing.Processing
         }
 
         public FilterContainer(
+            ITransactionFilter transactionFilter,
+            ITransactionReceiptFilter transactionReceiptFilter,
+            ITransactionAndReceiptFilter transactionAndReceiptFilter)
+            : this(null, transactionFilter, transactionReceiptFilter, transactionAndReceiptFilter)
+        {
+
+        }
+
+        public FilterContainer(
             IBlockFilter blockFilter = null,
             ITransactionFilter transactionFilter = null,
             ITransactionReceiptFilter transactionReceiptFilter = null,

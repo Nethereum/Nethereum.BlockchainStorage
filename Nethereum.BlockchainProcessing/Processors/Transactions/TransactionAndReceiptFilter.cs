@@ -15,17 +15,18 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
         {
         }
 
-        public static TransactionAndReceiptFilter CreatedOrCalledContract(string contractAddress)
+        public static TransactionAndReceiptFilter SentToOrCreatedContract(string contractAddress)
         {
             return new TransactionAndReceiptFilter(t =>
             {
-                if (t.Item1.To.IsAnEmptyAddress())
+                var (txn, receipt) = t;
+
+                if (txn.IsToAnEmptyAddress())
                 {
-                    return t.Item2.ContractAddress.IsNotAnEmptyAddress() &&
-                           t.Item2.ContractAddress.Equals(contractAddress, StringComparison.InvariantCultureIgnoreCase);
+                    return receipt.IsContractAddressEqual(contractAddress);
                 }
 
-                return contractAddress.Equals(t.Item1.To, StringComparison.InvariantCultureIgnoreCase);
+                return txn.IsTo(contractAddress);
             });
         }
     }

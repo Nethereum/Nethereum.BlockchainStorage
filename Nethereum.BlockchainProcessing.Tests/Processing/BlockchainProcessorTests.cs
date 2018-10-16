@@ -1,10 +1,9 @@
 ﻿using Moq;
-using Nethereum.BlockchainStore.Processing;
+using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.JsonRpc.Client;
 using System.Threading;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Processors;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing

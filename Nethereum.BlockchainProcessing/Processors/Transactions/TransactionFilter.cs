@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -16,25 +18,35 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
 
         public static TransactionFilter ValueGreaterThanZero()
         {
-            return new TransactionFilter(tx => Task.FromResult(tx.Value.Value > 0));
+            return new TransactionFilter(tx => tx.Value.Value > 0);
         }
 
         public static TransactionFilter To(string toAddress)
         {
-            return new TransactionFilter((t) => t.To?.Equals(toAddress, StringComparison.InvariantCultureIgnoreCase) ?? false);
+            return new TransactionFilter((t) => t.IsTo(toAddress));
+        }
+
+        public static TransactionFilter ToOrEmpty(string toAddress)
+        {
+            return new TransactionFilter((t) => t.IsToOrEmpty(toAddress));
+        }
+
+        public static TransactionFilter ToOrEmpty(IEnumerable<string> toAddresses)
+        {
+            return new TransactionFilter((t) => toAddresses.Any(t.IsToOrEmpty));
         }
 
         public static TransactionFilter From(string fromAddress)
         {
-            return new TransactionFilter((t) => t.From?.Equals(fromAddress, StringComparison.InvariantCultureIgnoreCase) ?? false);
+            return new TransactionFilter((t) => t.IsFrom(fromAddress));
         }
 
         public static TransactionFilter FromAndTo(string fromAddress, string toAddress)
         {
             return new TransactionFilter((t) =>
             {
-                var fromMatches = t.From?.Equals(fromAddress, StringComparison.InvariantCultureIgnoreCase) ?? false;
-                var toMatches = t.To?.Equals(toAddress, StringComparison.InvariantCultureIgnoreCase) ?? false;
+                var fromMatches = t.IsFrom(fromAddress);
+                var toMatches = t.IsTo(toAddress);
 
                 return fromMatches && toMatches;
             });

@@ -32,6 +32,11 @@ namespace Nethereum.BlockchainProcessing.Processors
             return false;
         }
 
+        public static bool IsToAnEmptyAddress(this Transaction txn)
+        {
+            return txn.To.IsAnEmptyAddress();
+        }
+
         public static bool IsAnEmptyAddress(this string address)
         {
             if(string.IsNullOrWhiteSpace(address))
@@ -43,6 +48,45 @@ namespace Nethereum.BlockchainProcessing.Processors
         public static bool IsNotAnEmptyAddress(this string address)
         {
             return !address.IsAnEmptyAddress();
+        }
+
+        public static bool EqualsAddress(this string address1, string address2)
+        {
+            if (address1.IsAnEmptyAddress() && address2.IsAnEmptyAddress()) 
+                return true;
+
+            return (address1 ?? string.Empty)
+                .Equals(address2 ?? string.Empty, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public static bool IsEmptyOrEqualsAddress(this string address1, string candidate)
+        {
+            return address1.IsAnEmptyAddress() || address1.EqualsAddress(candidate);
+        }
+
+        public static bool IsToOrEmpty(this Transaction txn, string address)
+        {
+            return txn.To.IsEmptyOrEqualsAddress(address);
+        }
+
+        public static bool IsTo(this Transaction txn, string address)
+        {
+            return txn.To.EqualsAddress(address);
+        }
+
+        public static bool IsFrom(this Transaction txn, string address)
+        {
+            return txn.From.EqualsAddress(address);
+        }
+
+        public static bool IsContractAddressEmptyOrEqual(this TransactionReceipt receipt, string contractAddress)
+        {
+            return receipt.ContractAddress.IsEmptyOrEqualsAddress(contractAddress);
+        }
+
+        public static bool IsContractAddressEqual(this TransactionReceipt receipt, string address)
+        {
+            return receipt.ContractAddress.EqualsAddress(address);
         }
 
         public static bool IsForContractCreation(

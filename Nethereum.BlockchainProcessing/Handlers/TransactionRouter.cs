@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Handlers
@@ -9,6 +10,12 @@ namespace Nethereum.BlockchainProcessing.Handlers
     /// </summary>
     public class TransactionRouter : ITransactionHandler
     {
+        private int _contractsCreated;
+        private int _transactionsHandled;
+
+        public int TransactionsHandled => _transactionsHandled;
+        public int ContractsCreated => _contractsCreated;
+
         private readonly List<
             (Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)> _handlers = 
             new List<(Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)>();
@@ -54,6 +61,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
                 if (await condition(contractCreationTransaction))
                 {
                     await handler.HandleContractCreationTransactionAsync(contractCreationTransaction);
+                    Interlocked.Increment(ref _contractsCreated);
                 }
             }
         }
@@ -65,6 +73,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
                 if (await condition(transactionWithReceipt))
                 {
                     await handler.HandleTransactionAsync(transactionWithReceipt);
+                    Interlocked.Increment(ref _transactionsHandled);
                 }
             }
         }

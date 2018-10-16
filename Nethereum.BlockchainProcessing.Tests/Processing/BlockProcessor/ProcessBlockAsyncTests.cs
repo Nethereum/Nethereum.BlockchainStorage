@@ -1,9 +1,8 @@
 ﻿using Moq;
-using Nethereum.BlockchainStore.Processing;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Processing;
 using Xunit;
 using IBlockFilter = Nethereum.BlockchainProcessing.Processors.IBlockFilter;
 

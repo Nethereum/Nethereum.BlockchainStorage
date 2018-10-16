@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -10,16 +12,26 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
         {
         }
 
-        public static TransactionReceiptFilter OnlyNewContracts()
+        public TransactionReceiptFilter(Func<TransactionReceipt, bool> condition) : base(condition)
         {
-            return new TransactionReceiptFilter(
-                receipt => Task.FromResult(!string.IsNullOrEmpty(receipt.ContractAddress)));
         }
 
-        public static TransactionReceiptFilter ContractCreated(string contractAddress)
+        public static TransactionReceiptFilter ForContract(string contractAddress)
         {
             return new TransactionReceiptFilter(
-                receipt => Task.FromResult(receipt.ContractAddress != null && receipt.ContractAddress.Equals(contractAddress, StringComparison.InvariantCultureIgnoreCase)));
+                receipt => receipt.IsContractAddressEqual(contractAddress));
+        }
+
+        public static TransactionReceiptFilter ForContract(IEnumerable<string> contractAddresses)
+        {
+            return new TransactionReceiptFilter(
+                receipt => contractAddresses.Any(receipt.IsContractAddressEqual));
+        }
+
+        public static TransactionReceiptFilter ForContractOrEmpty(IEnumerable<string> contractAddresses)
+        {
+            return new TransactionReceiptFilter(
+                receipt => contractAddresses.Any(receipt.IsContractAddressEmptyOrEqual));
         }
     }
 }
