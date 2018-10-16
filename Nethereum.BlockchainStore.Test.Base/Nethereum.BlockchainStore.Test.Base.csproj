@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities.Mapping\Nethereum.BlockchainStore.Entities.Mapping.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore.Utils\Nethereum.BlockchainStore.Utils.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Utils\Nethereum.Configuration.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
   </ItemGroup>
 

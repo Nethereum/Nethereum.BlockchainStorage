@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;

@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Entities.Mapping
 {

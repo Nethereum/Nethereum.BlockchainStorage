@@ -1,10 +1,8 @@
-﻿using System;
-using Nethereum.BlockchainStore;
-using Nethereum.BlockchainStore.Handlers;
-using Nethereum.BlockchainStore.Processing;
-using Nethereum.BlockchainStore.Processors;
-using Nethereum.BlockchainStore.Processors.Transactions;
-using Nethereum.BlockchainStore.Web3Abstractions;
+﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainProcessing.Processors.Transactions;
+using Nethereum.BlockchainProcessing.Web3Abstractions;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {

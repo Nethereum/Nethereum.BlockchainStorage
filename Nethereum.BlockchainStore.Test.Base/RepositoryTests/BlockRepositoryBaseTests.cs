@@ -1,5 +1,4 @@
 ﻿using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;

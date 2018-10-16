@@ -1,5 +1,6 @@
-﻿using Nethereum.BlockchainStore.Processing;
-using Nethereum.BlockchainStore.Processors.Transactions;
+﻿using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainStore.Processing;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite.Console
 {

@@ -9,7 +9,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
     public class ProcessTransactionTests : ProcessTransactionScenario
     {
-        JObject _vmStack = new JObject();
+        readonly JObject _vmStack = new JObject();
         string _error = "oops";
         bool _hasError = true;
         bool _hasStackTrace = true;

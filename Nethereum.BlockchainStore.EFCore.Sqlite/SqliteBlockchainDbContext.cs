@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Nethereum.BlockchainStore.EFCore.EntityBuilders;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite
 {
@@ -8,9 +9,8 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite
     {
         private readonly string _connectionString;
 
-        public SqliteBlockchainDbContext()
+        public SqliteBlockchainDbContext():this(GetConnectionString())
         {
-            _connectionString = GetConnectionString();
         }
 
         public SqliteBlockchainDbContext(string connectionString)
@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite
             _connectionString = connectionString;
         }
 
-        private string GetConnectionString()
+        private static string GetConnectionString()
         {
             var config = ConfigurationUtils.Build();
             var connectionStringName = $"BlockchainDbStorageDesignTime";

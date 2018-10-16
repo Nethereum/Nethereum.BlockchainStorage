@@ -1,5 +1,5 @@
-﻿using Nethereum.BlockchainStore.Processors;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Processors;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing

@@ -1,5 +1,7 @@
 ﻿using System;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Processing;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.Csv.Console
 {

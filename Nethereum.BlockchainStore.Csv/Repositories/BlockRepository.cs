@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using CsvHelper.Configuration;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;

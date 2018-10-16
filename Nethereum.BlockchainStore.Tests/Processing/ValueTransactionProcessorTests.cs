@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Moq;
-using Nethereum.BlockchainStore.Handlers;
-using Nethereum.BlockchainStore.Processors.Transactions;
+using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;

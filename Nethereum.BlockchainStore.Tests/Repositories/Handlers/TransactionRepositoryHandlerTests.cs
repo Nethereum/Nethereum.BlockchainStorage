@@ -1,11 +1,11 @@
 ﻿using Moq;
-using Nethereum.BlockchainStore.Handlers;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.BlockchainStore.Repositories.Handlers;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Handlers;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Repositories.Handlers

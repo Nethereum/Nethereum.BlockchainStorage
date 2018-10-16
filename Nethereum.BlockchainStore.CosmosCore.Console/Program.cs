@@ -1,6 +1,8 @@
 ﻿using System;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Console
 {

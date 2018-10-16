@@ -3,8 +3,9 @@ using Nethereum.BlockchainStore.Processing;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Processing;
 using Xunit;
-using IBlockFilter = Nethereum.BlockchainStore.Processors.IBlockFilter;
+using IBlockFilter = Nethereum.BlockchainProcessing.Processors.IBlockFilter;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 {

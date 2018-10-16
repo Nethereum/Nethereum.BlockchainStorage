@@ -1,5 +1,4 @@
 ﻿using Nethereum.BlockchainStore.Csv.Repositories;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using System;
 using System.IO;

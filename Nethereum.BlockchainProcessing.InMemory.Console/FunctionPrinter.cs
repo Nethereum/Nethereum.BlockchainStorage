@@ -1,8 +1,8 @@
 ﻿using Nethereum.ABI.Model;
-using Nethereum.BlockchainStore.Handlers;
 using Nethereum.Contracts;
 using System;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {

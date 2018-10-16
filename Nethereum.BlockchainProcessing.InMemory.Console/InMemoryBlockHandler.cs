@@ -1,8 +1,7 @@
-﻿using Nethereum.BlockchainStore.Handlers;
-using Nethereum.RPC.Eth.DTOs;
+﻿using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainStore.Processing
 {

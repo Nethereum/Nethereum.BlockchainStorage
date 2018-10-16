@@ -1,8 +1,9 @@
-﻿using Nethereum.BlockchainStore.Handlers;
-using Nethereum.BlockchainStore.Processing;
+﻿using Nethereum.BlockchainStore.Processing;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Repositories.Handlers;
 
 namespace Nethereum.BlockchainStore.Repositories

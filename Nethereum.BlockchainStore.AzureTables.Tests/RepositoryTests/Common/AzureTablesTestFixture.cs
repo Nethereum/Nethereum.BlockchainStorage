@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using System;
+using Nethereum.Configuration;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests

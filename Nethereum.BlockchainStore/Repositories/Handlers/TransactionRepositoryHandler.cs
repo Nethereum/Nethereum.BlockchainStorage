@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Handlers;
-using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 

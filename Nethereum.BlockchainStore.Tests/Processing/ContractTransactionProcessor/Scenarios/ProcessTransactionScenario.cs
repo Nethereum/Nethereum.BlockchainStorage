@@ -1,11 +1,11 @@
 ﻿using Moq;
-using Nethereum.BlockchainStore.Processors.Transactions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Handlers;
+using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests.Scenarios

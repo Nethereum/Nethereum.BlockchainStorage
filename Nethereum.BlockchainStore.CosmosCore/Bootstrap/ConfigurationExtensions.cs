@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
 {

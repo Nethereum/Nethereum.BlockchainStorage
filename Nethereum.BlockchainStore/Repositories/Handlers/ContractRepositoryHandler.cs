@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Handlers;
+using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
