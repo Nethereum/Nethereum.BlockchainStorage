@@ -30,22 +30,22 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public string Error { get; private set; }
         public bool HasVmStack { get; private set; }
 
-        public string[] GetAllRelatedAddresses()
+        public virtual string[] GetAllRelatedAddresses()
         {
             return Transaction?.GetAllRelatedAddresses(TransactionReceipt);
         }
 
-        public bool HasLogs()
+        public virtual bool HasLogs()
         {
             return TransactionReceipt?.HasLogs() ?? false;
         }
 
-        public bool IsForFunction<TFunctionMessage>() where TFunctionMessage : FunctionMessage, new()
+        public virtual bool IsForFunction<TFunctionMessage>() where TFunctionMessage : FunctionMessage, new()
         {
             return Transaction?.IsTransactionForFunctionMessage<TFunctionMessage>() ?? false;
         }
 
-        public TFunctionMessage Decode<TFunctionMessage>() where TFunctionMessage : FunctionMessage, new()
+        public virtual TFunctionMessage Decode<TFunctionMessage>() where TFunctionMessage : FunctionMessage, new()
         {
             return Transaction?.DecodeTransactionToFunctionMessage<TFunctionMessage>();
         }

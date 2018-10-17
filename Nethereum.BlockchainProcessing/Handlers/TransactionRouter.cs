@@ -45,7 +45,9 @@ namespace Nethereum.BlockchainProcessing.Handlers
             ITransactionHandler<TFunctionMessage> handler) 
             where TFunctionMessage : FunctionMessage, new()
         {
-            AddTransactionHandler(async (txn) => txn.IsForFunction<TFunctionMessage>() && await condition(txn), 
+            AddTransactionHandler(async (txn) => 
+                    txn.IsForFunction<TFunctionMessage>() && 
+                    await condition(txn), 
                 handler);
         }
 

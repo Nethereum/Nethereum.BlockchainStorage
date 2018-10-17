@@ -12,47 +12,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 {
     public class ExtensionTests
     {
-        [Theory]
-        [InlineData("0x0")]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void EmptyAddress(string address)
-        {
-            Assert.True(address.IsAnEmptyAddress());
-            Assert.False(address.IsNotAnEmptyAddress());
-        }
-
-        [Theory]
-        [InlineData("0x01234")]
-        [InlineData("0x9209b29f2094457d3dba62d1953efea58176ba27")]
-        public void NotAnEmptyAddress(string address)
-        {
-            Assert.False(address.IsAnEmptyAddress());
-            Assert.True(address.IsNotAnEmptyAddress());
-        }
-
-        [Theory]
-        [InlineData("", "0x1009b29f2094457d3dba62d1953efea58176ba27")]
-        public void IsForContractCreation_ReturnsTrue(string toAddress, string contractAddress)
-        {
-            var transaction = new Transaction {To = toAddress};
-            var receipt = new TransactionReceipt {ContractAddress = contractAddress};
-
-            Assert.True(transaction.IsForContractCreation(receipt));
-        }
-
-        [Theory]
-        [InlineData("", "")]
-        [InlineData("0x9209b29f2094457d3dba62d1953efea58176ba27", "")]
-        public void IsForContractCreation_ReturnsFalse(string toAddress, string contractAddress)
-        {
-            var transaction = new Transaction {To = toAddress};
-            var receipt = new TransactionReceipt {ContractAddress = contractAddress};
-
-            Assert.False(transaction.IsForContractCreation(receipt));
-        }
-
         [Fact]
         public async Task Filters_IsMatchAsync_WhenEmpty_ReturnsTrue()
         {
