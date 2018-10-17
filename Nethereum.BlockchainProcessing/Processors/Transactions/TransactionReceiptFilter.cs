@@ -28,6 +28,12 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                 receipt => contractAddresses.Any(receipt.IsContractAddressEqual));
         }
 
+        public static TransactionReceiptFilter ForContractOrEmpty(string contractAddress)
+        {
+            return new TransactionReceiptFilter(
+                receipt => receipt.IsContractAddressEmptyOrEqual(contractAddress));
+        }
+
         public static TransactionReceiptFilter ForContractOrEmpty(IEnumerable<string> contractAddresses)
         {
             return new TransactionReceiptFilter(
