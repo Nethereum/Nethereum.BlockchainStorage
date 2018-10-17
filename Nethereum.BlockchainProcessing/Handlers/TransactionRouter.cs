@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.Contracts;
@@ -18,7 +19,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public int ContractsCreated => _contractsCreated;
 
         private readonly List<
-            (Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)> _handlers = 
+            (Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)> _transactionHandlers = 
             new List<(Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)>();
 
         private readonly List<
@@ -60,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
             Func<TransactionWithReceipt, Task<bool>> condition, 
             ITransactionHandler handler)
         {
-            _handlers.Add((condition, handler));
+            _transactionHandlers.Add((condition, handler));
         }
 
         public void AddTransactionHandler(
@@ -105,7 +106,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public async Task HandleTransactionAsync(
             TransactionWithReceipt transactionWithReceipt)
         {
-            foreach (var (condition, handler) in _handlers)
+            foreach (var (condition, handler) in _transactionHandlers)
             {
                 if (await condition(transactionWithReceipt))
                 {
