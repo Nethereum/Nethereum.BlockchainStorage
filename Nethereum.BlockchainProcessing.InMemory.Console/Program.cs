@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Configuration;
@@ -28,13 +29,15 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             
             //for specific functions on our contract, output the name and input arg values
             var transactionRouter = new TransactionRouter();
-            transactionRouter.AddContractCreationHandler(new ContractCreationPrinter<GlitchGoonsItemConstructor>());
-            transactionRouter.AddTransactionHandler(new FunctionPrinter<BuyApprenticeFunction>());
-            transactionRouter.AddTransactionHandler(new FunctionPrinter<OpenChestFunction>());
+
+            transactionRouter.AddContractCreationHandler(
+                new ContractCreationPrinter<GlitchGoonsItemConstructor>());
+            transactionRouter.AddFunctionHandler(new FunctionPrinter<BuyApprenticeFunction>());
+            transactionRouter.AddFunctionHandler(new FunctionPrinter<OpenChestFunction>());
             
             //for specific events, output the values
             var transactionLogRouter = new TransactionLogRouter();
-            transactionLogRouter.Add(new EventPrinter<TransferEvent>());
+            transactionLogRouter.AddEventHandler(new EventPrinter<TransferEvent>());
 
             var strategy = new ProcessingStrategy
             {

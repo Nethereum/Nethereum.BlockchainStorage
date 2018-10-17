@@ -13,25 +13,49 @@ namespace Nethereum.BlockchainProcessing.Handlers
             (Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)> _handlers = 
             new List<(Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)>();
 
-        public void Add(ITransactionLogHandler handler)
+        public void AddLogHandler(ITransactionLogHandler handler)
         {
-            Map((log) => true, handler);
+            AddLogHandler((log) => true, handler);
         }
 
-        public void Map(Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)
+        public void AddEventHandler<TEvent>(ITransactionLogHandler<TEvent> handler) 
+            where TEvent: new()
+        {
+            AddLogHandler((log) => log.IsForEvent<TEvent>(), handler);
+        }
+
+        public void AddEventHandler<TEvent>(
+            Func<TransactionLogWrapper, bool> condition, 
+            ITransactionLogHandler<TEvent> handler) where TEvent: new()
+        {
+            AddLogHandler((log) => log.IsForEvent<TEvent>() && condition(log), handler);
+        }
+
+        public void AddEventHandler<TEvent>(
+            Func<TransactionLogWrapper, Task<bool>> condition, 
+            ITransactionLogHandler<TEvent> handler) where TEvent: new()
+        {
+            AddLogHandler(async (log) => log.IsForEvent<TEvent>() && await condition(log), handler);
+        }
+
+        public void AddLogHandler(
+            Func<TransactionLogWrapper, Task<bool>> condition, 
+            ITransactionLogHandler handler)
         {
             _handlers.Add((condition, handler));
         }
 
-        public void Map(Func<TransactionLogWrapper, bool> condition, ITransactionLogHandler handler)
+        public void AddLogHandler(
+            Func<TransactionLogWrapper, bool> condition, 
+            ITransactionLogHandler handler)
         {
-            Map(t => Task.FromResult(condition(t)), handler);
+            AddLogHandler(t => Task.FromResult(condition(t)), handler);
         }
 
-        public void MapToAddress(string toAddress, ITransactionLogHandler handler)
+        public void AddLogHandler(string toAddress, ITransactionLogHandler handler)
         {
-            Map(t => 
-                toAddress.Equals(t.Transaction.To, StringComparison.InvariantCultureIgnoreCase), 
+            AddLogHandler(t => 
+                t.IsTo(toAddress), 
                 handler);
         }
 
@@ -39,7 +63,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
         {
             foreach (var address in toAddresses)
             {
-                MapToAddress(address, handler);
+                AddLogHandler(address, handler);
             }
         }
 

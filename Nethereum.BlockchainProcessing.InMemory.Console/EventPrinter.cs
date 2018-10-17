@@ -4,7 +4,7 @@ using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
-    public class EventPrinter<TEvent>: ITransactionLogHandler where TEvent: new()
+    public class EventPrinter<TEvent>: ITransactionLogHandler<TEvent> where TEvent: new()
     {
         private readonly string _eventName;
 

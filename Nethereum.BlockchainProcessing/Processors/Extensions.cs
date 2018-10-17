@@ -79,6 +79,11 @@ namespace Nethereum.BlockchainProcessing.Processors
             return txn.From.EqualsAddress(address);
         }
 
+        public static bool IsFromAndTo(this Transaction txn, string from, string to)
+        {
+            return txn.IsFrom(from) && txn.IsTo(to);
+        }
+
         public static bool IsContractAddressEmptyOrEqual(this TransactionReceipt receipt, string contractAddress)
         {
             return receipt.ContractAddress.IsEmptyOrEqualsAddress(contractAddress);

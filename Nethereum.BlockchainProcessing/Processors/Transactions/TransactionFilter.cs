@@ -8,13 +8,11 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
 {
     public class TransactionFilter : Filter<Transaction>, ITransactionFilter
     {
-        public TransactionFilter(Func<Transaction, Task<bool>> condition) : base(condition)
-        {
-        }
+        public TransactionFilter(){}
 
-        public TransactionFilter(Func<Transaction, bool> condition) : base(condition)
-        {
-        }
+        public TransactionFilter(Func<Transaction, Task<bool>> condition) : base(condition){}
+
+        public TransactionFilter(Func<Transaction, bool> condition) : base(condition){}
 
         public static TransactionFilter ValueGreaterThanZero()
         {
@@ -41,15 +39,14 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             return new TransactionFilter((t) => t.IsFrom(fromAddress));
         }
 
+        public static TransactionFilter From(IEnumerable<string> fromAddresses)
+        {
+            return new TransactionFilter((t) => fromAddresses.Any(t.IsFrom));
+        }
+
         public static TransactionFilter FromAndTo(string fromAddress, string toAddress)
         {
-            return new TransactionFilter((t) =>
-            {
-                var fromMatches = t.IsFrom(fromAddress);
-                var toMatches = t.IsTo(toAddress);
-
-                return fromMatches && toMatches;
-            });
+            return new TransactionFilter((t) => t.IsFromAndTo(fromAddress, toAddress));
         }
     }
 }

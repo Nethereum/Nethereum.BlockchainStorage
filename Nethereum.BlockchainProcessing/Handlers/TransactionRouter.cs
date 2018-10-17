@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainProcessing.Handlers
 {
@@ -24,37 +25,70 @@ namespace Nethereum.BlockchainProcessing.Handlers
             (Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)> _contractCreationHandlers = 
             new List<(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)>();
 
+        public void AddFunctionHandler<TFunctionMessage>(ITransactionHandler<TFunctionMessage> handler) 
+            where TFunctionMessage : FunctionMessage, new()
+        {
+            AddTransactionHandler((txn) => txn.IsForFunction<TFunctionMessage>(), handler);
+        }
+
+        public void AddFunctionHandler<TFunctionMessage>(
+            Func<TransactionWithReceipt, bool> condition, 
+            ITransactionHandler<TFunctionMessage> handler) 
+            where TFunctionMessage : FunctionMessage, new()
+        {
+            AddTransactionHandler((txn) => 
+                txn.IsForFunction<TFunctionMessage>() && condition(txn), handler);
+        }
+
+        public void AddFunctionHandler<TFunctionMessage>(
+            Func<TransactionWithReceipt, Task<bool>> condition, 
+            ITransactionHandler<TFunctionMessage> handler) 
+            where TFunctionMessage : FunctionMessage, new()
+        {
+            AddTransactionHandler(async (txn) => txn.IsForFunction<TFunctionMessage>() && await condition(txn), 
+                handler);
+        }
+
         public void AddTransactionHandler(ITransactionHandler handler)
         {
-            Map((txn) => true, handler);
+            AddTransactionHandler((txn) => true, handler);
         }
 
-        public void AddContractCreationHandler(ITransactionHandler handler)
-        {
-            MapContractCreation((tx) => true, handler);
-        }
-
-        public void Map(Func<TransactionWithReceipt, Task<bool>> condition, ITransactionHandler handler)
+        public void AddTransactionHandler(
+            Func<TransactionWithReceipt, Task<bool>> condition, 
+            ITransactionHandler handler)
         {
             _handlers.Add((condition, handler));
         }
 
-        public void Map(Func<TransactionWithReceipt, bool> condition, ITransactionHandler handler)
+        public void AddTransactionHandler(
+            Func<TransactionWithReceipt, bool> condition, 
+            ITransactionHandler handler)
         {
-            Map(t => Task.FromResult(condition(t)), handler);
+            AddTransactionHandler(t => Task.FromResult(condition(t)), handler);
         }
 
-        public void MapContractCreation(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)
+        public void AddContractCreationHandler(ITransactionHandler handler)
+        {
+            AddContractCreationHandler((tx) => true, handler);
+        }
+
+        public void AddContractCreationHandler(
+            Func<ContractCreationTransaction, Task<bool>> condition, 
+            ITransactionHandler handler)
         {
             _contractCreationHandlers.Add((condition, handler));
         }
 
-        public void MapContractCreation(Func<ContractCreationTransaction, bool> condition, ITransactionHandler handler)
+        public void AddContractCreationHandler(
+            Func<ContractCreationTransaction, bool> condition, 
+            ITransactionHandler handler)
         {
-            MapContractCreation(t => Task.FromResult(condition(t)), handler);
+            AddContractCreationHandler(t => Task.FromResult(condition(t)), handler);
         }
 
-        public async Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
+        public async Task HandleContractCreationTransactionAsync(
+            ContractCreationTransaction contractCreationTransaction)
         {
             foreach (var (condition, handler) in _contractCreationHandlers)
             {
@@ -66,7 +100,8 @@ namespace Nethereum.BlockchainProcessing.Handlers
             }
         }
 
-        public async Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
+        public async Task HandleTransactionAsync(
+            TransactionWithReceipt transactionWithReceipt)
         {
             foreach (var (condition, handler) in _handlers)
             {

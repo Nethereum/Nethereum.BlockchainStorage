@@ -6,6 +6,8 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
 {
     public class TransactionLogFilter : Filter<TransactionLogWrapper>, ITransactionLogFilter
     {
+        public TransactionLogFilter(){}
+
         public TransactionLogFilter(Func<TransactionLogWrapper, Task<bool>> condition) : base(condition)
         {
         }

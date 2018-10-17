@@ -1,4 +1,5 @@
-﻿using Nethereum.Contracts;
+﻿using Nethereum.BlockchainProcessing.Processors;
+using Nethereum.Contracts;
 using Nethereum.Contracts.Extensions;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -28,6 +29,11 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public EventLog<TEvent> Decode<TEvent>() where TEvent : new()
         {
             return Log?.DecodeEvent<TEvent>();
+        }
+
+        public bool IsTo(string toAddress)
+        {
+            return Transaction?.IsTo(toAddress) ?? false;
         }
     }
 }

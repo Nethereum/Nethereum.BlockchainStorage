@@ -22,8 +22,6 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             }
 
             return Task.CompletedTask;
-
-
         }
 
         public Task HandleTransactionAsync(TransactionWithReceipt txnWithReceipt)

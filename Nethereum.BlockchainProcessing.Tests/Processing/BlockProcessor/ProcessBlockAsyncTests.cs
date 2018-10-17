@@ -109,6 +109,20 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
                         It.IsAny<Block>(), It.IsAny<Transaction>()), Times.Never);
 
             }
+
+            [Fact]
+            public async Task When_Reprocessing_The_Previous_Block_Will_Ignore_Transactions_Already_Processed()
+            {
+                //execute same block twice
+                await BlockProcessor.ProcessBlockAsync(BlockNumber);
+                await BlockProcessor.ProcessBlockAsync(BlockNumber);
+
+                //assert
+                MockTransactionProcessor
+                    .Verify(b => b.ProcessTransactionAsync(_stubBlock, It.IsAny<Transaction>()), 
+                    Times.Exactly(_stubBlock.TransactionCount()));
+            }
+            
         }
     }
 }

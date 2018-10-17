@@ -6,7 +6,7 @@ using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
-    public class FunctionPrinter<TFunctionInput>: ITransactionHandler where TFunctionInput : FunctionMessage, new()
+    public class FunctionPrinter<TFunctionInput>: ITransactionHandler<TFunctionInput> where TFunctionInput : FunctionMessage, new()
     {
         private readonly FunctionABI _functionAbi;
 

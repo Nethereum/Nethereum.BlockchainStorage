@@ -5,6 +5,10 @@ namespace Nethereum.BlockchainProcessing.Processors
 {
     public class Filter<T>: IFilter<T>
     {
+        public static readonly Func<T, bool> AlwaysMatch = (tx) => true;
+
+        public Filter():this(AlwaysMatch){}
+
         public Filter(Func<T, Task<bool>> condition)
         {
             Condition = condition;
