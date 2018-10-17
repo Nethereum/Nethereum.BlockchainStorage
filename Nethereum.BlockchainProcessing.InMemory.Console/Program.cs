@@ -32,8 +32,8 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             transactionRouter.AddContractCreationHandler(
                 new ContractCreationPrinter<GlitchGoonsItemConstructor>());
-            transactionRouter.AddFunctionHandler(new FunctionPrinter<BuyApprenticeFunction>());
-            transactionRouter.AddFunctionHandler(new FunctionPrinter<OpenChestFunction>());
+            transactionRouter.AddTransactionHandler(new FunctionPrinter<BuyApprenticeFunction>());
+            transactionRouter.AddTransactionHandler(new FunctionPrinter<OpenChestFunction>());
             
             //for specific events, output the values
             var transactionLogRouter = new TransactionLogRouter();

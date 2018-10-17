@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processors;
+﻿using System;
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -6,6 +7,11 @@ namespace Nethereum.BlockchainProcessing.Handlers
 {
     public class ContractCreationTransaction
     {
+        public ContractCreationTransaction()
+        {
+                
+        }
+
         public ContractCreationTransaction(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
         {
             ContractAddress = contractAddress;
@@ -23,9 +29,9 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public bool FailedCreatingContract { get; private set; }
         public HexBigInteger BlockTimestamp { get; private set; }
 
-        public string[] GetAllRelatedAddresses()
+        public virtual string[] GetAllRelatedAddresses()
         {
-            return Transaction.GetAllRelatedAddresses(TransactionReceipt);
+            return Transaction?.GetAllRelatedAddresses(TransactionReceipt) ?? Array.Empty<string>();
         }
     }
 }

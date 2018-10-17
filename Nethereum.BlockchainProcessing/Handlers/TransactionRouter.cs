@@ -26,49 +26,68 @@ namespace Nethereum.BlockchainProcessing.Handlers
             (Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)> _contractCreationHandlers = 
             new List<(Func<ContractCreationTransaction, Task<bool>> condition, ITransactionHandler handler)>();
 
-        public void AddFunctionHandler<TFunctionMessage>(ITransactionHandler<TFunctionMessage> handler) 
-            where TFunctionMessage : FunctionMessage, new()
+        public void AddTransactionHandler(
+            ITransactionHandler handler)
         {
-            AddTransactionHandler((txn) => txn.IsForFunction<TFunctionMessage>(), handler);
+            _AddTransactionHandler((txn) => true, handler);
         }
 
-        public void AddFunctionHandler<TFunctionMessage>(
+        public void AddTransactionHandler(
             Func<TransactionWithReceipt, bool> condition, 
-            ITransactionHandler<TFunctionMessage> handler) 
-            where TFunctionMessage : FunctionMessage, new()
+            ITransactionHandler handler)
         {
-            AddTransactionHandler((txn) => 
-                txn.IsForFunction<TFunctionMessage>() && condition(txn), handler);
-        }
-
-        public void AddFunctionHandler<TFunctionMessage>(
-            Func<TransactionWithReceipt, Task<bool>> condition, 
-            ITransactionHandler<TFunctionMessage> handler) 
-            where TFunctionMessage : FunctionMessage, new()
-        {
-            AddTransactionHandler(async (txn) => 
-                    txn.IsForFunction<TFunctionMessage>() && 
-                    await condition(txn), 
-                handler);
-        }
-
-        public void AddTransactionHandler(ITransactionHandler handler)
-        {
-            AddTransactionHandler((txn) => true, handler);
+            _AddTransactionHandler(condition, handler);
         }
 
         public void AddTransactionHandler(
             Func<TransactionWithReceipt, Task<bool>> condition, 
+            ITransactionHandler handler)
+        {
+            _AddTransactionHandler(condition, handler);
+        }
+
+        public void AddTransactionHandler<TFunctionMessage>(
+            ITransactionHandler<TFunctionMessage> handler) 
+            where TFunctionMessage: FunctionMessage, new()
+        {
+            var wrappedCondition = new Func<TransactionWithReceipt, bool>(
+                txn => txn.IsForFunction<TFunctionMessage>());
+
+            _AddTransactionHandler(wrappedCondition, handler);
+        }
+
+        public void AddTransactionHandler<TFunctionMessage>(
+            Func<TransactionWithReceipt, bool> condition,
+            ITransactionHandler<TFunctionMessage> handler) 
+            where TFunctionMessage: FunctionMessage, new()
+        {
+            var wrappedCondition = new Func<TransactionWithReceipt, bool>(
+                txn => txn.IsForFunction<TFunctionMessage>() && condition(txn));
+
+            _AddTransactionHandler(wrappedCondition, handler);
+        }
+
+        public void AddTransactionHandler<TFunctionMessage>(
+            Func<TransactionWithReceipt, Task<bool>> condition,
+            ITransactionHandler<TFunctionMessage> handler) 
+            where TFunctionMessage: FunctionMessage, new()
+        {
+            var wrappedCondition = new Func<TransactionWithReceipt, Task<bool>>(
+                async txn => txn.IsForFunction<TFunctionMessage>() && await condition(txn));
+
+            _AddTransactionHandler(wrappedCondition, handler);
+        }
+
+        private void _AddTransactionHandler(Func<TransactionWithReceipt, bool> condition,
+            ITransactionHandler handler)
+        {
+            _AddTransactionHandler((txn) => Task.FromResult(condition(txn)), handler);
+        }
+
+        private void _AddTransactionHandler(Func<TransactionWithReceipt, Task<bool>> condition,
             ITransactionHandler handler)
         {
             _transactionHandlers.Add((condition, handler));
-        }
-
-        public void AddTransactionHandler(
-            Func<TransactionWithReceipt, bool> condition, 
-            ITransactionHandler handler)
-        {
-            AddTransactionHandler(t => Task.FromResult(condition(t)), handler);
         }
 
         public void AddContractCreationHandler(ITransactionHandler handler)
