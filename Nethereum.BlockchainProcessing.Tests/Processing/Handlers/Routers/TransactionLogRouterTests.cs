@@ -24,6 +24,24 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Handlers.Routers
         }
 
         [Fact]
+        public async Task Invokes_All_Handlers_Meeting_Condition()
+        {
+            var handler1 = new Mock<ITransactionLogHandler>();
+            var handler2 = new Mock<ITransactionLogHandler>();
+            var handler3 = new Mock<ITransactionLogHandler>();
+
+            router.AddHandler((log) => true, handler1.Object);
+            router.AddHandler((log) => true, handler2.Object);
+            router.AddHandler((log) => false, handler3.Object);
+
+            await router.HandleAsync(_mockLog.Object);
+
+            handler1.Verify(h => h.HandleAsync(_mockLog.Object), Times.Once);
+            handler2.Verify(h => h.HandleAsync(_mockLog.Object), Times.Once);
+            handler3.Verify(h => h.HandleAsync(_mockLog.Object), Times.Never);
+        }
+
+        [Fact]
         public async Task Does_Not_Invoke_Handlers_With_Conditions_That_Are_Not_Met()
         {
             router.AddHandler((log) => false, _mockTransactionLogHandler.Object);

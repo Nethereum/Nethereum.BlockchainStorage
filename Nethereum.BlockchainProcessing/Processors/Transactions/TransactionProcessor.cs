@@ -46,33 +46,33 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                 transactionAndReceiptFilters ?? new ITransactionAndReceiptFilter[0]);
         }
        
-        public virtual async Task ProcessTransactionAsync(Block block, Transaction transactionSource)
+        public virtual async Task ProcessTransactionAsync(Block block, Transaction tx)
         {
-            if (await _transactionFilters.IgnoreAsync(transactionSource)) return;
+            if (await _transactionFilters.IgnoreAsync(tx)) return;
 
-            var transactionReceipt = await TransactionProxy
-                .GetTransactionReceipt(transactionSource.TransactionHash)
+            var receipt = await TransactionProxy
+                .GetTransactionReceipt(tx.TransactionHash)
                 .ConfigureAwait(false);
 
-            if (await _transactionReceiptFilters.IgnoreAsync(transactionReceipt)) return;
+            if (await _transactionReceiptFilters.IgnoreAsync(receipt)) return;
 
-            if (await _transactionAndReceiptFilters.IgnoreAsync((transactionSource, transactionReceipt))) return;
+            if (await _transactionAndReceiptFilters.IgnoreAsync((tx, receipt))) return;
 
-            await _transactionLogProcessor.ProcessAsync(transactionSource, transactionReceipt);
+            await _transactionLogProcessor.ProcessAsync(tx, receipt);
 
-            if (transactionSource.IsForContractCreation(transactionReceipt))
+            if (tx.IsForContractCreation(receipt))
             {
-                await ProcessContractCreation(block, transactionSource, transactionReceipt);
+                await ProcessContractCreation(block, tx, receipt);
                 return;
             }
 
-            if (await ContractTransactionProcessor.IsTransactionForContractAsync(transactionSource))
+            if (await ContractTransactionProcessor.IsTransactionForContractAsync(tx))
             {
-                await ProcessContractTransaction(block, transactionSource, transactionReceipt);
+                await ProcessContractTransaction(block, tx, receipt);
                 return;
             }
 
-            await ProcessValueTransaction(block, transactionSource, transactionReceipt);
+            await ProcessValueTransaction(block, tx, receipt);
         }
 
         private async Task ProcessValueTransaction(Block block, Transaction transactionSource, TransactionReceipt transactionReceipt)
