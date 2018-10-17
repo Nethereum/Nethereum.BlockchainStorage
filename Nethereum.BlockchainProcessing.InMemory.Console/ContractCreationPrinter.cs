@@ -1,7 +1,6 @@
-﻿using Nethereum.Contracts;
-using Nethereum.Contracts.Extensions;
+﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.Contracts;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
@@ -9,7 +8,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
     {
         public Task HandleContractCreationTransactionAsync(ContractCreationTransaction tx)
         {
-            var dto = tx.Transaction.DecodeTransactionToDeploymentMessage<TDeploymentMessage>();
+            var dto = tx.DecodeToDeploymentMessage<TDeploymentMessage>();
 
             if (dto == null) return Task.CompletedTask;
 

@@ -13,58 +13,57 @@ namespace Nethereum.BlockchainProcessing.Handlers
             (Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)> _handlers = 
             new List<(Func<TransactionLogWrapper, Task<bool>> condition, ITransactionLogHandler handler)>();
 
-        public void AddLogHandler(ITransactionLogHandler handler)
+        public void AddHandler(ITransactionLogHandler handler)
         {
-            AddLogHandler((log) => true, handler);
+            _AddHandler((log) => true, handler);
         }
 
-        public void AddEventHandler<TEvent>(ITransactionLogHandler<TEvent> handler) 
+        public void AddHandler(
+            Func<TransactionLogWrapper, bool> condition, 
+            ITransactionLogHandler handler)
+        {
+            _AddHandler(condition, handler);
+        }
+
+        public void AddHandler(
+            Func<TransactionLogWrapper, Task<bool>> condition, 
+            ITransactionLogHandler handler)
+        {
+            _AddHandler(condition, handler);
+        }
+
+        public void AddHandler<TEvent>(ITransactionLogHandler<TEvent> handler) 
             where TEvent: new()
         {
-            AddLogHandler((log) => log.IsForEvent<TEvent>(), handler);
+            _AddHandler((log) => log.IsForEvent<TEvent>(), handler);
         }
 
-        public void AddEventHandler<TEvent>(
+        public void AddHandler<TEvent>(
             Func<TransactionLogWrapper, bool> condition, 
             ITransactionLogHandler<TEvent> handler) where TEvent: new()
         {
-            AddLogHandler((log) => log.IsForEvent<TEvent>() && condition(log), handler);
+            _AddHandler((log) => log.IsForEvent<TEvent>() && condition(log), handler);
         }
 
-        public void AddEventHandler<TEvent>(
+        public void AddHandler<TEvent>(
             Func<TransactionLogWrapper, Task<bool>> condition, 
             ITransactionLogHandler<TEvent> handler) where TEvent: new()
         {
-            AddLogHandler(async (log) => log.IsForEvent<TEvent>() && await condition(log), handler);
+            _AddHandler(async (log) => log.IsForEvent<TEvent>() && await condition(log), handler);
         }
 
-        public void AddLogHandler(
+        private void _AddHandler(
+            Func<TransactionLogWrapper, bool> condition, 
+            ITransactionLogHandler handler)
+        {
+            AddHandler(t => Task.FromResult(condition(t)), handler);
+        }
+
+        private void _AddHandler(
             Func<TransactionLogWrapper, Task<bool>> condition, 
             ITransactionLogHandler handler)
         {
             _handlers.Add((condition, handler));
-        }
-
-        public void AddLogHandler(
-            Func<TransactionLogWrapper, bool> condition, 
-            ITransactionLogHandler handler)
-        {
-            AddLogHandler(t => Task.FromResult(condition(t)), handler);
-        }
-
-        public void AddLogHandler(string toAddress, ITransactionLogHandler handler)
-        {
-            AddLogHandler(t => 
-                t.IsTo(toAddress), 
-                handler);
-        }
-
-        public void MapToAddresses(IEnumerable<string> toAddresses, ITransactionLogHandler handler)
-        {
-            foreach (var address in toAddresses)
-            {
-                AddLogHandler(address, handler);
-            }
         }
 
         public async Task HandleAsync(TransactionLogWrapper transactionLog)

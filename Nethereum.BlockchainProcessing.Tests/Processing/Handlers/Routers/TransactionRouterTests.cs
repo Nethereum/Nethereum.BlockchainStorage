@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Contracts;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Handlers.Routers
@@ -18,7 +15,6 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Handlers.Routers
             }
         }
         public class TestFunctionDto : FunctionMessage{}
-        public class TestEventDto{}
 
         private readonly Mock<ITransactionHandler> _mockTransactionHandler = new Mock<ITransactionHandler>();
         private readonly Mock<ITransactionHandler<TestFunctionDto>> _mockFunctionHandler = new Mock<ITransactionHandler<TestFunctionDto>>();

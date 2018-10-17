@@ -1,5 +1,7 @@
 ﻿using System;
 using Nethereum.BlockchainProcessing.Processors;
+using Nethereum.Contracts;
+using Nethereum.Contracts.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
@@ -32,6 +34,12 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public virtual string[] GetAllRelatedAddresses()
         {
             return Transaction?.GetAllRelatedAddresses(TransactionReceipt) ?? Array.Empty<string>();
+        }
+
+        public virtual TDeploymentMessage DecodeToDeploymentMessage<TDeploymentMessage>()
+            where TDeploymentMessage : ContractDeploymentMessage, new()
+        {
+            return Transaction?.DecodeTransactionToDeploymentMessage<TDeploymentMessage>();
         }
     }
 }

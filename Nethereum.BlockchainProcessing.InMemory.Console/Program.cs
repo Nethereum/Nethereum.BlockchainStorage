@@ -1,6 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Configuration;
@@ -37,7 +36,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             
             //for specific events, output the values
             var transactionLogRouter = new TransactionLogRouter();
-            transactionLogRouter.AddEventHandler(new EventPrinter<TransferEvent>());
+            transactionLogRouter.AddHandler(new EventPrinter<TransferEvent>());
 
             var strategy = new ProcessingStrategy
             {
