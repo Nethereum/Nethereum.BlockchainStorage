@@ -1,10 +1,9 @@
-﻿using Nethereum.RPC.Eth.DTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
 
-namespace Nethereum.BlockchainStore.Processing
+namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
     public class InMemoryContractHandler : InMemoryHandlerBase, IContractHandler
     {

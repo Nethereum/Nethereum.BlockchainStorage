@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
 
-namespace Nethereum.BlockchainStore.Processing
+namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
     public class InMemoryTransactionHandler : InMemoryHandlerBase, ITransactionHandler
     {

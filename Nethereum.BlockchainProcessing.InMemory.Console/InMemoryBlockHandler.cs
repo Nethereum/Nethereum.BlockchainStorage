@@ -1,9 +1,9 @@
-﻿using Nethereum.RPC.Eth.DTOs;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.RPC.Eth.DTOs;
 
-namespace Nethereum.BlockchainStore.Processing
+namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
     public class InMemoryBlockHandler : InMemoryHandlerBase, IBlockHandler
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nethereum.BlockchainStore.Processing
+namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
     public abstract class InMemoryHandlerBase
     {
