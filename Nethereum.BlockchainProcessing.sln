@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing", "Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj", "{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Tests", "Nethereum.BlockchainProcessing.Tests\Nethereum.BlockchainProcessing.Tests.csproj", "{2053B5F4-AED1-497C-B057-E4C19DE5A44B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.InMemory.Console", "Nethereum.BlockchainProcessing.InMemory.Console\Nethereum.BlockchainProcessing.InMemory.Console.csproj", "{ECC56AED-BA01-4403-80C8-20164CB3779D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2053B5F4-AED1-497C-B057-E4C19DE5A44B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2053B5F4-AED1-497C-B057-E4C19DE5A44B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2053B5F4-AED1-497C-B057-E4C19DE5A44B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2053B5F4-AED1-497C-B057-E4C19DE5A44B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECC56AED-BA01-4403-80C8-20164CB3779D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECC56AED-BA01-4403-80C8-20164CB3779D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECC56AED-BA01-4403-80C8-20164CB3779D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECC56AED-BA01-4403-80C8-20164CB3779D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8BDA708-C821-4538-93BC-8FC3DCC98B7B}
+	EndGlobalSection
+EndGlobal
