@@ -3,9 +3,14 @@ using System.Numerics;
 
 namespace Nethereum.RPC.Eth.DTOs
 {
+    public static class Address
+    {
+        public const string EmptyAsHex = "0x0";
+    }
+
     public static class Extensions
     {
-        public const string EmptyAddressHex = "0x0";
+        public const string EmptyAddressHex = Address.EmptyAsHex;
 
         public static int TransactionCount(this Block block)
         {
