@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         public IBlockProcessor Create(IWeb3Wrapper web3,
             IBlockchainProcessingStrategy strategy, bool postVm = false, bool processTransactionsInParallel = true)
         {
-            return Create(web3, new VmStackErrorCheckerWrapper(), strategy, postVm);
+            return Create(web3, new VmStackErrorCheckerWrapper(), strategy, postVm, processTransactionsInParallel);
         }
 
         public IBlockProcessor Create(
