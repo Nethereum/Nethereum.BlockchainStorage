@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
+using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
@@ -21,14 +22,14 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task UpsertAsync(string transactionHash, long logIndex, JObject log)
+        public async Task UpsertAsync(Log log)
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(transactionHash, logIndex).ConfigureAwait(false) 
+                var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(log.TransactionHash, log.LogIndex.ToLong()).ConfigureAwait(false) 
                           ?? new TransactionLog();
 
-                transactionLog.Map(transactionHash, logIndex, log);
+                transactionLog.Map(log);
                 transactionLog.UpdateRowDates();
 
                 context.TransactionLogs.AddOrUpdate(transactionLog);

@@ -18,6 +18,15 @@ namespace Nethereum.BlockchainStore.EF
                                            t.Hash == transactionHash);
         }
 
+        public static async Task<T> FindByBlockNumberAndHashAndAddressAsync<T>(this IQueryable<T> transactions, HexBigInteger blockNumber, string transactionHash, string address)
+            where T: AddressTransaction
+        {
+            var blockNumberString = blockNumber.Value.ToString();
+            return await transactions.AsNoTracking()
+                .SingleOrDefaultAsync(t => t.BlockNumber == blockNumberString &&
+                                           t.Hash == transactionHash && t.Address == address);
+        }
+
         public static async Task<Block> FindByBlockNumberAsync(this IQueryable<Block> blocks, HexBigInteger blockNumber)
         {
             var blockNumberString = blockNumber.Value.ToString();

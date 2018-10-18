@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
-namespace Nethereum.BlockchainStore
+namespace Nethereum.Configuration
 {
     public static class ConfigurationUtils
     {
@@ -43,8 +44,11 @@ namespace Nethereum.BlockchainStore
         {
             string path = FindAppSettingsDirectory(appSettingsFileName);
 
+            if (path == null && File.Exists(Path.Combine(Environment.CurrentDirectory, appSettingsFileName)))
+                path = Environment.CurrentDirectory;
+
             if(path == null)
-                throw new Exception("Failed to find the appsettings.json file.  Please ensure it is in somewhere within the path of the executable.");
+                throw new Exception($"Failed to find the appsettings.json file.  Please ensure it is in somewhere within the path of the executable.  Working Directory: {Environment.CurrentDirectory}");
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(path)
@@ -81,5 +85,28 @@ namespace Nethereum.BlockchainStore
 
             return builder.Build();
         }
+
+        public static IConfigurationRoot AddConsoleLogging(this IConfigurationRoot config)
+        {
+            ApplicationLogging.LoggerFactory.AddConsole(includeScopes: true);
+            return config;
+        }
+
+        public static string GetOrThrow(this IConfigurationRoot config, string key)
+        {
+            var val = config[key];
+
+            if(string.IsNullOrEmpty(val))
+                throw CreateKeyNotFoundException(key);
+
+            return val;
+        }
+    }
+
+    public static class ApplicationLogging
+    {
+        public static ILoggerFactory LoggerFactory {get;} = new LoggerFactory();
+        public static ILogger CreateLogger<T>() =>
+            LoggerFactory.CreateLogger<T>();
     }
 }

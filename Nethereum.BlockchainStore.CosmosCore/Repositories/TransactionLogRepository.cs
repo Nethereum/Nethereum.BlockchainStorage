@@ -6,6 +6,7 @@ using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -32,10 +33,10 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task UpsertAsync(string transactionHash, long logIndex, JObject log)
+        public async Task UpsertAsync(Log log)
         {
             var transactionLog = new CosmosTransactionLog(); { };
-            transactionLog.Map(transactionHash, logIndex, log);
+            transactionLog.Map(log);
             transactionLog.UpdateRowDates();
             await UpsertDocumentAsync(transactionLog);
         }

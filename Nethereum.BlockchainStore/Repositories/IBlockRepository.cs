@@ -1,14 +1,13 @@
 ﻿using Nethereum.BlockchainStore.Entities;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainStore.Processors
+namespace Nethereum.BlockchainStore.Repositories
 {
     public interface IBlockRepository
     {
-        Task UpsertBlockAsync(BlockWithTransactionHashes source);
-        Task<long> GetMaxBlockNumber();
+        Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source);
+        Task<long> GetMaxBlockNumberAsync();
         Task<IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber);
     }
 }

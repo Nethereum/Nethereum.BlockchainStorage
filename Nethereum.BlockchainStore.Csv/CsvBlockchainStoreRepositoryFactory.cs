@@ -1,5 +1,4 @@
 ﻿using Nethereum.BlockchainStore.Csv.Repositories;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using System;
 using System.IO;
@@ -22,7 +21,7 @@ namespace Nethereum.BlockchainStore.Csv
 
         public IAddressTransactionRepository CreateAddressTransactionRepository()
         {
-            return new AddressTransactionRepository();
+            return new AddressTransactionRepository(_csvFolderPath);
         }
 
         public IBlockRepository CreateBlockRepository()

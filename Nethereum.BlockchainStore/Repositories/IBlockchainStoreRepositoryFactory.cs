@@ -1,6 +1,4 @@
-﻿using Nethereum.BlockchainStore.Processors;
-
-namespace Nethereum.BlockchainStore.Repositories
+﻿namespace Nethereum.BlockchainStore.Repositories
 {
     public interface IBlockchainStoreRepositoryFactory
     {

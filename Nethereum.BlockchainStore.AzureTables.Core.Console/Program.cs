@@ -1,5 +1,7 @@
-﻿using Nethereum.BlockchainStore.AzureTables.Bootstrap;
+﻿using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 {
@@ -9,8 +11,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 
         public static int Main(string[] args)
         {
-            var appConfig = ConfigurationUtils.Build(args, userSecretsId: "Nethereum.BlockchainStore.AzureTables");
-            var configuration = BlockchainSourceConfigurationPresets.Get(appConfig);
+            var appConfig = ConfigurationUtils
+                .Build(args, userSecretsId: "Nethereum.BlockchainStore.AzureTables")
+                .AddConsoleLogging();
+
+            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
 
             var connectionString = appConfig[ConnectionStringKey];
 

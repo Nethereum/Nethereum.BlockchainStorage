@@ -1,6 +1,7 @@
 ﻿using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
@@ -33,8 +34,10 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 
             var log = JObject.Parse(
                 $@"{{
+                    transactionHash: '{transactionHash}',
                     address: '{address}', 
                     data: '{data}', 
+                    logIndex: '{logIndex}',
                     topics: 
                     [
                         '{topic0}',
@@ -42,9 +45,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                         '{topic2}',
                         '{topic3}'
                     ]
-                }}");
+                }}").ToObject<Log>();
 
-            await _repo.UpsertAsync(transactionHash, logIndex, log);
+            await _repo.UpsertAsync(log);
 
             var storedLog = await _repo.FindByTransactionHashAndLogIndexAsync(transactionHash, logIndex);
 

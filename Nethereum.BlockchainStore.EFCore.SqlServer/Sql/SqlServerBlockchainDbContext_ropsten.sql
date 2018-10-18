@@ -13,6 +13,18 @@ IF SCHEMA_ID(N'ropsten') IS NULL EXEC(N'CREATE SCHEMA [ropsten];');
 
 GO
 
+CREATE TABLE [ropsten].[AddressTransactions] (
+    [RowIndex] int NOT NULL IDENTITY,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
+    [BlockNumber] nvarchar(100) NOT NULL,
+    [Hash] nvarchar(67) NOT NULL,
+    [Address] nvarchar(43) NOT NULL,
+    CONSTRAINT [PK_AddressTransactions] PRIMARY KEY ([RowIndex])
+);
+
+GO
+
 CREATE TABLE [ropsten].[Blocks] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
@@ -109,6 +121,18 @@ CREATE TABLE [ropsten].[Transactions] (
 
 GO
 
+CREATE INDEX [IX_AddressTransactions_Address] ON [ropsten].[AddressTransactions] ([Address]);
+
+GO
+
+CREATE INDEX [IX_AddressTransactions_Hash] ON [ropsten].[AddressTransactions] ([Hash]);
+
+GO
+
+CREATE UNIQUE INDEX [IX_AddressTransactions_BlockNumber_Hash_Address] ON [ropsten].[AddressTransactions] ([BlockNumber], [Hash], [Address]);
+
+GO
+
 CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [ropsten].[Blocks] ([BlockNumber], [Hash]);
 
 GO
@@ -174,7 +198,7 @@ CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [ropsten].[Transaction
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20180817152350_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20181010105733_InitialCreate', N'2.1.1-rtm-30846');
 
 GO
 

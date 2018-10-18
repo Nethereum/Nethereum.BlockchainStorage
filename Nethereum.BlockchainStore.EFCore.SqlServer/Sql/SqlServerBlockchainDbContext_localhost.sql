@@ -13,6 +13,18 @@ IF SCHEMA_ID(N'localhost') IS NULL EXEC(N'CREATE SCHEMA [localhost];');
 
 GO
 
+CREATE TABLE [localhost].[AddressTransactions] (
+    [RowIndex] int NOT NULL IDENTITY,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
+    [BlockNumber] nvarchar(100) NOT NULL,
+    [Hash] nvarchar(67) NOT NULL,
+    [Address] nvarchar(43) NOT NULL,
+    CONSTRAINT [PK_AddressTransactions] PRIMARY KEY ([RowIndex])
+);
+
+GO
+
 CREATE TABLE [localhost].[Blocks] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
@@ -109,6 +121,18 @@ CREATE TABLE [localhost].[Transactions] (
 
 GO
 
+CREATE INDEX [IX_AddressTransactions_Address] ON [localhost].[AddressTransactions] ([Address]);
+
+GO
+
+CREATE INDEX [IX_AddressTransactions_Hash] ON [localhost].[AddressTransactions] ([Hash]);
+
+GO
+
+CREATE UNIQUE INDEX [IX_AddressTransactions_BlockNumber_Hash_Address] ON [localhost].[AddressTransactions] ([BlockNumber], [Hash], [Address]);
+
+GO
+
 CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [localhost].[Blocks] ([BlockNumber], [Hash]);
 
 GO
@@ -174,7 +198,7 @@ CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [localhost].[Transacti
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20180817152343_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20181010105726_InitialCreate', N'2.1.1-rtm-30846');
 
 GO
 

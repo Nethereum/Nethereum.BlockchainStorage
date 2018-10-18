@@ -3,19 +3,49 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
+using Nethereum.BlockchainStore.Entities.Mapping;
+using CsvHelper.Configuration;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
-    public class AddressTransactionRepository : IAddressTransactionRepository
+    public class AddressTransactionRepository : CsvRepositoryBase<Entities.AddressTransaction>, IAddressTransactionRepository
     {
-        public Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber, string transactionHash)
+        public AddressTransactionRepository(string csvFolderpath) : base(csvFolderpath, "AddressTransactions")
         {
-            return Task.FromResult((ITransactionView) null);
         }
 
-        public Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null)
+        public async Task<IAddressTransactionView> FindAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
-            return Task.CompletedTask;
+            return await FindAsync(
+                    row => row.BlockNumber == blockNumber.Value.ToString() && 
+                         row.Hash == transactionHash && 
+                         row.Address == address)
+                .ConfigureAwait(false);
+        }
+
+        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null)
+        {
+            AddressTransaction tx = new AddressTransaction();
+
+            tx.Map(transaction, address);
+            tx.UpdateRowDates();
+
+            await Write(tx);
+        }
+
+        protected override ClassMap<AddressTransaction> CreateClassMap()
+        {
+            return AddressTransactionMap.Instance;
+        }
+    }
+
+    public class AddressTransactionMap : ClassMap<Entities.AddressTransaction>
+    {
+        public static AddressTransactionMap Instance = new AddressTransactionMap();
+
+        public AddressTransactionMap()
+        {
+            AutoMap();
         }
     }
 }

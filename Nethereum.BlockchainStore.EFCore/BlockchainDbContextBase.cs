@@ -8,6 +8,7 @@ namespace Nethereum.BlockchainStore.EFCore
     public abstract class BlockchainDbContextBase: DbContext
     {
         public DbSet<Block> Blocks { get; set; }
+        public DbSet<AddressTransaction> AddressTransactions { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<TransactionLog> TransactionLogs { get; set; }
@@ -20,6 +21,7 @@ namespace Nethereum.BlockchainStore.EFCore
             modelBuilder.ApplyConfiguration(new TransactionEntityBuilder());
             modelBuilder.ApplyConfiguration(new TransactionLogEntityBuilder());
             modelBuilder.ApplyConfiguration(new TransactionLogVmStackEntityBuilder());
+            modelBuilder.ApplyConfiguration(new AddressTransactionBuilder());
             base.OnModelCreating(modelBuilder);
         }
     }

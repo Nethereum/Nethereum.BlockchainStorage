@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CsvHelper.Configuration;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Block = Nethereum.BlockchainStore.Entities.Block;
@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return await FindAsync(b => b.BlockNumber == blockNumber.Value.ToString());
         }
 
-        public async Task<long> GetMaxBlockNumber()
+        public async Task<long> GetMaxBlockNumberAsync()
         {
             long maxBlock = 0;
             await EnumerateAsync(e =>
@@ -38,7 +38,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return maxBlock;
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
+        public async Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source)
         {
             var block = new Block();
             block.Map(source);

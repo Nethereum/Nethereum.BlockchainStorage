@@ -17,6 +17,14 @@ namespace Nethereum.BlockchainStore.EFCore
                                            t.Hash == transactionHash);
         }
 
+        public static async Task<T> FindByBlockNumberAndHashAndAddressAsync<T>(this DbSet<T> transactions, HexBigInteger blockNumber, string transactionHash, string address)
+            where T: AddressTransaction
+        {
+            return await transactions
+                .SingleOrDefaultAsync(t => t.BlockNumber == blockNumber.Value.ToString() &&
+                                           t.Hash == transactionHash && t.Address == address);
+        }
+
         public static async Task<Block> FindByBlockNumberAsync(this DbSet<Block> blocks, HexBigInteger blockNumber)
         {
             return await blocks

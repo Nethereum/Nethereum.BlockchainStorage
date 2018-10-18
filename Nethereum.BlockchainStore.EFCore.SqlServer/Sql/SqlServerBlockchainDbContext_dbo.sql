@@ -9,6 +9,18 @@ END;
 
 GO
 
+CREATE TABLE [dbo].[AddressTransactions] (
+    [RowIndex] int NOT NULL IDENTITY,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
+    [BlockNumber] nvarchar(100) NOT NULL,
+    [Hash] nvarchar(67) NOT NULL,
+    [Address] nvarchar(43) NOT NULL,
+    CONSTRAINT [PK_AddressTransactions] PRIMARY KEY ([RowIndex])
+);
+
+GO
+
 CREATE TABLE [dbo].[Blocks] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
@@ -105,6 +117,18 @@ CREATE TABLE [dbo].[Transactions] (
 
 GO
 
+CREATE INDEX [IX_AddressTransactions_Address] ON [dbo].[AddressTransactions] ([Address]);
+
+GO
+
+CREATE INDEX [IX_AddressTransactions_Hash] ON [dbo].[AddressTransactions] ([Hash]);
+
+GO
+
+CREATE UNIQUE INDEX [IX_AddressTransactions_BlockNumber_Hash_Address] ON [dbo].[AddressTransactions] ([BlockNumber], [Hash], [Address]);
+
+GO
+
 CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [dbo].[Blocks] ([BlockNumber], [Hash]);
 
 GO
@@ -170,7 +194,7 @@ CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [dbo].[Transactions] (
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20180817152336_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20181010105719_InitialCreate', N'2.1.1-rtm-30846');
 
 GO
 

@@ -20,6 +20,18 @@ namespace Nethereum.BlockchainStore.CosmosCore.Entities
         }
     }
 
+    public class CosmosAddressTransaction: AddressTransaction, ICosmosEntity
+    {
+        private string _id;
+
+        [JsonProperty(PropertyName = "id")]
+        public string Id
+        {
+            get => _id ?? $"{BlockNumber}{Hash}{Address}";
+            set => _id = value;
+        }
+    }
+
     public class CosmosBlock : Block, ICosmosEntity
     {
         private string _id;

@@ -1,6 +1,10 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
 using Nethereum.BlockchainStore.Test.Base.RepositoryTests;
+using Nethereum.Configuration;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Tests
@@ -8,12 +12,19 @@ namespace Nethereum.BlockchainStore.CosmosCore.Tests
     public class CosmosFixture : IDisposable
     {
         public static readonly string[] CommandLineArgs = new string[] {};
-        public static readonly string UserSecretsId = "Nethereum.BlockchainStore.CosmosCore.UserSecrets.UnitTests";
 
         public CosmosFixture()
         {
             ConfigurationUtils.SetEnvironment("development");
-            var appConfig = ConfigurationUtils.Build(CommandLineArgs, UserSecretsId);
+            var appConfig = ConfigurationUtils.Build(CommandLineArgs);
+
+            //Azure Cosmos DB emulator settings
+            //https://localhost:8081/_explorer/index.html
+
+            appConfig.SetCosmosEndpointUri("https://localhost:8081");
+            appConfig.SetCosmosAccessKey(
+                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
+
             Factory = CosmosRepositoryFactory.Create(appConfig, deleteAllExistingCollections: true);
         }
 

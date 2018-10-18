@@ -5,7 +5,7 @@ using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
-    public class AddressTransaction : TransactionBase, ITransactionView
+    public class AddressTransaction : TransactionBase, ITransactionView, IAddressTransactionView
     {
         public AddressTransaction()
         {

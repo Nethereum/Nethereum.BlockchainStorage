@@ -4,6 +4,7 @@ using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
@@ -18,11 +19,11 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return await FindAsync(t => t.TransactionHash == hash && t.LogIndex == idx).ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(string transactionHash, long logIndex, JObject log)
+        public async Task UpsertAsync(Log log)
         {
             var transactionLog =  new TransactionLog();
 
-            transactionLog.Map(transactionHash, logIndex, log);
+            transactionLog.Map(log);
             transactionLog.UpdateRowDates();
 
             await Write(transactionLog).ConfigureAwait(false);

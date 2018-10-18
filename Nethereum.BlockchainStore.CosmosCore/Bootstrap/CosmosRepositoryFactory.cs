@@ -1,12 +1,11 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Extensions.Configuration;
 using Nethereum.BlockchainStore.CosmosCore.Repositories;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
 {
@@ -14,17 +13,9 @@ namespace Nethereum.BlockchainStore.CosmosCore.Bootstrap
     {
         public static CosmosRepositoryFactory Create(IConfigurationRoot config, bool deleteAllExistingCollections = false)
         {       
-            var endpointUri = config["CosmosEndpointUri"];
-
-            if(string.IsNullOrEmpty(endpointUri))
-                throw ConfigurationUtils.CreateKeyNotFoundException("CosmosEndpointUri");
-
-            var key = config["CosmosAccessKey"];
-
-            if(string.IsNullOrEmpty(endpointUri))
-                throw ConfigurationUtils.CreateKeyNotFoundException("CosmosAccessKey");
-
-            var tag = config["CosmosDbTag"];
+            var endpointUri = config.GetCosmosEndpointUrlOrThrow();
+            var key = config.GetCosmosAccessKeyOrThrow();
+            var tag = config.GetCosmosDbTag();
 
             var factory = new CosmosRepositoryFactory(endpointUri, key, tag);
 

@@ -1,4 +1,6 @@
-﻿using Nethereum.BlockchainStore.Processing;
+﻿using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainStore.Processing;
+using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.EF.Sqlite.Console
 {
@@ -6,10 +8,10 @@ namespace Nethereum.BlockchainStore.EF.Sqlite.Console
     {
         public static int Main(string[] args)
         {
-            var appConfig = ConfigurationUtils.Build(args);
+            var appConfig = ConfigurationUtils.Build(args).AddConsoleLogging();
             var contextFactory = new SqliteBlockchainDbContextFactory("BlockchainDbContext");
             var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
-            var configuration = BlockchainSourceConfigurationPresets.Get(appConfig);
+            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
             configuration.ProcessBlockTransactionsInParallel = false;
             return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }

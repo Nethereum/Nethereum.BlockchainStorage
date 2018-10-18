@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             Property(m => m.TransactionHash).IsHash();
 
             HasIndex(m => m.Name);
-            HasIndex(m => m.Address);
+            HasIndex(m => m.Address).IsUnique();
         }
     }
 }

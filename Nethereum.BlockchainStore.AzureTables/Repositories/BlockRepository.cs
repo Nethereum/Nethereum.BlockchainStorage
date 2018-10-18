@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Processors;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Block = Nethereum.BlockchainStore.AzureTables.Entities.Block;
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             _countersTable = countersTable;
         }
 
-        public async Task UpsertBlockAsync(BlockWithTransactionHashes source)
+        public async Task UpsertBlockAsync(RPC.Eth.DTOs.Block source)
         {
             await _lock.WaitAsync();
             try
@@ -63,7 +63,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             }
         }
 
-        public Block MapBlock(BlockWithTransactionHashes blockSource, Block blockOutput)
+        public Block MapBlock(RPC.Eth.DTOs.Block blockSource, Block blockOutput)
         {
             blockOutput.SetBlockNumber(blockSource.Number);
             blockOutput.SetDifficulty(blockSource.Difficulty);
@@ -77,12 +77,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             blockOutput.ParentHash = blockSource.ParentHash ?? string.Empty;
             blockOutput.Miner = blockSource.Miner ?? string.Empty;
             blockOutput.Nonce = string.IsNullOrEmpty(blockSource.Nonce) ? 0 : (long)new HexBigInteger(blockSource.Nonce).Value;
-            blockOutput.TransactionCount = blockSource.TransactionHashes.Length;
+
+            blockOutput.TransactionCount = blockSource.TransactionCount();
 
             return blockOutput;
         }
 
-        public async Task<long> GetMaxBlockNumber()
+        public async Task<long> GetMaxBlockNumberAsync()
         {
             await _lock.WaitAsync();
             try

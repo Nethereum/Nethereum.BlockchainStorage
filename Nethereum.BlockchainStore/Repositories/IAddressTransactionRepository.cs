@@ -8,9 +8,12 @@ namespace Nethereum.BlockchainStore.Repositories
 {
     public interface IAddressTransactionRepository
     {
-        Task UpsertAsync(Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null);
+        Task UpsertAsync(
+            Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, 
+            HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, 
+            string newContractAddress = null);
 
-        Task<ITransactionView> FindByAddressBlockNumberAndHashAsync(string addrees, HexBigInteger blockNumber,
-            string transactionHash);
+        Task<IAddressTransactionView> FindAsync(
+            string address, HexBigInteger blockNumber, string transactionHash);
     }
 }

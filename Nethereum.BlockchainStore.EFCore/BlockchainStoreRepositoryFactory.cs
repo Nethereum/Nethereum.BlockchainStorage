@@ -1,5 +1,4 @@
 ﻿using Nethereum.BlockchainStore.EFCore.Repositories;
-using Nethereum.BlockchainStore.Processors;
 using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.EFCore

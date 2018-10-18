@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using Nethereum.BlockchainStore.EF.EntityBuilders;
 using Nethereum.BlockchainStore.Entities;
 using BlockEntityBuilder = Nethereum.BlockchainStore.EF.EntityBuilders.BlockEntityBuilder;
 using ContractEntityBuilder = Nethereum.BlockchainStore.EF.EntityBuilders.ContractEntityBuilder;
@@ -15,6 +16,7 @@ namespace Nethereum.BlockchainStore.EF
         protected BlockchainDbContextBase(string connectionName) : base(connectionName){}
 
         public DbSet<Block> Blocks { get; set; }
+        public DbSet<AddressTransaction> AddressTransactions { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<TransactionLog> TransactionLogs { get; set; }
@@ -27,6 +29,7 @@ namespace Nethereum.BlockchainStore.EF
             modelBuilder.Configurations.Add(new TransactionEntityBuilder());
             modelBuilder.Configurations.Add(new TransactionLogEntityBuilder());
             modelBuilder.Configurations.Add(new TransactionLogVmStackEntityBuilder());
+            modelBuilder.Configurations.Add(new AddressTransactionEntityBuilder());
             base.OnModelCreating(modelBuilder);
         }
     }
