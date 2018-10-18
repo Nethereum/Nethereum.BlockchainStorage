@@ -1,5 +1,14 @@
 # Nethereum Blockchain Store
 
+## Upcoming Changes
+**WARNING** - THIS DESIGN AND DOCUMENTATION ARE CURRENTLY BEING UPDATED. 
+The solution is being split to allow processing libraries to exist separately from the storage.
+
+Temporarily - the processing code has been put in to the Nethereum.BlockchainProcessing namespace and in to the Processing folder of the solution.
+This will shortly be moved to another repo and referenced from Nuget.
+
+## Blockchain Storage
+
 The Nethereum blockhain store is a library that allows the retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
 
 The current implementation processes and stores Blocks, Transactions, Logs, Contracts and the VM Stack.
