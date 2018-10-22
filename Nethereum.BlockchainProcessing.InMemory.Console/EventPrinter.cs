@@ -23,9 +23,9 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             System.Console.WriteLine($"[EVENT]");
             System.Console.WriteLine($"\t[{_eventName}]");
-            foreach (var prop in eventValues.GetType().GetProperties())
+            foreach (var prop in eventValues?.Event.GetType().GetProperties())
             {
-                System.Console.WriteLine($"\t\t[{prop.Name}:{prop.GetValue(eventValues) ?? "null"}]");
+                System.Console.WriteLine($"\t\t[{prop.Name}:{prop.GetValue(eventValues.Event) ?? "null"}]");
             }
 
             return Task.CompletedTask;
