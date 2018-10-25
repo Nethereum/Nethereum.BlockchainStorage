@@ -11,11 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nethereum.Geth" Version="3.0.0-rc1" />
-    <PackageReference Include="Nethereum.Web3" Version="3.0.0-rc1" />  
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Utils\Nethereum.Configuration.csproj" />
