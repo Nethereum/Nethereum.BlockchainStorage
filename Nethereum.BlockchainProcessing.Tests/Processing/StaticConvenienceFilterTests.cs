@@ -62,6 +62,18 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
         }
 
         [Fact]
+        public async Task TransactionFilter_To_Reports_Matches_Many()
+        {
+            var tx1 = new Transaction {To = Address1};
+            var tx2 = new Transaction {To = Address2};
+            var tx3 = new Transaction {To = UnknownAddress};
+            var filter = TransactionFilter.To(new []{Address1, Address2});
+            Assert.True(await filter.IsMatchAsync(tx1));  
+            Assert.True(await filter.IsMatchAsync(tx2));
+            Assert.False(await filter.IsMatchAsync(tx3));
+        }
+
+        [Fact]
         public async Task TransactionFilter_To_Reports_Non_Matches()
         {
             var tx = new Transaction {To = Address2};
