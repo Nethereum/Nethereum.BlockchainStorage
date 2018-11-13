@@ -34,6 +34,11 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             return new TransactionFilter((t) => toAddresses.Any(t.IsToOrEmpty));
         }
 
+        public static TransactionFilter To(IEnumerable<string> toAddresses)
+        {
+            return new TransactionFilter((t) => toAddresses.Any(t.IsTo));
+        }
+
         public static TransactionFilter From(string fromAddress)
         {
             return new TransactionFilter((t) => t.IsFrom(fromAddress));
