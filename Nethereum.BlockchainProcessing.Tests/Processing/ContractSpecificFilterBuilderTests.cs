@@ -67,10 +67,10 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
             var receipt = new TransactionReceipt {ContractAddress = AnotherAddress};
 
             Assert.True(await 
-                builder.FilterContainer.TransactionFilters.IsMatchAsync((tx)));
+                builder.Filters.TransactionFilters.IsMatchAsync((tx)));
 
             Assert.False(await 
-                builder.FilterContainer.TransactionReceiptFilters.IsMatchAsync((receipt)));
+                builder.Filters.TransactionReceiptFilters.IsMatchAsync((receipt)));
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
             var tx = new Transaction {To = AnotherAddress};
 
             Assert.False(await 
-                builder.FilterContainer.TransactionFilters.IsMatchAsync((tx)));
+                builder.Filters.TransactionFilters.IsMatchAsync((tx)));
 
         }
 
@@ -99,12 +99,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
         {
             var builder = new ContractSpecificFilterBuilder(ContractAddress1);
 
-            Assert.Single(builder.FilterContainer.TransactionFilters);
-            Assert.Single(builder.FilterContainer.TransactionReceiptFilters);
+            Assert.Single(builder.Filters.TransactionFilters);
+            Assert.Single(builder.Filters.TransactionReceiptFilters);
 
-            Assert.Null(builder.FilterContainer.BlockFilters);
-            Assert.Null(builder.FilterContainer.TransactionAndReceiptFilters);
-            Assert.Null(builder.FilterContainer.TransactionLogFilters);
+            Assert.Null(builder.Filters.BlockFilters);
+            Assert.Null(builder.Filters.TransactionAndReceiptFilters);
+            Assert.Null(builder.Filters.TransactionLogFilters);
         }
 
 

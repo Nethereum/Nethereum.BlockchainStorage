@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processors;
+﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
 
 namespace Nethereum.BlockchainProcessing.Processing
@@ -8,13 +9,15 @@ namespace Nethereum.BlockchainProcessing.Processing
         IBlockProcessor Create(
             IWeb3Wrapper web3, 
             IVmStackErrorChecker vmStackErrorChecker, 
-            IBlockchainProcessingStrategy strategy, 
+            HandlerContainer handlers,
+            FilterContainer filters,
             bool postVm = false, 
             bool processTransactionsInParallel = false);
 
         IBlockProcessor Create(
             IWeb3Wrapper web3, 
-            IBlockchainProcessingStrategy strategy, 
+            HandlerContainer handlers,
+            FilterContainer filters,
             bool postVm = false, 
             bool processTransactionsInParallel = false);
     }

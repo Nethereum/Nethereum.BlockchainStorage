@@ -1,24 +1,19 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.Processors;
+﻿using Microsoft.Extensions.Logging;
 using Nethereum.Configuration;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public class BlockchainProcessor
     {
         private readonly IBlockchainProcessingStrategy _strategy;
-        private readonly IBlockProcessor _blockProcessor;
         private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockchainProcessor>();
 
         public BlockchainProcessor(
-            IBlockchainProcessingStrategy strategy, 
-            IBlockProcessor blockProcessor
-            )
+            IBlockchainProcessingStrategy strategy)
         {
             this._strategy = strategy;
-            this._blockProcessor = blockProcessor;
         }
 
         /// <summary>
@@ -60,10 +55,10 @@ namespace Nethereum.BlockchainProcessing.Processing
 
             _log.LogInformation("Begin BlockEnumeration");
             return await new BlockEnumeration(
-                    (blkNumber) => _blockProcessor.ProcessBlockAsync(blkNumber), 
+                    (blkNumber) => _strategy.ProcessBlockAsync(blkNumber), 
                     (retryNum) => _strategy.WaitForNextBlock(retryNum),
                     (retryNum) => _strategy.PauseFollowingAnError(retryNum), 
-                    () => _blockProcessor.GetMaxBlockNumberAsync(),
+                    () => _strategy.GetMaxBlockNumberAsync(),
                     _strategy.MinimumBlockConfirmations,
                     _strategy.MaxRetries,
                     cancellationToken,

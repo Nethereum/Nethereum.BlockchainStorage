@@ -24,7 +24,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             System.Console.WriteLine($"Target Node/Name (URL): {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
             
             //only process transactions that created or called our contract
-            var contractSpecificFilterBuilder = new ContractSpecificFilterBuilder(ContractAddress);
+            var filters = new ContractSpecificFilterBuilder(ContractAddress).Filters;
             
             //for specific functions on our contract, output the name and input arg values
             var transactionRouter = new TransactionRouter();
@@ -38,20 +38,26 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             var transactionLogRouter = new TransactionLogRouter();
             transactionLogRouter.AddHandler(new EventPrinter<TransferEvent>());
 
-            var strategy = new ProcessingStrategy
+            var handlers = new HandlerContainer()
             {
-                Filters = contractSpecificFilterBuilder.FilterContainer,
                 TransactionHandler = transactionRouter,
                 TransactionLogHandler = transactionLogRouter,
-                MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
             };
 
             var web3Wrapper = new Web3Wrapper(targetBlockchain.BlockchainUrl);
-            var blockProcessorFactory = new BlockProcessorFactory();
-            var blockProcessor = blockProcessorFactory.Create(
-                web3Wrapper, strategy, processTransactionsInParallel: false);
 
-            var blockchainProcessor = new BlockchainProcessor(strategy, blockProcessor);
+            var blockProcessor = new BlockProcessorFactory().Create(
+                web3Wrapper, 
+                handlers, 
+                filters, 
+                processTransactionsInParallel: false);
+
+            var strategy = new ProcessingStrategy(blockProcessor)
+            {
+                MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
+            };
+
+            var blockchainProcessor = new BlockchainProcessor(strategy);
 
             blockchainProcessor.ExecuteAsync
                 (targetBlockchain.FromBlock, targetBlockchain.ToBlock)

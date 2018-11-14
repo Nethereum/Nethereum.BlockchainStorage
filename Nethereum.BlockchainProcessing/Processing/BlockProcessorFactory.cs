@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processors;
+﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.PostProcessors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
@@ -8,30 +9,30 @@ namespace Nethereum.BlockchainProcessing.Processing
     public class BlockProcessorFactory : IBlockProcessorFactory
     {
         public IBlockProcessor Create(IWeb3Wrapper web3,
-            IBlockchainProcessingStrategy strategy, bool postVm = false, bool processTransactionsInParallel = true)
+            HandlerContainer handlers, FilterContainer filters = null, bool postVm = false, bool processTransactionsInParallel = true)
         {
-            return Create(web3, new VmStackErrorCheckerWrapper(), strategy, postVm, processTransactionsInParallel);
+            return Create(web3, new VmStackErrorCheckerWrapper(), handlers, filters, postVm, processTransactionsInParallel);
         }
 
         public IBlockProcessor Create(
             IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, 
-            IBlockchainProcessingStrategy strategy, bool postVm = false, bool processTransactionsInParallel = true)
+            HandlerContainer handlers, FilterContainer filters = null, bool postVm = false, bool processTransactionsInParallel = true)
         {
 
             var transactionLogProcessor = new TransactionLogProcessor(
-                strategy.Filters?.TransactionLogFilters,
-                strategy.TransactionLogHandler);
+                filters?.TransactionLogFilters,
+                handlers.TransactionLogHandler);
 
             var contractTransactionProcessor = new ContractTransactionProcessor(
-                web3, vmStackErrorChecker, strategy.ContractHandler,
-                strategy.TransactionHandler, strategy.TransactionVmStackHandler);
+                web3, vmStackErrorChecker, handlers.ContractHandler,
+                handlers.TransactionHandler, handlers.TransactionVmStackHandler);
 
             var contractCreationTransactionProcessor = new ContractCreationTransactionProcessor(
-                web3, strategy.ContractHandler,
-                strategy.TransactionHandler);
+                web3, handlers.ContractHandler,
+                handlers.TransactionHandler);
 
             var valueTransactionProcessor = new ValueTransactionProcessor(
-                strategy.TransactionHandler);
+                handlers.TransactionHandler);
 
             var transactionProcessor = new TransactionProcessor(
                 web3, 
@@ -39,20 +40,20 @@ namespace Nethereum.BlockchainProcessing.Processing
                 valueTransactionProcessor, 
                 contractCreationTransactionProcessor, 
                 transactionLogProcessor,
-                strategy.Filters?.TransactionFilters, 
-                strategy.Filters?.TransactionReceiptFilters,
-                strategy.Filters?.TransactionAndReceiptFilters);
+                filters?.TransactionFilters, 
+                filters?.TransactionReceiptFilters,
+                filters?.TransactionAndReceiptFilters);
 
             if (postVm)
                 return new BlockVmPostProcessor(
-                    web3, strategy.BlockHandler, transactionProcessor)
+                    web3, handlers.BlockHandler, transactionProcessor)
                 {
                     ProcessTransactionsInParallel = processTransactionsInParallel
                 };
 
             transactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = false;
             return new BlockProcessor(
-                web3, strategy.BlockHandler, transactionProcessor, strategy.Filters?.BlockFilters)
+                web3, handlers.BlockHandler, transactionProcessor, filters?.BlockFilters)
             {
                 ProcessTransactionsInParallel = processTransactionsInParallel
             };

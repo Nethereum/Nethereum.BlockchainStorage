@@ -9,7 +9,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
     {
         public ITransactionFilter TransactionFilter { get; }
         public ITransactionReceiptFilter TransactionReceiptFilter { get; }
-        public FilterContainer FilterContainer { get; }
+        public FilterContainer Filters { get; }
 
         public ContractSpecificFilterBuilder(IEnumerable<string> contractAddresses)
         {
@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             TransactionFilter = Transactions.TransactionFilter.ToOrEmpty(addresses);
             TransactionReceiptFilter = Transactions.TransactionReceiptFilter.ForContractOrEmpty(addresses);
 
-            FilterContainer = new FilterContainer(
+            Filters = new FilterContainer(
                 TransactionFilter,
                 TransactionReceiptFilter); 
         }

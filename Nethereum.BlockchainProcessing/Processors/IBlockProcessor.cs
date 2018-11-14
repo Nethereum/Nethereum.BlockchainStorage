@@ -6,7 +6,6 @@ namespace Nethereum.BlockchainProcessing.Processors
     {
         bool ProcessTransactionsInParallel { get;set; }
         Task ProcessBlockAsync(long blockNumber);
-
         Task<long> GetMaxBlockNumberAsync();
     }
 }

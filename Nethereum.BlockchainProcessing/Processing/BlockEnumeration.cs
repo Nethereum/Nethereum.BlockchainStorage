@@ -56,7 +56,7 @@ namespace Nethereum.BlockchainProcessing.Processing
                 {
                     if (_cancellationToken.IsCancellationRequested) return false;
 
-                    await WaitForBlockConfirmations();
+                    await WaitForBlockConfirmations().ConfigureAwait(false);
 
                     LogProcessBlockAttempt();
 
@@ -69,10 +69,10 @@ namespace Nethereum.BlockchainProcessing.Processing
                     LogError(blockNotFoundException);
 
                     if (_runContinuously)
-                        return await WaitForNextBlockAndRetry();
+                        return await WaitForNextBlockAndRetry().ConfigureAwait(false);
 
                     if (WithinRetryLimit())
-                        return await PauseAndRetry();
+                        return await PauseAndRetry().ConfigureAwait(false);
 
                     LogBlockSkipped();
                     IncrementBlockAndResetRetries();
@@ -82,7 +82,7 @@ namespace Nethereum.BlockchainProcessing.Processing
                     LogError(ex);
 
                     if (WithinRetryLimit())
-                        return await PauseAndRetry();
+                        return await PauseAndRetry().ConfigureAwait(false);
 
                     LogBlockSkipped();
                     IncrementBlockAndResetRetries();
@@ -97,21 +97,21 @@ namespace Nethereum.BlockchainProcessing.Processing
             if (_minimumBlockConfirmations < 1) return;
 
             if (_maxBlockNumber == null)
-                await RefreshMaxBlockNumber();
+                await RefreshMaxBlockNumber().ConfigureAwait(false);
 
             int retryNumber = 0;
             while ((_maxBlockNumber - _currentBlock) < _minimumBlockConfirmations)
             {
                 _log.LogInformation($"Waiting for current block ({_currentBlock}) to be more than {_minimumBlockConfirmations} confirmations behind the max block on the chain ({_maxBlockNumber})");
-                await _waitForBlockAvailability(retryNumber);
+                await _waitForBlockAvailability(retryNumber).ConfigureAwait(false);
                 retryNumber++;
-                await RefreshMaxBlockNumber();
+                await RefreshMaxBlockNumber().ConfigureAwait(false);
             }
         }
 
         private async Task RefreshMaxBlockNumber()
         {
-            _maxBlockNumber = await _getMaxBlockNumber();
+            _maxBlockNumber = await _getMaxBlockNumber().ConfigureAwait(false);
         }
 
         private void LogBlockSkipped()
@@ -122,7 +122,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         private async Task<bool> WaitForNextBlockAndRetry()
         {
             _log?.LogInformation($"Waiting for block {_currentBlock}...");
-            await _waitForBlockAvailability(_retryNumber);
+            await _waitForBlockAvailability(_retryNumber).ConfigureAwait(false);
             _retryNumber++;
             return await ExecuteAsync().ConfigureAwait(false);
         }
@@ -135,7 +135,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         private async Task<bool> PauseAndRetry()
         {
             _log?.LogInformation($"Pausing before next process Attempt.  Block: {_currentBlock}, Attempt: {_retryNumber}.");
-            await _pauseFollowingAnError(_retryNumber);
+            await _pauseFollowingAnError(_retryNumber).ConfigureAwait(false);
             _retryNumber++;
             return await ExecuteAsync().ConfigureAwait(false);
         }

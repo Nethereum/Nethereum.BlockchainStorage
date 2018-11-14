@@ -1,6 +1,5 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.JsonRpc.Client;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,11 +14,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         protected Mock<IBlockchainProcessingStrategy> MockProcessingStrategy =
             new Mock<IBlockchainProcessingStrategy>();
 
-        protected Mock<IBlockProcessor> MockBlockProcessor = new Mock<IBlockProcessor>();
-
         public BlockchainProcessorTests()
         {
-            Processor = new BlockchainProcessor(MockProcessingStrategy.Object, MockBlockProcessor.Object);
+            Processor = new BlockchainProcessor(MockProcessingStrategy.Object);
         }
 
         public class ExecuteAsyncTests : BlockchainProcessorTests
@@ -45,7 +42,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 await Processor.ExecuteAsync(startBlock: 0, endBlock: 0, cancellationToken: cancellationTokenSource.Token);
 
                 MockProcessingStrategy.VerifyAll();
-                MockBlockProcessor.Verify(p => p.ProcessBlockAsync(It.IsAny<long>()), Times.Never);
+                MockProcessingStrategy.Verify(p => p.ProcessBlockAsync(It.IsAny<long>()), Times.Never);
 
             }
 
@@ -60,12 +57,12 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
                     for (var block = StartBlock; block <= EndBlock; block++)
                     {
-                        MockBlockProcessor.Setup(p => p.ProcessBlockAsync(block)).Returns(Task.CompletedTask);
+                        MockProcessingStrategy.Setup(p => p.ProcessBlockAsync(block)).Returns(Task.CompletedTask);
                     }
 
                     Assert.True(await Processor.ExecuteAsync(StartBlock, EndBlock));
 
-                    MockBlockProcessor.VerifyAll();
+                    MockProcessingStrategy.VerifyAll();
                 }
 
                 [Fact]
@@ -80,7 +77,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .Setup(s => s.MinimumBlockConfirmations)
                         .Returns(RequiredBlockConfirmations);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.GetMaxBlockNumberAsync())
                         .Callback(() => maxBlockNumber++)
                         .ReturnsAsync(() => maxBlockNumber);
@@ -90,7 +87,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .Callback<int>((retryNumber) => numberOfWaitCycles++)
                         .Returns(Task.CompletedTask);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
                         .Returns(() =>
                         {
@@ -105,7 +102,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     Assert.Equal(1, blocksProcessed);
                     Assert.Equal(RequiredBlockConfirmations - 1, numberOfWaitCycles);
                     Assert.Equal(RequiredBlockConfirmations, maxBlockNumber);
-                    MockBlockProcessor.VerifyAll();
                     MockProcessingStrategy.VerifyAll();
                 }
 
@@ -126,7 +122,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     MockProcessingStrategy
                         .SetupGet(s => s.MaxRetries).Returns(MaxRetries);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
                         .Callback<long>((blkNum) => timesThrown++)
                         .Throws(blockProcessingException);
@@ -154,12 +150,12 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 {
                     var cancellationTokenSource = new CancellationTokenSource();
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
                         .Returns(Task.CompletedTask)
                         .Verifiable("ProcessBlockAsync should have been called for Block 0");
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(1))
                         .Callback<long>(blkNum => cancellationTokenSource.Cancel())
                         .Returns(Task.CompletedTask)
@@ -170,7 +166,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     Assert.False(result,
                         "Result should be false because execution was cancelled by cancellation token source after block number 1");
 
-                    MockBlockProcessor.VerifyAll();
+                    MockProcessingStrategy.VerifyAll();
                 }
 
                 [Fact]
@@ -187,7 +183,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .Setup(s => s.MinimumBlockConfirmations)
                         .Returns(RequiredBlockConfirmations);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.GetMaxBlockNumberAsync())
                         .Callback(() => maxBlockNumber++)
                         .ReturnsAsync(() => maxBlockNumber);
@@ -197,7 +193,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .Callback<int>((retryNumber) => numberOfWaitCycles++)
                         .Returns(Task.CompletedTask);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
                         .Returns(() =>
                         {
@@ -213,7 +209,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     Assert.Equal(1, blocksProcessed);
                     Assert.Equal(RequiredBlockConfirmations - 1, numberOfWaitCycles);
                     Assert.Equal(RequiredBlockConfirmations, maxBlockNumber);
-                    MockBlockProcessor.VerifyAll();
                     MockProcessingStrategy.VerifyAll();
                 }
 
@@ -222,7 +217,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 {
                     var cancellationTokenSource = new CancellationTokenSource();
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
                         .Throws(new BlockNotFoundException(0));
 
@@ -239,9 +234,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     Assert.False(result,
                         "Result should be false because execution was cancelled by cancellation token source");
 
-                    MockBlockProcessor.VerifyAll();
                     MockProcessingStrategy.VerifyAll();
-
                 }
 
             }
@@ -262,14 +255,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .Setup(s => s.GetLastBlockProcessedAsync())
                         .ReturnsAsync(LastBlockProcessed);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(ExpectedStartBlock))
                         .Returns(Task.CompletedTask);
 
                     await Processor.ExecuteAsync(startBlock: null, endBlock: EndingBlock);
 
                     MockProcessingStrategy.VerifyAll();
-                    MockBlockProcessor.VerifyAll();
                 }
 
                 [Fact]
@@ -279,21 +271,21 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     const long MinimumStartingBlock = 20;
                     const long EndingBlock = MinimumStartingBlock;
 
-                    MockProcessingStrategy.SetupGet(s => s.MinimumBlockNumber).Returns(MinimumStartingBlock);
+                    MockProcessingStrategy
+                        .SetupGet(s => s.MinimumBlockNumber)
+                        .Returns(MinimumStartingBlock);
 
                     MockProcessingStrategy
                         .Setup(s => s.GetLastBlockProcessedAsync())
                         .ReturnsAsync(LastBlockProcessed);
 
-                    MockBlockProcessor
+                    MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(MinimumStartingBlock))
                         .Returns(Task.CompletedTask);
 
                     await Processor.ExecuteAsync(startBlock: null, endBlock: EndingBlock);
 
                     MockProcessingStrategy.VerifyAll();
-                    MockBlockProcessor.VerifyAll();
-
                 }
             }
         }

@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Handlers;
+﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
-using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processors
 {
     public class BlockProcessor : IBlockProcessor
     {
-        private readonly IBlockHandler _blockHandler;
-        private readonly IEnumerable<IBlockFilter> _blockFilters;
-
         protected IBlockProxy BlockProxy { get; }
-        protected ITransactionProcessor TransactionProcessor { get; set; }
+        protected IBlockHandler BlockHandler { get; }
+        protected IEnumerable<IBlockFilter> BlockFilters { get; }
+        protected ITransactionProcessor TransactionProcessor { get; }
 
-        public bool ProcessTransactionsInParallel { get; set; } = true;
-
-        readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private long _lastBlock = -1;
         private readonly object _sync = new object();
 
@@ -32,10 +28,12 @@ namespace Nethereum.BlockchainProcessing.Processors
            )
         {
             BlockProxy = blockProxy;
-            _blockHandler = blockHandler;
+            BlockHandler = blockHandler;
             TransactionProcessor = transactionProcessor;
-            _blockFilters = blockFilters ?? new IBlockFilter[0];
+            BlockFilters = blockFilters ?? new IBlockFilter[0];
         }
+
+        public bool ProcessTransactionsInParallel { get; set; } = true;
 
         public virtual async Task ProcessBlockAsync(long blockNumber)
         {
@@ -50,9 +48,9 @@ namespace Nethereum.BlockchainProcessing.Processors
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
 
-            if (await _blockFilters.IsMatchAsync(block))
+            if (await BlockFilters.IsMatchAsync(block))
             {
-                await _blockHandler.HandleAsync(block);
+                await BlockHandler.HandleAsync(block);
 
                 if (ProcessTransactionsInParallel)
                     await ProcessTransactionsMultiThreaded(block);
@@ -96,7 +94,7 @@ namespace Nethereum.BlockchainProcessing.Processors
             {
                 if (!HasAlreadyBeenProcessed(txn))
                 {
-                    await TransactionProcessor.ProcessTransactionAsync(block, txn);
+                    await TransactionProcessor.ProcessTransactionAsync(block, txn).ConfigureAwait(false);
                     MarkAsProcessed(txn);
                 }
             }
@@ -120,7 +118,7 @@ namespace Nethereum.BlockchainProcessing.Processors
                 }
             }
 
-            await Task.WhenAll(txTasks);
+            await Task.WhenAll(txTasks).ConfigureAwait(false);
         }
     }
 }
