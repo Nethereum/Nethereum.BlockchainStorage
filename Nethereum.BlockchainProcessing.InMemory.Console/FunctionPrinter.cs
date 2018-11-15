@@ -8,15 +8,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
     public class FunctionPrinter<TFunctionInput>: ITransactionHandler<TFunctionInput> where TFunctionInput : FunctionMessage, new()
     {
-        private readonly FunctionABI _functionAbi;
-
-        public FunctionPrinter()
-        {
-            _functionAbi = ABITypedRegistry.GetFunctionABI<TFunctionInput>();
-
-            if(_functionAbi == null)
-                throw new ArgumentException("Function for TFunctionInput not found in contract");
-        }
+        private readonly FunctionABI _functionAbi = ABITypedRegistry.GetFunctionABI<TFunctionInput>();
 
         public Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
         {
