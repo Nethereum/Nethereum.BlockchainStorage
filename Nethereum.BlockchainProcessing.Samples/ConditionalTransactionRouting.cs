@@ -1,20 +1,20 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.ABI.Model;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
-using Nethereum.Configuration;
 using Nethereum.Contracts;
-using System;
+using Nethereum.RPC.Eth.DTOs;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Nethereum.ABI.Model;
-using Nethereum.RPC.Eth.DTOs;
+using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
 {
     public class ConditionalTransactionRouting
     {
+        #region DTO's to represent function input parameters for a known solidity contract
         [Function("buyApprenticeChest")]
         public class BuyApprenticeFunction: FunctionMessage
         {
@@ -28,82 +28,71 @@ namespace Nethereum.BlockchainProcessing.Samples
             [Parameter("uint256", "_identifier", 1)]
             public BigInteger Identifier { get; set; }
         }
+        #endregion
 
-        public class BasicTransactionPrinter : ITransactionHandler
+        public class CatchAllTransactionHandler : ITransactionHandler
         {
+            public List<TransactionWithReceipt> TransactionsHandled = new List<TransactionWithReceipt>();
+            public List<ContractCreationTransaction> ContractCreationTransactionsHandled = new List<ContractCreationTransaction>();
+            
             public Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
             {
-                System.Console.WriteLine($"Hash: {contractCreationTransaction.Transaction.TransactionHash}, Sender:{contractCreationTransaction.Transaction.From}");
+                ContractCreationTransactionsHandled.Add(contractCreationTransaction);
                 return Task.CompletedTask;
             }
 
             public Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
             {
-                System.Console.WriteLine($"Hash: {transactionWithReceipt.Transaction.TransactionHash}, Sender:{transactionWithReceipt.Transaction.From}");
+                TransactionsHandled.Add(transactionWithReceipt); 
                 return Task.CompletedTask;
             }
         }
 
-        public class FunctionPrinter<TFunctionInput>: ITransactionHandler<TFunctionInput> where TFunctionInput : FunctionMessage, new()
+        public class FunctionHandler<TFunctionInput>: ITransactionHandler<TFunctionInput> where TFunctionInput : FunctionMessage, new()
         {
-            private readonly FunctionABI _functionAbi = ABITypedRegistry.GetFunctionABI<TFunctionInput>();
+            public List<ContractCreationTransaction> ContractCreationTransactionsHandled = new List<ContractCreationTransaction>();
+            public List<(TransactionWithReceipt, TFunctionInput)> FunctionsHandled = new List<(TransactionWithReceipt, TFunctionInput)>();
 
             public Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
             {
+                ContractCreationTransactionsHandled.Add(contractCreationTransaction);
                 return Task.CompletedTask;
             }
 
             public Task HandleTransactionAsync(TransactionWithReceipt txnWithReceipt)
             {
-                if (!txnWithReceipt.IsForFunction<TFunctionInput>())
-                    return Task.CompletedTask;
-
                 var dto = txnWithReceipt.Decode<TFunctionInput>();
-
-                Print(dto);
-
+                FunctionsHandled.Add((txnWithReceipt, dto));
                 return Task.CompletedTask;
             }
 
-            private void Print(TFunctionInput dto)
-            {
-                System.Console.WriteLine($"[FUNCTION]");
-                System.Console.WriteLine($"\t{_functionAbi.Name ?? "unknown"}");
-
-                foreach (var prop in dto.GetType().GetProperties())
-                {
-                    System.Console.WriteLine($"\t\t[{prop.Name}:{prop.GetValue(dto) ?? "null"}]");
-                }
-            }
         }
 
+        [Fact]
         public async Task Run()
         {
-            ApplicationLogging.LoggerFactory.AddConsole(includeScopes: true);
+            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
 
-            var targetBlockchain = new BlockchainSourceConfiguration(
-                blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60",
-                name: "rinkeby") {FromBlock = 3146684, ToBlock = 3146709};
-            
-            var web3Wrapper = new Web3Wrapper(targetBlockchain.BlockchainUrl);
+            var catchAllHandler = new CatchAllTransactionHandler();
+            var openChestHandler = new FunctionHandler<OpenChestFunction>();
+            var buyApprenticeHandler = new FunctionHandler<BuyApprenticeFunction>();
 
             var transactionRouter = new TransactionRouter();
 
             //to be invoked for every tx
-            transactionRouter.AddTransactionHandler(new BasicTransactionPrinter());
+            transactionRouter.AddTransactionHandler(catchAllHandler);
 
             //to be invoked if function matches
-            transactionRouter.AddTransactionHandler<OpenChestFunction>(
-                new FunctionPrinter<OpenChestFunction>());
+            transactionRouter.AddTransactionHandler(openChestHandler);
 
             //to be invoked if tx is from a specific address and function matches
-            transactionRouter.AddTransactionHandler<BuyApprenticeFunction>(
+            transactionRouter.AddTransactionHandler(
                 (txn) => txn.Transaction.IsTo("0xC03cDD393C89D169bd4877d58f0554f320f21037"), 
-                new FunctionPrinter<BuyApprenticeFunction>());
+                buyApprenticeHandler);
 
             var handlers = new HandlerContainer{ TransactionHandler = transactionRouter};
 
-            var blockProcessor = new BlockProcessorFactory().Create(
+            var blockProcessor = BlockProcessorFactory.Create(
                 web3Wrapper, 
                 handlers,
                 processTransactionsInParallel: false);
@@ -111,8 +100,18 @@ namespace Nethereum.BlockchainProcessing.Samples
             var processingStrategy = new ProcessingStrategy(blockProcessor);
             var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 
-            await blockchainProcessor.ExecuteAsync
-                (targetBlockchain.FromBlock, targetBlockchain.ToBlock);
+            //run once to catch first instance of function call
+            var result = await blockchainProcessor.ExecuteAsync(3146684, 3146684);
+            //run again (deliberately skipping irrelevant blocks to reduce unit test duration)
+            result = await blockchainProcessor.ExecuteAsync(3146709, 3146709);
+
+            Assert.True(result);
+            Assert.Single(openChestHandler.FunctionsHandled);
+            Assert.Empty(openChestHandler.ContractCreationTransactionsHandled);
+            Assert.Single(buyApprenticeHandler.FunctionsHandled);
+            Assert.Empty(buyApprenticeHandler.ContractCreationTransactionsHandled);
+            Assert.Equal(31, catchAllHandler.TransactionsHandled.Count);
+
         }
     }
 }

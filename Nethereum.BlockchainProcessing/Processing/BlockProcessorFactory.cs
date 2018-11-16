@@ -6,15 +6,15 @@ using Nethereum.BlockchainProcessing.Web3Abstractions;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class BlockProcessorFactory : IBlockProcessorFactory
+    public static class BlockProcessorFactory
     {
-        public IBlockProcessor Create(IWeb3Wrapper web3,
+        public static IBlockProcessor Create(IWeb3Wrapper web3,
             HandlerContainer handlers, FilterContainer filters = null, bool postVm = false, bool processTransactionsInParallel = true)
         {
             return Create(web3, new VmStackErrorCheckerWrapper(), handlers, filters, postVm, processTransactionsInParallel);
         }
 
-        public IBlockProcessor Create(
+        public static IBlockProcessor Create(
             IWeb3Wrapper web3, IVmStackErrorChecker vmStackErrorChecker, 
             HandlerContainer handlers, FilterContainer filters = null, bool postVm = false, bool processTransactionsInParallel = true)
         {

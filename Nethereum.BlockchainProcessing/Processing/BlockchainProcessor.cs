@@ -34,6 +34,14 @@ namespace Nethereum.BlockchainProcessing.Processing
             return blockNumber;
         }
 
+        /// <summary>
+        /// Enumerates blocks on the chain.
+        /// Invokes the ProcessBlockAsync method on the strategy for each block
+        /// </summary>
+        /// <param name="startBlock">Starting block - if null, will start from 0 or from where it left off
+        /// (If the strategy provides for that)</param>
+        /// <param name="endBlock">End block - if null, will run continuously and wait for new blocks</param>
+        /// <returns>False if processing was cancelled else True</returns>
         public async Task<bool> ExecuteAsync(
             long? startBlock, long? endBlock)
         {

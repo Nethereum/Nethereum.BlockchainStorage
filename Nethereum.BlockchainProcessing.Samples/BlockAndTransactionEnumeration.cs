@@ -1,10 +1,10 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
-using Nethereum.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
 {
@@ -12,31 +12,30 @@ namespace Nethereum.BlockchainProcessing.Samples
     {  
         public class SimpleTransactionHandler : ITransactionHandler
         {
+            public List<TransactionWithReceipt> TransactionsHandled = new List<TransactionWithReceipt>();
+            public List<ContractCreationTransaction> ContractCreationsHandled = new List<ContractCreationTransaction>();
+
             public Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
             {
-                Console.WriteLine($"(Handling Contract Creation Transaction) Block:{contractCreationTransaction.Transaction.BlockNumber.Value}, Hash:{contractCreationTransaction.Transaction.TransactionHash}");
+                ContractCreationsHandled.Add(contractCreationTransaction);
                 return Task.CompletedTask;
             }
 
             public Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
             {
-                Console.WriteLine($"(Handling Transaction) Block:{transactionWithReceipt.Transaction.BlockNumber.Value}, Hash:{transactionWithReceipt.Transaction.TransactionHash}");
+                TransactionsHandled.Add(transactionWithReceipt);
                 return Task.CompletedTask;
             }
         }
 
+        [Fact]
         public async Task Run()
         {
-            ApplicationLogging.LoggerFactory.AddConsole(includeScopes: true);
+            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var transactionHandler = new SimpleTransactionHandler();
+            var handlers = new HandlerContainer{ TransactionHandler = transactionHandler};
 
-            var targetBlockchain = new BlockchainSourceConfiguration(
-                blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60",
-                name: "rinkeby") {FromBlock = 2830143, ToBlock = 2830243};
-            
-            var web3Wrapper = new Web3Wrapper(targetBlockchain.BlockchainUrl);
-            var handlers = new HandlerContainer{ TransactionHandler = new SimpleTransactionHandler()};
-
-            var blockProcessor = new BlockProcessorFactory().Create(
+            var blockProcessor = BlockProcessorFactory.Create(
                 web3Wrapper, 
                 handlers, 
                 processTransactionsInParallel: false);
@@ -44,8 +43,11 @@ namespace Nethereum.BlockchainProcessing.Samples
             var processingStrategy = new ProcessingStrategy(blockProcessor);
             var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 
-            await blockchainProcessor.ExecuteAsync
-                (targetBlockchain.FromBlock, targetBlockchain.ToBlock);
+            var result = await blockchainProcessor.ExecuteAsync(2830144, 2830145);
+
+            Assert.True(result);
+            Assert.Equal(20, transactionHandler.TransactionsHandled?.Count);
+            Assert.Equal(5, transactionHandler.ContractCreationsHandled?.Count);
         }
     }
 }

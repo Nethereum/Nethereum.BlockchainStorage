@@ -2,12 +2,12 @@
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
-using Nethereum.Configuration;
 using Nethereum.Contracts;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
 {
@@ -33,53 +33,40 @@ namespace Nethereum.BlockchainProcessing.Samples
 
         public class TransferEventHandler: ITransactionLogHandler<TransferEvent>
         {
-            private readonly string _eventName = ABITypedRegistry.GetEvent<TransferEvent>().Name;
+            public List<(TransactionLogWrapper, EventLog<TransferEvent>)> TransferEventsHandled = 
+                new List<(TransactionLogWrapper, EventLog<TransferEvent>)>();
+
+            public List<TransactionLogWrapper> TransferEventsWithDifferentSignature = 
+                new List<TransactionLogWrapper>();
 
             public Task HandleAsync(TransactionLogWrapper transactionLog)
             {
                 try
                 {
-                    if (!transactionLog.IsForEvent<TransferEvent>()) return Task.CompletedTask;
-
-                    Console.WriteLine($"Tx Hash:{transactionLog.Transaction.TransactionHash}, LogIndex: {transactionLog.LogIndex}");
+                    if(!transactionLog.IsForEvent<TransferEvent>()) return Task.CompletedTask;
 
                     var eventValues = transactionLog.Decode<TransferEvent>();
-                    if (eventValues == null) return Task.CompletedTask;
-
-                    PrintEvent(eventValues);
+                    TransferEventsHandled.Add((transactionLog, eventValues));
                 }
                 catch (Exception x)
                 {
-                    Console.WriteLine("Error whilst handling transaction log - expected event signature may differ from the expected event.");
-                    Console.WriteLine(x.Message);
+                    //Error whilst handling transaction log
+                    //expected event signature may differ from the expected event.
+                    TransferEventsWithDifferentSignature.Add(transactionLog);
                 }
 
                 return Task.CompletedTask;
             }
-
-            private void PrintEvent(EventLog<TransferEvent> eventValues)
-            {
-                System.Console.WriteLine($"[EVENT]");
-                System.Console.WriteLine($"\t[{_eventName}]");
-                foreach (var prop in eventValues?.Event.GetType().GetProperties())
-                {
-                    System.Console.WriteLine($"\t\t[{prop.Name}:{prop.GetValue(eventValues.Event) ?? "null"}]");
-                }
-            }
         }
 
+        [Fact]
         public async Task Run()
-        {
-            ApplicationLogging.LoggerFactory.AddConsole(includeScopes: true);
+        {            
+            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var transferEventHandler = new TransferEventHandler();
+            var handlers = new HandlerContainer{ TransactionLogHandler = transferEventHandler};
 
-            var targetBlockchain = new BlockchainSourceConfiguration(
-                blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60",
-                name: "rinkeby") {FromBlock = 3146684, ToBlock = 3146684};
-            
-            var web3Wrapper = new Web3Wrapper(targetBlockchain.BlockchainUrl);
-            var handlers = new HandlerContainer{ TransactionLogHandler = new TransferEventHandler()};
-
-            var blockProcessor = new BlockProcessorFactory().Create(
+            var blockProcessor = BlockProcessorFactory.Create(
                 web3Wrapper, 
                 handlers,
                 processTransactionsInParallel: false);
@@ -87,8 +74,17 @@ namespace Nethereum.BlockchainProcessing.Samples
             var processingStrategy = new ProcessingStrategy(blockProcessor);
             var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 
-            await blockchainProcessor.ExecuteAsync
-                (targetBlockchain.FromBlock, targetBlockchain.ToBlock);
+            var result = await blockchainProcessor.ExecuteAsync(3146684, 3146684);
+
+            Assert.True(result);
+
+            //this is our expected event (see TransferEvent class)
+            Assert.Single(transferEventHandler.TransferEventsHandled);
+
+            //there is an event from another contract called Transfer
+            //it can't be deserialized because
+            //the number of indexed fields is different
+            Assert.Single(transferEventHandler.TransferEventsWithDifferentSignature);
         }
     }
 }
