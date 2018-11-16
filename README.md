@@ -1,27 +1,19 @@
 # Nethereum.BlockchainProcessing
 Blockchain core processing library
 
+## Summary
+
 A library of tools to help read from the block chain so you can do what you need with the data.
 
-## Summary
-Processors are orchestrators. They navigate and retrieve or receive block chain data, filter it, invoke custom handlers and lower level processors.
+Processors are orchestrators. They navigate and retrieve or receive block chain data, filter it, invoke custom handlers and invoke lower level processors.
 In general the processors do not need customisation and you don't need to write your own. They are there to walk the chain and pass the relevant data to *your* handlers.
 
 Handlers are pluggable interfaces.  To inject your own behaviour - you should create a class that implements the relevant handler interface and inject it.
 
-## Quick Start
-TO DO!
+## Quick Start Samples
+Several quick start block chain processing samples are available.
 
-### Create *your own* handler classes
-This is the non-boiler plate code you need to write to cover your own needs.
-
-### Bootstrap 
-* If you need filters - create a FilterContainer - there are static convenience methods to create filters.
-* Create instances of your handler classes
-* Instantiate a new "HandlerContainer"
-* Use the property setters on the "HandlerContainer" to set your handlers
-* Create an instance of the BlockProcessorFactory
-* Call the "Create" method to create a BlockProcessor 
+[Go to Samples](Nethereum.BlockchainProcessing.Samples/README.md)
 
 ## PROCESSING COMPONENTS
 Here is a high level processing overview. 
