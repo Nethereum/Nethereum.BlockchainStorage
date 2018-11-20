@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
         private Web3.Web3 Web3 { get; }
 
         public async Task<BlockWithTransactions> GetBlockWithTransactionsAsync
-            (long blockNumber)
+            (ulong blockNumber)
         {
             var block =
                 await
@@ -35,10 +35,17 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
                 .ConfigureAwait(false);
         }
 
-        public async Task<long> GetMaxBlockNumberAsync()
+        public async Task<FilterLog[]> GetLogs(NewFilterInput newFilter, object id = null)
+        {
+            return await Web3.Eth.Filters.GetLogs
+                .SendRequestAsync(newFilter, id)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<ulong> GetMaxBlockNumberAsync()
         {
             var blockNumber = await Web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
-            return (long)blockNumber.Value;
+            return (ulong)blockNumber.Value;
         }
 
         public async Task<Transaction> GetTransactionByHash(string txnHash)

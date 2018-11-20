@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.JsonRpc.Client;
 using System.Threading;
@@ -42,7 +43,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 await Processor.ExecuteAsync(startBlock: 0, endBlock: 0, cancellationToken: cancellationTokenSource.Token);
 
                 MockProcessingStrategy.VerifyAll();
-                MockProcessingStrategy.Verify(p => p.ProcessBlockAsync(It.IsAny<long>()), Times.Never);
+                MockProcessingStrategy.Verify(p => p.ProcessBlockAsync(It.IsAny<ulong>()), Times.Never);
 
             }
 
@@ -52,8 +53,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 public async Task
                     Will_Process_The_Requested_Block_Range()
                 {
-                    const long StartBlock = 1000;
-                    const long EndBlock = 1205;
+                    const ulong StartBlock = 1000;
+                    const ulong EndBlock = 1205;
 
                     for (var block = StartBlock; block <= EndBlock; block++)
                     {
@@ -68,9 +69,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 [Fact]
                 public async Task Will_Wait_For_Minimum_Block_Confirmations()
                 {
-                    const int RequiredBlockConfirmations = 6;
-                    long maxBlockNumber = 0;
-                    int numberOfWaitCycles = 0;
+                    const uint RequiredBlockConfirmations = 6;
+                    ulong maxBlockNumber = 0;
+                    uint numberOfWaitCycles = 0;
                     int blocksProcessed = 0;
 
                     MockProcessingStrategy
@@ -83,8 +84,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .ReturnsAsync(() => maxBlockNumber);
 
                     MockProcessingStrategy
-                        .Setup(s => s.WaitForNextBlock(It.IsAny<int>()))
-                        .Callback<int>((retryNumber) => numberOfWaitCycles++)
+                        .Setup(s => s.WaitForNextBlock(It.IsAny<uint>()))
+                        .Callback<uint>((retryNumber) => numberOfWaitCycles++)
                         .Returns(Task.CompletedTask);
 
                     MockProcessingStrategy
@@ -124,10 +125,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
                     MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
-                        .Callback<long>((blkNum) => timesThrown++)
+                        .Callback<ulong>((blkNum) => timesThrown++)
                         .Throws(blockProcessingException);
 
-                    for (var retryNum = 0; retryNum < MaxRetries; retryNum++)
+                    for (uint retryNum = 0; retryNum < MaxRetries; retryNum++)
                     {
                         MockProcessingStrategy
                             .Setup(s => s.PauseFollowingAnError(retryNum))
@@ -157,7 +158,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
                     MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(1))
-                        .Callback<long>(blkNum => cancellationTokenSource.Cancel())
+                        .Callback<ulong>(blkNum => cancellationTokenSource.Cancel())
                         .Returns(Task.CompletedTask)
                         .Verifiable("ProcessBlockAsync should have been called for Block 1");
 
@@ -172,10 +173,10 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 [Fact]
                 public async Task Will_Wait_For_Minimum_Block_Confirmations()
                 {
-                    const int RequiredBlockConfirmations = 6;
-                    long maxBlockNumber = 0;
-                    int numberOfWaitCycles = 0;
-                    int blocksProcessed = 0;
+                    const uint RequiredBlockConfirmations = 6;
+                    ulong maxBlockNumber = 0;
+                    uint numberOfWaitCycles = 0;
+                    uint blocksProcessed = 0;
 
                     var cancellationTokenSource = new CancellationTokenSource();
 
@@ -189,8 +190,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                         .ReturnsAsync(() => maxBlockNumber);
 
                     MockProcessingStrategy
-                        .Setup(s => s.WaitForNextBlock(It.IsAny<int>()))
-                        .Callback<int>((retryNumber) => numberOfWaitCycles++)
+                        .Setup(s => s.WaitForNextBlock(It.IsAny<uint>()))
+                        .Callback<uint>((retryNumber) => numberOfWaitCycles++)
                         .Returns(Task.CompletedTask);
 
                     MockProcessingStrategy
@@ -206,7 +207,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
                     Assert.False(result, "Result should be false because execution should have been stopped by cancellation token");
 
-                    Assert.Equal(1, blocksProcessed);
+                    Assert.Equal((uint)1, blocksProcessed);
                     Assert.Equal(RequiredBlockConfirmations - 1, numberOfWaitCycles);
                     Assert.Equal(RequiredBlockConfirmations, maxBlockNumber);
                     MockProcessingStrategy.VerifyAll();
@@ -247,9 +248,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 public async Task
                     Requests_Last_Block_Processed_From_Strategy_And_Uses_The_Previous_Block_Number()
                 {
-                    const long LastBlockProcessed = 11;
-                    const long ExpectedStartBlock = LastBlockProcessed - 1;
-                    const long EndingBlock = ExpectedStartBlock;
+                    const ulong LastBlockProcessed = 11;
+                    const ulong ExpectedStartBlock = LastBlockProcessed - 1;
+                    const ulong EndingBlock = ExpectedStartBlock;
 
                     MockProcessingStrategy
                         .Setup(s => s.GetLastBlockProcessedAsync())
@@ -267,9 +268,9 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                 [Fact]
                 public async Task Last_Block_Processsed_Is_Only_Used_If_Greater_Than_Minimum_Block_Number()
                 {
-                    const long LastBlockProcessed = 11;
-                    const long MinimumStartingBlock = 20;
-                    const long EndingBlock = MinimumStartingBlock;
+                    const ulong LastBlockProcessed = 11;
+                    const ulong MinimumStartingBlock = 20;
+                    const ulong EndingBlock = MinimumStartingBlock;
 
                     MockProcessingStrategy
                         .SetupGet(s => s.MinimumBlockNumber)

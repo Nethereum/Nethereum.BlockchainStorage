@@ -8,32 +8,32 @@ namespace Nethereum.BlockchainProcessing.Processing
 {
     public class BlockEnumeration
     {
-        private readonly Func<long, Task> _processBlock;
-        private readonly Func<int, Task> _waitForBlockAvailability;
-        private readonly Func<int, Task> _pauseFollowingAnError;
-        private readonly Func<Task<long>> _getMaxBlockNumber;
-        private readonly int _minimumBlockConfirmations;
-        private readonly long _endBlock;
+        private readonly Func<ulong, Task> _processBlock;
+        private readonly Func<uint, Task> _waitForBlockAvailability;
+        private readonly Func<uint, Task> _pauseFollowingAnError;
+        private readonly Func<Task<ulong>> _getMaxBlockNumber;
+        private readonly uint _minimumBlockConfirmations;
+        private readonly ulong _endBlock;
         private readonly CancellationToken _cancellationToken;
-        private readonly int _maxRetries;
+        private readonly uint _maxRetries;
         private readonly bool _runContinuously;
-        private long? _maxBlockNumber;
+        private ulong? _maxBlockNumber;
 
-        private long _currentBlock;
-        private int _retryNumber;
+        private ulong _currentBlock;
+        private uint _retryNumber;
 
         private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockEnumeration>();
 
         public BlockEnumeration(
-            Func<long, Task> processBlock,
-            Func<int, Task> waitForBlockAvailability,
-            Func<int, Task> pauseFollowingAnError,
-            Func<Task<long>> getMaxBlockNumber,
-            int minimumBlockConfirmations,
-            int maxRetries,
+            Func<ulong, Task> processBlock,
+            Func<uint, Task> waitForBlockAvailability,
+            Func<uint, Task> pauseFollowingAnError,
+            Func<Task<ulong>> getMaxBlockNumber,
+            uint minimumBlockConfirmations,
+            uint maxRetries,
             CancellationToken cancellationToken,
-            long startBlock,
-            long? endBlock = null
+            ulong startBlock,
+            ulong? endBlock = null
             )
         {
             _processBlock = processBlock;
@@ -99,7 +99,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             if (_maxBlockNumber == null)
                 await RefreshMaxBlockNumber().ConfigureAwait(false);
 
-            int retryNumber = 0;
+            uint retryNumber = 0;
             while ((_maxBlockNumber - _currentBlock) < _minimumBlockConfirmations)
             {
                 _log.LogInformation($"Waiting for current block ({_currentBlock}) to be more than {_minimumBlockConfirmations} confirmations behind the max block on the chain ({_maxBlockNumber})");

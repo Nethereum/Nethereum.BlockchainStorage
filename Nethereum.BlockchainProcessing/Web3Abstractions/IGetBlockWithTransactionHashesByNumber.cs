@@ -5,6 +5,6 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
 {
     public interface IGetBlockWithTransactionHashesByNumber
     {
-        Task<BlockWithTransactions> GetBlockWithTransactionsAsync(long blockNumber);
+        Task<BlockWithTransactions> GetBlockWithTransactionsAsync(ulong blockNumber);
     }
 }

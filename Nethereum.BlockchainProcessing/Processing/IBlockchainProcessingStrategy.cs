@@ -5,18 +5,17 @@ namespace Nethereum.BlockchainProcessing.Processing
 {
     public interface IBlockchainProcessingStrategy: IDisposable
     {
+        uint MaxRetries { get; }
+        ulong MinimumBlockNumber { get; }
+        uint MinimumBlockConfirmations { get; }
 
-        int MaxRetries { get; }
-        long MinimumBlockNumber { get; }
-        int MinimumBlockConfirmations { get; }
+        Task WaitForNextBlock(uint retryNumber);
+        Task PauseFollowingAnError(uint retryNumber);
 
-        Task WaitForNextBlock(int retryNumber);
-        Task PauseFollowingAnError(int retryNumber);
-
-        Task<long> GetLastBlockProcessedAsync();
+        Task<ulong> GetLastBlockProcessedAsync();
         Task FillContractCacheAsync();
 
-        Task ProcessBlockAsync(long blockNumber);
-        Task<long> GetMaxBlockNumberAsync();
+        Task ProcessBlockAsync(ulong blockNumber);
+        Task<ulong> GetMaxBlockNumberAsync();
     }
 }

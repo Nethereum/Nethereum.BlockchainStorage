@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processors
         protected ITransactionProcessor TransactionProcessor { get; }
 
         private readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-        private long _lastBlock = -1;
+        private ulong _lastBlock;
         private readonly object _sync = new object();
 
         public BlockProcessor(
@@ -35,7 +35,7 @@ namespace Nethereum.BlockchainProcessing.Processors
 
         public bool ProcessTransactionsInParallel { get; set; } = true;
 
-        public virtual async Task ProcessBlockAsync(long blockNumber)
+        public virtual async Task ProcessBlockAsync(ulong blockNumber)
         {
             if (_lastBlock != blockNumber)
             {
@@ -59,7 +59,7 @@ namespace Nethereum.BlockchainProcessing.Processors
             }
         }
 
-        public virtual async Task<long> GetMaxBlockNumberAsync()
+        public virtual async Task<ulong> GetMaxBlockNumberAsync()
         {
             return await BlockProxy.GetMaxBlockNumberAsync();
         }

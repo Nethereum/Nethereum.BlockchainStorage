@@ -4,6 +4,6 @@ namespace Nethereum.BlockchainProcessing.Processing
 {
     public interface IWaitStrategy
     {
-        Task Apply(int retryCount);
+        Task Apply(uint retryCount);
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class BlockchainProcessor
+    public class BlockchainProcessor: IBlockchainProcessor
     {
         private readonly IBlockchainProcessingStrategy _strategy;
         private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockchainProcessor>();
@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// <summary>
         /// Allow the processor to resume from where it left off
         /// </summary>
-        private async Task<long> GetStartingBlockNumber()
+        private async Task<ulong> GetStartingBlockNumber()
         {
             _log.LogInformation("Begin GetStartingBlockNumber / _strategy.GetLastBlockProcessedAsync()");
             var blockNumber = await _strategy.GetLastBlockProcessedAsync();
@@ -43,13 +43,13 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// <param name="endBlock">End block - if null, will run continuously and wait for new blocks</param>
         /// <returns>False if processing was cancelled else True</returns>
         public async Task<bool> ExecuteAsync(
-            long? startBlock, long? endBlock)
+            ulong? startBlock, ulong? endBlock)
         {
             return await ExecuteAsync(startBlock, endBlock, new CancellationToken());
         }
 
         public async Task<bool> ExecuteAsync(
-            long? startBlock, long? endBlock, CancellationToken cancellationToken)
+            ulong? startBlock, ulong? endBlock, CancellationToken cancellationToken)
         {
 
             startBlock = startBlock ?? await GetStartingBlockNumber();
@@ -76,5 +76,14 @@ namespace Nethereum.BlockchainProcessing.Processing
                 .ExecuteAsync().ConfigureAwait(false);
         }
 
+        public async Task ProcessAsync(ulong fromBlockNumber, ulong toBlockNumber)
+        {
+            await ExecuteAsync(fromBlockNumber, toBlockNumber, new CancellationToken());
+        }
+
+        public async Task ProcessAsync(ulong fromBlockNumber, ulong toBlockNumber, CancellationToken cancellationToken)
+        {
+            await ExecuteAsync(fromBlockNumber, toBlockNumber, cancellationToken);
+        }
     }
 }

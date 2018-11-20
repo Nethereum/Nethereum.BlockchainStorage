@@ -4,7 +4,8 @@
         IBlockProxy,
         ITransactionProxy,
         IGetCode,
-        IGetTransactionVMStack
+        IGetTransactionVMStack,
+        IEventLogProxy
     {
 
     }

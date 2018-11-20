@@ -5,7 +5,7 @@ namespace Nethereum.BlockchainProcessing.Processors
     public interface IBlockProcessor
     {
         bool ProcessTransactionsInParallel { get;set; }
-        Task ProcessBlockAsync(long blockNumber);
-        Task<long> GetMaxBlockNumberAsync();
+        Task ProcessBlockAsync(ulong blockNumber);
+        Task<ulong> GetMaxBlockNumberAsync();
     }
 }

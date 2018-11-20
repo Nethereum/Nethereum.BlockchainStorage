@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainProcessing.Processors.PostProcessors
         {
         }
 
-        public override async Task ProcessBlockAsync(long blockNumber)
+        public override async Task ProcessBlockAsync(ulong blockNumber)
         {
             var block = await BlockProxy.GetBlockWithTransactionsAsync(blockNumber);
             //no need to save the block again

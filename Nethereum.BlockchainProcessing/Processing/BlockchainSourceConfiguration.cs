@@ -10,9 +10,9 @@
 
         public string BlockchainUrl { get; set; }
         public string Name { get; set; }
-        public long? MinimumBlockNumber { get; set; }
-        public long? FromBlock { get; set; }
-        public long? ToBlock { get; set; }
+        public ulong? MinimumBlockNumber { get; set; }
+        public ulong? FromBlock { get; set; }
+        public ulong? ToBlock { get; set; }
         public bool PostVm { get; set; } = false;
         public bool ProcessBlockTransactionsInParallel { get; set; } = true;
     }

@@ -70,13 +70,13 @@ namespace Nethereum.BlockchainProcessing.Processing
                     processTransactionsInParallel.Value;
         }
 
-        public static long? Parse(IConfigurationRoot config, string name)
+        public static ulong? Parse(IConfigurationRoot config, string name)
         {
             var configVal = config[name];
 
             return string.IsNullOrEmpty(configVal)
-                ? (long?) null
-                : long.Parse(configVal);
+                ? (ulong?) null
+                : ulong.Parse(configVal);
         }
 
         public static bool? ParseBool(IConfigurationRoot config, string name)

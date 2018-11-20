@@ -7,7 +7,7 @@ namespace Nethereum.BlockchainProcessing.Processing
     {
         private static readonly int[] WaitIntervals = {1000, 2000, 5000, 10000, 15000};
 
-        public async Task Apply(int retryCount)
+        public async Task Apply(uint retryCount)
         {
             var intervalMs = retryCount >= WaitIntervals.Length ? 
                 WaitIntervals.Last() : 
