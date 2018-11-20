@@ -16,4 +16,4 @@ If you need transactions and logs then use these examples.
 
 ## Event Log Processing (excludes transactions)
 If you are ONLY interested in event logs - then this is a much faster way of enumerating the chain and listening for events.
-* [EventLogEnumeration](EventLogEnumeration.cs)
+* [Event Log Enumeration](EventLogEnumeration.cs)
