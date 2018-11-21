@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using Nethereum.ABI;
+using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.FunctionEncoding.AttributeEncoding;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.ABI.Model;
@@ -13,8 +15,18 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
+    /// <summary>
+    /// Builds a filter based on indexed parameters on an event DTO query template.
+    /// The DTO should have properties decorated with ParameterAttribute
+    /// Only ParameterAttributes flagged as indexed are included
+    /// Use AddCondition to set a value on a indexed property on the query template
+    /// Values set on the query template are put in to the filter when Build is called
+    /// </summary>
+    /// <typeparam name="TEventDTo"></typeparam>
     public class NewFilterInputBuilder<TEventDTo> where TEventDTo : new()
     {
+        private readonly AttributesToABIExtractor _attributesToAbiExtractor;
+        private readonly ParametersEncoder _parametersEncoder;
         private readonly EventABI _eventAbi;
         private readonly IEnumerable<PropertyInfo> _eventDtoProperties;
 
@@ -23,19 +35,29 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             Template = new TEventDTo();
             _eventAbi = ABITypedRegistry.GetEvent<TEventDTo>();
             _eventDtoProperties = PropertiesExtractor.GetPropertiesWithParameterAttribute(typeof(TEventDTo));
+            _attributesToAbiExtractor = new AttributesToABIExtractor();
+            _parametersEncoder = new ParametersEncoder();
         }
 
         private TEventDTo Template { get; }
 
         /// <summary>
-        /// Prevents zeros (which are often defaults for BigIntegers and number types) from appearing in the filter
+        /// Prevents zeros (which are often defaults on BigInteger structs or numeric value types) from appearing in the filter
+        /// If these are not ignored the filter can contain an equals 0 condition
+        /// This condition may exclude desired logs from being returned
         /// Default is true
         /// </summary>
         public bool IgnoreZeros { get; set; } = true;
 
-        public NewFilterInputBuilder<TEventDTo> AddCondition(Action<TEventDTo> setTemplateAction)
+        /// <summary>
+        /// Set the desired filter value on one of the indexed properties of the object
+        /// </summary>
+        /// <param name="setValueOnIndexedField">An action to set the value on the query template.
+        /// Set a property representing an indexed parameter of the event
+        /// e.g. (queryTemplate) => queryTemplate.From = "xyz"</param>
+        public NewFilterInputBuilder<TEventDTo> AddCondition(Action<TEventDTo> setValueOnIndexedField)
         {
-            setTemplateAction(Template);
+            setValueOnIndexedField(Template);
             return this;
         }
 
@@ -53,11 +75,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 return _eventAbi.CreateFilterInput(contractAddresses, from, to);
             }
 
-            var indexedVal1 = indexedParameterValues[0].Value;
-            var indexedVal2 = indexedParameterValues.Length > 0 ? indexedParameterValues[1].Value : null;
-            var indexedVal3 = indexedParameterValues.Length > 1 ? indexedParameterValues[2].Value :  null;
+            var topic1 = indexedParameterValues[0].Value;
+            var topic2 = indexedParameterValues.Length > 0 ? indexedParameterValues[1].Value : null;
+            var topic3 = indexedParameterValues.Length > 1 ? indexedParameterValues[2].Value : null;
 
-            return _eventAbi.CreateFilterInput(contractAddresses, indexedVal1, indexedVal2, indexedVal3, from, to);
+            return _eventAbi.CreateFilterInput(contractAddresses, topic1, topic2, topic3, from, to);
         }
 
         private static void NullifyZeros(ParameterAttributeValue[] indexedParameterValues)
@@ -92,11 +114,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 
                 var propertyValue = property.GetValue(instanceValue);
 
-                //if (parameterAttribute.ParameterABIType is TupleType tupleType)
-                //{
-                //    attributesToABIExtractor.InitTupleComponentsFromTypeAttributes(property.PropertyType, tupleType);
-                //    propertyValue = GetTupleComponentValuesFromTypeAttributes(property.PropertyType, propertyValue);
-                //}
+                if (parameterAttribute.Parameter.ABIType is TupleType tupleType)
+                {
+                    _attributesToAbiExtractor.InitTupleComponentsFromTypeAttributes(property.PropertyType, tupleType);
+                    propertyValue = _parametersEncoder.GetTupleComponentValuesFromTypeAttributes(property.PropertyType, propertyValue);
+                }
 
                 parameterObjects.Add(new ParameterAttributeValue
                 {

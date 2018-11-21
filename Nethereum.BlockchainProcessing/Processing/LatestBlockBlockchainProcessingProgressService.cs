@@ -7,6 +7,8 @@ namespace Nethereum.BlockchainProcessing.Processing
     {
         private readonly IWeb3Wrapper _web3;
 
+        public uint MinimumBlockConfirmations = 0;
+
         public LatestBlockBlockchainProcessingProgressService(
             IWeb3Wrapper web3, 
             ulong defaultStartingBlockNumber, 
@@ -20,7 +22,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public override async Task<ulong> GetBlockNumberToProcessTo()
         {
-            return await _web3.GetMaxBlockNumberAsync().ConfigureAwait(false);
+            return await _web3.GetMaxBlockNumberAsync().ConfigureAwait(false) - MinimumBlockConfirmations;
         }
     }
 }
