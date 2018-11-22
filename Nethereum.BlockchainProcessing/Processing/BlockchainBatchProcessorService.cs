@@ -48,14 +48,14 @@ namespace Nethereum.BlockchainProcessing.Processing
 
             if (nullableRange == null)
             {
-                _logger.LogInformation("No block range to process");
+                _logger.LogInformation("No block range to process - the most recent block may already have been processed");
                 return null;
             }
 
             var range = nullableRange.Value;
 
-            _logger.LogInformation($"Getting all data changes events from: {range.From} to {range.To}");
-            await _processor.ProcessAsync(range.From, range.To, cancellationToken);
+            _logger.LogInformation($"Processing Block Range. from: {range.From} to {range.To}");
+            await _processor.ProcessAsync(range, cancellationToken);
 
             _logger.LogInformation($"Updating current process progress to: {range.To}");
             await _progressService.UpsertBlockNumberProcessedTo(range.To);
@@ -63,32 +63,43 @@ namespace Nethereum.BlockchainProcessing.Processing
             return range;
         }
 
-        public async Task ProcessContinuallyAsync(CancellationToken cancellationToken, Action<uint, BlockRange> rangesProcessedCallback = null)
+        /// <summary>
+        /// Processes block ranges until cancellation is requested 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <param name="rangesProcessedCallback"></param>
+        /// <returns>The total number of blocks processed</returns>
+        public async Task<ulong> ProcessContinuallyAsync(
+            CancellationToken cancellationToken, 
+            Action<uint, BlockRange> rangesProcessedCallback = null)
         {
-            //iterate until we reach an arbitrary ending block
             uint rangesProcessed = 0;
-            uint attemptNumber = 0;
+            uint rangeAttemptCount = 0;
+            ulong blocksProcessed = 0;
 
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                attemptNumber++;
+                rangeAttemptCount++;
                 var range = await ProcessLatestBlocksAsync(cancellationToken);
                 
                 if (cancellationToken.IsCancellationRequested) break;
 
                 if (range == null) // assume we're up to date - wait for next block
                 {
-                    await WaitForBlockStrategy.Apply(attemptNumber);
+                    await WaitForBlockStrategy.Apply(rangeAttemptCount);
                 }
                 else // block range was processed so continue straight to the next
                 {
                     rangesProcessed++;
+                    blocksProcessed += range.Value.BlockCount;
+                    rangeAttemptCount = 0;
                     rangesProcessedCallback?.Invoke(rangesProcessed, range.Value);
-                    attemptNumber = 0;
                 }
             }
+
+            return blocksProcessed;
         }
 
     }

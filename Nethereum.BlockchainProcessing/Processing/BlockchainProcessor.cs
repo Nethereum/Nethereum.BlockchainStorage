@@ -76,14 +76,14 @@ namespace Nethereum.BlockchainProcessing.Processing
                 .ExecuteAsync().ConfigureAwait(false);
         }
 
-        public async Task ProcessAsync(ulong fromBlockNumber, ulong toBlockNumber)
+        public async Task ProcessAsync(BlockRange range)
         {
-            await ExecuteAsync(fromBlockNumber, toBlockNumber, new CancellationToken());
+            await ExecuteAsync(range.From, range.To, new CancellationToken());
         }
 
-        public async Task ProcessAsync(ulong fromBlockNumber, ulong toBlockNumber, CancellationToken cancellationToken)
+        public async Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
         {
-            await ExecuteAsync(fromBlockNumber, toBlockNumber, cancellationToken);
+            await ExecuteAsync(range.From, range.To, cancellationToken);
         }
     }
 }

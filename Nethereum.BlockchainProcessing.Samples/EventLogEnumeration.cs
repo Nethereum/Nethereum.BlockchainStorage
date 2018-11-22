@@ -41,10 +41,7 @@ Other contracts may have transfer events with different signatures, this won't w
             public List<(FilterLog, EventLog<TransferEvent>)> ProcessedEvents = new List<(FilterLog, EventLog<TransferEvent>)>();
             public List<(FilterLog, Exception)> DecodingErrors = new List<(FilterLog, Exception)>();
 
-            public bool IsLogForEvent(FilterLog log)
-            {
-                return log.IsLogForEvent<TransferEvent>();
-            }
+            public bool IsLogForEvent(FilterLog log) => log.IsLogForEvent<TransferEvent>();
 
             public Task ProcessLogsAsync(params FilterLog[] eventLogs)
             {
@@ -70,10 +67,7 @@ Other contracts may have transfer events with different signatures, this won't w
         {
             public List<FilterLog> ProcessedEvents = new List<FilterLog>();
 
-            public bool IsLogForEvent(FilterLog log)
-            {
-                return true;
-            }
+            public bool IsLogForEvent(FilterLog log) => true;
 
             public Task ProcessLogsAsync(params FilterLog[] eventLogs)
             {
@@ -150,18 +144,21 @@ Other contracts may have transfer events with different signatures, this won't w
                 if (countOfRangesProcessed == 2) cancellationTokenSource.Cancel();
             });
 
-            await batchProcessorService.ProcessContinuallyAsync(cancellationTokenSource.Token, rangesProcessedCallback);
+            var blocksProcessed = await batchProcessorService.ProcessContinuallyAsync(
+                cancellationTokenSource.Token, rangesProcessedCallback);
 
+            Assert.Equal((ulong)22, blocksProcessed);
             Assert.Equal(2, blockRangesProcessed.Count);
             Assert.Equal(new BlockRange(3379061, 3379071), blockRangesProcessed[0]);
             Assert.Equal(new BlockRange(3379072, 3379082), blockRangesProcessed[1]);
-
+            
             Assert.Equal(395, catchAllEventProcessor.ProcessedEvents.Count);
             Assert.Equal(4, transferEventProcessor.ProcessedEvents.Count);
 
             //there are Transfer events on other contracts with differing number of indexed fields
             //they can't be decoded into our TransferEvent
             Assert.Equal(46, transferEventProcessor.DecodingErrors.Count);
+
             
         }
 

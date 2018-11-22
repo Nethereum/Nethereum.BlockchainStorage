@@ -45,16 +45,16 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             }
         }
 
-        public async Task ProcessAsync(ulong fromBlockNumber, ulong toBlockNumber)
+        public async Task ProcessAsync(BlockRange range)
         {
-            await ProcessAsync(fromBlockNumber, toBlockNumber, new CancellationToken());
+            await ProcessAsync(range, new CancellationToken());
         }
 
-        public async Task ProcessAsync(ulong fromBlockNumber, ulong toBlockNumber, CancellationToken cancellationToken)
+        public async Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
         {
-            _log.LogInformation($"Beginning ProcessAsync. from: {fromBlockNumber}, to: {toBlockNumber}.");
+            _log.LogInformation($"Beginning ProcessAsync. from: {range.From}, to: {range.To}.");
             _log.LogInformation("Retrieving logs");
-            var distinctLogs = await RetrieveLogsAsync(fromBlockNumber, toBlockNumber, cancellationToken);
+            var distinctLogs = await RetrieveLogsAsync(range, cancellationToken);
 
             if (!distinctLogs.Any()) return;
             if (cancellationToken.IsCancellationRequested) return;
@@ -89,13 +89,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         private async Task<FilterLog[]> RetrieveLogsAsync(
-            ulong fromBlockNumber, ulong toBlockNumber, CancellationToken cancellationToken)
+            BlockRange range, CancellationToken cancellationToken)
         {
             var logs = new Dictionary<string, FilterLog>();
 
             foreach (var filter in _filters)
             {
-                FilterLog[] logsMatchingFilter = await RetrieveLogsAsync(fromBlockNumber, toBlockNumber, filter);
+                FilterLog[] logsMatchingFilter = await RetrieveLogsAsync(range, filter);
 
                 logs.Merge(logsMatchingFilter);
 
@@ -106,14 +106,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         private async Task<FilterLog[]> RetrieveLogsAsync(
-            ulong fromBlockNumber, ulong toBlockNumber, NewFilterInput filter, uint retryNumber = 0)
+            BlockRange range, NewFilterInput filter, uint retryNumber = 0)
         {
             try
             {
-                filter.FromBlock = new BlockParameter(fromBlockNumber);
-                filter.ToBlock = new BlockParameter(toBlockNumber);
+                filter.SetBlockRange(range);
 
-                _log.LogInformation($"RetrieveLogsAsync - getting logs. RetryNumber:{retryNumber}, from:{fromBlockNumber}, to:{toBlockNumber}.");
+                _log.LogInformation($"RetrieveLogsAsync - getting logs. RetryNumber:{retryNumber}, from:{range.From}, to:{range.To}.");
 
                 return await _eventLogProxy.GetLogs(filter).ConfigureAwait(false);
             }
@@ -128,7 +127,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                     await RetryWaitStrategy.Apply(retryNumber);
 
                     _log.LogInformation("Retrying get logs");
-                    return await RetrieveLogsAsync(fromBlockNumber, toBlockNumber, filter, retryNumber);
+                    return await RetrieveLogsAsync(range, filter, retryNumber);
                 }
 
                 _log.LogError("MaxRetries exceeded when getting logs, throwing exception.", ex);

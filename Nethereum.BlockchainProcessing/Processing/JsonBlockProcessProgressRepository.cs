@@ -21,7 +21,26 @@ namespace Nethereum.BlockchainProcessing.Processing
             Initialise();
         }
 
-        void Initialise()
+        public Task<ulong?> GetLatestAsync()
+        {
+            return Task.FromResult(_progress.To);
+        }
+
+        public ulong Latest => _progress.To ?? 0;
+
+        public Task UpsertProgressAsync(ulong blockNumber)
+        {
+            _progress.To = blockNumber;
+            Persist();
+            return Task.CompletedTask;
+        }
+
+        private void Persist()
+        {
+            File.WriteAllText(JsonFileNameAndPath, JsonConvert.SerializeObject(_progress));
+        }
+
+        private void Initialise()
         {
             if (!File.Exists(JsonFileNameAndPath))
             {
@@ -47,25 +66,6 @@ namespace Nethereum.BlockchainProcessing.Processing
         {
             _progress = new BlockProcessingProgress();
             Persist();
-        }
-
-        public Task<ulong?> GetLatestAsync()
-        {
-            return Task.FromResult(_progress.To);
-        }
-
-        public ulong Latest => _progress.To ?? 0;
-
-        public Task UpsertProgressAsync(ulong blockNumber)
-        {
-            _progress.To = blockNumber;
-            Persist();
-            return Task.CompletedTask;
-        }
-
-        private void Persist()
-        {
-            File.WriteAllText(JsonFileNameAndPath, JsonConvert.SerializeObject(_progress));
         }
     }
 }

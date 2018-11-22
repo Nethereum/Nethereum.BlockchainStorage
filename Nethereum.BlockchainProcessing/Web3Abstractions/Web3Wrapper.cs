@@ -90,7 +90,7 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
         {
             try
             {
-                return await web3Request();
+                return await web3Request().ConfigureAwait(false);
             }
             catch (RpcClientUnknownException)
             {
@@ -99,7 +99,7 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
                 if (attempts < 4)
                 {
                     await Task.Delay(1000 * attempts);
-                    return await Wrap(web3Request, attempts);
+                    return await Wrap(web3Request, attempts).ConfigureAwait(false);
                 }
 
                 throw;

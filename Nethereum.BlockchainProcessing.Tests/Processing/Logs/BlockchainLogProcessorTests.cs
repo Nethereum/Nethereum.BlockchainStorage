@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
@@ -22,10 +23,10 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var log2Processor = new Mock<ILogProcessor>();
             var catchAllProcessor = new Mock<ILogProcessor>();
 
-            var processors = new[] {log1Processor, log2Processor, catchAllProcessor };
+            var mockProcessors = new[] {log1Processor, log2Processor, catchAllProcessor };
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, processors.Select(p => p.Object));
+                eventLogProxy.Object, mockProcessors.Select(p => p.Object));
 
             var log1 = new FilterLog();
             var log2 = new FilterLog();
@@ -45,7 +46,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .ReturnsAsync(logs);
 
             var processedLogs = new Dictionary<Mock<ILogProcessor>, List<FilterLog>>();
-            foreach (var processor in processors)
+            foreach (var processor in mockProcessors)
             {
                 processedLogs.Add(processor, new List<FilterLog>());
 
@@ -54,15 +55,100 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                     .Returns(Task.CompletedTask);
             }
 
-            await logProcessor.ProcessAsync(0, 0);
+            await logProcessor.ProcessAsync(new BlockRange(0, 0));
 
             Assert.Single(processedLogs[log1Processor], log1);
             Assert.Single(processedLogs[log2Processor], log2);
-            foreach (var log in logs)
-            {
-                Assert.Contains(log, processedLogs[catchAllProcessor]);
-            }
-   
+            Assert.True(logs.SequenceEqual(processedLogs[catchAllProcessor]));
+        }
+
+        [Fact]
+        public async Task Dedupes_Logs_Matching_Multiple_Filters()
+        {
+            var eventLogProxy = new Mock<IEventLogProxy>();
+            var catchAllProcessor = new Mock<ILogProcessor>();
+
+            var filter1 = new NewFilterInput();
+            var filter2 = new NewFilterInput();
+            var filters = new[] {filter1, filter2};
+
+            var mockProcessors = new[] {catchAllProcessor };
+
+            var logProcessor = new BlockchainLogProcessor(
+                eventLogProxy.Object, mockProcessors.Select(p => p.Object), filters);
+
+            var log1 = new FilterLog(){TransactionHash = "x", LogIndex = new HexBigInteger(0)};
+            var duplicateLog = new FilterLog(){TransactionHash = "x", LogIndex = new HexBigInteger(0)};
+            var log2 = new FilterLog(){TransactionHash = "y", LogIndex = new HexBigInteger(0)};
+
+            var logsFromFilter1 = new []{log1, duplicateLog};
+            var logsFromFilter2 = new []{log2, duplicateLog};
+
+            catchAllProcessor
+                .Setup(p => p.IsLogForEvent(It.IsAny<FilterLog>()))
+                .Returns(true);
+
+            eventLogProxy
+                .Setup(p => p.GetLogs(filter1, null))
+                .ReturnsAsync(logsFromFilter1);
+
+            eventLogProxy
+                .Setup(p => p.GetLogs(filter2, null))
+                .ReturnsAsync(logsFromFilter2);
+
+            var processedLogs = new List<FilterLog>();
+            catchAllProcessor.Setup(p => p.ProcessLogsAsync(It.IsAny<FilterLog[]>()))
+                .Callback<FilterLog[]>(l => processedLogs.AddRange(l))
+                .Returns(Task.CompletedTask);
+
+            await logProcessor.ProcessAsync(new BlockRange(0, 0));
+
+            Assert.Equal(2, processedLogs.Count);
+            Assert.Contains(log1, processedLogs);
+            Assert.Contains(log2, processedLogs);
+            Assert.DoesNotContain(duplicateLog, processedLogs);
+        }
+
+        [Fact]
+        public async Task Retrieves_Logs_For_Each_Filter()
+        {
+            var eventLogProxy = new Mock<IEventLogProxy>();
+            var catchAllProcessor = new Mock<ILogProcessor>();
+
+            var filter1 = new NewFilterInput();
+            var filter2 = new NewFilterInput();
+            var filters = new[] {filter1, filter2};
+
+            var mockProcessors = new[] {catchAllProcessor };
+
+            var logProcessor = new BlockchainLogProcessor(
+                eventLogProxy.Object, mockProcessors.Select(p => p.Object), filters);
+
+            var log1 = new FilterLog(){TransactionHash = "x", LogIndex = new HexBigInteger(0)};
+            var log2 = new FilterLog(){TransactionHash = "y", LogIndex = new HexBigInteger(0)};
+
+            catchAllProcessor
+                .Setup(p => p.IsLogForEvent(It.IsAny<FilterLog>()))
+                .Returns(true);
+
+            eventLogProxy
+                .Setup(p => p.GetLogs(filter1, null))
+                .ReturnsAsync(new []{log1});
+
+            eventLogProxy
+                .Setup(p => p.GetLogs(filter2, null))
+                .ReturnsAsync(new []{log2});
+
+            var processedLogs = new List<FilterLog>();
+            catchAllProcessor.Setup(p => p.ProcessLogsAsync(It.IsAny<FilterLog[]>()))
+                .Callback<FilterLog[]>(l => processedLogs.AddRange(l))
+                .Returns(Task.CompletedTask);
+
+            await logProcessor.ProcessAsync(new BlockRange(0, 0));
+
+            Assert.Equal(2, processedLogs.Count);
+            Assert.Contains(log1, processedLogs);
+            Assert.Contains(log2, processedLogs);
         }
 
         [Fact]
@@ -82,7 +168,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Callback<NewFilterInput, object>((f,o) => actualFilter = f)
                 .ReturnsAsync(logs);
 
-            await logProcessor.ProcessAsync(0, 10);
+            await logProcessor.ProcessAsync(new BlockRange(0, 10));
 
             Assert.NotNull(actualFilter);
             Assert.Equal(0, actualFilter.FromBlock.BlockNumber.Value);
@@ -112,7 +198,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Callback<NewFilterInput, object>((f, o) => cancellationToken.Cancel())
                 .ReturnsAsync(logs);
 
-            await logProcessor.ProcessAsync(0, 10, cancellationToken.Token);
+            await logProcessor.ProcessAsync(new BlockRange(0, 10), cancellationToken.Token);
 
             catchAllProcessor
                 .Verify(p => p.IsLogForEvent(It.IsAny<FilterLog>()), Times.Never);
@@ -150,7 +236,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Callback<FilterLog[]>(l => cancellationToken.Cancel())
                 .Returns(Task.CompletedTask);
 
-            await logProcessor.ProcessAsync(0, 10, cancellationToken.Token);
+            await logProcessor.ProcessAsync(new BlockRange(0, 10), cancellationToken.Token);
 
             catchAllProcessor1
                 .Verify(p => p.ProcessLogsAsync(It.IsAny<FilterLog[]>()), Times.Once);
