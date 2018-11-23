@@ -162,6 +162,77 @@ Other contracts may have transfer events with different signatures, this won't w
             
         }
 
+
+        [Fact]
+        public async Task Filtering_By_Many_Values()
+        {
+            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+
+            var transferEventProcessor = new TransferEventProcessor();
+            var eventProcessors = new ILogProcessor[] {transferEventProcessor};
+
+            //create filter to catch multiple from addresses
+            //and multiple values
+            var filter = new NewFilterInputBuilder<TransferEvent>()
+                .AddTopic(e => e.From, "0x15829f2c25563481178cc4669b229775c6a49a85")
+                .AddTopic(e => e.From, "0x84b1383edee2babfe839b2a177425f0682e679f6")
+                .AddTopic(e => e.Value, new BigInteger(95))
+                .AddTopic(e => e.Value, new BigInteger(94))
+                .Build();
+
+            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors, filter);
+
+            var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
+            if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
+
+            var progressRepository = new JsonBlockProgressRepository(progressFileNameAndPath);
+
+            //this will get the last block on the chain each time a "to" block is requested
+            var progressService = new BlockProgressService(
+                web3Wrapper, 3379061, progressRepository)
+            {
+                MinimumBlockConfirmations = 6 //stay within x blocks of the most recent
+            };
+
+            var batchProcessorService = new BlockchainBatchProcessorService(
+                logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            var blockRangesProcessed = new List<BlockRange>();
+
+            var rangesProcessedCallback = new Action<uint, BlockRange>((countOfRangesProcessed, lastRange) => 
+            {  
+                blockRangesProcessed.Add(lastRange);
+
+                // short circuit - something to trigger the cancellation token
+                if (countOfRangesProcessed == 2) cancellationTokenSource.Cancel();
+            });
+
+            await batchProcessorService.ProcessContinuallyAsync(
+                cancellationTokenSource.Token, rangesProcessedCallback);
+
+            var distinctFromAddresses =
+                transferEventProcessor.ProcessedEvents
+                    .Select(e => e.Item2.Event.From)
+                    .Distinct()
+                    .ToArray();
+
+            var distinctValues =
+                transferEventProcessor.ProcessedEvents
+                    .Select(e => (int)e.Item2.Event.Value)
+                    .Distinct()
+                    .ToArray();
+
+            Assert.Equal(2, distinctFromAddresses.Length);
+            Assert.Contains("0x15829f2c25563481178cc4669b229775c6a49a85", distinctFromAddresses);
+            Assert.Contains("0x84b1383edee2babfe839b2a177425f0682e679f6", distinctFromAddresses);
+
+            Assert.Equal(2, distinctValues.Length);
+            Assert.Contains(94, distinctValues);
+            Assert.Contains(95, distinctValues);
+        }
+
         [Fact]
         public async Task TargetSpecificEventAndIndexedValueForAnyContract()
         {

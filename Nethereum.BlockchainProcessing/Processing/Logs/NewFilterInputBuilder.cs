@@ -73,7 +73,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             var parameterAttribute = propertyInfo?.GetCustomAttribute<ParameterAttribute>(true);
 
             if(parameterAttribute == null || !parameterAttribute.Parameter.Indexed)
-                throw new ArgumentException("Property must have attribute ParameterAttribute flagged as indexed");
+                throw new ArgumentException($"Property '{propertyInfo.Name}' does not represent a topic. The property must have a ParameterAttribute which is flagged as indexed");
 
             var key = CreateKey(parameterAttribute);
 

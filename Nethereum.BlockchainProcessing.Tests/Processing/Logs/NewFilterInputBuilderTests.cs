@@ -23,6 +23,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             [Parameter("uint256", "_value", 3, true)]
             public BigInteger Value { get; set; }
+            
+            [Parameter("uint256", "_notIndexed", 3, false)]
+            public uint NotIndexed { get; set; }
+
+            public uint NotAnEventParameter { get; set; }
         }
 
         [Event("TransferEvent_WithEmptyParameterNames")]
@@ -218,6 +223,27 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             Assert.Equal(range.From, filter.FromBlock.BlockNumber.Value);
             Assert.Equal(range.To, filter.ToBlock.BlockNumber.Value);
+        }
+
+        [Fact]
+        public void When_Assigning_To_A_Non_Indexed_Property_It_Will_Throw_Argument_Exception()
+        {
+            var x = Assert.Throws<ArgumentException>(() => 
+                new NewFilterInputBuilder<TransferEvent>()
+                    .AddTopic((t) => t.NotIndexed, (uint)1));
+
+            Assert.Equal("Property 'NotIndexed' does not represent a topic. The property must have a ParameterAttribute which is flagged as indexed", x.Message);
+        }
+
+        [Fact]
+        public void When_Assigning_To_A_Property_Without_A_Parameter_Attribute_It_Will_Throw_Argument_Exception()
+        {
+            var x = Assert.Throws<ArgumentException>(() => 
+                new NewFilterInputBuilder<TransferEvent>()
+                    .AddTopic((t) => t.NotAnEventParameter, (uint)1));
+
+            Assert.Equal("Property 'NotAnEventParameter' does not represent a topic. The property must have a ParameterAttribute which is flagged as indexed", x.Message);
+                
         }
     }
 }
