@@ -14,13 +14,13 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
     {
         const uint MaxBlocksPerBatch = 10;
         protected internal Mock<IBlockchainProcessor> MockProcessor;
-        protected internal Mock<IBlockchainProcessingProgressService> MockProgressService;
+        protected internal Mock<IBlockProgressService> MockProgressService;
         protected internal BlockchainBatchProcessorService Service;
 
         public BlockchainBatchProcessorServiceTests()
         {
             MockProcessor = new Mock<IBlockchainProcessor>();
-            MockProgressService = new Mock<IBlockchainProcessingProgressService>();
+            MockProgressService = new Mock<IBlockProgressService>();
             Service = new BlockchainBatchProcessorService(
                 MockProcessor.Object, MockProgressService.Object, MaxBlocksPerBatch);
         }
@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             public async Task When_There_Is_Nothing_To_Process_Returns_Null()
             {
                 MockProgressService
-                    .Setup(s => s.GetNextBlockRangeToProcess(MaxBlocksPerBatch))
+                    .Setup(s => s.GetNextBlockRangeToProcessAsync(MaxBlocksPerBatch))
                     .ReturnsAsync((BlockRange?) null);
 
                 var processedRange = await Service.ProcessLatestBlocksAsync();
@@ -46,7 +46,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 var range = new BlockRange(0, 10);
 
                 MockProgressService
-                    .Setup(s => s.GetNextBlockRangeToProcess(MaxBlocksPerBatch))
+                    .Setup(s => s.GetNextBlockRangeToProcessAsync(MaxBlocksPerBatch))
                     .ReturnsAsync(range);
 
                 MockProcessor
@@ -54,7 +54,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                     .Returns(Task.CompletedTask);
 
                 MockProgressService
-                    .Setup(s => s.UpsertBlockNumberProcessedTo(range.To))
+                    .Setup(s => s.SaveLastBlockProcessedAsync(range.To))
                     .Returns(Task.CompletedTask);
 
                 var processedRange = await Service.ProcessLatestBlocksAsync();
@@ -95,7 +95,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 //get next range from queue
                 MockProgressService
-                    .Setup(s => s.GetNextBlockRangeToProcess(MaxBlocksPerBatch))
+                    .Setup(s => s.GetNextBlockRangeToProcessAsync(MaxBlocksPerBatch))
                     .ReturnsAsync(() => rangeQueue.Dequeue());
 
                 //process range 1
@@ -116,12 +116,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 //update progress range 1
                 MockProgressService
-                    .Setup(s => s.UpsertBlockNumberProcessedTo(range1.To))
+                    .Setup(s => s.SaveLastBlockProcessedAsync(range1.To))
                     .Returns(Task.CompletedTask);
 
                 //update progress range 2
                 MockProgressService
-                    .Setup(s => s.UpsertBlockNumberProcessedTo(range2.To))
+                    .Setup(s => s.SaveLastBlockProcessedAsync(range2.To))
                     .Returns(Task.CompletedTask);
 
                 //short circuit callback used to exit process

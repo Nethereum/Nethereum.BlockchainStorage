@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class JsonBlockProcessProgressRepository : IBlockProcessProgressRepository
+    public class JsonBlockProgressRepository : IBlockProgressRepository
     {
         public class BlockProcessingProgress
         {
@@ -15,18 +15,16 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public string JsonFileNameAndPath { get; } 
 
-        public JsonBlockProcessProgressRepository(string jsonFileNameAndPath)
+        public JsonBlockProgressRepository(string jsonFileNameAndPath)
         {
             this.JsonFileNameAndPath = jsonFileNameAndPath;
             Initialise();
         }
 
-        public Task<ulong?> GetLatestAsync()
+        public Task<ulong?> GetLastBlockNumberProcessedAsync()
         {
             return Task.FromResult(_progress.To);
         }
-
-        public ulong Latest => _progress.To ?? 0;
 
         public Task UpsertProgressAsync(ulong blockNumber)
         {

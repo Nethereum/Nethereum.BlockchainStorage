@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Processing
     {
         private readonly IBlockchainProcessor _processor;
         private readonly ILogger _logger = ApplicationLogging.CreateLogger<BlockchainBatchProcessorService>();
-        private readonly IBlockchainProcessingProgressService _progressService;
+        private readonly IBlockProgressService _progressService;
         private readonly uint _maxNumberOfBlocksPerBatch;
         private static readonly uint DefaultMaxNumberOfBlocksPerBatch = 100;
 
@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public BlockchainBatchProcessorService(
             IBlockchainProcessor processor, 
-            IBlockchainProcessingProgressService  progressService, 
+            IBlockProgressService  progressService, 
             uint? maxNumberOfBlocksPerBatch = null)
         {
             _processor = processor;
@@ -44,7 +44,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         {
             _logger.LogInformation("Getting block number range to process");
 
-            var nullableRange = await _progressService.GetNextBlockRangeToProcess(_maxNumberOfBlocksPerBatch);
+            var nullableRange = await _progressService.GetNextBlockRangeToProcessAsync(_maxNumberOfBlocksPerBatch);
 
             if (nullableRange == null)
             {
@@ -58,7 +58,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             await _processor.ProcessAsync(range, cancellationToken);
 
             _logger.LogInformation($"Updating current process progress to: {range.To}");
-            await _progressService.UpsertBlockNumberProcessedTo(range.To);
+            await _progressService.SaveLastBlockProcessedAsync(range.To);
 
             return range;
         }

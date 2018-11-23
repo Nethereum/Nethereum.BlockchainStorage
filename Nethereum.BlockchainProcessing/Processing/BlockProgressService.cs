@@ -3,19 +3,19 @@ using Nethereum.BlockchainProcessing.Web3Abstractions;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class LatestBlockBlockchainProcessingProgressService : BlockchainProcessingProgressService
+    public class BlockProgressService : BlockProgressServiceBase
     {
         private readonly IWeb3Wrapper _web3;
 
         public uint MinimumBlockConfirmations = 0;
 
-        public LatestBlockBlockchainProcessingProgressService(
+        public BlockProgressService(
             IWeb3Wrapper web3, 
             ulong defaultStartingBlockNumber, 
-            IBlockProcessProgressRepository blockProcessProgressRepository) : 
+            IBlockProgressRepository blockProgressRepository) : 
             base(
             defaultStartingBlockNumber, 
-            blockProcessProgressRepository)
+            blockProgressRepository)
         {
             _web3 = web3;
         }

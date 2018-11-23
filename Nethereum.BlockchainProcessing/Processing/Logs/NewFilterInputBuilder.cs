@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
 using Nethereum.ABI;
@@ -19,7 +21,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     /// Builds a filter based on indexed parameters on an event DTO query template.
     /// The DTO should have properties decorated with ParameterAttribute
     /// Only ParameterAttributes flagged as indexed are included
-    /// Use AddCondition to set a value on a indexed property on the query template
+    /// Use SetTopic to set a value on a indexed property on the query template
     /// Values set on the query template are put in to the filter when Build is called
     /// </summary>
     /// <typeparam name="TEventDTo"></typeparam>
@@ -28,108 +30,136 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         private readonly AttributesToABIExtractor _attributesToAbiExtractor;
         private readonly ParametersEncoder _parametersEncoder;
         private readonly EventABI _eventAbi;
-        private readonly IEnumerable<PropertyInfo> _eventDtoProperties;
+        private readonly ParameterAttribute[] _indexedParameters;
+
+        private readonly Dictionary<string, List<object>> _topicValuesDictionary;
 
         public NewFilterInputBuilder()
         {
             Template = new TEventDTo();
             _eventAbi = ABITypedRegistry.GetEvent<TEventDTo>();
-            _eventDtoProperties = PropertiesExtractor.GetPropertiesWithParameterAttribute(typeof(TEventDTo));
+
+            _indexedParameters = PropertiesExtractor
+                .GetPropertiesWithParameterAttribute(typeof(TEventDTo))
+                .Select(p => p.GetCustomAttribute<ParameterAttribute>())
+                .Where(p => p?.Parameter.Indexed ?? false)
+                .OrderBy(p => p.Order)
+                .ToArray();
+                
             _attributesToAbiExtractor = new AttributesToABIExtractor();
             _parametersEncoder = new ParametersEncoder();
+            _topicValuesDictionary = new Dictionary<string, List<object>>(_indexedParameters.Count());
         }
 
         private TEventDTo Template { get; }
 
-        /// <summary>
-        /// Prevents zeros (which are often defaults on BigInteger structs or numeric value types) from appearing in the filter
-        /// If these are not ignored the filter can contain an equals 0 condition
-        /// This condition may exclude desired logs from being returned
-        /// Default is true
-        /// </summary>
-        public bool IgnoreZeros { get; set; } = true;
-
-        /// <summary>
-        /// Set the desired filter value on one of the indexed properties of the object
-        /// </summary>
-        /// <param name="setValueOnIndexedField">An action to set the value on the query template.
-        /// Set a property representing an indexed parameter of the event
-        /// e.g. (queryTemplate) => queryTemplate.From = "xyz"</param>
-        public NewFilterInputBuilder<TEventDTo> AddCondition(Action<TEventDTo> setValueOnIndexedField)
+        public NewFilterInputBuilder<TEventDTo> AddTopic<TPropertyType>(
+            Expression<Func<TEventDTo, TPropertyType>> propertySelector, IEnumerable<TPropertyType> desiredValues)
         {
-            setValueOnIndexedField(Template);
+            foreach (var desiredValue in desiredValues)
+            {
+                AddTopic(propertySelector, desiredValue);
+            }
+
             return this;
         }
 
-        public NewFilterInput Build(string[] contractAddresses = null, BlockParameter from = null, BlockParameter to = null)
+        public NewFilterInputBuilder<TEventDTo> AddTopic<TPropertyType>(
+            Expression<Func<TEventDTo, TPropertyType>> propertySelector, TPropertyType desiredValue)
         {
-            var indexedParameterValues = GetIndexedParameterValues(Template);
+            var member = propertySelector.Body as MemberExpression; 
+            var propertyInfo = member?.Member as PropertyInfo;
 
-            if (IgnoreZeros)
+            var parameterAttribute = propertyInfo?.GetCustomAttribute<ParameterAttribute>(true);
+
+            if(parameterAttribute == null || !parameterAttribute.Parameter.Indexed)
+                throw new ArgumentException("Property must have attribute ParameterAttribute flagged as indexed");
+
+            var key = CreateKey(parameterAttribute);
+
+            if (!_topicValuesDictionary.ContainsKey(key))
             {
-                NullifyZeros(indexedParameterValues);
+                _topicValuesDictionary.Add(key, new List<object>());
             }
 
-            if (indexedParameterValues.Length == 0 || indexedParameterValues.All(p => p.Value == null))
+            object valueToStore = desiredValue;
+
+            if (parameterAttribute.Parameter.ABIType is TupleType tupleType)
+            {
+                _attributesToAbiExtractor.InitTupleComponentsFromTypeAttributes(propertyInfo.PropertyType, tupleType);
+                valueToStore = _parametersEncoder.GetTupleComponentValuesFromTypeAttributes(propertyInfo.PropertyType, desiredValue);
+            }
+
+            _topicValuesDictionary[key].Add(valueToStore);
+
+            return this;
+        }
+
+        public NewFilterInput Build(string contractAddress, BlockRange? blockRange = null)
+        {
+            return Build(new[] {contractAddress}, blockRange);
+        }
+
+        public NewFilterInput Build(string[] contractAddresses = null, BlockRange? blockRange = null)
+        {
+            BlockParameter from = blockRange == null ? null : new BlockParameter(blockRange.Value.From);
+            BlockParameter to = blockRange == null ? null : new BlockParameter(blockRange.Value.To);
+
+            if (!_indexedParameters.Any() || _topicValuesDictionary.Count == 0)
             {
                 return _eventAbi.CreateFilterInput(contractAddresses, from, to);
             }
 
-            var topic1 = indexedParameterValues[0].Value;
-            var topic2 = indexedParameterValues.Length > 0 ? indexedParameterValues[1].Value : null;
-            var topic3 = indexedParameterValues.Length > 1 ? indexedParameterValues[2].Value : null;
+            object[] topic1 = null;
+            object[] topic2 = null;
+            object[] topic3 = null;
 
-            return _eventAbi.CreateFilterInput(contractAddresses, topic1, topic2, topic3, from, to);
-        }
+            string key = null;
 
-        private static void NullifyZeros(ParameterAttributeValue[] indexedParameterValues)
-        {
-            foreach (var indexedParameter in indexedParameterValues.Where(p => p.Value != null))
+            if (_indexedParameters.Length > 0)
             {
-                if (indexedParameter.Value is BigInteger bigInt)
-                {
-                    if (bigInt.IsZero)
-                    {
-                        indexedParameter.Value = null;
-                        break;
-                    }
-                }
+                var topic1Parameter = _indexedParameters[0];
+                key = CreateKey(topic1Parameter);
 
-                if (indexedParameter.Value.GetType().IsNumber() && (long)indexedParameter.Value == 0)
-                {
-                    indexedParameter.Value = null;
-                }
-            }
-        }
-
-        private ParameterAttributeValue[] GetIndexedParameterValues(object instanceValue)
-        {
-            var parameterObjects = new List<ParameterAttributeValue>();
-
-            foreach (var property in _eventDtoProperties)
-            {
-                var parameterAttribute = property.GetCustomAttribute<ParameterAttribute>(true);
-
-                if(!parameterAttribute.Parameter.Indexed) continue;
-                
-                var propertyValue = property.GetValue(instanceValue);
-
-                if (parameterAttribute.Parameter.ABIType is TupleType tupleType)
-                {
-                    _attributesToAbiExtractor.InitTupleComponentsFromTypeAttributes(property.PropertyType, tupleType);
-                    propertyValue = _parametersEncoder.GetTupleComponentValuesFromTypeAttributes(property.PropertyType, propertyValue);
-                }
-
-                parameterObjects.Add(new ParameterAttributeValue
-                {
-                    ParameterAttribute = parameterAttribute,
-                    Value = propertyValue
-                });
+                topic1 = _topicValuesDictionary.ContainsKey(key)
+                    ? _topicValuesDictionary[key].ToArray()
+                    : Array.Empty<object>();
             }
 
-            return 
-                parameterObjects.OrderBy(x => x.ParameterAttribute.Order)
-                    .ToArray();
+            if (_indexedParameters.Length > 1)
+            {
+                var topic2Parameter = _indexedParameters[1];
+                key = CreateKey(topic2Parameter);
+
+                topic2 = _topicValuesDictionary.ContainsKey(key)
+                    ? _topicValuesDictionary[key].ToArray()
+                    : Array.Empty<object>();
+            }
+
+            if (_indexedParameters.Length > 2)
+            {
+                var topic3Parameter = _indexedParameters[2];
+                key = CreateKey(topic3Parameter);
+
+                topic3 = _topicValuesDictionary.ContainsKey(key)
+                    ? _topicValuesDictionary[key].ToArray()
+                    : Array.Empty<object>();
+            }
+
+            return _eventAbi.CreateFilterInput(
+                contractAddresses, 
+                topic1 ?? Array.Empty<object>(), 
+                topic2 ?? Array.Empty<object>(), 
+                topic3 ?? Array.Empty<object>(), 
+                from, 
+                to);
+        }
+
+        private string CreateKey(ParameterAttribute parameterAttribute)
+        {
+            return string.IsNullOrWhiteSpace(parameterAttribute.Name)
+                ? parameterAttribute.Order.ToString()
+                : parameterAttribute.Name;
         }
     }
 }

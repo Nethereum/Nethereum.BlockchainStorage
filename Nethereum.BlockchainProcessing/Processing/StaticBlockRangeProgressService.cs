@@ -2,15 +2,15 @@
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class PreDefinedRangeBlockchainProcessingProgressService : BlockchainProcessingProgressService
+    public class StaticBlockRangeProgressService : BlockProgressServiceBase
     {
-        public PreDefinedRangeBlockchainProcessingProgressService(
+        public StaticBlockRangeProgressService(
             ulong blockNumberFrom, 
             ulong blockNumberTo,
-            IBlockProcessProgressRepository blockProcessProgressRepository) : 
+            IBlockProgressRepository blockProgressRepository) : 
             base(
                 blockNumberFrom, 
-                blockProcessProgressRepository)
+                blockProgressRepository)
         {
             BlockNumberTo = blockNumberTo;
         }

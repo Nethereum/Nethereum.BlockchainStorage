@@ -1,5 +1,7 @@
-﻿using Nethereum.RPC.Eth.DTOs;
+﻿using System;
+using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
@@ -32,6 +34,41 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         {
             filter.FromBlock = new BlockParameter(range.From);
             filter.ToBlock = new BlockParameter(range.To);
+        }
+
+        public static bool IsTopicFiltered(this NewFilterInput filter, uint topicNumber)
+        {
+            var filterValue = filter.GetFirstTopicValue(topicNumber);
+            return filterValue != null;
+        }
+
+        public static string GetFirstTopicValueAsString(this NewFilterInput filter, uint topicNumber)
+        {
+            var filterValue = filter.GetFirstTopicValue(topicNumber);
+            return filterValue?.ToString();
+        }
+
+        public static object GetFirstTopicValue(this NewFilterInput filter, uint topicNumber)
+        {
+            var topicValues = filter.GetTopicValues(topicNumber);
+            return topicValues.FirstOrDefault();
+        }
+
+        public static object[] GetTopicValues(this NewFilterInput filter, uint topicNumber)
+        {
+            var allTopics = filter.Topics;
+
+            if (allTopics == null) return Array.Empty<object>();
+            if (allTopics.Length < 2) return Array.Empty<object>();
+            if (topicNumber > allTopics.Length) return Array.Empty<object>();
+
+            if (allTopics[topicNumber] is object[] topicValues)
+                return topicValues;
+
+            if (allTopics[topicNumber] is object val)
+                return new [] {val};
+
+            return Array.Empty<object>();
         }
     }
 }

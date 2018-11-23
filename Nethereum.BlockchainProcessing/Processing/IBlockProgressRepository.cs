@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public interface IBlockProcessProgressRepository
+    public interface IBlockProgressRepository
     {
         Task UpsertProgressAsync(ulong blockNumber);
-        Task<ulong?> GetLatestAsync();
+        Task<ulong?> GetLastBlockNumberProcessedAsync();
     }
 }

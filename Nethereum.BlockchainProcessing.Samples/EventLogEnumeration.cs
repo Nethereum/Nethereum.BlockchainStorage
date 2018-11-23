@@ -90,8 +90,8 @@ Other contracts may have transfer events with different signatures, this won't w
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
 
-            var progressRepository = new JsonBlockProcessProgressRepository(progressFileNameAndPath);
-            var progressService = new PreDefinedRangeBlockchainProcessingProgressService(
+            var progressRepository = new JsonBlockProgressRepository(progressFileNameAndPath);
+            var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
@@ -120,10 +120,10 @@ Other contracts may have transfer events with different signatures, this won't w
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
 
-            var progressRepository = new JsonBlockProcessProgressRepository(progressFileNameAndPath);
+            var progressRepository = new JsonBlockProgressRepository(progressFileNameAndPath);
 
             //this will get the last block on the chain each time a "to" block is requested
-            var progressService = new LatestBlockBlockchainProcessingProgressService(
+            var progressService = new BlockProgressService(
                 web3Wrapper, 3379061, progressRepository)
             {
                 MinimumBlockConfirmations = 6 //stay within x blocks of the most recent
@@ -189,8 +189,8 @@ Other contracts may have transfer events with different signatures, this won't w
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
 
-            var progressRepository = new JsonBlockProcessProgressRepository(progressFileNameAndPath);
-            var progressService = new PreDefinedRangeBlockchainProcessingProgressService(
+            var progressRepository = new JsonBlockProgressRepository(progressFileNameAndPath);
+            var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
@@ -211,7 +211,7 @@ Other contracts may have transfer events with different signatures, this won't w
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
 
             var filter = new NewFilterInputBuilder<TransferEvent>()
-                .AddCondition(eventVal => eventVal.To = "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
+                .AddTopic(eventVal => eventVal.To, "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
                 .Build();
 
             var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors, filter);
@@ -219,8 +219,8 @@ Other contracts may have transfer events with different signatures, this won't w
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
 
-            var progressRepository = new JsonBlockProcessProgressRepository(progressFileNameAndPath);
-            var progressService = new PreDefinedRangeBlockchainProcessingProgressService(
+            var progressRepository = new JsonBlockProgressRepository(progressFileNameAndPath);
+            var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
@@ -249,8 +249,8 @@ Other contracts may have transfer events with different signatures, this won't w
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
 
-            var progressRepository = new JsonBlockProcessProgressRepository(progressFileNameAndPath);
-            var progressService = new PreDefinedRangeBlockchainProcessingProgressService(
+            var progressRepository = new JsonBlockProgressRepository(progressFileNameAndPath);
+            var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
