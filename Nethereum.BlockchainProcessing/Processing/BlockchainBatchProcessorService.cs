@@ -31,9 +31,9 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// Processes the blocks dictated by the progress service
         /// </summary>
         /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
-        public async Task<BlockRange?> ProcessLatestBlocksAsync()
+        public Task<BlockRange?> ProcessLatestBlocksAsync()
         {
-            return await ProcessLatestBlocksAsync(new CancellationToken());
+            return ProcessLatestBlocksAsync(new CancellationToken());
         }
 
         /// <summary>

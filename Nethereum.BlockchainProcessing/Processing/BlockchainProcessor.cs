@@ -42,10 +42,10 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// (If the strategy provides for that)</param>
         /// <param name="endBlock">End block - if null, will run continuously and wait for new blocks</param>
         /// <returns>False if processing was cancelled else True</returns>
-        public async Task<bool> ExecuteAsync(
+        public Task<bool> ExecuteAsync(
             ulong? startBlock, ulong? endBlock)
         {
-            return await ExecuteAsync(startBlock, endBlock, new CancellationToken());
+            return ExecuteAsync(startBlock, endBlock, new CancellationToken());
         }
 
         public async Task<bool> ExecuteAsync(

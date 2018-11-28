@@ -59,9 +59,9 @@ namespace Nethereum.BlockchainProcessing.Processors
             }
         }
 
-        public virtual async Task<ulong> GetMaxBlockNumberAsync()
+        public virtual Task<ulong> GetMaxBlockNumberAsync()
         {
-            return await BlockProxy.GetMaxBlockNumberAsync();
+            return BlockProxy.GetMaxBlockNumberAsync();
         }
 
         protected virtual void ClearCacheOfProcessedTransactions()

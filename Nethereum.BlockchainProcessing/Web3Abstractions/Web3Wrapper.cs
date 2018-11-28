@@ -21,10 +21,10 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
 
         private Web3.Web3 Web3 { get; }
 
-        public async Task<BlockWithTransactions> GetBlockWithTransactionsAsync
+        public Task<BlockWithTransactions> GetBlockWithTransactionsAsync
             (ulong blockNumber)
         {
-            return await Wrap(async () =>
+            return Wrap(async () =>
             {
                 var block =
                     await
@@ -34,46 +34,46 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
             });
         }
 
-        public async Task<string> GetCode(string address)
+        public Task<string> GetCode(string address)
         {
-            return await Wrap(async () => await Web3.Eth.GetCode.SendRequestAsync(address)
+            return Wrap(async () => await Web3.Eth.GetCode.SendRequestAsync(address)
                 .ConfigureAwait(false));
         }
 
-        public async Task<FilterLog[]> GetLogs(NewFilterInput newFilter, object id = null)
+        public Task<FilterLog[]> GetLogs(NewFilterInput newFilter, object id = null)
         {
-            return await Wrap(async () => await Web3.Eth.Filters.GetLogs
+            return Wrap(async () => await Web3.Eth.Filters.GetLogs
                 .SendRequestAsync(newFilter, id)
                 .ConfigureAwait(false));
         }
 
-        public async Task<ulong> GetMaxBlockNumberAsync()
+        public Task<ulong> GetMaxBlockNumberAsync()
         {
-            return await Wrap(async () =>
+            return Wrap(async () =>
             {
                 var blockNumber = await Web3.Eth.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false);
                 return (ulong) blockNumber.Value;
             });
         }
 
-        public async Task<Transaction> GetTransactionByHash(string txnHash)
+        public Task<Transaction> GetTransactionByHash(string txnHash)
         {
-            return await Wrap(async () => await Web3.Eth.Transactions.GetTransactionByHash
+            return Wrap(async () => await Web3.Eth.Transactions.GetTransactionByHash
                 .SendRequestAsync(txnHash)
                 .ConfigureAwait(false));
         }
 
-        public async Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
+        public Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
         {
-            return await Wrap(async () => await Web3.Eth.Transactions.
+            return Wrap(async () => await Web3.Eth.Transactions.
                 GetTransactionReceipt.
                 SendRequestAsync(txnHash).
                 ConfigureAwait(false));
         }
 
-        public async Task<JObject> GetTransactionVmStack(string transactionHash)
+        public Task<JObject> GetTransactionVmStack(string transactionHash)
         {
-            return await Wrap(async () =>
+            return Wrap(async () =>
             {
                 if(Web3 is Web3Geth web3Geth)
                     return await web3Geth.Debug.

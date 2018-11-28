@@ -22,9 +22,9 @@ namespace Nethereum.BlockchainProcessing.Processors
         
         private Func<T, Task<bool>> Condition { get; }
 
-        public virtual async Task<bool> IsMatchAsync(T item)
+        public virtual Task<bool> IsMatchAsync(T item)
         {
-            return await Condition(item);
+            return Condition(item);
         }
     }
 }
