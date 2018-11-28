@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
 
             blockchainProcessor.ExecuteAsync
                 (targetBlockchain.FromBlock, targetBlockchain.ToBlock)
-                .Wait();
+                .GetAwaiter().GetResult();
 
             System.Console.WriteLine($"Contracts Created: {transactionRouter.ContractsCreated}");
             System.Console.WriteLine($"Transactions Handled: {transactionRouter.TransactionsHandled}");
