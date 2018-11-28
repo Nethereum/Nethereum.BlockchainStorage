@@ -26,7 +26,8 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             {
                 if (await _filters.IsMatchAsync(transactionLog))
                 {
-                    await _transactionLogHandler.HandleAsync(transactionLog);
+                    await _transactionLogHandler.HandleAsync(transactionLog)
+                        .ConfigureAwait(false);
                 }
             }
         }

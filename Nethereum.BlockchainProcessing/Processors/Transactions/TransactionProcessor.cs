@@ -54,25 +54,31 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                 .GetTransactionReceipt(tx.TransactionHash)
                 .ConfigureAwait(false);
 
-            if (await _transactionReceiptFilters.IgnoreAsync(receipt)) return;
+            if (await _transactionReceiptFilters
+                .IgnoreAsync(receipt).ConfigureAwait(false)) return;
 
-            if (await _transactionAndReceiptFilters.IgnoreAsync((tx, receipt))) return;
+            if (await _transactionAndReceiptFilters.IgnoreAsync((tx, receipt))
+                .ConfigureAwait(false)) return;
 
-            await _transactionLogProcessor.ProcessAsync(tx, receipt);
+            await _transactionLogProcessor.ProcessAsync(tx, receipt)
+                .ConfigureAwait(false);
 
             if (tx.IsForContractCreation(receipt))
             {
-                await ProcessContractCreation(block, tx, receipt);
+                await ProcessContractCreation(block, tx, receipt)
+                    .ConfigureAwait(false);
                 return;
             }
 
             if (await ContractTransactionProcessor.IsTransactionForContractAsync(tx))
             {
-                await ProcessContractTransaction(block, tx, receipt);
+                await ProcessContractTransaction(block, tx, receipt)
+                    .ConfigureAwait(false);
                 return;
             }
 
-            await ProcessValueTransaction(block, tx, receipt);
+            await ProcessValueTransaction(block, tx, receipt)
+                .ConfigureAwait(false);
         }
 
         private async Task ProcessValueTransaction(Block block, Transaction transactionSource, TransactionReceipt transactionReceipt)

@@ -22,7 +22,8 @@ namespace Nethereum.BlockchainProcessing.Processing
         private async Task<ulong> GetStartingBlockNumber()
         {
             _log.LogInformation("Begin GetStartingBlockNumber / _strategy.GetLastBlockProcessedAsync()");
-            var blockNumber = await _strategy.GetLastBlockProcessedAsync();
+            var blockNumber = await _strategy.GetLastBlockProcessedAsync()
+                .ConfigureAwait(false);
 
             _log.LogInformation($"GetLastBlockProcessedAsync: {blockNumber}");
 
@@ -76,14 +77,14 @@ namespace Nethereum.BlockchainProcessing.Processing
                 .ExecuteAsync().ConfigureAwait(false);
         }
 
-        public async Task ProcessAsync(BlockRange range)
+        public Task ProcessAsync(BlockRange range)
         {
-            await ExecuteAsync(range.From, range.To, new CancellationToken());
+            return ExecuteAsync(range.From, range.To, new CancellationToken());
         }
 
-        public async Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
+        public Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
         {
-            await ExecuteAsync(range.From, range.To, cancellationToken);
+            return ExecuteAsync(range.From, range.To, cancellationToken);
         }
     }
 }

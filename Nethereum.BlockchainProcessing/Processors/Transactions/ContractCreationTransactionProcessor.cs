@@ -38,7 +38,16 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                 await _contractHandler.HandleAsync(new ContractTransaction(contractAddress, code, transaction))
                     .ConfigureAwait(false);
 
-            await _transactionHandler.HandleContractCreationTransactionAsync(new ContractCreationTransaction(contractAddress, code, transaction, transactionReceipt, failedCreatingContract, blockTimestamp));
+            await _transactionHandler
+                .HandleContractCreationTransactionAsync(
+                    new ContractCreationTransaction(
+                        contractAddress, 
+                        code, 
+                        transaction, 
+                        transactionReceipt, 
+                        failedCreatingContract, 
+                        blockTimestamp))
+                .ConfigureAwait(false);
         }
 
         protected virtual bool HasFailedToCreateContract(string code)

@@ -11,13 +11,13 @@ namespace Nethereum.BlockchainProcessing.Processors.PostProcessors
         {
         }
 
-        public override async Task ProcessBlockAsync(ulong blockNumber)
+        public override Task ProcessBlockAsync(ulong blockNumber)
         {
             TransactionProcessor.EnabledValueProcessing = false;
             TransactionProcessor.EnabledContractCreationProcessing = false;
             TransactionProcessor.EnabledContractProcessing = true;
             TransactionProcessor.ContractTransactionProcessor.EnabledVmProcessing = true;
-            await base.ProcessBlockAsync(blockNumber);
+            return base.ProcessBlockAsync(blockNumber);
         }
     }
 }

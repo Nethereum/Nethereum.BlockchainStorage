@@ -45,16 +45,17 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             }
         }
 
-        public async Task ProcessAsync(BlockRange range)
+        public Task ProcessAsync(BlockRange range)
         {
-            await ProcessAsync(range, new CancellationToken());
+            return ProcessAsync(range, new CancellationToken());
         }
 
         public async Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
         {
             _log.LogInformation($"Beginning ProcessAsync. from: {range.From}, to: {range.To}.");
             _log.LogInformation("Retrieving logs");
-            var distinctLogs = await RetrieveLogsAsync(range, cancellationToken);
+            var distinctLogs = await RetrieveLogsAsync(range, cancellationToken)
+                .ConfigureAwait(false);
 
             if (!distinctLogs.Any()) return;
             if (cancellationToken.IsCancellationRequested) return;
@@ -63,7 +64,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             var queues = Allocate(distinctLogs);
 
             _log.LogInformation("Processing logs");
-            await ProcessQueuesAsync(queues, cancellationToken);
+            await ProcessQueuesAsync(queues, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private static async Task ProcessQueuesAsync(
@@ -75,7 +77,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 if (cancellationToken.IsCancellationRequested) return;
 
                 var logsToProcess = processorWorkQueue[processor].ToArray();
-                await processor.ProcessLogsAsync(logsToProcess);
+                await processor.ProcessLogsAsync(logsToProcess).ConfigureAwait(false);
             }
         }
 
@@ -95,7 +97,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
             foreach (var filter in _filters)
             {
-                FilterLog[] logsMatchingFilter = await RetrieveLogsAsync(range, filter);
+                FilterLog[] logsMatchingFilter = await RetrieveLogsAsync(range, filter)
+                    .ConfigureAwait(false);
 
                 logs.Merge(logsMatchingFilter);
 
@@ -124,10 +127,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 if (retryNumber < MaxRetries)
                 {
                     _log.LogInformation("Pausing before retry get logs");
-                    await RetryWaitStrategy.Apply(retryNumber);
+                    await RetryWaitStrategy.Apply(retryNumber).ConfigureAwait(false);
 
                     _log.LogInformation("Retrying get logs");
-                    return await RetrieveLogsAsync(range, filter, retryNumber);
+                    return await RetrieveLogsAsync(range, filter, retryNumber)
+                        .ConfigureAwait(false);
                 }
 
                 _log.LogError("MaxRetries exceeded when getting logs, throwing exception.", ex);

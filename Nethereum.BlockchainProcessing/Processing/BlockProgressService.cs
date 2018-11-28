@@ -22,7 +22,8 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public override async Task<ulong> GetBlockNumberToProcessTo()
         {
-            return await _web3.GetMaxBlockNumberAsync().ConfigureAwait(false) - MinimumBlockConfirmations;
+            return await _web3.GetMaxBlockNumberAsync()
+                       .ConfigureAwait(false) - MinimumBlockConfirmations;
         }
     }
 }

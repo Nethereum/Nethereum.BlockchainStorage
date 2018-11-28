@@ -116,7 +116,10 @@ namespace Nethereum.BlockchainProcessing.Handlers
             {
                 if (await condition(contractCreationTransaction))
                 {
-                    await handler.HandleContractCreationTransactionAsync(contractCreationTransaction);
+                    await handler
+                        .HandleContractCreationTransactionAsync(contractCreationTransaction)
+                        .ConfigureAwait(false);
+
                     Interlocked.Increment(ref _contractsCreated);
                 }
             }
@@ -129,7 +132,9 @@ namespace Nethereum.BlockchainProcessing.Handlers
             {
                 if (await condition(transactionWithReceipt))
                 {
-                    await handler.HandleTransactionAsync(transactionWithReceipt);
+                    await handler.HandleTransactionAsync(transactionWithReceipt)
+                        .ConfigureAwait(false);
+
                     Interlocked.Increment(ref _transactionsHandled);
                 }
             }

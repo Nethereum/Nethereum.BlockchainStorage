@@ -16,15 +16,18 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             _transactionHandler = transactionHandler;
         }
 
-        public async Task ProcessTransactionAsync(
+        public Task ProcessTransactionAsync(
             Transaction transaction, 
             TransactionReceipt transactionReceipt, 
             HexBigInteger blockTimestamp)
         {
 
-            await _transactionHandler.HandleTransactionAsync(
-                    new TransactionWithReceipt(transaction, transactionReceipt, false, blockTimestamp))
-                .ConfigureAwait(false);
+            return _transactionHandler.HandleTransactionAsync(
+                    new TransactionWithReceipt(
+                        transaction, 
+                        transactionReceipt, 
+                        false, 
+                        blockTimestamp));
         }
     }
 }

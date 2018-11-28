@@ -44,7 +44,9 @@ namespace Nethereum.BlockchainProcessing.Processing
         {
             _logger.LogInformation("Getting block number range to process");
 
-            var nullableRange = await _progressService.GetNextBlockRangeToProcessAsync(_maxNumberOfBlocksPerBatch);
+            var nullableRange = await _progressService
+                .GetNextBlockRangeToProcessAsync(_maxNumberOfBlocksPerBatch)
+                .ConfigureAwait(false);
 
             if (nullableRange == null)
             {
@@ -55,10 +57,12 @@ namespace Nethereum.BlockchainProcessing.Processing
             var range = nullableRange.Value;
 
             _logger.LogInformation($"Processing Block Range. from: {range.From} to {range.To}");
-            await _processor.ProcessAsync(range, cancellationToken);
+            await _processor.ProcessAsync(range, cancellationToken)
+                .ConfigureAwait(false);
 
             _logger.LogInformation($"Updating current process progress to: {range.To}");
-            await _progressService.SaveLastBlockProcessedAsync(range.To);
+            await _progressService.SaveLastBlockProcessedAsync(range.To)
+                .ConfigureAwait(false);
 
             return range;
         }
@@ -82,13 +86,15 @@ namespace Nethereum.BlockchainProcessing.Processing
                 if (cancellationToken.IsCancellationRequested) break;
 
                 rangeAttemptCount++;
-                var range = await ProcessLatestBlocksAsync(cancellationToken);
+                var range = await ProcessLatestBlocksAsync(cancellationToken)
+                    .ConfigureAwait(false);
                 
                 if (cancellationToken.IsCancellationRequested) break;
 
                 if (range == null) // assume we're up to date - wait for next block
                 {
-                    await WaitForBlockStrategy.Apply(rangeAttemptCount);
+                    await WaitForBlockStrategy.Apply(rangeAttemptCount)
+                        .ConfigureAwait(false);
                 }
                 else // block range was processed so continue straight to the next
                 {

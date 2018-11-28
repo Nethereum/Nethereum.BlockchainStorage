@@ -43,7 +43,9 @@ namespace Nethereum.BlockchainProcessing.Processors
                 _lastBlock = blockNumber;
             }
 
-            var block = await BlockProxy.GetBlockWithTransactionsAsync(blockNumber);
+            var block = await BlockProxy
+                .GetBlockWithTransactionsAsync(blockNumber)
+                .ConfigureAwait(false);
 
             if(block == null)
                 throw new BlockNotFoundException(blockNumber);
@@ -53,9 +55,9 @@ namespace Nethereum.BlockchainProcessing.Processors
                 await BlockHandler.HandleAsync(block);
 
                 if (ProcessTransactionsInParallel)
-                    await ProcessTransactionsMultiThreaded(block);
+                    await ProcessTransactionsMultiThreaded(block).ConfigureAwait(false);
                 else
-                    await ProcessTransactions(block);
+                    await ProcessTransactions(block).ConfigureAwait(false);
             }
         }
 
@@ -94,7 +96,8 @@ namespace Nethereum.BlockchainProcessing.Processors
             {
                 if (!HasAlreadyBeenProcessed(txn))
                 {
-                    await TransactionProcessor.ProcessTransactionAsync(block, txn).ConfigureAwait(false);
+                    await TransactionProcessor.ProcessTransactionAsync(block, txn)
+                        .ConfigureAwait(false);
                     MarkAsProcessed(txn);
                 }
             }

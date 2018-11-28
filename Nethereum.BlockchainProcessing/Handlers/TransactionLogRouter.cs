@@ -72,7 +72,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
             {
                 if (await condition(transactionLog))
                 {
-                    await handler.HandleAsync(transactionLog);
+                    await handler.HandleAsync(transactionLog).ConfigureAwait(false);
                 }                    
             }
         }

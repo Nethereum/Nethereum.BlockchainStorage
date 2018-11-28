@@ -24,7 +24,9 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public virtual async Task<ulong> GetBlockNumberToProcessFrom()
         {
-            var lastBlockProcessed = await _blockProgressRepository.GetLastBlockNumberProcessedAsync().ConfigureAwait(false);
+            var lastBlockProcessed = await _blockProgressRepository
+                .GetLastBlockNumberProcessedAsync()
+                .ConfigureAwait(false);
 
             var blockNumber = DefaultStartingBlockNumber;
 
@@ -41,8 +43,8 @@ namespace Nethereum.BlockchainProcessing.Processing
         public virtual async Task<BlockRange?> GetNextBlockRangeToProcessAsync(
             uint maxNumberOfBlocksPerBatch)
         {
-            var from = await GetBlockNumberToProcessFrom();
-            var to = await GetBlockNumberToProcessTo();
+            var from = await GetBlockNumberToProcessFrom().ConfigureAwait(false);
+            var to = await GetBlockNumberToProcessTo().ConfigureAwait(false);
 
             if (to < from) 
                 return null;

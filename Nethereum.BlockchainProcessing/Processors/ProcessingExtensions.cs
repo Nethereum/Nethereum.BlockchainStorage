@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainProcessing.Processors
         public static async Task<bool> IgnoreAsync<T>(
             this IEnumerable<IFilter<T>> filters, T item)
         {
-            var match = await filters.IsMatchAsync(item);
+            var match = await filters.IsMatchAsync(item).ConfigureAwait(false);
             return !match;
         }
 
@@ -26,7 +26,8 @@ namespace Nethereum.BlockchainProcessing.Processors
 
             foreach (var filter in filters)
             {
-                if(await filter.IsMatchAsync(item)) return true;
+                if(await filter.IsMatchAsync(item).ConfigureAwait(false)) 
+                    return true;
             }
 
             return false;

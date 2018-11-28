@@ -28,8 +28,10 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
             {
                 var block =
                     await
-                        Web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(
-                            new HexBigInteger(blockNumber)).ConfigureAwait(false);
+                        Web3.Eth.Blocks.GetBlockWithTransactionsByNumber
+                            .SendRequestAsync(
+                            new HexBigInteger(blockNumber))
+                            .ConfigureAwait(false);
                 return block;
             });
         }

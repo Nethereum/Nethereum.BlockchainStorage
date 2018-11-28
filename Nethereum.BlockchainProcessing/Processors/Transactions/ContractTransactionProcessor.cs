@@ -70,7 +70,8 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                     hasStackTrace = true;
 
                     await _transactionVmStackHandler.HandleAsync
-                        (new TransactionVmStack(transactionHash, transaction.To, stackTrace));
+                        (new TransactionVmStack(transactionHash, transaction.To, stackTrace))
+                        .ConfigureAwait(false);
                 }
             }
 
@@ -81,7 +82,8 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                     hasError, 
                     blockTimestamp, 
                     error, 
-                    hasStackTrace));
+                    hasStackTrace))
+                .ConfigureAwait(false);
 
         }
     }
