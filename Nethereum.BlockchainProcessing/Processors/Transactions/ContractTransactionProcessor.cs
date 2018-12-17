@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
+using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
@@ -58,9 +60,9 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                         .GetTransactionVmStack(transactionHash)
                         .ConfigureAwait(false);
                 }
-                catch
+                catch(Exception x)
                 {
-
+                    
                 }
 
                 if (stackTrace != null)

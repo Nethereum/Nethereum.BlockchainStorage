@@ -82,7 +82,7 @@ namespace Nethereum.BlockchainProcessing.Web3Abstractions
                         TraceTransaction.
                         SendRequestAsync(
                             transactionHash, 
-                            new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = true});
+                            new TraceTransactionOptions {DisableMemory = true, DisableStorage = true, DisableStack = false});
 
                 return null;
             });
