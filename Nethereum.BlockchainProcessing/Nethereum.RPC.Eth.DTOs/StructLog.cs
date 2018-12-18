@@ -4,6 +4,7 @@ namespace Nethereum.RPC.Eth.DTOs
 {
     public struct StructLog
     {
+        public string From { get; set; }
         public uint PC { get; set; }
         public string Op { get; set; }
         public BigInteger Gas { get; set; }
@@ -11,9 +12,7 @@ namespace Nethereum.RPC.Eth.DTOs
         public uint Depth { get; set; }
 
         public BigInteger StackEtherValue { get; set; }
-        public string StackAddress { get; set; }
+        public string To { get; set; }
         public BigInteger StackGas { get; set; }
-
-
     }
 }

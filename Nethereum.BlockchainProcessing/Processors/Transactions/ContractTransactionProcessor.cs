@@ -69,7 +69,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                 if (stackTrace != null)
                 {
                     //TODO!  _Remove this debug line
-                    //File.WriteAllText($"c:/Temp/StackTrace_{transactionReceipt.BlockNumber.Value}.json", stackTrace.ToString());
+                    File.WriteAllText($"c:/Temp/StackTrace_{transactionReceipt.BlockNumber.Value}.json", stackTrace.ToString());
 
                     error = _vmStackErrorChecker.GetError(stackTrace);
                     hasError = !string.IsNullOrEmpty(error);

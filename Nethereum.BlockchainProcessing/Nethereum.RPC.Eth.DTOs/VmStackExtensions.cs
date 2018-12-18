@@ -11,9 +11,9 @@ namespace Nethereum.RPC.Eth.DTOs
         private static readonly JArray EmptyJArray = new JArray();
         private static readonly AddressType AddressType = new AddressType();
 
-        public static IEnumerable<StructLog> GetInterContractCalls(this JObject stackTrace)
+        public static IEnumerable<StructLog> GetInterContractCalls(this JObject stackTrace, string contractAddress)
         {
-            return stackTrace.GetStructLogs().GetInterContractCalls();
+            return stackTrace.GetStructLogs().GetInterContractCalls(contractAddress);
         }
 
         public static JArray GetStructLogs(this JObject stackTrace)
@@ -28,32 +28,60 @@ namespace Nethereum.RPC.Eth.DTOs
             return EmptyJArray;
         }
 
-        public static IEnumerable<StructLog> GetInterContractCalls(this JArray structLogs)
+        public static IEnumerable<StructLog> GetInterContractCalls(this JArray structLogs, string contractAddress)
         {
+            var addressStack = new Stack<string>();
+            int currentDepth = 1;
+
             for (int i = 0; i < structLogs.Count; i++)
             {
                 var l = structLogs[i];
+
+                var depth = l["depth"].Value<int>();
+
+                if (depth < currentDepth)
+                {
+                    addressStack.Pop();
+                    currentDepth = depth;
+                }
+
+                if (addressStack.Count == 0)
+                {
+                    addressStack.Push(contractAddress);
+                }
+
+                if (l["op"].Value<string>() == OpCodes.SelfDestruct)
+                {
+                    var destructedAddress = addressStack.Pop();
+                    var selfDestructLog = l.ToStructLog(structLogs, i, addressStack.Peek());
+                    selfDestructLog.To = destructedAddress;
+                    yield return selfDestructLog;
+                }
+
                 if(OpCodes.IsInterContract(l["op"]?.Value<string>()))
                 {
-                    var log = l.ToStructLog(structLogs, i);
+                    var log = l.ToStructLog(structLogs, i, addressStack.Peek());
+                    addressStack.Push(log.To);
+                    currentDepth++;
                     yield return log;
                 }
             }
         }
 
-        private static StructLog ToStructLog(this JToken token, JArray structLogs, int currentIndex)
+        private static StructLog ToStructLog(this JToken token, JArray structLogs, int currentIndex, string callingAddress)
         {
             var stackArray = token["stack"] as JArray;
 
             return new StructLog
             {
+                From = callingAddress,
                 Op = token["op"]?.Value<string>(),
                 Depth = token["depth"].Value<uint>(),
                 Gas = token["gas"]?.ToBigInteger(),
                 GasCost = token["gasCost"]?.ToBigInteger(),
 
                 StackGas = stackArray?[stackArray.Count - 1].ToBigInteger(),
-                StackAddress = stackArray?[stackArray.Count - 2].ConvertStructLogValueToAddress(),
+                To = stackArray?[stackArray.Count - 2].ConvertStructLogValueToAddress(),
                 StackEtherValue = stackArray?[stackArray.Count - 3].ToBigInteger()
             }
                 .Populate(structLogs, currentIndex);
@@ -88,7 +116,7 @@ namespace Nethereum.RPC.Eth.DTOs
         {
             if (structLog.Op == OpCodes.Create)
             {
-                structLog.StackAddress = structLog.FindAddressOfNewlyCreatedContract(structLogArray, currentIndex);   
+                structLog.To = structLog.FindAddressOfNewlyCreatedContract(structLogArray, currentIndex);   
             }
 
             return structLog;

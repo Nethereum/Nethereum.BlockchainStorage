@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Nethereum.RPC.Eth.DTOs;
+﻿using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Handlers
 {
@@ -21,7 +20,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
 
         public StructLog[] GetInterContractCalls()
         {
-            return StackTrace?.GetInterContractCalls().ToArray() ?? Array.Empty<StructLog>();
+            return StackTrace?.GetInterContractCalls(Address).ToArray() ?? Array.Empty<StructLog>();
         }
     }
 }

@@ -64,10 +64,10 @@ namespace Nethereum.BlockchainProcessing.Samples
         public async Task Run()
         {
             var contractAddresses = new[]
-            {"0x786a30e1ab0c58303c85419b9077657ad4fdb0ea","0xd0828aeb00e4db6813e2f330318ef94d2bba2f60","0x6c498f0f83d0bbec758ee7f23e13c9ee522a4c8f","0x243e72b69141f6af525a9a5fd939668ee9f2b354","0x2a212f50a2a020010ea88cc33fc4c333e6a5c5c4" };
+            {"0xd2e474c616cc60fb95d8b5f86c1043fa4552611b" };
 
-            const ulong FromBlock = 57;
-            const ulong ToBlock = 57;
+            const ulong FromBlock = 4347;
+            const ulong ToBlock = 4347;
 
             var web3geth = new Web3Geth();
             var web3Wrapper = new Web3Wrapper(web3geth);
