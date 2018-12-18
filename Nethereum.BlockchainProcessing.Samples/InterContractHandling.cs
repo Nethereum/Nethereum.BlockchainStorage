@@ -2,6 +2,7 @@
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Geth;
+using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -32,11 +33,12 @@ namespace Nethereum.BlockchainProcessing.Samples
         public class VmStackHandler : ITransactionVMStackHandler
         {
             public List<TransactionVmStack> Stacks = new List<TransactionVmStack>();
+            public List<StructLog> Calls = new List<StructLog>();
 
             public Task HandleAsync(TransactionVmStack transactionVmStack)
             {
-                var contractsCalled = transactionVmStack.GetContractsCalled();
-
+                var contractsCalled = transactionVmStack.GetInterContractCalls();
+                Calls.AddRange(contractsCalled);
                 Stacks.Add(transactionVmStack);
                 return Task.CompletedTask;
             }
@@ -61,14 +63,22 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task Run()
         {
+            var contractAddresses = new[]
+            {"0x786a30e1ab0c58303c85419b9077657ad4fdb0ea","0xd0828aeb00e4db6813e2f330318ef94d2bba2f60","0x6c498f0f83d0bbec758ee7f23e13c9ee522a4c8f","0x243e72b69141f6af525a9a5fd939668ee9f2b354","0x2a212f50a2a020010ea88cc33fc4c333e6a5c5c4" };
+
+            const ulong FromBlock = 57;
+            const ulong ToBlock = 57;
+
             var web3geth = new Web3Geth();
             var web3Wrapper = new Web3Wrapper(web3geth);
             var transactionHandler = new SimpleTransactionHandler();
             var vmStackHandler = new VmStackHandler();
             var contractHandler = new ContractHandler();
-            contractHandler.ContractAddresses.Add("0x243e72b69141f6af525a9a5fd939668ee9f2b354");
-            contractHandler.ContractAddresses.Add("0x2a212f50a2a020010ea88cc33fc4c333e6a5c5c4");
-            contractHandler.ContractAddresses.Add("0xd0828aeb00e4db6813e2f330318ef94d2bba2f60");
+
+            foreach (var contractAddress in contractAddresses)
+            {
+                contractHandler.ContractAddresses.Add(contractAddress);
+            }
 
             var handlers = new HandlerContainer{ ContractHandler = contractHandler, TransactionHandler = transactionHandler, TransactionVmStackHandler = vmStackHandler};
 
@@ -82,7 +92,7 @@ namespace Nethereum.BlockchainProcessing.Samples
 
             var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 
-            var result = await blockchainProcessor.ExecuteAsync(20, 20);
+            var result = await blockchainProcessor.ExecuteAsync(FromBlock, ToBlock);
 
             Assert.True(result);
         }

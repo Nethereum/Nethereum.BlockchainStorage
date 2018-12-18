@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Web3Abstractions;
@@ -67,6 +68,9 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
 
                 if (stackTrace != null)
                 {
+                    //TODO!  _Remove this debug line
+                    //File.WriteAllText($"c:/Temp/StackTrace_{transactionReceipt.BlockNumber.Value}.json", stackTrace.ToString());
+
                     error = _vmStackErrorChecker.GetError(stackTrace);
                     hasError = !string.IsNullOrEmpty(error);
                     hasStackTrace = true;
@@ -77,14 +81,15 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                 }
             }
 
-            await _transactionHandler.HandleTransactionAsync(
-                new TransactionWithReceipt(
-                    transaction, 
-                    transactionReceipt, 
-                    hasError, 
-                    blockTimestamp, 
-                    error, 
-                    hasStackTrace))
+            var tx = new TransactionWithReceipt(
+                transaction,
+                transactionReceipt,
+                hasError,
+                blockTimestamp,
+                error,
+                hasStackTrace);
+
+            await _transactionHandler.HandleTransactionAsync(tx)
                 .ConfigureAwait(false);
 
         }

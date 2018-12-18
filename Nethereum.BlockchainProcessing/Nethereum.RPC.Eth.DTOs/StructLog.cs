@@ -1,0 +1,19 @@
+﻿using System.Numerics;
+
+namespace Nethereum.RPC.Eth.DTOs
+{
+    public struct StructLog
+    {
+        public uint PC { get; set; }
+        public string Op { get; set; }
+        public BigInteger Gas { get; set; }
+        public BigInteger GasCost { get; set; }
+        public uint Depth { get; set; }
+
+        public BigInteger StackEtherValue { get; set; }
+        public string StackAddress { get; set; }
+        public BigInteger StackGas { get; set; }
+
+
+    }
+}
