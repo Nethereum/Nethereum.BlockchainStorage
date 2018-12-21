@@ -83,7 +83,7 @@ namespace Nethereum.BlockchainProcessing.Tests.DtoExtensions
                 {
                     using (var jsonReader = new JsonTextReader(streamReader))
                     {
-                        jObject = JObject.Load(jsonReader);
+                        jObject = await JObject.LoadAsync(jsonReader);
                     }
                 }
             }
