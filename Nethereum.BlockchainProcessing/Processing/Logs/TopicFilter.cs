@@ -8,13 +8,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public static readonly TopicFilter Empty = new TopicFilter(null, null);
 
-        private readonly List<object> _values;
+        private List<object> _values;
 
         public TopicFilter(PropertyInfo eventDtoProperty, ParameterAttribute parameterAttribute)
         {
             EventDtoProperty = eventDtoProperty;
             ParameterAttribute = parameterAttribute;
-            _values = new List<object>();
         }
 
         public PropertyInfo EventDtoProperty { get; }
@@ -22,11 +21,15 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public object[] GetValues()
         {
-            return _values.Count == 0 ? null : _values.ToArray();
+            return _values == null || _values.Count == 0 ? null : _values.ToArray();
         }
 
         public void AddValue(object val)
         {
+            if (_values == null)
+            {
+                _values = new List<object>();
+            }
             _values.Add(val);
         }
     }
