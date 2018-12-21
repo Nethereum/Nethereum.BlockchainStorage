@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 
 namespace Nethereum.BlockchainProcessing.Processors.PostProcessors
 {

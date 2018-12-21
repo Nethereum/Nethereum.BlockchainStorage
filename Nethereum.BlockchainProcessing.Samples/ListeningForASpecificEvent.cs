@@ -1,12 +1,12 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
@@ -62,12 +62,12 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task Run()
         {            
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
             var transferEventHandler = new TransferEventHandler();
             var handlers = new HandlerContainer{ TransactionLogHandler = transferEventHandler};
 
             var blockProcessor = BlockProcessorFactory.Create(
-                web3Wrapper, 
+                blockchainProxyService, 
                 handlers,
                 processTransactionsInParallel: false);
 

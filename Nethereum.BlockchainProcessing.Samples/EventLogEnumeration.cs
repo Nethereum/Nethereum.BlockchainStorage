@@ -1,7 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Extensions;
 using Nethereum.RPC.Eth.DTOs;
@@ -12,6 +11,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
@@ -79,13 +79,13 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task RunOnce()
         {
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
 
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
 
-            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -109,13 +109,13 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task RunContinually()
         {
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
 
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
 
-            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -124,7 +124,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             //this will get the last block on the chain each time a "to" block is requested
             var progressService = new BlockProgressService(
-                web3Wrapper, 3379061, progressRepository)
+                blockchainProxyService, 3379061, progressRepository)
             {
                 MinimumBlockConfirmations = 6 //stay within x blocks of the most recent
             };
@@ -166,7 +166,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task Filtering_By_Many_Values()
         {
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
 
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
@@ -180,7 +180,7 @@ Other contracts may have transfer events with different signatures, this won't w
                 .AddTopic(e => e.Value, new BigInteger(94))
                 .Build();
 
-            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -189,7 +189,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             //this will get the last block on the chain each time a "to" block is requested
             var progressService = new BlockProgressService(
-                web3Wrapper, 3379061, progressRepository)
+                blockchainProxyService, 3379061, progressRepository)
             {
                 MinimumBlockConfirmations = 6 //stay within x blocks of the most recent
             };
@@ -236,7 +236,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task TargetSpecificEventAndIndexedValueForAnyContract()
         {
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
@@ -255,7 +255,7 @@ Other contracts may have transfer events with different signatures, this won't w
             //the "to" address is the second indexed parameter on the event
             var filter = eventAbi.CreateFilterInput(AnyContract, AnyFromAddress, TransferToAddress);
 
-            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -277,7 +277,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task UsingFilterInputBuilder()
         {
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
 
@@ -285,7 +285,7 @@ Other contracts may have transfer events with different signatures, this won't w
                 .AddTopic(eventVal => eventVal.To, "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
                 .Build();
 
-            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -306,7 +306,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task TargetSpecificEventForSpecificContracts()
         {
-            var web3Wrapper = new Web3Wrapper("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
@@ -315,7 +315,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             var filter = new NewFilterInputBuilder<TransferEvent>().Build(ContractAddresses);
 
-            var logProcessor = new BlockchainLogProcessor(web3Wrapper, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);

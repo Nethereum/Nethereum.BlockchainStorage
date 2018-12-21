@@ -1,7 +1,7 @@
 ﻿using Nethereum.Geth;
 using Newtonsoft.Json.Linq;
 
-namespace Nethereum.BlockchainProcessing.Web3Abstractions
+namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
     public class VmStackErrorCheckerWrapper: VmStackErrorChecker, IVmStackErrorChecker
     {

@@ -1,11 +1,11 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing

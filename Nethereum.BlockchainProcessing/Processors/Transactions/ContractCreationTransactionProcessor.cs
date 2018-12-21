@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;

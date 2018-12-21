@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Processors.Transactions

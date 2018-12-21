@@ -1,11 +1,11 @@
 ﻿using System;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs

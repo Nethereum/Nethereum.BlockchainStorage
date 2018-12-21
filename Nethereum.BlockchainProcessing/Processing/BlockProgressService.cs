@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public class BlockProgressService : BlockProgressServiceBase
     {
-        private readonly IWeb3Wrapper _web3;
+        private readonly IBlockchainProxyService _web3;
 
         public uint MinimumBlockConfirmations = 0;
 
         public BlockProgressService(
-            IWeb3Wrapper web3, 
+            IBlockchainProxyService web3, 
             ulong defaultStartingBlockNumber, 
             IBlockProgressRepository blockProgressRepository) : 
             base(

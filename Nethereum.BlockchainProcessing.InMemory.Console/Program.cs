@@ -1,7 +1,7 @@
-﻿using Nethereum.BlockchainProcessing.Handlers;
+﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
@@ -44,10 +44,10 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
                 TransactionLogHandler = transactionLogRouter,
             };
 
-            var web3Wrapper = new Web3Wrapper(targetBlockchain.BlockchainUrl);
+            var blockchainProxy = new BlockchainProxyService(targetBlockchain.BlockchainUrl);
 
             var blockProcessor = BlockProcessorFactory.Create(
-                web3Wrapper, 
+                blockchainProxy, 
                 handlers, 
                 filters, 
                 processTransactionsInParallel: false);

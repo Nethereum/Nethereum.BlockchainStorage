@@ -7,14 +7,14 @@ using Nethereum.JsonRpc.Client;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 
-namespace Nethereum.BlockchainProcessing.Web3Abstractions
+namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
-    public class Web3Wrapper: IWeb3Wrapper
+    public class BlockchainProxyService: IBlockchainProxyService
     {
-        public Web3Wrapper(string url):this(new Web3.Web3(url))
+        public BlockchainProxyService(string url):this(new Web3.Web3(url))
         {}
 
-        public Web3Wrapper(Web3.Web3 web3)
+        public BlockchainProxyService(Web3.Web3 web3)
         {
             Web3 = web3;
         }

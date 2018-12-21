@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {
     public class BlockProgressServiceTests
     {
-        protected internal Mock<IWeb3Wrapper> Web3;
+        protected internal Mock<IBlockchainProxyService> Web3;
         protected internal Mock<IBlockProgressRepository> ProgressRepo;
         protected internal BlockProgressService Service;
 
         public BlockProgressServiceTests()
         {
-            Web3 = new Mock<IWeb3Wrapper>();
+            Web3 = new Mock<IBlockchainProxyService>();
             ProgressRepo = new Mock<IBlockProgressRepository>();
             Service = new BlockProgressService(Web3.Object, 10, ProgressRepo.Object);
         }

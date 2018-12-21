@@ -1,6 +1,6 @@
-﻿namespace Nethereum.BlockchainProcessing.Web3Abstractions
+﻿namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
-    public interface IWeb3Wrapper:         
+    public interface IBlockchainProxyService:         
         IBlockProxy,
         ITransactionProxy,
         IGetCode,

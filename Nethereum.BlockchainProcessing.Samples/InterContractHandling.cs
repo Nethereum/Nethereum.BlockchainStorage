@@ -1,11 +1,11 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.Geth;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
@@ -59,8 +59,8 @@ namespace Nethereum.BlockchainProcessing.Samples
                 return Task.CompletedTask;
             }
         }
-
-        [Fact]
+        
+        [Fact(Skip = "Work In Progress - Requires a private geth chain")]
         public async Task Run()
         {
             var contractAddresses = new[]
@@ -70,7 +70,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             const ulong ToBlock = 4347;
 
             var web3geth = new Web3Geth();
-            var web3Wrapper = new Web3Wrapper(web3geth);
+            var blockchainProxyService = new BlockchainProxyService(web3geth);
             var transactionHandler = new SimpleTransactionHandler();
             var vmStackHandler = new VmStackHandler();
             var contractHandler = new ContractHandler();
@@ -83,7 +83,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             var handlers = new HandlerContainer{ ContractHandler = contractHandler, TransactionHandler = transactionHandler, TransactionVmStackHandler = vmStackHandler};
 
             var blockProcessor = BlockProcessorFactory.Create(
-                web3Wrapper, 
+                blockchainProxyService, 
                 handlers, 
                 processTransactionsInParallel: false,
                 postVm: true);

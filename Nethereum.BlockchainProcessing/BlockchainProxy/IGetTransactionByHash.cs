@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 
-namespace Nethereum.BlockchainProcessing.Web3Abstractions
+namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
     public interface IGetTransactionByHash
     {

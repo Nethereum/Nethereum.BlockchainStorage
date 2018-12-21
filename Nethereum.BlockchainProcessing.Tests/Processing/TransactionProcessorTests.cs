@@ -4,8 +4,8 @@ using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Tests.Processing

@@ -1,11 +1,11 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 
 namespace Nethereum.BlockchainProcessing.Processors
 {

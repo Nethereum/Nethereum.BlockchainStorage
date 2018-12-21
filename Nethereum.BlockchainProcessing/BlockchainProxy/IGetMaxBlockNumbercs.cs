@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Web3Abstractions
+namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
     public interface IGetMaxBlockNumber
     {
