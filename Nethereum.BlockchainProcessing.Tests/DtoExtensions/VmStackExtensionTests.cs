@@ -2,7 +2,11 @@
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.DtoExtensions
@@ -75,8 +79,13 @@ namespace Nethereum.BlockchainProcessing.Tests.DtoExtensions
             JObject jObject = null;
             using (var stream = GetResourceStream(name))
             {
-                var json = await new StreamReader(stream).ReadToEndAsync();
-                jObject = JObject.Parse(json);
+                using (var streamReader = new StreamReader(stream))
+                {
+                    using (var jsonReader = new JsonTextReader(streamReader))
+                    {
+                        jObject = JObject.Load(jsonReader);
+                    }
+                }
             }
 
             return jObject;
