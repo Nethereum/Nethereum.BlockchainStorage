@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainProcessing.Processors
 
         public bool ProcessTransactionsInParallel { get; set; } = true;
 
-        readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private long _lastBlock = -1;
         private readonly object _sync = new object();
 

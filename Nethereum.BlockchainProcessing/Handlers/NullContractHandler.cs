@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
 {
     public class NullContractHandler : IContractHandler
     {
-        private readonly HashSet<string> _cachedContracts = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly HashSet<string> _cachedContracts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         public Task<bool> ExistsAsync(string contractAddress)
         {

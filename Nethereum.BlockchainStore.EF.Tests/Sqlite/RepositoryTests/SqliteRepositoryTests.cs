@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainStore.EF.Tests.Sqlite.RepositoryTests
                     db.Connection.ConnectionString.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 
                 var dataSource = configValues.First(p =>
-                    p.StartsWith("Data Source", StringComparison.InvariantCultureIgnoreCase));
+                    p.StartsWith("Data Source", StringComparison.OrdinalIgnoreCase));
 
                 var path = dataSource.Split('=')[1].Trim();
                 if (File.Exists(path))

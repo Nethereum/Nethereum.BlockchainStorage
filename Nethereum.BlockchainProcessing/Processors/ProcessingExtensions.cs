@@ -51,7 +51,7 @@ namespace Nethereum.BlockchainProcessing.Processors
             if (tx == null)
                 return Array.Empty<string>();
 
-            var uniqueAddresses = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) 
+            var uniqueAddresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
                 {tx.From};
 
             if (tx.To.IsNotAnEmptyAddress()) 

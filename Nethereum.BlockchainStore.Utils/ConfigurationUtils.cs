@@ -76,7 +76,7 @@ namespace Nethereum.Configuration
                 .AddJsonFile(baseJsonFile, optional: true, reloadOnChange: false)
                 .AddJsonFile(environmentJsonFile, optional: true, reloadOnChange: false);
 
-            if (userSecretsId != null && environment.Equals("development", StringComparison.InvariantCultureIgnoreCase))
+            if (userSecretsId != null && environment.Equals("development", StringComparison.OrdinalIgnoreCase))
                 builder.AddUserSecrets(userSecretsId);
 
             builder
