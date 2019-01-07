@@ -46,7 +46,7 @@ namespace Nethereum.BlockchainProcessing.Samples
 
         public class ContractHandler : IContractHandler
         {
-            public HashSet<string> ContractAddresses = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            public HashSet<string> ContractAddresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             public Task<bool> ExistsAsync(string contractAddress)
             {

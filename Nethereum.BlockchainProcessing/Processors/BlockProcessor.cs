@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainProcessing.Processors
         protected IEnumerable<IBlockFilter> BlockFilters { get; }
         protected ITransactionProcessor TransactionProcessor { get; }
 
-        private readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private ulong _lastBlock;
         private readonly object _sync = new object();
 

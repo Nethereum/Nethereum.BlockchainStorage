@@ -44,7 +44,7 @@ namespace Nethereum.RPC.Eth.DTOs
         public static bool EqualsAddress(this string address1, string address2)
         {
             return (address1.AddressValueOrEmpty())
-                .Equals(address2.AddressValueOrEmpty(), StringComparison.InvariantCultureIgnoreCase);
+                .Equals(address2.AddressValueOrEmpty(), StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool IsEmptyOrEqualsAddress(this string address1, string candidate)
