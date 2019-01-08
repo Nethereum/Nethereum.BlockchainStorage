@@ -39,6 +39,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             IConfigurationRoot config, BlockchainSourceConfiguration configuration)
         {
             var minBlockNumber = Parse(config, "MinimumBlockNumber");
+            var minBlockConfirmations = Parse(config, "MinimumBlockConfirmations");
             var fromBlock = Parse(config, "FromBlock");
             var toBlock = Parse(config, "ToBlock");
             var blockchainUrl = config["BlockchainUrl"];
@@ -49,6 +50,9 @@ namespace Nethereum.BlockchainProcessing.Processing
 
             if (minBlockNumber != null)
                 configuration.MinimumBlockNumber = minBlockNumber;
+
+            if (minBlockConfirmations != null)
+                configuration.MinimumBlockConfirmations = minBlockConfirmations;
 
             if (fromBlock != null)
                 configuration.FromBlock = fromBlock;
