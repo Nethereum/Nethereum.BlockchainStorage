@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Processors
 {
@@ -16,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processors
         protected IEnumerable<IBlockFilter> BlockFilters { get; }
         protected ITransactionProcessor TransactionProcessor { get; }
 
-        private readonly HashSet<string> _processedTransactions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly UniqueTransactionHashList _processedTransactions = new UniqueTransactionHashList();
         private ulong _lastBlock;
         private readonly object _sync = new object();
 

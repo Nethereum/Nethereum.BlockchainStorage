@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 
@@ -52,7 +53,7 @@ namespace Nethereum.BlockchainProcessing.Processors
             if (tx == null)
                 return Array.Empty<string>();
 
-            var uniqueAddresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+            var uniqueAddresses = new UniqueAddressList()
                 {tx.From};
 
             if (tx.To.IsNotAnEmptyAddress()) 

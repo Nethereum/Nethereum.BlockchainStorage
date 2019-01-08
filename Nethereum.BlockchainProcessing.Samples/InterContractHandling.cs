@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples
@@ -46,7 +47,7 @@ namespace Nethereum.BlockchainProcessing.Samples
 
         public class ContractHandler : IContractHandler
         {
-            public HashSet<string> ContractAddresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            public UniqueAddressList ContractAddresses = new UniqueAddressList();
 
             public Task<bool> ExistsAsync(string contractAddress)
             {

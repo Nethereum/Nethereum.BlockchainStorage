@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Handlers
 {
     public class NullContractHandler : IContractHandler
     {
-        private readonly HashSet<string> _cachedContracts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly UniqueAddressList _cachedContracts = new UniqueAddressList();
 
         public Task<bool> ExistsAsync(string contractAddress)
         {
