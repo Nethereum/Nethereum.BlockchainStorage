@@ -38,10 +38,10 @@ namespace Nethereum.BlockchainProcessing.Processing
         private static void ApplyOverrides(
             IConfigurationRoot config, BlockchainSourceConfiguration configuration)
         {
-            var minBlockNumber = Parse(config, "MinimumBlockNumber");
-            var minBlockConfirmations = Parse(config, "MinimumBlockConfirmations");
-            var fromBlock = Parse(config, "FromBlock");
-            var toBlock = Parse(config, "ToBlock");
+            var minBlockNumber = ParseUlong(config, "MinimumBlockNumber");
+            var minBlockConfirmations = ParseUint(config, "MinimumBlockConfirmations");
+            var fromBlock = ParseUlong(config, "FromBlock");
+            var toBlock = ParseUlong(config, "ToBlock");
             var blockchainUrl = config["BlockchainUrl"];
             var blockchainName = config["Blockchain"];
             var postVm = ParseBool(config, "PostVm");
@@ -74,7 +74,7 @@ namespace Nethereum.BlockchainProcessing.Processing
                     processTransactionsInParallel.Value;
         }
 
-        public static ulong? Parse(IConfigurationRoot config, string name)
+        public static ulong? ParseUlong(IConfigurationRoot config, string name)
         {
             var configVal = config[name];
 
@@ -82,6 +82,16 @@ namespace Nethereum.BlockchainProcessing.Processing
                 ? (ulong?) null
                 : ulong.Parse(configVal);
         }
+
+        public static uint? ParseUint(IConfigurationRoot config, string name)
+        {
+            var configVal = config[name];
+
+            return string.IsNullOrEmpty(configVal)
+                ? (uint?) null
+                : uint.Parse(configVal);
+        }
+
 
         public static bool? ParseBool(IConfigurationRoot config, string name)
         {
