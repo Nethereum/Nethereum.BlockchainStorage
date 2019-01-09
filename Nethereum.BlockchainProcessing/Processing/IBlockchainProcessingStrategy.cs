@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public interface IBlockchainProcessingStrategy: IDisposable
+    public interface IBlockchainProcessingStrategy
     {
         uint MaxRetries { get; }
         ulong MinimumBlockNumber { get; }

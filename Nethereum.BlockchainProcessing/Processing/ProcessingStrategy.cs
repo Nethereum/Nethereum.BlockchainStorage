@@ -19,8 +19,6 @@ namespace Nethereum.BlockchainProcessing.Processing
         public virtual ulong MinimumBlockNumber { get; set; } = 0;
         public virtual uint MinimumBlockConfirmations { get; set; } = 0;
 
-        public virtual void Dispose() { }
-
         public virtual Task FillContractCacheAsync() { return Task.CompletedTask; }
 
         public virtual Task<ulong> GetLastBlockProcessedAsync() => TaskReturningZero;
