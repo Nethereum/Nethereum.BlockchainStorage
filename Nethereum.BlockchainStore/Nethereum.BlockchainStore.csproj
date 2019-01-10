@@ -11,9 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
+    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190109-091937" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore.Utils\Nethereum.Configuration.csproj" />
   </ItemGroup>
   
 </Project>

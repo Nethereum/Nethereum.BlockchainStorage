@@ -2,7 +2,7 @@
   "profiles": {
     "Nethereum.BlockchainStore.Csv.Console": {
       "commandName": "Project",
-      "commandLineArgs": "--ASPNETCORE_ENVIRONMENT development --Blockchain rinkeby --DbSchema rinkeby --FromBlock 3014873 --ToBlock 3015873 --CsvOutputPath c:\\Temp\\BlockchainStorage\\Csv"
+      "commandLineArgs": "--ASPNETCORE_ENVIRONMENT development --Blockchain rinkeby --DbSchema rinkeby --FromBlock 3665593 --ToBlock 3665597 --CsvOutputPath c:\\Temp\\BlockchainStorage\\Csv"
     }
   }
 }

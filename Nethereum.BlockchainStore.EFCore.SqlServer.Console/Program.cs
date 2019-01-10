@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Console
             var blockchainConfig = BlockchainSourceConfigurationFactory.Get(appConfig);
             var dbContextFactory = SqlServerCoreBlockchainDbContextFactory.Create(appConfig);
             var repositoryFactory = new BlockchainStoreRepositoryFactory(dbContextFactory);
-            return ProcessorConsole.Execute(repositoryFactory, blockchainConfig).Result;
+            return StorageProcessorConsole.Execute(repositoryFactory, blockchainConfig).Result;
         }
     }
 }

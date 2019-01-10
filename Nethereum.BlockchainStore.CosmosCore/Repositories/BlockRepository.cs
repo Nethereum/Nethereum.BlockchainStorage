@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task<long> GetMaxBlockNumberAsync()
+        public async Task<ulong> GetMaxBlockNumberAsync()
         {
             var countQuery = await Client.CreateDocumentQuery<CosmosBlock>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName)).CountAsync();
@@ -44,7 +44,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 
             var sqlQuery = "SELECT VALUE MAX(b.BlockNumber) FROM Blocks b";
 
-            var query = Client.CreateDocumentQuery<long>(
+            var query = Client.CreateDocumentQuery<ulong>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName),
                 sqlQuery).AsDocumentQuery();
 

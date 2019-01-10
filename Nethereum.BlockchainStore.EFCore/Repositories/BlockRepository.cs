@@ -22,12 +22,12 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             }
         }
 
-        public async Task<long> GetMaxBlockNumberAsync()
+        public async Task<ulong> GetMaxBlockNumberAsync()
         {
             using (var context = _contextFactory.CreateContext())
             {
                 var max = await context.Blocks.MaxAsync(b => b.BlockNumber).ConfigureAwait(false);
-                return string.IsNullOrEmpty(max) ? 0 : long.Parse(max);
+                return string.IsNullOrEmpty(max) ? 0 : ulong.Parse(max);
             }
         }
 

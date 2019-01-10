@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.Util;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
@@ -19,6 +19,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
         private readonly HashSet<string> _savedEntityHashes = new HashSet<string>();
         private readonly Sha3Keccack _hasher = new Sha3Keccack();
+        private readonly PropertyInfo[] _propertiesForHash;
 
         //hack - rather than store a last row index
         private long _rowIndex = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -30,6 +31,12 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             FilePath = Path.Combine(csvFolderpath, $"{repositoryName}.csv");
 
             CreateFileIfNotExists();
+
+            _propertiesForHash = typeof(TEntity).GetProperties()
+                .Where(p => p.Name != "RowIndex")
+                .Where(p => p.Name != "RowCreated")
+                .Where(p => p.Name != "RowUpdated")
+                .ToArray();
         }
 
         private void CreateFileIfNotExists()
@@ -53,15 +60,15 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         
         private string CreateHash(TEntity entity)
         {
-            var values = entity.GetType().GetProperties()
-                .Where(p => p.Name != nameof(entity.RowIndex))
-                .Where(p => p.Name != nameof(entity.RowCreated))
-                .Where(p => p.Name != nameof(entity.RowUpdated))
+            var values = _propertiesForHash
                 .Select(p => p.GetValue(entity))
                 .Where(v => v != null)
-                .Select(v => v.ToString());
+                .Select(v => v.ToString())
+                .Where(s => s.Length > 0);
 
-            return _hasher.CalculateHash(string.Join("~", values));
+            var key = string.Join("~", values);
+            var hash = _hasher.CalculateHash(key);
+            return hash;
         }
 
         protected async Task Write(TEntity entity)
@@ -69,17 +76,23 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             await _lock.WaitAsync();
             try
             {
+                InitWriter();
+
                 var hash = CreateHash(entity);
                 if (_savedEntityHashes.Contains(hash))
                     return;
 
-                InitWriter();
-
                 _rowIndex++;
-                entity.RowIndex = (int)_rowIndex;
+                entity.RowIndex = (int) _rowIndex;
                 _csvWriter.WriteRecord(entity);
-                await _csvWriter.NextRecordAsync();
+                _csvWriter.NextRecord();
+                // NextRecord "says" it flushes - but doesn't always and leaves incomplete rows if app is terminated early
+                Flush(); 
                 _savedEntityHashes.Add(hash);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
             finally
             {
@@ -118,21 +131,30 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         {
             Enumerate(entity =>
             {
-                _savedEntityHashes.Add(CreateHash(entity));
+                var hash = CreateHash(entity);
+                _savedEntityHashes.Add(hash);
             });
         }
 
-        protected void CloseWriter()
+        protected void FlushAndDisposeWriters()
         {
-            _csvWriter?.Flush();
-            _textWriter?.Flush();
+            Flush();
+            DisposeWriters();
+        }
 
+        private void DisposeWriters()
+        {
             _csvWriter?.Dispose();
             _csvWriter = null;
 
             _textWriter?.Dispose();
             _textWriter = null;
+        }
 
+        protected void Flush()
+        {
+            _csvWriter?.Flush();
+            _textWriter?.Flush();
         }
 
         protected async Task<TEntity> FindAsync(Func<TEntity, bool> criteria)
@@ -140,7 +162,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             try
             {
                 await _lock.WaitAsync();
-                CloseWriter();
+                FlushAndDisposeWriters();
 
                 TEntity row = null;
                 WithCsvReader((csvReader) =>
@@ -163,7 +185,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             {
                 await _lock.WaitAsync();
 
-                CloseWriter();
+                FlushAndDisposeWriters();
 
                 await Task.Run(() =>
                 {
@@ -210,7 +232,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             {
                 if (disposing)
                 {
-                    CloseWriter();
+                    FlushAndDisposeWriters();
                 }
 
                 disposedValue = true;

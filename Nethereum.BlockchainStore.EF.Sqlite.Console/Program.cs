@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.EF.Sqlite.Console
             var repositoryFactory = new BlockchainStoreRepositoryFactory(contextFactory);
             var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
             configuration.ProcessBlockTransactionsInParallel = false;
-            return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
+            return StorageProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }
 }

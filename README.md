@@ -1,19 +1,12 @@
 # Nethereum Blockchain Store
 
-## Upcoming Changes
-**WARNING** - THIS DESIGN AND DOCUMENTATION ARE CURRENTLY BEING UPDATED. 
-The solution is being split to allow processing libraries to exist separately from the storage.
-
-Temporarily - the processing code has been put in to the Nethereum.BlockchainProcessing namespace and in to the Processing folder of the solution.
-This will shortly be moved to another repo and referenced from Nuget.
-
 ## Blockchain Storage
 
 The Nethereum blockhain store is a library that allows the retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
 
 The current implementation processes and stores Blocks, Transactions, Logs, Contracts and the VM Stack.
 
-The VM is specific for Geth, so if connecting to another implementation the VM will need to be disabled.
+The VM Stack retrieval/parsing is specific for Geth, so if connecting to another implementation the VM will need to be disabled.
 
 All the repositories are abstracted through interfaces providing easy replacement.
 
@@ -146,6 +139,9 @@ When provided in the command line, ensure the argument is prefixed with "--".  T
 * --MinimumBlockNumber
   - A number dictating the lowest block number to process - instead of starting at 0.
   - Useful when "FromBlock" has not neen specified.
+  - Default is 0.
+* --MinimumBlockConfirmations
+  - The number of blocks to remain behind the front of the chain
   - Default is 0.
 * --FromBlock
   - The starting block number.

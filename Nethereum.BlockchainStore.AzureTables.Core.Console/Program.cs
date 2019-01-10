@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Core.Console
                 throw ConfigurationUtils.CreateKeyNotFoundException(ConnectionStringKey);
 
             var repositoryFactory = new CloudTableSetup(connectionString, configuration.Name);
-            return ProcessorConsole.Execute(repositoryFactory, configuration).Result;
+            return StorageProcessorConsole.Execute(repositoryFactory, configuration).Result;
         }
     }
 }

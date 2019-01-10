@@ -1,46 +1,43 @@
-﻿using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Geth;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Web3Abstractions;
 
 namespace Nethereum.BlockchainStore.Processing
 {
-    public class ProcessorConsole
+    public class StorageProcessorConsole
     {
-        private static PersistenceStrategy _strategy;
-
         public static async Task<int> Execute(
             IBlockchainStoreRepositoryFactory repositoryFactory, 
             BlockchainSourceConfiguration configuration,
             FilterContainer filterContainer = null,
             bool useGeth = false)
         {
-            IWeb3Wrapper web3 = new Web3Wrapper(
+            IBlockchainProxyService web3 = new BlockchainProxyService(
                 useGeth 
                     ? new Web3Geth(configuration.BlockchainUrl) 
                     : new Web3.Web3(configuration.BlockchainUrl));
 
-            using (_strategy = new PersistenceStrategy(
-                repositoryFactory, filterContainer, minimumBlockNumber: configuration.MinimumBlockNumber ?? 0))
+            using(var repositoryHandlerContext = new RepositoryHandlerContext(repositoryFactory))
             {
-                var blockProcessor = new BlockProcessorFactory()
-                    .Create(
-                        web3, 
-                        _strategy, 
-                        configuration.PostVm,
-                        configuration.ProcessBlockTransactionsInParallel);
+                var blockProcessor = BlockProcessorFactory
+                        .Create(
+                            web3, 
+                            repositoryHandlerContext.Handlers, 
+                            postVm: configuration.PostVm,
+                            processTransactionsInParallel: configuration.ProcessBlockTransactionsInParallel);
 
-                var blockchainProcessor = new BlockchainProcessor(_strategy, blockProcessor);
-                
-                //this should not really be necessary
-                //but without it, when the process is killed early, some csv records where not being flushed
-                AppDomain.CurrentDomain.ProcessExit += (s, e) =>
+                var storageProcessingStrategy = new StorageProcessingStrategy(
+                    repositoryHandlerContext, blockProcessor)
                 {
-                    _strategy?.Dispose();
+                    MinimumBlockNumber = configuration.MinimumBlockNumber ?? 0,
+                    MinimumBlockConfirmations = configuration.MinimumBlockConfirmations ?? 0
                 };
+                
+                var blockchainProcessor = new BlockchainProcessor(storageProcessingStrategy);
 
                 var stopWatch = Stopwatch.StartNew();
 

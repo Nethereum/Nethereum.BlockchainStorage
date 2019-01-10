@@ -22,12 +22,12 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return await FindAsync(b => b.BlockNumber == blockNumber.Value.ToString());
         }
 
-        public async Task<long> GetMaxBlockNumberAsync()
+        public async Task<ulong> GetMaxBlockNumberAsync()
         {
-            long maxBlock = 0;
+            ulong maxBlock = 0;
             await EnumerateAsync(e =>
             {
-                var blockNumber = long.Parse(e.BlockNumber);
+                var blockNumber = ulong.Parse(e.BlockNumber);
 
                 if (maxBlock < blockNumber)
                 {
