@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.EFCore.Sqlite;
+﻿using Nethereum.BlockchainStore.EFCore.Sqlite;
+using System.IO;
 
 namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite
 {
@@ -8,8 +8,8 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.Sqlite
         public static readonly object _lock = new object();
         public static bool _dbExists = false;
 
-        public const string ConnectionString =
-            "Data Source=C:/temp/Blockchain_EFCore_UnitTest.db";
+        public static readonly string ConnectionString =
+            $"Data Source={Path.Combine(Path.GetTempPath(), "Blockchain_EFCore_UnitTest.db")}";
 
         public TestSqliteDbContextFactory() : base(ConnectionString)
         {

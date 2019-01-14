@@ -8,7 +8,7 @@ namespace Nethereum.BlockchainStore.Csv.Tests
 
     public class CsvTestFixture : IDisposable
     {
-        public const string CsvPath = "c:/Temp/BlockchainStorageCsvTests/csv";
+        public static readonly string CsvPath = Path.Combine(Path.GetTempPath(), "BlockchainStorageCsvTests", "csv");
 
         public CsvTestFixture()
         {
