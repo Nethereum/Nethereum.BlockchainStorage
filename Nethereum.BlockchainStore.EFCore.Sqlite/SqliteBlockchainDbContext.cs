@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Nethereum.BlockchainStore.EFCore.EntityBuilders;
 using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainStore.EFCore.Sqlite
@@ -15,7 +14,7 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite
 
         public SqliteBlockchainDbContext(string connectionString)
         {
-            EntityBuilderExtensions.ColumnTypeForUnlimitedText = "TEXT";
+            ColumnTypeForUnlimitedText = "TEXT";
             _connectionString = connectionString;
         }
 
@@ -29,7 +28,6 @@ namespace Nethereum.BlockchainStore.EFCore.Sqlite
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            EntityBuilderExtensions.ColumnTypeForUnlimitedText = "TEXT";
             optionsBuilder.UseSqlite(_connectionString);
         }
     }

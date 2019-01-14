@@ -6,12 +6,10 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
 {
     public static class EntityBuilderExtensions
     {
-        public static string ColumnTypeForUnlimitedText = "nvarchar(max)";
-
         public static PropertyBuilder<TProperty> IsUnlimitedText<TProperty>(
-            this PropertyBuilder<TProperty> propertyBuilder)
+            this PropertyBuilder<TProperty> propertyBuilder, string columnTypeForUnlimitedText)
         {
-            return propertyBuilder.HasColumnType(ColumnTypeForUnlimitedText);
+            return propertyBuilder.HasColumnType(columnTypeForUnlimitedText);
         }
 
         public static PropertyBuilder<TProperty> IsAddress<TProperty>(

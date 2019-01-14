@@ -7,6 +7,8 @@ namespace Nethereum.BlockchainStore.EFCore
 {
     public abstract class BlockchainDbContextBase: DbContext
     {
+        public string ColumnTypeForUnlimitedText { get; protected set; } = "nvarchar(max)";
+
         public DbSet<Block> Blocks { get; set; }
         public DbSet<AddressTransaction> AddressTransactions { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
@@ -16,12 +18,12 @@ namespace Nethereum.BlockchainStore.EFCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new BlockEntityBuilder());
-            modelBuilder.ApplyConfiguration(new ContractEntityBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionEntityBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionLogEntityBuilder());
-            modelBuilder.ApplyConfiguration(new TransactionLogVmStackEntityBuilder());
-            modelBuilder.ApplyConfiguration(new AddressTransactionBuilder());
+            modelBuilder.ApplyConfiguration(new BlockEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
+            modelBuilder.ApplyConfiguration(new ContractEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
+            modelBuilder.ApplyConfiguration(new TransactionEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
+            modelBuilder.ApplyConfiguration(new TransactionLogEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
+            modelBuilder.ApplyConfiguration(new TransactionLogVmStackEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
+            modelBuilder.ApplyConfiguration(new AddressTransactionBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
             base.OnModelCreating(modelBuilder);
         }
     }

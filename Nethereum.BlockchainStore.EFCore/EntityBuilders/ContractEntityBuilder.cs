@@ -13,8 +13,8 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
 
             entityBuilder.Property(m => m.Address).IsAddress();
             entityBuilder.Property(m => m.Name).HasMaxLength(255);
-            entityBuilder.Property(m => m.ABI).IsUnlimitedText();
-            entityBuilder.Property(m => m.Code).IsUnlimitedText();
+            entityBuilder.Property(m => m.ABI).IsUnlimitedText(ColumnTypeForUnlimitedText);
+            entityBuilder.Property(m => m.Code).IsUnlimitedText(ColumnTypeForUnlimitedText);
             entityBuilder.Property(m => m.Creator).IsAddress();
             entityBuilder.Property(m => m.TransactionHash).IsHash();
 

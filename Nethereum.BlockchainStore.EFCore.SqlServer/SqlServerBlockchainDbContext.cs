@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.EFCore.EntityBuilders;
+using Nethereum.BlockchainStore.Entities;
 using System;
 using System.Reflection;
-using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer
 {
@@ -50,6 +49,8 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
 
         protected SqlServerBlockchainDbContext(string connectionString)
         {
+            ColumnTypeForUnlimitedText = "nvarchar(max)";
+
             _connectionString = connectionString;
 
             var dbSchemaAttribute = (DbSchemaAttribute)this.GetType().GetCustomAttribute(typeof(DbSchemaAttribute));
@@ -67,7 +68,6 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            EntityBuilderExtensions.ColumnTypeForUnlimitedText = "nvarchar(max)";
             optionsBuilder.UseSqlServer(_connectionString, (a) =>
             {
                 

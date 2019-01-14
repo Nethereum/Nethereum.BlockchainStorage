@@ -3,5 +3,6 @@
 
     public abstract class BaseEntityBuilder
     {
+        public string ColumnTypeForUnlimitedText = "nvarchar(max)";
     }
 }

@@ -23,9 +23,9 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
             entityBuilder.Property(b => b.AddressFrom).IsAddress();
             entityBuilder.Property(b => b.AddressTo).IsAddress();
             entityBuilder.Property(b => b.Value).IsBigInteger();
-            entityBuilder.Property(b => b.Input).IsUnlimitedText();
+            entityBuilder.Property(b => b.Input).IsUnlimitedText(ColumnTypeForUnlimitedText);
             entityBuilder.Property(b => b.ReceiptHash).IsHash();
-            entityBuilder.Property(b => b.Error).IsUnlimitedText();
+            entityBuilder.Property(b => b.Error).IsUnlimitedText(ColumnTypeForUnlimitedText);
             entityBuilder.Property(b => b.NewContractAddress).IsAddress();
         }
     }
