@@ -1,6 +1,6 @@
 ﻿namespace Nethereum.BlockchainStore.Search
 {
-    public static class Extensions
+    public static class SearchExtensions
     {
         public static SearchType InferResultType(this string query)
         {
