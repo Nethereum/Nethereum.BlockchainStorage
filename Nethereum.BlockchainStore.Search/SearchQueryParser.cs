@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class RegularExpressions
+    public static class SearchQueryParser
     {
         public static readonly Regex BlockNumber = new Regex(@"^\d+$");
         public static readonly Regex TransactionHash = new Regex("^0(?i)x([A-Fa-f0-9]{64})$");

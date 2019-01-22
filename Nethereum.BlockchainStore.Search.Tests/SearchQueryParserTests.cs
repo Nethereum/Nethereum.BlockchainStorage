@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
 {
-    public class RegularExpressionsTests
+    public class SearchQueryParserTests
     {
         [Theory]
         [InlineData("0", SearchType.Block)]

@@ -4,4 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PurchaseOrderPOC\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nethereum.Web3" Version="3.0.0" />
+  </ItemGroup>
+
 </Project>

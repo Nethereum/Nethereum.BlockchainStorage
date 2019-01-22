@@ -1,4 +1,6 @@
-﻿namespace Nethereum.BlockchainStore.Search
+﻿using Nethereum.BlockchainStore.Entities;
+
+namespace Nethereum.BlockchainStore.Search
 {
     public class SearchResult
     {
@@ -6,9 +8,8 @@
 
         public string Title { get; set; }
         public SearchType Type { get; set; }
-        public Block Block { get; set; }
-        public Transaction Transaction { get; set; }
-        public Contract Contract { get; set; }
-        public Address Address { get; set; }
+        public IBlockView Block { get; set; }
+        public ITransactionView Transaction { get; set; }
+        public IContractView Contract { get; set; }
     }
 }

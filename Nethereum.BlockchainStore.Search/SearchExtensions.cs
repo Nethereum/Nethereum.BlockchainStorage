@@ -5,7 +5,7 @@
         public static SearchType InferResultType(this string query)
         {
             if (string.IsNullOrWhiteSpace(query)) return SearchType.Unknown;
-            return RegularExpressions.InferSearchType(query.Trim());
+            return SearchQueryParser.InferSearchType(query.Trim());
         }
     }
 }
