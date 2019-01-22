@@ -9,10 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PurchaseOrderPOC\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190109-091937" />
     <PackageReference Include="Nethereum.Web3" Version="3.0.0" />
   </ItemGroup>
 
