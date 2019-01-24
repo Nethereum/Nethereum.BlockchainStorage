@@ -6,21 +6,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Nethereum.Contracts;
 
-namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
+namespace Nethereum.BlockchainStore.Search
 {
-    public class SearchIndex
+    public class EventSearchIndexDefinition
     {
         protected Type _eventType;
         protected EventAttribute _eventAttribute;
 
         public SearchField[] Fields { get; set; } = Array.Empty<SearchField>();
-        public string IndexName { get; set; }
+        public string IndexName { get; protected set; }
+
+        protected EventSearchIndexDefinition()
+        {
+        }
+
+        public EventSearchIndexDefinition(string indexName)
+        {
+            IndexName = indexName;
+        }
     }
 
-    public class SearchIndex<TEvent> : SearchIndex where TEvent : IEventDTO, new()
+    public class EventSearchIndexDefinition<TEvent> : EventSearchIndexDefinition where TEvent : class, IEventDTO, new() 
     {
-        public SearchIndex()
+        public EventSearchIndexDefinition()
         {
             _eventType = typeof(TEvent);
             _eventAttribute = _eventType.GetCustomAttribute<EventAttribute>();
@@ -43,71 +53,86 @@ namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
             Fields = fieldDictionary.Values.ToArray();
         }
 
-        private void LoadBlockchainLogFields(Dictionary<string, SearchField> fieldDictionary)
+        private void AddField(Dictionary<string, SearchField> fieldDictionary,
+            PresetSearchFieldName name, Action<SearchField> fieldConfigurationAction)
         {
-            fieldDictionary.Add("log_key", new SearchField("log_key")
+            var searchField = new SearchField(name);
+            fieldConfigurationAction(searchField);
+            fieldDictionary.Add(searchField.Name, searchField);
+        }
+
+        private void LoadBlockchainLogFields(Dictionary<string, SearchField> fields)
+        {
+            AddField(fields, PresetSearchFieldName.log_key, f =>
             {
-                DataType = typeof(string),
-                IsKey = true,
-                IsSortable = true,
-                LogValue = (filter) => 
-                    $"{filter.BlockNumber.Value}_{filter.TransactionIndex.Value}_{filter.LogIndex.Value}"
+                f.DataType = typeof(string);
+                f.IsKey = true;
+                f.IsSortable = true;
+                f.LogValueCallback = (filter) =>
+                    $"{filter.BlockNumber.Value}_{filter.TransactionIndex.Value}_{filter.LogIndex.Value}";
             });
 
-            fieldDictionary.Add("log_removed", new SearchField("log_removed")
+            AddField(fields, PresetSearchFieldName.log_removed, f =>
             {
-                DataType = typeof(bool),
-                IsSortable = true,
-                IsFilterable = true,
-                LogValue = (filter) => filter.Removed
+                f.DataType = typeof(bool);
+                f.IsSortable = true;
+                f.IsFilterable = true;
+                f.LogValueCallback = (filter) => filter.Removed;
             });
 
-            fieldDictionary.Add("log_type", new SearchField("log_type")
+            AddField(fields, PresetSearchFieldName.log_type, f =>
             {
-                DataType = typeof(string),
-                IsSortable = true,
-                IsFilterable = true,
-                LogValue = (filter) => filter.Type
+                f.DataType = typeof(string);
+                f.IsSortable = true;
+                f.IsFilterable = true;
+                f.LogValueCallback = (filter) => filter.Type;
             });
 
-            fieldDictionary.Add("log_logIndex", new SearchField("log_logIndex")
+            AddField(fields, PresetSearchFieldName.log_log_index, f => 
             {
-                DataType = typeof(HexBigInteger),
-                IsFilterable = false,
-                LogValue = (filter) => filter.LogIndex
+                    f.DataType = typeof(HexBigInteger);
+                    f.IsFilterable = false;
+                    f.LogValueCallback = (filter) => filter.LogIndex;
             });
             
-            fieldDictionary.Add("log_transactionHash", new SearchField("log_transactionHash")
+            AddField(fields, PresetSearchFieldName.log_transaction_hash, f =>
             {
-                DataType = typeof(string),
-                IsSearchable = true,
-                LogValue = (filter) => filter.TransactionHash
+                f.DataType = typeof(string);
+                f.IsSearchable = true;
+                f.LogValueCallback = (filter) => filter.TransactionHash;
+                f.IsSuggester = true;
             });
-            fieldDictionary.Add("log_transactionIndex", new SearchField("log_transactionIndex")
+
+            AddField(fields, PresetSearchFieldName.log_transaction_index, f =>
             {
-                DataType = typeof(HexBigInteger),
-                LogValue = (filter) => filter.TransactionIndex
+                f.DataType = typeof(HexBigInteger);
+                f.LogValueCallback = (filter) => filter.TransactionIndex;
             });
-            fieldDictionary.Add("log_blockHash", new SearchField("log_blockHash")
+
+            AddField(fields, PresetSearchFieldName.log_block_hash, f =>
             {
-                DataType = typeof(string),
-                LogValue = (filter) => filter.BlockHash
+                f.DataType = typeof(string);
+                f.LogValueCallback = (filter) => filter.BlockHash;
             });
-            fieldDictionary.Add("log_blockNumber", new SearchField("log_blockNumber")
+
+            AddField(fields, PresetSearchFieldName.log_block_number, f =>
             {
-                DataType = typeof(HexBigInteger),
-                IsSearchable = true,
-                IsSortable = true,
-                IsFilterable = true,
-                LogValue = (filter) => filter.BlockNumber
+                f.DataType = typeof(HexBigInteger);
+                f.IsSearchable = true;
+                f.IsSortable = true;
+                f.IsFilterable = true;
+                f.LogValueCallback = (filter) => filter.BlockNumber;
+                f.IsSuggester = true;
             });
-            fieldDictionary.Add("log_address", new SearchField("log_address")
+
+            AddField(fields, PresetSearchFieldName.log_address, f =>
             {
-                DataType = typeof(string),
-                IsSearchable = true,
-                IsSortable = true,
-                IsFilterable = true,
-                LogValue = (filter) => filter.Address
+                f.DataType = typeof(string);
+                f.IsSearchable = true;
+                f.IsSortable = true;
+                f.IsFilterable = true;
+                f.LogValueCallback = (filter) => filter.Address;
+                f.IsSuggester = true;
             });
 
         }
@@ -138,7 +163,7 @@ namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
 
                 if (string.IsNullOrEmpty(searchFieldAttribute.Name))
                 {
-                    searchFieldAttribute.Name = nonIndexedProperty.parameter.Parameter.Name;
+                    searchFieldAttribute.Name = nonIndexedProperty.property.Name;
                 }
 
                 fieldDictionary[searchFieldAttribute.Name] = searchFieldAttribute;
@@ -217,7 +242,8 @@ namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
                 IsSearchable = true,
                 IsSortable = true,
                 IsFilterable = true,
-                IsFacetable = true
+                IsFacetable = true,
+                IsSuggester = true
             };
 
             field.SourceProperty = topic.EventDtoProperty;
@@ -234,12 +260,17 @@ namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
 
     public static class SearchIndexExtensions
     {
-        public static SearchField Field(this SearchIndex searchIndex, string name)
+        public static SearchField Field(this EventSearchIndexDefinition searchIndex, string name)
         {
             return searchIndex.Fields.FirstOrDefault(f => f.Name == name);
         }
 
-        public static SearchField KeyField(this SearchIndex searchIndex)
+        public static SearchField Field(this EventSearchIndexDefinition searchIndex, PresetSearchFieldName name)
+        {
+            return searchIndex.Field(name.ToString());
+        }
+
+        public static SearchField KeyField(this EventSearchIndexDefinition searchIndex)
         {
             return searchIndex.Fields.FirstOrDefault(f => f.IsKey);
         }
@@ -266,6 +297,11 @@ namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
             Name = name;
         }
 
+        public SearchField(PresetSearchFieldName fieldName)
+        {
+            Name = fieldName.ToString();
+        }
+
         public string Name { get; set; }
         public Type DataType { get; set; } = typeof(System.String);
         public bool IsKey { get; set; }
@@ -274,14 +310,21 @@ namespace Nethereum.BlockchainStore.Search.PurchaseOrderPOC
         public bool IsSortable { get;set; }
         public bool IsFacetable { get; set; }
         public bool Ignore { get; set; }
+        public bool IsSuggester { get;set; }
+        public int SuggesterOrder { get; set; }
 
         public PropertyInfo SourceProperty { get; set; }
 
-        public Func<FilterLog, object> LogValue { get; set; }
+        public Func<FilterLog, object> LogValueCallback { get; set; }
 
         public object EventValue(IEventDTO eventDto)
         {
             return SourceProperty?.GetValue(eventDto);
+        }
+
+        public object GetValue<TEvent>(EventLog<TEvent> e)
+        {
+            return SourceProperty?.GetValue(e.Event) ??  LogValueCallback?.Invoke(e.Log);
         }
         
     }

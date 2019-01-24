@@ -1,8 +1,9 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainStore.Search.PurchaseOrderPOC;
+using Nethereum.BlockchainStore.Search;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Numerics;
+using System.Text;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
@@ -27,7 +28,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void BuildsExpectedIndexForCodeGeneratedEventDto()
         {
-            var searchIndex = new SearchIndex<DepositedEventDTO>();
+            var searchIndex = new EventSearchIndexDefinition<DepositedEventDTO>();
 
             var depositedEventDto = new DepositedEventDTO
             {
@@ -39,7 +40,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.Equal("Deposited", searchIndex.IndexName);
             Assert.Equal(12, searchIndex.Fields.Length);
 
-            var senderField = searchIndex.Field("Sender");
+            var senderField = searchIndex.Field(nameof(depositedEventDto.Sender));
             Assert.NotNull(senderField);
             Assert.Equal(typeof(string), senderField.DataType);
             Assert.False(senderField.IsKey);
@@ -50,7 +51,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(senderField.IsSortable);
             Assert.Equal(depositedEventDto.Sender, senderField.EventValue(depositedEventDto));
 
-            var valueField = searchIndex.Field("Value");
+            var valueField = searchIndex.Field(nameof(depositedEventDto.Value));
             Assert.NotNull(valueField);
             Assert.Equal(typeof(BigInteger), valueField.DataType);
             Assert.False(valueField.IsKey);
@@ -61,7 +62,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(valueField.IsSortable);
             Assert.Equal(depositedEventDto.Value, valueField.EventValue(depositedEventDto));
 
-            var newBalanceField = searchIndex.Field("NewBalance");
+            var newBalanceField = searchIndex.Field(nameof(depositedEventDto.NewBalance));
             Assert.NotNull(newBalanceField);
             Assert.Equal(typeof(BigInteger), newBalanceField.DataType);
             Assert.False(newBalanceField.IsKey);
@@ -72,15 +73,15 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(newBalanceField.IsSortable);
             Assert.Equal(depositedEventDto.NewBalance, newBalanceField.EventValue(depositedEventDto));
 
-            var log_key = searchIndex.Field("log_key");
-            var log_removed = searchIndex.Field("log_removed");
-            var log_type = searchIndex.Field("log_type");
-            var log_logIndex = searchIndex.Field("log_logIndex");
-            var log_transactionIndex = searchIndex.Field("log_transactionIndex");
-            var log_transactionHash = searchIndex.Field("log_transactionHash");
-            var log_blockHash = searchIndex.Field("log_blockHash");
-            var log_blockNumber = searchIndex.Field("log_blockNumber");
-            var log_address = searchIndex.Field("log_address");
+            var log_key = searchIndex.Field(PresetSearchFieldName.log_key);
+            var log_removed = searchIndex.Field(PresetSearchFieldName.log_removed);
+            var log_type = searchIndex.Field(PresetSearchFieldName.log_type);
+            var log_logIndex = searchIndex.Field(PresetSearchFieldName.log_log_index);
+            var log_transactionIndex = searchIndex.Field(PresetSearchFieldName.log_transaction_index);
+            var log_transactionHash = searchIndex.Field(PresetSearchFieldName.log_transaction_hash);
+            var log_blockHash = searchIndex.Field(PresetSearchFieldName.log_block_hash);
+            var log_blockNumber = searchIndex.Field(PresetSearchFieldName.log_block_number);
+            var log_address = searchIndex.Field(PresetSearchFieldName.log_address);
 
             var filterLog = new FilterLog
             {
@@ -102,7 +103,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False( log_key.IsSearchable);
             Assert.False(log_key.IsFacetable);
             Assert.False(log_key.IsFilterable);
-            Assert.Equal("101_3_9", log_key.LogValue(filterLog));
+            Assert.Equal("101_3_9", log_key.LogValueCallback(filterLog));
 
             Assert.NotNull(log_removed);
             Assert.Equal(typeof(bool), log_removed.DataType);
@@ -112,7 +113,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(log_removed.IsFilterable);
             Assert.False(log_removed.IsSearchable);
             Assert.True(log_removed.IsSortable);
-            Assert.Equal(filterLog.Removed, log_removed.LogValue(filterLog));
+            Assert.Equal(filterLog.Removed, log_removed.LogValueCallback(filterLog));
             
             Assert.NotNull(log_type);
             Assert.Equal(typeof(string), log_type.DataType);
@@ -122,7 +123,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(log_type.IsFilterable);
             Assert.False(log_type.IsSearchable);
             Assert.True(log_type.IsSortable);
-            Assert.Equal(filterLog.Type, log_type.LogValue(filterLog));
+            Assert.Equal(filterLog.Type, log_type.LogValueCallback(filterLog));
 
             Assert.NotNull(log_logIndex);
             Assert.Equal(typeof(HexBigInteger), log_logIndex.DataType);
@@ -132,7 +133,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(log_logIndex.IsFilterable);
             Assert.False(log_logIndex.IsSearchable);
             Assert.False(log_logIndex.IsSortable);
-            Assert.Equal(filterLog.LogIndex, log_logIndex.LogValue(filterLog));
+            Assert.Equal(filterLog.LogIndex, log_logIndex.LogValueCallback(filterLog));
 
             Assert.NotNull(log_transactionHash);
             Assert.Equal(typeof(string), log_transactionHash.DataType);
@@ -142,7 +143,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(log_transactionHash.IsFilterable);
             Assert.True(log_transactionHash.IsSearchable);
             Assert.False(log_transactionHash.IsSortable);
-            Assert.Equal(filterLog.TransactionHash, log_transactionHash.LogValue(filterLog));
+            Assert.Equal(filterLog.TransactionHash, log_transactionHash.LogValueCallback(filterLog));
 
             Assert.NotNull(log_transactionIndex);
             Assert.Equal(typeof(HexBigInteger), log_transactionIndex.DataType);
@@ -152,7 +153,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(log_transactionIndex.IsFilterable);
             Assert.False(log_transactionIndex.IsSearchable);
             Assert.False(log_transactionIndex.IsSortable);
-            Assert.Equal(filterLog.TransactionIndex, log_transactionIndex.LogValue(filterLog));
+            Assert.Equal(filterLog.TransactionIndex, log_transactionIndex.LogValueCallback(filterLog));
 
             Assert.NotNull(log_blockHash);
             Assert.Equal(typeof(string), log_blockHash.DataType);
@@ -162,7 +163,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(log_blockHash.IsFilterable);
             Assert.False(log_blockHash.IsSearchable);
             Assert.False(log_blockHash.IsSortable);
-            Assert.Equal(filterLog.BlockHash, log_blockHash.LogValue(filterLog));
+            Assert.Equal(filterLog.BlockHash, log_blockHash.LogValueCallback(filterLog));
 
             Assert.NotNull(log_blockNumber);
             Assert.Equal(typeof(HexBigInteger), log_blockNumber.DataType);
@@ -172,7 +173,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(log_blockNumber.IsFilterable);
             Assert.True(log_blockNumber.IsSearchable);
             Assert.True(log_blockNumber.IsSortable);
-            Assert.Equal(filterLog.BlockNumber, log_blockNumber.LogValue(filterLog));
+            Assert.Equal(filterLog.BlockNumber, log_blockNumber.LogValueCallback(filterLog));
 
             Assert.NotNull(log_address);
             Assert.Equal(typeof(string), log_address.DataType);
@@ -182,7 +183,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(log_address.IsFilterable);
             Assert.True(log_address.IsSearchable);
             Assert.True(log_address.IsSortable);
-            Assert.Equal(filterLog.Address, log_address.LogValue(filterLog)); 
+            Assert.Equal(filterLog.Address, log_address.LogValueCallback(filterLog)); 
         }
 
         [Searchable(Name = "IndexA")]
@@ -196,7 +197,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void IndexCanIncludeCustomFieldsOutsideOfTheSolidityEvent()
         {
-            var searchIndex = new SearchIndex<CustomEventDtoA>();
+            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoA>();
 
             var categoryField = searchIndex.Field("Category");
             Assert.NotNull(categoryField);
@@ -216,7 +217,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void IndexNameCanBeOverridden()
         {
-            var searchIndex = new SearchIndex<CustomEventDtoA>();
+            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoA>();
             Assert.Equal("IndexA", searchIndex.IndexName);
         }
 
@@ -232,7 +233,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void EventParametersCanBeCustomIndexed()
         {
-            var searchIndex = new SearchIndex<CustomEventDtoB>();
+            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoB>();
 
             Assert.Null(searchIndex.Field("Sender"));
 
@@ -261,7 +262,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillExcludeIgnoredFields()
         {
-            var searchIndex = new SearchIndex<CustomEventDtoC>();
+            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoC>();
             Assert.Null(searchIndex.Field("Sender"));
         }
 
@@ -275,8 +276,27 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillProvideDefaultPropertyName()
         {
-            var searchIndex = new SearchIndex<CustomEventDtoD>();
+            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoD>();
             Assert.NotNull(searchIndex.Field("Sender"));
+        }
+
+        public partial class CustomEventDtoE : DepositedEventDTOBase
+        {
+            [Parameter("address", "_sender", 1, true )]
+            public new byte[] Sender { get; set; }
+        }
+
+        [Fact]
+        public void WillIndexNewProperties()
+        {
+            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoE>();
+            Assert.NotNull(searchIndex.Field("Sender"));
+
+            const string sender = "Test";
+            var dto = new CustomEventDtoE {Sender = Encoding.ASCII.GetBytes(sender)};
+            var valueAsBytes = (byte[]) searchIndex.Field("Sender").EventValue(dto);
+            var valueAsString = Encoding.ASCII.GetString(valueAsBytes);
+            Assert.Equal(sender, valueAsString);
         }
     }
 }
