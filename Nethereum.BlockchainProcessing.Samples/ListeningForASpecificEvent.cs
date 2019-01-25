@@ -48,7 +48,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                     var eventValues = transactionLog.Decode<TransferEvent>();
                     TransferEventsHandled.Add((transactionLog, eventValues));
                 }
-                catch (Exception x)
+                catch (Exception)
                 {
                     //Error whilst handling transaction log
                     //expected event signature may differ from the expected event.
