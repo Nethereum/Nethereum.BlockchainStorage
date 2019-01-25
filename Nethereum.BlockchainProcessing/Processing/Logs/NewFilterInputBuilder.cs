@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     /// Values set on the query template are put in to the filter when Build is called
     /// </summary>
     /// <typeparam name="TEventDTo"></typeparam>
-    public class NewFilterInputBuilder<TEventDTo> where TEventDTo : new()
+    public class NewFilterInputBuilder<TEventDTo> where TEventDTo : class
     {
         private readonly EventABI _eventAbi;
         private readonly TopicFilterContainer<TEventDTo> _topics;

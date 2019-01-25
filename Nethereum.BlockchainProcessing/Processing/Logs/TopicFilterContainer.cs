@@ -5,7 +5,7 @@ using Nethereum.ABI.FunctionEncoding.Attributes;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class TopicFilterContainer<T> where T: new()
+    public class TopicFilterContainer<T> where T: class
     {
         public TopicFilterContainer()
         {
