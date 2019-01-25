@@ -1,14 +1,13 @@
-﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainStore.Search;
+﻿using System.Numerics;
+using System.Text;
+using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System.Numerics;
-using System.Text;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
 {
-    public class SearchIndexTests
+    public class EventSearchIndexDefinitionTests
     {
         public partial class DepositedEventDTO : DepositedEventDTOBase { }
 

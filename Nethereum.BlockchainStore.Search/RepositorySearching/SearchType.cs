@@ -1,4 +1,4 @@
-﻿namespace Nethereum.BlockchainStore.Search
+﻿namespace Nethereum.BlockchainStore.Search.RepositorySearching
 {
     public enum SearchType
     {

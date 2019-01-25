@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Nethereum.BlockchainStore.Search
+﻿namespace Nethereum.BlockchainStore.Search.RepositorySearching
 {
     public interface ISearcherFactory
     {

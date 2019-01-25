@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.BlockchainStore.Search;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests
+namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
-    public class AzureSearchTests
+    public class AzureEventSearchTests
     {
         [Event("Transfer")]
         public class TransferEvent : IEventDTO
@@ -46,7 +41,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             var eventSearchIndexDefinition = new EventSearchIndexDefinition<TransferEvent>();
 
-            using (var searchService = new AzureSearchService(AzureSearchServiceName, apiKey))
+            using (var searchService = new AzureEventSearchService(AzureSearchServiceName, apiKey))
             {
                 try
                 {

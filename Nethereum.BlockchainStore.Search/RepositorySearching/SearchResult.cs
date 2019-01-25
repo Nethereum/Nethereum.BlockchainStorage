@@ -1,6 +1,6 @@
 ﻿using Nethereum.BlockchainStore.Entities;
 
-namespace Nethereum.BlockchainStore.Search
+namespace Nethereum.BlockchainStore.Search.RepositorySearching
 {
     public class SearchResult
     {

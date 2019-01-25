@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using Nethereum.BlockchainStore.Search.RepositorySearching;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests
+namespace Nethereum.BlockchainStore.Search.Tests.RepositorySearching
 {
     public class SearchServiceTests
     {

@@ -1,20 +1,19 @@
-﻿using System;
+﻿using Microsoft.Azure.Search.Models;
+using Nethereum.Contracts;
+using Nethereum.Hex.HexTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using Microsoft.Azure.Search.Models;
-using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.Contracts;
-using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public static class AzureSearchExtensions
+    public static class AzureEventSearchExtensions
     {
         public const string SuggesterName = "sg";
 
-        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventSearchIndexDefinition<TEvent> indexDefinition) where TEvent : class, IEventDTO, new()
+        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventSearchIndexDefinition<TEvent> indexDefinition) where TEvent : class, new()
         {
             var dictionary = new Dictionary<string, object>();
             foreach (var field in indexDefinition.Fields)
@@ -30,7 +29,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return dictionary;
         }
         
-        public static Index ToAzureIndex(this EventSearchIndexDefinition searchIndex)
+        public static Index ToAzureIndex(this SearchIndexDefinition searchIndex)
         {
             var index = new Index
             {

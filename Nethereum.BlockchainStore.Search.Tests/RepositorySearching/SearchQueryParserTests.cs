@@ -1,7 +1,7 @@
-using System;
+using Nethereum.BlockchainStore.Search.RepositorySearching;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests
+namespace Nethereum.BlockchainStore.Search.Tests.RepositorySearching
 {
     public class SearchQueryParserTests
     {

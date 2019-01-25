@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainStore.Search
+namespace Nethereum.BlockchainStore.Search.RepositorySearching
 {
 
     public class SearchService : ISearchService

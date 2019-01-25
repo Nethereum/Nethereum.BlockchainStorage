@@ -1,47 +1,28 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventSearchIndexDefinition
+    public class EventSearchIndexDefinition<TEvent> : SearchIndexDefinition where TEvent : class, new()
     {
-        protected Type _eventType;
-        protected EventAttribute _eventAttribute;
-
-        public SearchField[] Fields { get; set; } = Array.Empty<SearchField>();
-        public string IndexName { get; protected set; }
-
-        protected EventSearchIndexDefinition()
-        {
-        }
-
-        public EventSearchIndexDefinition(string indexName)
-        {
-            IndexName = indexName;
-        }
-    }
-
-    public class EventSearchIndexDefinition<TEvent> : EventSearchIndexDefinition where TEvent : class, IEventDTO, new() 
-    {
+        private readonly Type _eventType;
+        
         public EventSearchIndexDefinition()
         {
             _eventType = typeof(TEvent);
-            _eventAttribute = _eventType.GetCustomAttribute<EventAttribute>();
-            if (_eventAttribute == null)
+            var eventAttribute = _eventType.GetCustomAttribute<EventAttribute>();
+            if (eventAttribute == null)
             {
                 throw new ArgumentException("Event class does not have an EventAttribute");
             }
 
-            //get SearchIndex attribute
-            Searchable searchable = _eventType.GetCustomAttribute<Searchable>();
-            IndexName = searchable == null ? _eventAttribute.Name : searchable.Name;
+            var searchable = _eventType.GetCustomAttribute<Searchable>();
+            IndexName = searchable == null ? eventAttribute.Name : searchable.Name;
 
             var fieldDictionary = new Dictionary<string, SearchField>();
 
@@ -257,77 +238,4 @@ namespace Nethereum.BlockchainStore.Search
             return field;
         }
     }
-
-    public static class SearchIndexExtensions
-    {
-        public static SearchField Field(this EventSearchIndexDefinition searchIndex, string name)
-        {
-            return searchIndex.Fields.FirstOrDefault(f => f.Name == name);
-        }
-
-        public static SearchField Field(this EventSearchIndexDefinition searchIndex, PresetSearchFieldName name)
-        {
-            return searchIndex.Field(name.ToString());
-        }
-
-        public static SearchField KeyField(this EventSearchIndexDefinition searchIndex)
-        {
-            return searchIndex.Fields.FirstOrDefault(f => f.IsKey);
-        }
-
-    }
-
-    [AttributeUsage(validOn:AttributeTargets.Class)]
-    public class Searchable : Attribute
-    {
-        public string Name { get; set; }
-        public bool AddToIndex { get; set; } = true;
-    }
-
-    [AttributeUsage(validOn:AttributeTargets.Property)]
-    public class SearchField: Attribute
-    {
-        public SearchField()
-        {
-            
-        }
-
-        public SearchField(string name)
-        {
-            Name = name;
-        }
-
-        public SearchField(PresetSearchFieldName fieldName)
-        {
-            Name = fieldName.ToString();
-        }
-
-        public string Name { get; set; }
-        public Type DataType { get; set; } = typeof(System.String);
-        public bool IsKey { get; set; }
-        public bool IsSearchable { get; set; } 
-        public bool IsFilterable { get;set; }
-        public bool IsSortable { get;set; }
-        public bool IsFacetable { get; set; }
-        public bool Ignore { get; set; }
-        public bool IsSuggester { get;set; }
-        public int SuggesterOrder { get; set; }
-
-        public PropertyInfo SourceProperty { get; set; }
-
-        public Func<FilterLog, object> LogValueCallback { get; set; }
-
-        public object EventValue(IEventDTO eventDto)
-        {
-            return SourceProperty?.GetValue(eventDto);
-        }
-
-        public object GetValue<TEvent>(EventLog<TEvent> e)
-        {
-            return SourceProperty?.GetValue(e.Event) ??  LogValueCallback?.Invoke(e.Log);
-        }
-        
-    }
-
-
 }

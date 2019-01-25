@@ -7,18 +7,18 @@ using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureSearchService: IDisposable
+    public class AzureEventSearchService: IDisposable
     {
         private readonly SearchServiceClient _client;
         private readonly ConcurrentDictionary<string, Index> _azureIndexes;
 
-        public AzureSearchService(string serviceName, string searchApiKey)
+        public AzureEventSearchService(string serviceName, string searchApiKey)
         {
             _client = new SearchServiceClient(serviceName, new SearchCredentials(searchApiKey));
             _azureIndexes = new ConcurrentDictionary<string, Index>();
         }
 
-        public async Task<IAzureEventIndex<TEvent>> GetOrCreateIndex<TEvent>(EventSearchIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class, IEventDTO, new()
+        public async Task<IAzureEventIndex<TEvent>> GetOrCreateIndex<TEvent>(EventSearchIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class, new()
         {
             var azureIndex = GetAzureIndex(searchIndexDefinition);
 
@@ -27,10 +27,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 azureIndex = await _client.Indexes.CreateAsync(azureIndex);
             }
 
-            return new AzureEventIndex<TEvent>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
+            return new AzureEventSearchIndex<TEvent>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
         }
 
-        public async Task DeleteIndexAsync(EventSearchIndexDefinition searchIndex)
+        public async Task DeleteIndexAsync(SearchIndexDefinition searchIndex)
         {
             var azureIndex = GetAzureIndex(searchIndex);
 
@@ -40,7 +40,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             }
         }
 
-        private Index GetAzureIndex(EventSearchIndexDefinition eventIndex)
+        private Index GetAzureIndex(SearchIndexDefinition eventIndex)
         {
             if (_azureIndexes.TryGetValue(eventIndex.IndexName, out var index))
             {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moq;
+﻿using Moq;
+using Nethereum.BlockchainStore.Search.RepositorySearching;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests
+namespace Nethereum.BlockchainStore.Search.Tests.RepositorySearching
 {
     public class SearcherFactoryTests
     {

@@ -1,18 +1,18 @@
-﻿using Microsoft.Azure.Search.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Text;
+using Microsoft.Azure.Search.Models;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests
+namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
-    public class AzureSearchExtensionTests
+    public class AzureEventSearchExtensionTests
     {
         [Fact]
         public void ToAzureDataType()
@@ -103,7 +103,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void ToAzureIndex()
         {
-            var eventSearchDefinition = new EventSearchIndexDefinition("IndexA")
+            var eventSearchDefinition = new SearchIndexDefinition("IndexA")
             {
                 Fields = new []
                 {

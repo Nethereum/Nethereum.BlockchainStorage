@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Nethereum.BlockchainStore.Search
+namespace Nethereum.BlockchainStore.Search.RepositorySearching
 {
     public static class SearchQueryParser
     {
