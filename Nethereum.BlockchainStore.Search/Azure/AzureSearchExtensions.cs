@@ -12,6 +12,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
 {
     public static class AzureSearchExtensions
     {
+        public const string SuggesterName = "sg";
+
         public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventSearchIndexDefinition<TEvent> indexDefinition) where TEvent : class, IEventDTO, new()
         {
             var dictionary = new Dictionary<string, object>();
@@ -48,7 +50,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 .ToArray();
 
             if (!suggesterFields.Any()) return Array.Empty<Suggester>();
-            return new[] {new Suggester("sg", suggesterFields.Select(f => f.Name.ToLower()).ToArray())};
+            return new[] {new Suggester(SuggesterName, suggesterFields.Select(f => f.Name.ToLower()).ToArray())};
         }
 
         public static Field[] ToAzureFields(this IEnumerable<SearchField> fields)
@@ -89,6 +91,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
             if(type == typeof(BigInteger)) return DataType.String;
 
             return DataType.String;
+        }
+
+        public static IList<string> FacetableFieldNames(this Index index)
+        {
+            return index.Fields.Where(f => f.IsFacetable).Select(f => f.Name).ToList();
         }
     }
 }

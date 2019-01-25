@@ -17,11 +17,13 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void ToAzureDataType()
         {
+            //mapped field types
             Assert.Equal(DataType.String, typeof(string).ToAzureDataType());
             Assert.Equal(DataType.String, typeof(BigInteger).ToAzureDataType());
             Assert.Equal(DataType.String, typeof(HexBigInteger).ToAzureDataType());
             Assert.Equal(DataType.Boolean, typeof(bool).ToAzureDataType());
 
+            //unmapped - default field type is string
             Assert.Equal(DataType.String, typeof(DateTime).ToAzureDataType());
             Assert.Equal(DataType.String, typeof(int).ToAzureDataType());
             Assert.Equal(DataType.String, typeof(long).ToAzureDataType());
