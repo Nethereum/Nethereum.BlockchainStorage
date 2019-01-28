@@ -7,7 +7,7 @@ using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureEventSearchService: IDisposable
+    public class AzureEventSearchService : IAzureEventSearchService
     {
         private readonly SearchServiceClient _client;
         private readonly ConcurrentDictionary<string, Index> _azureIndexes;
@@ -18,7 +18,12 @@ namespace Nethereum.BlockchainStore.Search.Azure
             _azureIndexes = new ConcurrentDictionary<string, Index>();
         }
 
-        public async Task<IAzureEventIndex<TEvent>> GetOrCreateIndex<TEvent>(EventSearchIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class, new()
+        public async Task<IAzureEventSearchIndex<TEvent>> GetOrCreateIndex<TEvent>(string indexName = null) where TEvent : class
+        {
+            return await GetOrCreateIndex<TEvent>(new EventSearchIndexDefinition<TEvent>(indexName));
+        }
+
+        public async Task<IAzureEventSearchIndex<TEvent>> GetOrCreateIndex<TEvent>(EventSearchIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
         {
             var azureIndex = GetAzureIndex(searchIndexDefinition);
 
@@ -27,16 +32,17 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 azureIndex = await _client.Indexes.CreateAsync(azureIndex);
             }
 
-            return new AzureEventSearchIndex<TEvent>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
+            return new AzureEventSearchSearchIndex<TEvent>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
         }
 
-        public async Task DeleteIndexAsync(SearchIndexDefinition searchIndex)
-        {
-            var azureIndex = GetAzureIndex(searchIndex);
+        public Task DeleteIndexAsync(SearchIndexDefinition searchIndex) =>
+            DeleteIndexAsync(GetAzureIndex(searchIndex).Name);
 
-            if (await _client.Indexes.ExistsAsync(azureIndex.Name))
+        public async Task DeleteIndexAsync(string indexName)
+        {
+            if (await _client.Indexes.ExistsAsync(indexName))
             {
-                await _client.Indexes.DeleteAsync(azureIndex.Name);
+                await _client.Indexes.DeleteAsync(indexName);
             }
         }
 

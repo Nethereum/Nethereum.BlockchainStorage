@@ -68,7 +68,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
                                 TransactionIndex = new HexBigInteger(0)
                             });
 
-                        await azureIndex.UpsertAsync(transferEventLog);
+                        await azureIndex.IndexAsync(transferEventLog);
 
                         await Task.Delay(TimeSpan.FromSeconds(5));
 

@@ -8,11 +8,11 @@ using System.Reflection;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventSearchIndexDefinition<TEvent> : SearchIndexDefinition where TEvent : class, new()
+    public class EventSearchIndexDefinition<TEvent> : SearchIndexDefinition where TEvent : class
     {
         private readonly Type _eventType;
         
-        public EventSearchIndexDefinition()
+        public EventSearchIndexDefinition(string indexName = null)
         {
             _eventType = typeof(TEvent);
             var eventAttribute = _eventType.GetCustomAttribute<EventAttribute>();
@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.Search
             }
 
             var searchable = _eventType.GetCustomAttribute<Searchable>();
-            IndexName = searchable == null ? eventAttribute.Name : searchable.Name;
+            IndexName = indexName ?? (searchable == null ? eventAttribute.Name : searchable.Name);
 
             var fieldDictionary = new Dictionary<string, SearchField>();
 

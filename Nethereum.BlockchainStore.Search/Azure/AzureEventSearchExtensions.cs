@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         public const string SuggesterName = "sg";
 
-        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventSearchIndexDefinition<TEvent> indexDefinition) where TEvent : class, new()
+        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventSearchIndexDefinition<TEvent> indexDefinition) where TEvent : class
         {
             var dictionary = new Dictionary<string, object>();
             foreach (var field in indexDefinition.Fields)

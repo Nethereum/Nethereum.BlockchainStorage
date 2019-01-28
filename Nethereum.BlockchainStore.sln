@@ -86,9 +86,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Search", "Search", "{FB329F89-6656-49DA-8948-DBB1017C15B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Search", "Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj", "{30F1A98B-A6E0-4AAE-9102-662AC8353994}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Search", "Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj", "{30F1A98B-A6E0-4AAE-9102-662AC8353994}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Search.Tests", "Nethereum.BlockchainStore.Search.Tests\Nethereum.BlockchainStore.Search.Tests.csproj", "{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Search.Tests", "Nethereum.BlockchainStore.Search.Tests\Nethereum.BlockchainStore.Search.Tests.csproj", "{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Search.Samples", "Nethereum.BlockchainStore.Search.Samples\Nethereum.BlockchainStore.Search.Samples.csproj", "{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -212,6 +214,10 @@ Global
 		{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,6 +262,7 @@ Global
 		{9CEBB355-7B4B-4CC0-A572-69B886D928CE} = {EEDCA637-8CC5-4390-8C10-8BD09AB24947}
 		{30F1A98B-A6E0-4AAE-9102-662AC8353994} = {FB329F89-6656-49DA-8948-DBB1017C15B1}
 		{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4} = {FB329F89-6656-49DA-8948-DBB1017C15B1}
+		{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515} = {FB329F89-6656-49DA-8948-DBB1017C15B1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B38D1C4-9FAE-4BA6-A315-8451597A4E9C}

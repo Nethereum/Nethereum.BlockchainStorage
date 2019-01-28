@@ -4,27 +4,36 @@ using Microsoft.Rest.TransientFaultHandling;
 using Nethereum.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureEventSearchIndex<TEvent> : IAzureEventIndex<TEvent> where TEvent : class, new()
+    public class AzureEventSearchSearchIndex<TEvent> : IAzureEventSearchIndex<TEvent> where TEvent : class
     {
         private readonly EventSearchIndexDefinition<TEvent> _eventSearchDefinition;
         private readonly Index _index;
         private readonly ISearchIndexClient _indexClient;
 
-        public AzureEventSearchIndex(EventSearchIndexDefinition<TEvent> eventSearchDefinition, Index index, ISearchIndexClient indexClient)
+        public int Indexed { get; private set; }
+
+        public AzureEventSearchSearchIndex(EventSearchIndexDefinition<TEvent> eventSearchDefinition, Index index, ISearchIndexClient indexClient)
         {
             _eventSearchDefinition = eventSearchDefinition;
             _index = index;
             _indexClient = indexClient;
         }
 
-        public async Task UpsertAsync(EventLog<TEvent> log)
+        public async Task IndexAsync(EventLog<TEvent> log)
         {
-            var document = log.ToAzureDocument(_eventSearchDefinition);
-            await BatchUpdateAsync(new[] {document});
+            await IndexAsync(new[] {log});
+        }
+
+        public async Task IndexAsync(IEnumerable<EventLog<TEvent>> logs)
+        {
+            var documents = logs.Select(l => l.ToAzureDocument(_eventSearchDefinition)).ToArray();
+            await BatchUpdateAsync(documents);
+            Indexed += documents.Length;
         }
 
         public async Task<DocumentSuggestResult<Dictionary<string, object>>> SuggestAsync(string searchText, bool fuzzy = true)
@@ -54,6 +63,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 .Documents
                 .SearchAsync<Dictionary<string, object>>(text, sp);
         }
+
+        public Task<long> DocumentCountAsync() => _indexClient.Documents.CountAsync();
 
         private async Task BatchUpdateAsync<T>(IEnumerable<T> uploadOrMerge, IEnumerable<T> upload = null, IEnumerable<T> delete = null) where T : class
         {

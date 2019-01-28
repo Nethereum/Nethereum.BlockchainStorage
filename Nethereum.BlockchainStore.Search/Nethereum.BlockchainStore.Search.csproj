@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,8 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Search" Version="5.0.3" />
-    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190109-091937" />
-    <PackageReference Include="Nethereum.Web3" Version="3.0.0" />
+    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190125-144206" />
   </ItemGroup>
 
 </Project>
