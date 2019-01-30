@@ -2,6 +2,7 @@
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -19,6 +20,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             foreach (var field in indexDefinition.Fields)
             {
                 var azureField = field.ToAzureField();
+
                 var val = field.GetValue(log)?.ToAzureFieldValue();
                 if (val != null)
                 {
@@ -33,7 +35,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         {
             var index = new Index
             {
-                Name = searchIndex.IndexName.ToLower(), 
+                Name = searchIndex.IndexName.ToLower().Replace(".", "_"), 
                 Fields = searchIndex.Fields.ToAzureFields(), 
                 Suggesters = searchIndex.Fields.ToAzureSuggesters()
             };
@@ -59,7 +61,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public static Field ToAzureField(this SearchField f)
         {
-            return new Field(f.Name.ToLower(), f.DataType.ToAzureDataType())
+            return new Field(f.Name.ToAzureFieldName(), f.IsCollection ? DataType.Collection(f.DataType.ToAzureDataType()) : f.DataType.ToAzureDataType())
             {
                 IsKey = f.IsKey,
                 IsFilterable = f.IsFilterable,
@@ -67,6 +69,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 IsSearchable = f.IsSearchable,
                 IsFacetable = f.IsFacetable,
             };
+        }
+
+        public static string ToAzureFieldName(this string fieldName)
+        {
+            return fieldName.ToLower().Replace(".", "_");
         }
 
         public static object ToAzureFieldValue(this object val)
@@ -79,6 +86,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
             if(val is BigInteger bigInteger) return bigInteger.ToString();
             if (val is byte[] byteArray) return Encoding.UTF8.GetString(byteArray);
 
+            if (val.GetType().IsArrayOrList())
+            {
+                return val;
+            }
+
             return val.ToString();
         }
 
@@ -88,6 +100,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
             if(type == typeof(bool)) return DataType.Boolean;
             if(type == typeof(HexBigInteger)) return DataType.String;
             if(type == typeof(BigInteger)) return DataType.String;
+            if (type.IsArray) return DataType.Collection(type.GetElementType().ToAzureDataType());
+            if (type.IsGenericList()) return DataType.Collection(type.GetGenericArguments()[0].ToAzureDataType());
 
             return DataType.String;
         }

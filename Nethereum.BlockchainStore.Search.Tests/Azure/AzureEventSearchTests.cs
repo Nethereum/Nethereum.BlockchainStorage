@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding.Attributes;
@@ -24,6 +25,29 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
             [Parameter("uint256", "_value", 3, true)]
             public BigInteger Value {get; set;}
+
+            [Parameter("tuple", "_detail", 4, false)]
+            public TransferDetail Detail { get; set; }
+        }
+
+        public class TransferDetail
+        {
+            [Parameter("string", "_description", 1)]
+            public string Description {get; set;}
+
+            [Parameter("tuple[2]", "_tags", 2)]
+            public List<Tag> Tags { get; set; }
+        }
+
+        public class Tag
+        {
+            [SearchField(IsSearchable = true, IsFacetable = true, IsFilterable = true)]
+            [Parameter("string", "_description", 1, true)]
+            public string Name {get; set;}
+
+            [SearchField(IsSearchable = true, IsFacetable = true, IsFilterable = true)]
+            [Parameter("string", "_value", 2, true)]
+            public string Value {get; set;}
         }
 
         public const string ApiKeyName = "AzureSearchApiKey";
@@ -55,7 +79,16 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
                             {
                                 From = "0x9209b29f2094457d3dba62d1953efea58176ba27",
                                 To = "0x1209b29f2094457d3dba62d1953efea58176ba28",
-                                Value = new HexBigInteger("2000000")
+                                Value = new HexBigInteger("2000000"),
+                                Detail = new TransferDetail
+                                {
+                                    Description = "A generic transfer",
+                                    Tags = new List<Tag>
+                                    {
+                                        new Tag{Name = "Status", Value = "Good"},
+                                        new Tag{Name = "Year", Value = "2019"}
+                                    }
+                                }
                             },
                             new FilterLog
                             {

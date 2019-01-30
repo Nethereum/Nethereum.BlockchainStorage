@@ -1,8 +1,11 @@
-﻿using System.Numerics;
-using System.Text;
-using Nethereum.ABI.FunctionEncoding.Attributes;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
@@ -22,6 +25,34 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             [Parameter("uint256", "_newBalance", 3, false)]
             public virtual BigInteger NewBalance { get; set; }
+
+            //a struct
+            [Parameter("tuple", "_detail", 3, false)]
+            public virtual DepositDetailDTO Detail { get; set; }
+        }
+
+        //a class to represent a struct
+        public class DepositDetailDTO
+        {
+            [Parameter("uint256", "_timestamp", 1, false )]
+            public long Timestamp { get; set; }
+
+            [SearchField(IsSearchable = true, IsFilterable = true, IsFacetable = true)]
+            [Parameter("string", "_currency", 2, false )]
+            public string Currency { get; set; }
+
+            //an array of structs
+            [Parameter("tuple[2]", "_categories", 3, false )]
+            public List<CategoryDTO> Categories { get; set; }
+
+ 
+        }
+
+        //another struct - expected to be returned in an array
+        public class CategoryDTO
+        {
+            [Parameter("string", "_name", 1, false)]
+            public string Name { get; set; }
         }
 
         [Fact]
@@ -33,11 +64,21 @@ namespace Nethereum.BlockchainStore.Search.Tests
             {
                 NewBalance = new HexBigInteger("100"),
                 Value = new HexBigInteger("10"),
-                Sender = "adsfadsfasdfasdf"
+                Sender = "adsfadsfasdfasdf",
+                Detail = new DepositDetailDTO
+                {
+                    Currency = "GBP",
+                    Timestamp = DateTimeOffset.UnixEpoch.ToUnixTimeSeconds(),
+                    Categories = new List<CategoryDTO>
+                    {
+                        new CategoryDTO{Name = "Dodgy"}, 
+                        new CategoryDTO{Name = "International"}
+                    }
+                }
             };
 
             Assert.Equal("Deposited", searchIndex.IndexName);
-            Assert.Equal(12, searchIndex.Fields.Length);
+            Assert.Equal(15, searchIndex.Fields.Length);
 
             var senderField = searchIndex.Field(nameof(depositedEventDto.Sender));
             Assert.NotNull(senderField);
@@ -182,10 +223,27 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(log_address.IsFilterable);
             Assert.True(log_address.IsSearchable);
             Assert.True(log_address.IsSortable);
-            Assert.Equal(filterLog.Address, log_address.LogValueCallback(filterLog)); 
+            Assert.Equal(filterLog.Address, log_address.LogValueCallback(filterLog));
+
+            var currencyField = searchIndex.Field("Detail.Currency");
+            Assert.NotNull(currencyField);
+            Assert.True(currencyField.IsSearchable);
+            Assert.True(currencyField.IsFilterable);
+            Assert.True(currencyField.IsFacetable);
+            Assert.Equal(depositedEventDto.Detail.Currency, currencyField.EventValue(depositedEventDto));
+
+
+            var categoryNameField = searchIndex.Field("Detail.Categories.Name");
+            Assert.NotNull(categoryNameField);
+            Assert.True(categoryNameField.IsCollection);
+            var categoryNames = categoryNameField.EventValue(depositedEventDto) as string[];
+            Assert.NotNull(categoryNames);
+            Assert.Equal(depositedEventDto.Detail.Categories.Count, categoryNames.Length);
+            Assert.Equal(depositedEventDto.Detail.Categories[0].Name, (string)categoryNames[0]);
+            Assert.Equal(depositedEventDto.Detail.Categories[1].Name, (string)categoryNames[1]);
         }
 
-        [Searchable(Name = "IndexA")]
+        [SearchIndex(Name = "IndexA")]
         public partial class CustomEventDtoA : DepositedEventDTOBase
         {
             [SearchField("Category", 
@@ -293,9 +351,97 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             const string sender = "Test";
             var dto = new CustomEventDtoE {Sender = Encoding.ASCII.GetBytes(sender)};
-            var valueAsBytes = (byte[]) searchIndex.Field("Sender").EventValue(dto);
+            var valueAsBytes = searchIndex.Field("Sender").EventValue(dto) as byte[]; 
             var valueAsString = Encoding.ASCII.GetString(valueAsBytes);
             Assert.Equal(sender, valueAsString);
+        }
+
+        [SearchIndex("CustomIndexA")]
+        public class DtoWithoutParameterAttributes
+        {
+            [SearchField]
+            public string Name { get;set; }
+        
+            // do not place SearchField attribute on complex object properties
+            public MetadataDto Metadata { get; set; }
+
+            // do not place SearchField attribute on arrays or lists of complex objects
+            public List<TagDto> Tags { get; set; }
+
+            [SearchField]
+            public List<int> Values { get; set; } 
+        }
+
+        public class MetadataDto
+        {
+            [SearchField(IsSearchable = true)]
+            public string Id { get; set; }
+
+            [SearchField]
+            public string Description { get; set; }
+        }
+
+        public class TagDto
+        {
+            [SearchField(IsSearchable = true, IsFilterable = true)]
+            public string Value { get; set; }
+        }
+
+        [Fact]
+        public void WillIndexDtoWithOnlySearchFieldAttributes()
+        {
+            var searchIndex = new EventSearchIndexDefinition<DtoWithoutParameterAttributes>(addStandardBlockchainFields: false);
+
+            var dto = new DtoWithoutParameterAttributes
+            {
+                Name = "Test",
+                Metadata = new MetadataDto { Id = "A1", Description = "first description"},
+                Tags = new List<TagDto>
+                {
+                    new TagDto() {Value = "Category A"},
+                    new TagDto() {Value = "Category B"}
+                },
+                Values = new List<int>(){1, 2, 3}
+            };
+
+            Assert.Equal("CustomIndexA", searchIndex.IndexName);
+
+            Assert.Equal(5, searchIndex.Fields.Length);
+
+            var nameField = searchIndex.Field(nameof(dto.Name));
+            Assert.NotNull(nameField);
+            Assert.Equal(dto.Name, nameField.EventValue(dto));
+
+            var valuesField = searchIndex.Field(nameof(dto.Values));
+            Assert.NotNull(valuesField);
+            Assert.True(valuesField.IsCollection);
+            var values = valuesField.EventValue(dto) as int[];
+            Assert.NotNull(values);
+            Assert.Equal(1, values[0]);
+            Assert.Equal(2, values[1]);
+            Assert.Equal(3, values[2]);
+
+            var metaDataIdField = searchIndex.Field($"{nameof(dto.Metadata)}.{nameof(dto.Metadata.Id)}");
+            Assert.NotNull(metaDataIdField);
+            Assert.True(metaDataIdField.IsSearchable);
+            Assert.Equal(dto.Metadata.Id, metaDataIdField.EventValue(dto));
+           
+            var metaDataDescriptionField = searchIndex.Field($"{nameof(dto.Metadata)}.{nameof(dto.Metadata.Description)}");
+            Assert.NotNull(metaDataDescriptionField);
+            Assert.False(metaDataDescriptionField.IsSearchable);
+            Assert.Equal(dto.Metadata.Description, metaDataDescriptionField.EventValue(dto));
+
+            var tagsValueField = searchIndex.Field($"{nameof(dto.Tags)}.Value");
+            Assert.NotNull(tagsValueField);
+            Assert.True(tagsValueField.IsCollection);
+            Assert.True(tagsValueField.IsSearchable);
+            Assert.True(tagsValueField.IsFilterable);
+
+            var tagValues = tagsValueField.EventValue(dto) as string[];
+            Assert.NotNull(tagValues);
+            Assert.Equal(dto.Tags.Count, tagValues.Length);
+            Assert.Equal(dto.Tags[0].Value, tagValues[0]);
+            Assert.Equal(dto.Tags[1].Value, tagValues[1]);
         }
     }
 }

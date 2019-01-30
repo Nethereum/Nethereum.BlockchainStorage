@@ -12,21 +12,21 @@ namespace Nethereum.BlockchainStore.Search
     {
         private readonly Type _eventType;
         
-        public EventSearchIndexDefinition(string indexName = null)
+        public EventSearchIndexDefinition(string indexName = null, bool addStandardBlockchainFields = true)
         {
             _eventType = typeof(TEvent);
             var eventAttribute = _eventType.GetCustomAttribute<EventAttribute>();
-            if (eventAttribute == null)
-            {
-                throw new ArgumentException("Event class does not have an EventAttribute");
-            }
+            var searchable = _eventType.GetCustomAttribute<SearchIndex>();
 
-            var searchable = _eventType.GetCustomAttribute<Searchable>();
-            IndexName = indexName ?? (searchable == null ? eventAttribute.Name : searchable.Name);
+            IndexName = indexName ?? searchable?.Name ?? eventAttribute?.Name ?? _eventType.Name;
 
             var fieldDictionary = new Dictionary<string, SearchField>();
 
-            LoadBlockchainLogFields(fieldDictionary);
+            if (addStandardBlockchainFields)
+            {
+                LoadBlockchainLogFields(fieldDictionary);
+            }
+
             LoadIndexedFields(fieldDictionary);
             LoadNonIndexedFields(fieldDictionary);
             LoadCustomSearchFields(fieldDictionary);
@@ -130,56 +130,120 @@ namespace Nethereum.BlockchainStore.Search
 
             foreach (var nonIndexedProperty in nonIndexedProperties)
             {
-                var searchFieldAttribute =
-                    nonIndexedProperty.property.GetCustomAttribute<SearchField>() ??
-                    new SearchField();
-
-                if (searchFieldAttribute.Ignore)
-                {
-                    continue;
-                }
-            
-                searchFieldAttribute.SourceProperty = nonIndexedProperty.property;
-                searchFieldAttribute.DataType = nonIndexedProperty.property.PropertyType;
-
-                if (string.IsNullOrEmpty(searchFieldAttribute.Name))
-                {
-                    searchFieldAttribute.Name = nonIndexedProperty.property.Name;
-                }
-
-                fieldDictionary[searchFieldAttribute.Name] = searchFieldAttribute;
-                
+                AddField(fieldDictionary, nonIndexedProperty.property, nonIndexedProperty.parameter);
             }
         }
 
-        private void LoadCustomSearchFields(Dictionary<string, SearchField> fieldDictionary)
+        private void AddField(
+            Dictionary<string, SearchField> fieldDictionary, 
+            PropertyInfo property, 
+            ParameterAttribute parameter = null, 
+            List<PropertyInfo> parentProperties = null,  
+            string prefix = null, 
+            bool isCollection = false)
         {
-            var searchFields = _eventType
-                .GetProperties()
-                .Select(
-                    p => new { property = p, searchField = p.GetCustomAttribute<SearchField>()})
-                .Where(p => p.searchField != null);
+            var searchFieldAttribute =
+                property.GetCustomAttribute<SearchField>() ??
+                new SearchField();
 
-            foreach (var propertySearchFieldPair in searchFields)
+            if (searchFieldAttribute.Ignore)
             {
-                var searchFieldAttribute = propertySearchFieldPair.searchField;
+                return;
+            }
 
-                if (string.IsNullOrEmpty(searchFieldAttribute.Name))
+            if (parentProperties == null)
+            {
+                parentProperties = new List<PropertyInfo>();
+            }
+
+            searchFieldAttribute.ParentProperties.AddRange(parentProperties);
+
+            searchFieldAttribute.SourceProperty = property;
+            searchFieldAttribute.DataType = property.PropertyType;
+            searchFieldAttribute.IsCollection = isCollection;
+            
+            if (string.IsNullOrEmpty(searchFieldAttribute.Name))
+            {
+                searchFieldAttribute.Name = prefix == null ? property.Name : $"{prefix}.{property.Name}";
+            }
+
+            if (parameter?.Type == "tuple")
+            {
+                var structProperties = PropertiesExtractor
+                    .GetPropertiesWithParameterAttribute(property.PropertyType)
+                    .Select(p => new { property = p, parameter = p.GetCustomAttribute<ParameterAttribute>() })
+                    .Where(p => p.parameter != null)
+                    .OrderBy(p => p.parameter.Order)
+                    .ToArray();
+
+                parentProperties.Add(property);
+
+                foreach (var structProperty in structProperties)
                 {
-                    searchFieldAttribute.Name = propertySearchFieldPair.property.Name;
+                    AddField(fieldDictionary, structProperty.property, structProperty.parameter, parentProperties, searchFieldAttribute.Name);
                 }
+            }
+            else if (parameter?.Type.StartsWith("tuple[") ?? false)
+            {
+                Type structType = property.GetArrayType();
 
-                if (searchFieldAttribute.Ignore || 
-                    fieldDictionary.ContainsKey(searchFieldAttribute.Name))
+                if (structType == null) return;
+
+                var structProperties = PropertiesExtractor
+                    .GetPropertiesWithParameterAttribute(structType)
+                    .Select(p => new { property = p, parameter = p.GetCustomAttribute<ParameterAttribute>() })
+                    .Where(p => p.parameter != null)
+                    .OrderBy(p => p.parameter.Order)
+                    .ToArray();
+
+                parentProperties.Add(property);
+
+                foreach (var structProperty in structProperties)
                 {
-                    continue;
+                    AddField(fieldDictionary, structProperty.property, structProperty.parameter, parentProperties, searchFieldAttribute.Name, isCollection: true);
                 }
-
-                searchFieldAttribute.SourceProperty = propertySearchFieldPair.property;
-                searchFieldAttribute.DataType = propertySearchFieldPair.property.PropertyType;
-           
+            }
+            else
+            {
                 fieldDictionary[searchFieldAttribute.Name] = searchFieldAttribute;
+            }
+        }
 
+        private void LoadCustomSearchFields(
+            Dictionary<string, SearchField> fieldDictionary, 
+            Type type = null, 
+            string prefix = null, 
+            List<PropertyInfo> parentProperties = null,
+            bool parentIsCollection = false)
+        {
+            type = type ?? _eventType;
+
+            var properties = type
+                .GetProperties()
+                .Where(p => p.GetCustomAttribute<ParameterAttribute>() == null)
+                .Select(
+                    p => new { property = p, searchField = p.GetCustomAttribute<SearchField>()});
+
+            foreach (var pair in properties)
+            {
+                var parents = parentProperties ?? new List<PropertyInfo>();
+
+                var isCollection = parentIsCollection || pair.property.IsArrayOrList();
+
+                if (pair.searchField != null)
+                {
+                    AddField(fieldDictionary, pair.property, null, parents, prefix, isCollection);
+                }
+                else
+                {
+                    parents.Add(pair.property);
+
+                    var childType = isCollection ? pair.property.GetArrayType() : pair.property.PropertyType;
+
+                    var namePrefix = prefix == null ? pair.property.Name : $"{prefix}.{pair.property.Name}";
+
+                    LoadCustomSearchFields(fieldDictionary, childType, namePrefix, parents, isCollection);
+                }
             }
         }
 

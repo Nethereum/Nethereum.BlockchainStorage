@@ -43,7 +43,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public void ToAzureField()
         {
-            var eventSearchField = new SearchField("FieldA")
+            var eventSearchField = new SearchField("FieldA.Val")
             {
                 DataType = typeof(string),
                 IsFacetable = true,
@@ -55,7 +55,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             };
 
             var azureField = eventSearchField.ToAzureField();
-            Assert.Equal("fielda", azureField.Name);
+            Assert.Equal("fielda_val", azureField.Name);
             Assert.Equal(DataType.String, azureField.Type);
             Assert.True(azureField.IsFacetable);
             Assert.True(azureField.IsKey);
