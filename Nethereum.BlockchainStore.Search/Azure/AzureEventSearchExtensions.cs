@@ -86,7 +86,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             if(val is BigInteger bigInteger) return bigInteger.ToString();
             if (val is byte[] byteArray) return Encoding.UTF8.GetString(byteArray);
 
-            if (val.GetType().IsArrayOrList())
+            if (val.GetType().IsArrayOrListOfT())
             {
                 return val;
             }
@@ -101,7 +101,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             if(type == typeof(HexBigInteger)) return DataType.String;
             if(type == typeof(BigInteger)) return DataType.String;
             if (type.IsArray) return DataType.Collection(type.GetElementType().ToAzureDataType());
-            if (type.IsGenericList()) return DataType.Collection(type.GetGenericArguments()[0].ToAzureDataType());
+            if (type.IsListOfT()) return DataType.Collection(type.GetGenericArguments()[0].ToAzureDataType());
 
             return DataType.String;
         }

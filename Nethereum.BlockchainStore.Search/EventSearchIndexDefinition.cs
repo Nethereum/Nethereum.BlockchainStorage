@@ -185,7 +185,7 @@ namespace Nethereum.BlockchainStore.Search
             }
             else if (parameter?.Type.StartsWith("tuple[") ?? false)
             {
-                Type structType = property.GetArrayType();
+                Type structType = property.GetItemTypeFromArrayOrListOfT();
 
                 if (structType == null) return;
 
@@ -228,7 +228,7 @@ namespace Nethereum.BlockchainStore.Search
             {
                 var parents = parentProperties ?? new List<PropertyInfo>();
 
-                var isCollection = parentIsCollection || pair.property.IsArrayOrList();
+                var isCollection = parentIsCollection || pair.property.IsArrayOrListOfT();
 
                 if (pair.searchField != null)
                 {
@@ -238,7 +238,7 @@ namespace Nethereum.BlockchainStore.Search
                 {
                     parents.Add(pair.property);
 
-                    var childType = isCollection ? pair.property.GetArrayType() : pair.property.PropertyType;
+                    var childType = isCollection ? pair.property.GetItemTypeFromArrayOrListOfT() : pair.property.PropertyType;
 
                     var namePrefix = prefix == null ? pair.property.Name : $"{prefix}.{pair.property.Name}";
 

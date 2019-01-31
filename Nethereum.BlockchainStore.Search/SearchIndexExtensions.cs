@@ -23,55 +23,63 @@ namespace Nethereum.BlockchainStore.Search
             return searchIndex.Fields.FirstOrDefault(f => f.IsKey);
         }
 
-        public static bool IsGenericList(this Type type)
+        public static bool IsListOfT(this Type type)
         {
-            return (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)));
+            var underlyingListType = type.GetUnderlyingGenericListType();
+            return underlyingListType != null;
         }
 
-        public static bool IsArrayOrList(this Type type)
+        public static bool IsArrayOrListOfT(this Type type)
         {
-            return type.IsArray || type.IsGenericList();
+            return type.IsArray || type.IsListOfT();
         }
 
-        public static bool IsArrayOrList(this PropertyInfo propertyInfo)
+        public static bool IsArrayOrListOfT(this PropertyInfo propertyInfo)
         {
-            return propertyInfo.PropertyType.IsArrayOrList();
+            return propertyInfo.PropertyType.IsArrayOrListOfT();
         }
 
-        public static Type GetArrayType(this PropertyInfo property)
+        public static Type GetItemTypeFromArrayOrListOfT(this PropertyInfo property)
         {
-            return property.PropertyType.GetArrayType();
+            return property.PropertyType.GetItemTypeFromArrayOrListOfT();
         }
 
-        public static Type GetArrayType(this Type arrayOrListType)
+        public static Type GetItemTypeFromListOfT(this Type listType)
+        {
+            var underlyingListType = listType.GetUnderlyingGenericListType();
+            return underlyingListType == null ? 
+                null : 
+                underlyingListType.GetGenericArguments().FirstOrDefault();
+        }
+
+        public static Type GetItemTypeFromArrayOrListOfT(this Type arrayOrListType)
         {
             if (arrayOrListType.IsArray) return arrayOrListType.GetElementType();
-            if (arrayOrListType.IsGenericList())
-                return arrayOrListType.GetGenericArguments()[0];
+            if (arrayOrListType.IsListOfT())
+                return arrayOrListType.GetItemTypeFromListOfT();
             return null;
         }
 
-        public static bool IsArrayOrList(this object val)
+        public static bool IsArrayOrListOfT(this object val)
         {
-            return val?.GetType().IsArrayOrList() ?? false;
+            return val?.GetType().IsArrayOrListOfT() ?? false;
         }
 
-        public static bool IsArrayOrList(this object arrayOrList, out IEnumerable val)
+        public static bool IsArrayOrListOfT(this object arrayOrList, out IEnumerable val)
         {
             val = null;
-            if (!arrayOrList.IsArrayOrList()) return false;
+            if (!arrayOrList.IsArrayOrListOfT()) return false;
             val = (IEnumerable) arrayOrList;
             return true;
         }
 
-        public static Array GetPropertyValues(this IEnumerable arrayOrList, PropertyInfo propertyInfo)
+        public static Array GetAllElementPropertyValues(this IEnumerable arrayOrList, PropertyInfo propertyInfo)
         {
-            var itemType = arrayOrList.GetType().GetElementType();
+            if(propertyInfo == null) throw new ArgumentNullException(nameof(propertyInfo));
 
-            if (itemType?.IsValueType ?? false)
-            {
-                return arrayOrList as Array;
-            }
+            var itemType = arrayOrList.GetType().GetItemTypeFromArrayOrListOfT();
+
+            if (itemType == null) return null;
 
             if (arrayOrList is Array array)
             {
@@ -103,8 +111,10 @@ namespace Nethereum.BlockchainStore.Search
             return null;
         }
 
-        public static Array GetElementsAsArray(this IEnumerable arrayOrList)
+        public static Array GetItems(this IEnumerable arrayOrList)
         {
+            if (arrayOrList == null) return null;
+
             if (arrayOrList is Array array)
             {
                 return array;
@@ -112,7 +122,9 @@ namespace Nethereum.BlockchainStore.Search
 
             if (arrayOrList is IList list)
             {
-                var type = arrayOrList.GetType().GetArrayType();
+                var type = arrayOrList.GetType().GetItemTypeFromListOfT();
+
+                if (type == null) return null;
 
                 var objectArray = Array.CreateInstance(type, list.Count);
 
@@ -126,6 +138,26 @@ namespace Nethereum.BlockchainStore.Search
             }
 
             return null;
+        }
+
+        private static Type GetUnderlyingGenericListType(this Type listType)
+        {
+            do
+            {
+                if (listType.IsListOfT_WithoutInheritanceChecks())
+                {
+                    return listType;
+                }
+
+                listType = listType.BaseType;
+            } while (listType != null && listType != typeof(object));
+
+            return null;
+        }
+
+        private static bool IsListOfT_WithoutInheritanceChecks(this Type type)
+        {
+            return type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>));
         }
 
     }

@@ -58,9 +58,9 @@ namespace Nethereum.BlockchainStore.Search
 
                 if (val == null) return null;
 
-                if(val.IsArrayOrList(out IEnumerable collection))
+                if(val.IsArrayOrListOfT(out IEnumerable collection))
                 {
-                    return collection.GetElementsAsArray();
+                    return collection.GetItems();
                 }
 
                 return val;
@@ -76,9 +76,9 @@ namespace Nethereum.BlockchainStore.Search
 
             if (parentVal == null) return null;
 
-            if(parentVal.IsArrayOrList(out IEnumerable enumerable))
+            if(parentVal.IsArrayOrListOfT(out IEnumerable enumerable))
             {
-                return enumerable.GetPropertyValues(SourceProperty);
+                return enumerable.GetAllElementPropertyValues(SourceProperty);
             }
 
             return SourceProperty?.GetValue(parentVal);

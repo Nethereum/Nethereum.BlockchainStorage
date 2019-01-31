@@ -65,17 +65,30 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         }
 
         [Fact]
+        public void ToAzureField_ConvertsToCollectionDataType()
+        {
+            var eventSearchField = new SearchField("FieldA.Val")
+            {
+                DataType = typeof(string),
+                IsCollection = true
+            };
+
+            var azureField = eventSearchField.ToAzureField();
+            Assert.Equal(DataType.Collection(DataType.String), azureField.Type);
+        }
+
+        [Fact]
         public void ToAzureFields()
         {
             var fields = new[]
             {
-                new SearchField("FieldA"),
+                new SearchField("FieldA.Prop1"),
                 new SearchField("FieldB")
             };
 
             var azureSearchFields = fields.ToAzureFields();
             Assert.Equal(2, azureSearchFields.Length);
-            Assert.Equal("fielda", azureSearchFields[0].Name);
+            Assert.Equal("fielda_prop1", azureSearchFields[0].Name);
             Assert.Equal("fieldb", azureSearchFields[1].Name);
         }
 
