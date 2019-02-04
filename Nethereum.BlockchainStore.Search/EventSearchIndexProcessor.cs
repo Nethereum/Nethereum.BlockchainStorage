@@ -9,13 +9,13 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventLogSearchIndexProcessor<TEvent> : ILogProcessor, IDisposable where TEvent : class, new()
+    public class EventSearchIndexProcessor<TEvent> : ILogProcessor, IDisposable where TEvent : class, new()
     {
-        private readonly IEventSearchIndexer<TEvent> _indexer;
+        private readonly IIndexer<TEvent> _indexer;
         private readonly int _logsPerIndexBatch;
         private readonly ConcurrentQueue<EventLog<TEvent>> _currentBatch = new ConcurrentQueue<EventLog<TEvent>>();
 
-        public EventLogSearchIndexProcessor(IEventSearchIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
+        public EventSearchIndexProcessor(IIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
         {
             _indexer = indexer;
             _logsPerIndexBatch = logsPerIndexBatch;

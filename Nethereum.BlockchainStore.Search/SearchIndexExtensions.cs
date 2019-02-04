@@ -34,6 +34,11 @@ namespace Nethereum.BlockchainStore.Search
             return type.IsArray || type.IsListOfT();
         }
 
+        public static bool IsPresetSearchField(this SearchField field)
+        {
+            return Enum.TryParse(field.Name, out PresetSearchFieldName val);
+        }
+
         public static bool IsArrayOrListOfT(this PropertyInfo propertyInfo)
         {
             return propertyInfo.PropertyType.IsArrayOrListOfT();

@@ -1,13 +1,10 @@
-﻿using System;
+﻿using Nethereum.Contracts;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public interface IEventSearchIndexer<TEvent> where TEvent : class
+    public interface IIndexer<TEvent> where TEvent : class
     {
         Task IndexAsync(EventLog<TEvent> log) ;
         Task IndexAsync(IEnumerable<EventLog<TEvent>> logs) ;

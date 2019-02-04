@@ -48,17 +48,19 @@ namespace Nethereum.BlockchainStore.Search
 
         public Func<FilterLog, object> LogValueCallback { get; set; }
 
-        public object EventValue(object eventDto)
+        public Func<Transaction, object> TxValueCallback { get; set; }
+
+        public object GetValue(object dto)
         {
-            if (eventDto == null) return null;
+            if (dto == null) return null;
 
             if (ParentProperties.Count == 0)
             {
-                var val = SourceProperty?.GetValue(eventDto);
+                var val = SourceProperty?.GetValue(dto);
 
                 if (val == null) return null;
 
-                if(val.IsArrayOrListOfT(out IEnumerable collection))
+                if (val.IsArrayOrListOfT(out IEnumerable collection))
                 {
                     return collection.GetItems();
                 }
@@ -66,7 +68,7 @@ namespace Nethereum.BlockchainStore.Search
                 return val;
             }
 
-            object parentVal = eventDto;
+            object parentVal = dto;
 
             foreach (var parentProperty in ParentProperties)
             {
@@ -76,19 +78,34 @@ namespace Nethereum.BlockchainStore.Search
 
             if (parentVal == null) return null;
 
-            if(parentVal.IsArrayOrListOfT(out IEnumerable enumerable))
+            if (parentVal.IsArrayOrListOfT(out IEnumerable enumerable))
             {
                 return enumerable.GetAllElementPropertyValues(SourceProperty);
             }
 
-            return SourceProperty?.GetValue(parentVal);
+            var childVal = SourceProperty?.GetValue(parentVal);
+
+            if (childVal == null) return null;
+
+            if (childVal.IsArrayOrListOfT(out IEnumerable childEnumerable))
+            {
+                return childEnumerable.GetItems();
+            }
+
+            return childVal;
+        }
+
+        public object GetValue<TFunction>(TFunction functionDto, Transaction transaction)
+        {
+            if (TxValueCallback != null) return TxValueCallback.Invoke(transaction);
+            return GetValue(functionDto);
         }
 
         public object GetValue<TEvent>(EventLog<TEvent> e)
         {
             if (LogValueCallback != null) return LogValueCallback.Invoke(e.Log);
 
-            return EventValue(e.Event);
+            return GetValue(e.Event);
         }
         
     }

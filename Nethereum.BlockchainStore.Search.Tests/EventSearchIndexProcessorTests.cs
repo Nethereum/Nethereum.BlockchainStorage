@@ -8,9 +8,9 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests.Azure
+namespace Nethereum.BlockchainStore.Search.Tests
 {
-    public class AzureEventSearchProcessorTests
+    public class EventSearchIndexProcessorTests
     {
         [Event("Transfer")]
         public class TransferEvent : IEventDTO
@@ -30,8 +30,8 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public async Task IsLogForEvent()
         {
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
-            var processor = new EventLogSearchIndexProcessor<TransferEvent>(indexer.Object);
+            var indexer = new Mock<IIndexer<TransferEvent>>();
+            var processor = new EventSearchIndexProcessor<TransferEvent>(indexer.Object);
 
             var transferLog = new FilterLog {Topics = new object[]{ TransferEvent.Signature() }};
             var irrelevantLog = new FilterLog {Topics = new object[]{ "SignatureForAnotherEvent" }};
@@ -43,14 +43,14 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public async Task SendsToIndexerInBatchesAndSendsAnyPendingOnDispose()
         {
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
+            var indexer = new Mock<IIndexer<TransferEvent>>();
             var indexedLogs = new List<EventLog<TransferEvent>>();
 
             indexer.Setup(i => i.IndexAsync(It.IsAny<IEnumerable<EventLog<TransferEvent>>>()))
                 .Returns<IEnumerable<EventLog<TransferEvent>>>(
                     logs => { indexedLogs.AddRange(logs); return Task.CompletedTask; });
 
-            var processor = new EventLogSearchIndexProcessor<TransferEvent>(indexer.Object, logsPerIndexBatch: 10);
+            var processor = new EventSearchIndexProcessor<TransferEvent>(indexer.Object, logsPerIndexBatch: 10);
 
             var topics = new object[]
             {
@@ -78,14 +78,14 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public async Task AcceptsArraysOfEventLogsAndProcessesInBatches()
         {
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
+            var indexer = new Mock<IIndexer<TransferEvent>>();
             var indexedLogs = new List<EventLog<TransferEvent>>();
 
             indexer.Setup(i => i.IndexAsync(It.IsAny<IEnumerable<EventLog<TransferEvent>>>()))
                 .Returns<IEnumerable<EventLog<TransferEvent>>>(
                     logs => { indexedLogs.AddRange(logs); return Task.CompletedTask; });
 
-            var processor = new EventLogSearchIndexProcessor<TransferEvent>(indexer.Object, logsPerIndexBatch: 10);
+            var processor = new EventSearchIndexProcessor<TransferEvent>(indexer.Object, logsPerIndexBatch: 10);
 
             var topics = new object[]
             {
@@ -115,14 +115,14 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public async Task WillSwallowDecodingErrorsAndIgnoreLog()
         {
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
+            var indexer = new Mock<IIndexer<TransferEvent>>();
             var indexedLogs = new List<EventLog<TransferEvent>>();
 
             indexer.Setup(i => i.IndexAsync(It.IsAny<IEnumerable<EventLog<TransferEvent>>>()))
                 .Returns<IEnumerable<EventLog<TransferEvent>>>(
                     logs => { indexedLogs.AddRange(logs); return Task.CompletedTask; });
 
-            var processor = new EventLogSearchIndexProcessor<TransferEvent>(indexer.Object, logsPerIndexBatch: 10);
+            var processor = new EventSearchIndexProcessor<TransferEvent>(indexer.Object, logsPerIndexBatch: 10);
 
             var topicsForAnotherEvent = new object[]
             {

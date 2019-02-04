@@ -45,7 +45,9 @@ namespace Nethereum.BlockchainStore.Search.Tests
             [Parameter("tuple[2]", "_categories", 3, false )]
             public List<CategoryDTO> Categories { get; set; }
 
- 
+            [SearchField]
+            public List<string> Tags { get; set; }
+
         }
 
         //another struct - expected to be returned in an array
@@ -73,12 +75,13 @@ namespace Nethereum.BlockchainStore.Search.Tests
                     {
                         new CategoryDTO{Name = "Dodgy"}, 
                         new CategoryDTO{Name = "International"}
-                    }
+                    },
+                    Tags = new List<string>{"A", "B"}
                 }
             };
 
             Assert.Equal("Deposited", searchIndex.IndexName);
-            Assert.Equal(15, searchIndex.Fields.Length);
+            Assert.Equal(16, searchIndex.Fields.Length);
 
             var senderField = searchIndex.Field(nameof(depositedEventDto.Sender));
             Assert.NotNull(senderField);
@@ -89,7 +92,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(senderField.IsFilterable);
             Assert.True(senderField.IsSearchable);
             Assert.True(senderField.IsSortable);
-            Assert.Equal(depositedEventDto.Sender, senderField.EventValue(depositedEventDto));
+            Assert.Equal(depositedEventDto.Sender, senderField.GetValue(depositedEventDto));
 
             var valueField = searchIndex.Field(nameof(depositedEventDto.Value));
             Assert.NotNull(valueField);
@@ -100,7 +103,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(valueField.IsFilterable);
             Assert.False(valueField.IsFacetable);
             Assert.False(valueField.IsSortable);
-            Assert.Equal(depositedEventDto.Value, valueField.EventValue(depositedEventDto));
+            Assert.Equal(depositedEventDto.Value, valueField.GetValue(depositedEventDto));
 
             var newBalanceField = searchIndex.Field(nameof(depositedEventDto.NewBalance));
             Assert.NotNull(newBalanceField);
@@ -111,7 +114,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(newBalanceField.IsFilterable);
             Assert.False(newBalanceField.IsFacetable);
             Assert.False(newBalanceField.IsSortable);
-            Assert.Equal(depositedEventDto.NewBalance, newBalanceField.EventValue(depositedEventDto));
+            Assert.Equal(depositedEventDto.NewBalance, newBalanceField.GetValue(depositedEventDto));
 
             var log_key = searchIndex.Field(PresetSearchFieldName.log_key);
             var log_removed = searchIndex.Field(PresetSearchFieldName.log_removed);
@@ -230,17 +233,25 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(currencyField.IsSearchable);
             Assert.True(currencyField.IsFilterable);
             Assert.True(currencyField.IsFacetable);
-            Assert.Equal(depositedEventDto.Detail.Currency, currencyField.EventValue(depositedEventDto));
+            Assert.Equal(depositedEventDto.Detail.Currency, currencyField.GetValue(depositedEventDto));
 
 
             var categoryNameField = searchIndex.Field("Detail.Categories.Name");
             Assert.NotNull(categoryNameField);
             Assert.True(categoryNameField.IsCollection);
-            var categoryNames = categoryNameField.EventValue(depositedEventDto) as string[];
+            var categoryNames = categoryNameField.GetValue(depositedEventDto) as string[];
             Assert.NotNull(categoryNames);
             Assert.Equal(depositedEventDto.Detail.Categories.Count, categoryNames.Length);
             Assert.Equal(depositedEventDto.Detail.Categories[0].Name, (string)categoryNames[0]);
             Assert.Equal(depositedEventDto.Detail.Categories[1].Name, (string)categoryNames[1]);
+
+            var detailTagsField = searchIndex.Field("Detail.Tags");
+            Assert.NotNull(detailTagsField);
+            Assert.True(detailTagsField.IsCollection);
+            var tags = detailTagsField.GetValue(depositedEventDto) as string[];
+            Assert.NotNull(tags);
+            Assert.Equal("A", tags[0]);
+            Assert.Equal("B", tags[1]);
         }
 
         [SearchIndex(Name = "IndexA")]
@@ -267,7 +278,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             var customEventDto = new CustomEventDtoA() {Category = "CatA"};
 
-            Assert.Equal(customEventDto.Category, categoryField.EventValue(customEventDto));
+            Assert.Equal(customEventDto.Category, categoryField.GetValue(customEventDto));
 
         }
 
@@ -305,7 +316,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             var customEventDto = new CustomEventDtoB() {Sender = "Charles"};
 
-            Assert.Equal(customEventDto.Sender, senderAddressField.EventValue(customEventDto));
+            Assert.Equal(customEventDto.Sender, senderAddressField.GetValue(customEventDto));
 
         }
 
@@ -351,7 +362,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             const string sender = "Test";
             var dto = new CustomEventDtoE {Sender = Encoding.ASCII.GetBytes(sender)};
-            var valueAsBytes = searchIndex.Field("Sender").EventValue(dto) as byte[]; 
+            var valueAsBytes = searchIndex.Field("Sender").GetValue(dto) as byte[]; 
             var valueAsString = Encoding.ASCII.GetString(valueAsBytes);
             Assert.Equal(sender, valueAsString);
         }
@@ -390,7 +401,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillIndexDtoWithOnlySearchFieldAttributes()
         {
-            var searchIndex = new EventSearchIndexDefinition<DtoWithoutParameterAttributes>(addStandardBlockchainFields: false);
+            var searchIndex = new EventSearchIndexDefinition<DtoWithoutParameterAttributes>(addPresetEventLogFields: false);
 
             var dto = new DtoWithoutParameterAttributes
             {
@@ -410,12 +421,12 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             var nameField = searchIndex.Field(nameof(dto.Name));
             Assert.NotNull(nameField);
-            Assert.Equal(dto.Name, nameField.EventValue(dto));
+            Assert.Equal(dto.Name, nameField.GetValue(dto));
 
             var valuesField = searchIndex.Field(nameof(dto.Values));
             Assert.NotNull(valuesField);
             Assert.True(valuesField.IsCollection);
-            var values = valuesField.EventValue(dto) as int[];
+            var values = valuesField.GetValue(dto) as int[];
             Assert.NotNull(values);
             Assert.Equal(1, values[0]);
             Assert.Equal(2, values[1]);
@@ -424,12 +435,12 @@ namespace Nethereum.BlockchainStore.Search.Tests
             var metaDataIdField = searchIndex.Field($"{nameof(dto.Metadata)}.{nameof(dto.Metadata.Id)}");
             Assert.NotNull(metaDataIdField);
             Assert.True(metaDataIdField.IsSearchable);
-            Assert.Equal(dto.Metadata.Id, metaDataIdField.EventValue(dto));
+            Assert.Equal(dto.Metadata.Id, metaDataIdField.GetValue(dto));
            
             var metaDataDescriptionField = searchIndex.Field($"{nameof(dto.Metadata)}.{nameof(dto.Metadata.Description)}");
             Assert.NotNull(metaDataDescriptionField);
             Assert.False(metaDataDescriptionField.IsSearchable);
-            Assert.Equal(dto.Metadata.Description, metaDataDescriptionField.EventValue(dto));
+            Assert.Equal(dto.Metadata.Description, metaDataDescriptionField.GetValue(dto));
 
             var tagsValueField = searchIndex.Field($"{nameof(dto.Tags)}.Value");
             Assert.NotNull(tagsValueField);
@@ -437,11 +448,40 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.True(tagsValueField.IsSearchable);
             Assert.True(tagsValueField.IsFilterable);
 
-            var tagValues = tagsValueField.EventValue(dto) as string[];
+            var tagValues = tagsValueField.GetValue(dto) as string[];
             Assert.NotNull(tagValues);
             Assert.Equal(dto.Tags.Count, tagValues.Length);
             Assert.Equal(dto.Tags[0].Value, tagValues[0]);
             Assert.Equal(dto.Tags[1].Value, tagValues[1]);
+        }
+
+
+        [Event("Transfer")]
+        public class TransferEvent_Custom
+        {
+            [Parameter("address", "_from", 1, true)]
+            public string From {get; set;}
+
+            [Parameter("address", "_to", 2, true)]
+            public string To {get; set;}
+
+            [Parameter("uint256", "_value", 3, true)]
+            public BigInteger Value {get; set;}
+
+            public TransferMetadata Metadata { get; set; } = new TransferMetadata();
+        }
+
+        public class TransferMetadata
+        {
+            [SearchField]
+            public static string CurrentChainUrl { get;set; }
+        }
+
+        [Fact]
+        public void StaticPropertiesOnDtoAreIgnored()
+        {
+            var searchIndex = new EventSearchIndexDefinition<TransferEvent_Custom>(addPresetEventLogFields:false);
+            Assert.Null(searchIndex.Field("Metadata.CurrentChainUrl"));
         }
     }
 }

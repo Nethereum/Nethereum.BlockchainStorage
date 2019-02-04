@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Tests.Azure
+namespace Nethereum.BlockchainStore.Search.Tests
 {
-    public class AzureEventSearchTransactionLogHandlerTests
+    public class EventSearchTransactionLogHandlerTests
     {
         [Event("Transfer")]
         public class TransferEvent : IEventDTO
@@ -31,8 +28,8 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public async Task BatchesUpBeforeSendingToIndex()
         {
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
-            var handler = new AzureEventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2);
+            var indexer = new Mock<IIndexer<TransferEvent>>();
+            var handler = new EventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2);
 
             var transactionLog1 = new Mock<TransactionLogWrapper>();
             var transactionLog2 = new Mock<TransactionLogWrapper>();
@@ -68,9 +65,9 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public async Task WhenDisposeIsCalledWillAttemptToIndexPendingItems()
         {
             var indexedLogs = new List<EventLog<TransferEvent>>();
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
+            var indexer = new Mock<IIndexer<TransferEvent>>();
             using (var handler =
-                new AzureEventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2))
+                new EventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2))
             {
 
                 var transactionLog1 = new Mock<TransactionLogWrapper>();
@@ -99,9 +96,9 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public async Task WillIgnoreLogsThatDoNotMatchTheEvent()
         {
             var indexedLogs = new List<EventLog<TransferEvent>>();
-            var indexer = new Mock<IEventSearchIndexer<TransferEvent>>();
+            var indexer = new Mock<IIndexer<TransferEvent>>();
             var handler =
-                new AzureEventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 1);
+                new EventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 1);
 
             var logForAnotherEvent = new Mock<TransactionLogWrapper>();
             logForAnotherEvent.Setup(t => t.IsForEvent<TransferEvent>()).Returns(false);

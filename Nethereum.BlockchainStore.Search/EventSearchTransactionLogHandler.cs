@@ -1,21 +1,18 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.Contracts;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.Contracts;
 
-namespace Nethereum.BlockchainStore.Search.Azure
+namespace Nethereum.BlockchainStore.Search
 {
-
-
-    public class AzureEventSearchTransactionLogHandler<TEvent> : ITransactionLogHandler<TEvent>, IDisposable where TEvent : class, new()
+    public class EventSearchTransactionLogHandler<TEvent> : ITransactionLogHandler<TEvent>, IDisposable where TEvent : class, new()
     {
-        private readonly IEventSearchIndexer<TEvent> _indexer;
+        private readonly IIndexer<TEvent> _indexer;
         private readonly int _logsPerIndexBatch;
         private ConcurrentQueue<EventLog<TEvent>> _currentBatch = new ConcurrentQueue<EventLog<TEvent>>();
 
-        public AzureEventSearchTransactionLogHandler(IEventSearchIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
+        public EventSearchTransactionLogHandler(IIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
         {
             _indexer = indexer;
             this._logsPerIndexBatch = logsPerIndexBatch;

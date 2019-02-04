@@ -1,19 +1,15 @@
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainStore.Search.Azure;
+using Nethereum.Configuration;
 using Nethereum.Contracts;
-using Nethereum.Contracts.Extensions;
-using Nethereum.RPC.Eth.DTOs;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Configuration;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples
@@ -35,6 +31,8 @@ Solidity Contract Excerpt
 
             [Parameter("uint256", "_value", 3, false)]
             public BigInteger Value {get; set;}
+
+            public TransferMetadata Metadata { get; set; } = new TransferMetadata();
         }
 
         /*
@@ -52,6 +50,29 @@ Solidity Contract Excerpt
 
             [Parameter("uint256", "_value", 3, true)]
             public BigInteger Value {get; set;}
+
+            public TransferMetadata Metadata { get; set; } = new TransferMetadata();
+        }
+
+        public class TransferMetadata
+        {
+            public static string CurrentChainUrl { get;set; }
+
+            public TransferMetadata()
+            {
+                IndexedOn = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                ChainUrl = CurrentChainUrl;
+                IndexingMachineName = Environment.MachineName;
+            }
+
+            [SearchField]
+            public string IndexedOn { get; set; }
+
+            [SearchField(IsSearchable = true)]
+            public string ChainUrl { get;set; }
+
+            [SearchField(IsSearchable = true)]
+            public string IndexingMachineName { get;set; }
         }
 
         public const string ApiKeyName = "AzureSearchApiKey";
@@ -78,8 +99,11 @@ Solidity Contract Excerpt
         [Fact]
         public async Task ERC20()
         {
+            const string chainUrl = "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60";
+            TransferMetadata.CurrentChainUrl = chainUrl;
+
             var blockchainProxyService =
-                new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+                new BlockchainProxyService(chainUrl);
 
             using (var azureSearchService = new AzureEventSearchService(AzureSearchServiceName, _azureSearchApiKey))
             {
@@ -88,7 +112,7 @@ Solidity Contract Excerpt
                 using (var transferIndexer = await azureSearchService.GetOrCreateIndex<TransferEvent_ERC20>(AzureTransferIndexName))
                 {
                     using (var transferProcessor =
-                        new EventLogSearchIndexProcessor<TransferEvent_ERC20>(transferIndexer))
+                        new EventSearchIndexProcessor<TransferEvent_ERC20>(transferIndexer))
                     {
 
                         var logProcessor = new BlockchainLogProcessor(
@@ -134,13 +158,13 @@ Solidity Contract Excerpt
                 //this will create the index in azure
                 //this has an indexable "value" element and we want that to be searchable in azure
                 var customIndexer = await d.Add(() => searchService.GetOrCreateIndex<TransferEvent_Custom>(AzureTransferIndexName));
-                var customProcessor = d.Add(() => new EventLogSearchIndexProcessor<TransferEvent_Custom>(customIndexer));
+                var customProcessor = d.Add(() => new EventSearchIndexProcessor<TransferEvent_Custom>(customIndexer));
 
                 //add the erc 20 event -
                 //this will use the same azure index as the custom event - it won't be re-created or altered
                 //the "value" element will still be indexed in azure despite not being indexed in ethereum
                 var erc20Indexer = await d.Add(() => searchService.GetOrCreateIndex<TransferEvent_ERC20>(AzureTransferIndexName));
-                var erc20Processor = d.Add(() => new EventLogSearchIndexProcessor<TransferEvent_ERC20>(erc20Indexer));
+                var erc20Processor = d.Add(() => new EventSearchIndexProcessor<TransferEvent_ERC20>(erc20Indexer));
 
                 var logProcessor = new BlockchainLogProcessor(
                     blockchainProxyService,
