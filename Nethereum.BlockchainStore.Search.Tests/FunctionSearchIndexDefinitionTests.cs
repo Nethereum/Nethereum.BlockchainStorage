@@ -1,10 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Nethereum.BlockchainStore.Search.Tests
 {
@@ -16,14 +14,14 @@ namespace Nethereum.BlockchainStore.Search.Tests
             //configure a primary key
             [SearchField(IsKey = true, IsSearchable = true)]
             [Parameter("bytes32", "_id", 1)]
-            public string Id { get;set; }
+            public string Id { get; set; }
 
             //customise how the field is indexed
             [SearchField(IsFacetable = true, IsFilterable = true)]
             [Parameter("bytes32", "_currency", 1)]
-            public string Currency { get;set; }
+            public string Currency { get; set; }
 
-            //this value will be saved in the index however it won't be searchable by default
+            //this value will be saved as data in the index however it won't be searchable by default
             [Parameter("uint256", "_amount", 2)]
             public uint Amount { get; set; }
 
@@ -33,13 +31,13 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             //not related to solidity args (in or out)
             [SearchField(IsFilterable = true, IsFacetable = true)]
-            public string Category { get;set; }
+            public string Category { get; set; }
         }
 
         [Fact]
         public void DefinesExpectedName()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields:false);
+            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             Assert.Equal("Deposit", searchIndex.IndexName);
@@ -48,8 +46,8 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void CanIncludeNonParameterFieldsWithSearchFieldAttribute()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields:false);
-            var dto = new DepositDto{Category = "test"};
+            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
+            var dto = new DepositDto { Category = "test" };
 
             var categoryField = searchIndex.Field(nameof(dto.Category));
             Assert.True(categoryField.IsFacetable);
@@ -60,7 +58,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void ParameterFieldsCanBeIgnored()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields:false);
+            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             Assert.Null(searchIndex.Field(nameof(dto.Approver)));
@@ -69,7 +67,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void APrimaryKeyFieldCanBeConfigured()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields:false);
+            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             var idField = searchIndex.Field(nameof(dto.Id));
@@ -81,7 +79,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void AllowsSearchCustomisationOfParameterFields()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields:false);
+            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             var currencyField = searchIndex.Field(nameof(dto.Currency));
@@ -93,7 +91,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillAddParametersToSearchData_ButWillNotBeSearchableByDefault()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields:false);
+            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             var amountField = searchIndex.Field(nameof(dto.Amount));
@@ -101,7 +99,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(amountField.IsSearchable);
         }
 
-        public class EmptyDto{}
+        public class EmptyDto { }
 
         [Fact]
         public void AddsPresetTransactionRelatedFields()
@@ -119,94 +117,67 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             var tx = CreateDummyTransaction();
 
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_uid, 
-                expectedType: typeof(string), expectedValue: "1_1", 
-                isKey: true, isSortable: true, isSearchable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_hash, 
-                expectedType: typeof(string), expectedValue: tx.TransactionHash, 
-                isSortable: true, isSearchable: true, isFilterable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_index, 
-                expectedType: typeof(HexBigInteger), expectedValue: tx.TransactionIndex, 
-                isSortable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_block_hash, 
-                expectedType: typeof(string), expectedValue: tx.BlockHash);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_block_number, 
-                expectedType: typeof(HexBigInteger), expectedValue: tx.BlockNumber, 
-                isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_value, 
-                expectedType: typeof(HexBigInteger), expectedValue: tx.Value, 
-                isSortable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_from, 
-                expectedType: typeof(string), expectedValue: tx.From, 
-                isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_to, 
-                expectedType: typeof(string), expectedValue: tx.To, 
-                isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_gas, 
-                expectedType: typeof(HexBigInteger), expectedValue: tx.Gas, 
-                isSortable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_gas_price, 
-                expectedType: typeof(HexBigInteger), expectedValue: tx.GasPrice, 
-                isSortable: true);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_input, 
-                expectedType: typeof(string), expectedValue: tx.Input);
-
-            CheckField(tx, dto, searchIndex, PresetSearchFieldName.tx_nonce, 
-                expectedType: typeof(HexBigInteger), expectedValue: tx.Nonce, 
-                isSortable: true, isSearchable: true, isFilterable: true);
+            searchIndex
+                .Assertions(dto, tx)
+                    .HasField(PresetSearchFieldName.tx_uid,  f =>  
+                        f.IsString()
+                        .HasFlags(isKey: true, isSortable: true, isSearchable: true)
+                        .ReturnsValue("1_1"))
+                    .HasField(PresetSearchFieldName.tx_hash, f =>
+                        f.IsString()
+                        .HasFlags(isSortable: true, isSearchable: true, isFilterable: true)
+                        .ReturnsValue(tx.TransactionHash))
+                    .HasField(PresetSearchFieldName.tx_index, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true)
+                        .ReturnsValue(tx.TransactionIndex))
+                    .HasField(PresetSearchFieldName.tx_block_hash, f =>
+                        f.IsString()
+                        .HasFlags()
+                        .ReturnsValue(tx.BlockHash))
+                    .HasField(PresetSearchFieldName.tx_block_number, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true)
+                        .ReturnsValue(tx.BlockNumber))
+                    .HasField(PresetSearchFieldName.tx_value, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true)
+                        .ReturnsValue(tx.Value))
+                    .HasField(PresetSearchFieldName.tx_from, f =>
+                        f.IsString()
+                        .HasFlags(isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true)
+                        .ReturnsValue(tx.From))
+                    .HasField(PresetSearchFieldName.tx_to, f =>
+                        f.IsString()
+                        .HasFlags(isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true)
+                        .ReturnsValue(tx.To))
+                    .HasField(PresetSearchFieldName.tx_gas, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true)
+                        .ReturnsValue(tx.Gas))
+                    .HasField(PresetSearchFieldName.tx_gas_price, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true)
+                        .ReturnsValue(tx.GasPrice))
+                    .HasField(PresetSearchFieldName.tx_input, f =>
+                        f.IsString()
+                        .HasFlags()
+                        .ReturnsValue(tx.Input))
+                    .HasField(PresetSearchFieldName.tx_nonce, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true, isSearchable: true, isFilterable: true)
+                        .ReturnsValue(tx.Nonce));
         }
 
-        private void CheckField(Transaction tx,
-            object dto,
-            SearchIndexDefinition searchIndex,
-            PresetSearchFieldName fieldName,
-            Type expectedType,
-            object expectedValue,
-            bool isKey = false,
-            bool isSortable = false,
-            bool isSearchable = false,
-            bool ignore = false,
-            bool isFilterable = false,
-            bool isFacetable = false)
+        [Fact]
+        public void SupportsExcludingPresetTransactionRelatedFields()
         {
-            var field = searchIndex.Field(fieldName);
-            string property = "Null Check";
-            try
-            {
-                Assert.NotNull(field);
-                property = "DataType";
-                Assert.Equal(expectedType, field.DataType);
-                property = "TxValueCallback";
-                Assert.NotNull(field.TxValueCallback);
-                property = "IsKey";
-                Assert.Equal(isKey, field.IsKey);
-                property = "IsSortable";
-                Assert.Equal(isSortable, field.IsSortable);
-                property = "IsSearchable";
-                Assert.Equal(isSearchable, field.IsSearchable);
-                property = "Ignore";
-                Assert.Equal(ignore, field.Ignore);
-                property = "IsFilterable";
-                Assert.Equal(isFilterable, field.IsFilterable);
-                property = "IsFacetable";
-                Assert.Equal(isFacetable, field.IsFacetable);
-                property = "GetValue";
-                Assert.Equal(expectedValue, field.GetValue(dto, tx));
-            }
-            catch (XunitException ex)
-            {
-                throw new Exception($"Field expectation failure: '{field.Name}':'{property}'. {ex.Message}", ex);
-            }
+            var searchIndex = new FunctionSearchIndexDefinition<EmptyDto>(
+                addPresetTransactionFields: false);
+
+            Assert.Empty(searchIndex
+                .Fields
+                .Where(f => f.IsPresetSearchField()).ToArray());
         }
 
         private static Transaction CreateDummyTransaction()
@@ -231,7 +202,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         public void UserDefinedPrimaryKeysOverridePresets()
         {
             var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(
-                addPresetTransactionFields:true);
+                addPresetTransactionFields: true);
 
             var dto = new DepositDto();
 

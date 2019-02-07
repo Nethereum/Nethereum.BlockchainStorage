@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.Search
         public EventSearchTransactionLogHandler(IIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
         {
             _indexer = indexer;
-            this._logsPerIndexBatch = logsPerIndexBatch;
+            _logsPerIndexBatch = logsPerIndexBatch;
         }
 
         public void Dispose()
@@ -35,6 +35,11 @@ namespace Nethereum.BlockchainStore.Search
                 if(!transactionLog.IsForEvent<TEvent>()) return;
 
                 var eventValues = transactionLog.Decode<TEvent>();
+                if (eventValues == null)
+                {
+                    return;
+                }
+
                 _currentBatch.Enqueue(eventValues);
                 if (_currentBatch.Count == _logsPerIndexBatch)
                 {
@@ -42,7 +47,7 @@ namespace Nethereum.BlockchainStore.Search
                     _currentBatch = new ConcurrentQueue<EventLog<TEvent>>();
                 }
             }
-            catch (Exception x)
+            catch (Exception)
             {
                 //Error whilst handling transaction log
                 //expected event signature may differ from the expected event.   
