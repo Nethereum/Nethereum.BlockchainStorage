@@ -2,6 +2,7 @@
 using System.Linq;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
@@ -99,7 +100,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             Assert.False(amountField.IsSearchable);
         }
 
-        public class EmptyDto { }
+        public class EmptyDto : FunctionMessage { }
 
         [Fact]
         public void AddsPresetTransactionRelatedFields()

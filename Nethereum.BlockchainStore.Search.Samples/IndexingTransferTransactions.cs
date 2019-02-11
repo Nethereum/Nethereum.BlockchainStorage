@@ -67,6 +67,8 @@ namespace Nethereum.BlockchainStore.Search.Samples
                     var blockRange = new BlockRange(3146684, 3146694);
                     await blockchainProcessor.ProcessAsync(blockRange);
 
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+
                     //ensure we have written the expected docs to the index
                     Assert.Equal(3, await azureFunctionMessageIndexer.DocumentCountAsync());
                 }

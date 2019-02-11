@@ -20,22 +20,21 @@ namespace Nethereum.BlockchainStore.Search.Tests
         public abstract object GetValue(SearchField field);
     }
 
-    public class TransactionContext : Context
+    public class TransactionContext<T> : Context where T : FunctionMessage, new()
     {
-        public object Dto;
-        public TransactionWithReceipt Tx;
+        public FunctionCall<T> FunctionCall { get; }
+        
 
-        public TransactionContext(IndexDefinition index, object dto, TransactionWithReceipt tx)
+        public TransactionContext(IndexDefinition index, T dto, TransactionWithReceipt tx)
             :base(index)
         {
-            Tx = tx;
-            Dto = dto;
+            FunctionCall = new FunctionCall<T>(tx, dto);
             Index = index;
         }
 
         public override object GetValue(SearchField field)
         {
-            return field.GetValue(Dto, Tx);
+            return field.GetValue(FunctionCall);
         }
     }
 
@@ -60,9 +59,9 @@ namespace Nethereum.BlockchainStore.Search.Tests
     public static class SearchIndexAssertionExtensions
     {
 
-        public static TransactionContext Assertions(this IndexDefinition index, object dto, TransactionWithReceipt tx)
+        public static TransactionContext<T> Assertions<T>(this IndexDefinition index, T dto, TransactionWithReceipt tx) where T : FunctionMessage, new()
         {
-            return new TransactionContext(index, dto, tx);
+            return new TransactionContext<T>(index, dto, tx);
         }
 
         public static EventLogContext<TEvent> Assertions<TEvent>(this IndexDefinition index, EventLog<TEvent> eventLog)
