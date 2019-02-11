@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainStore.Search
                 f.IsSortable = true;
                 f.IsSearchable = true;
                 f.TxValueCallback = (tx) =>
-                    $"{tx.BlockNumber.Value}_{tx.TransactionIndex.Value}";
+                    $"{tx.BlockNumber.Value}_{tx.Transaction.TransactionIndex.Value}";
             });
 
             AddField(fields, PresetSearchFieldName.tx_hash, f =>
@@ -46,13 +46,13 @@ namespace Nethereum.BlockchainStore.Search
                 f.DataType = typeof(HexBigInteger);
                 f.IsSortable = true;
                 f.IsFilterable = false;
-                f.TxValueCallback = (tx) => tx.TransactionIndex;
+                f.TxValueCallback = (tx) => tx.Transaction.TransactionIndex;
             });
 
             AddField(fields, PresetSearchFieldName.tx_block_hash, f => 
             {
                 f.DataType = typeof(string);
-                f.TxValueCallback = (tx) => tx.BlockHash;
+                f.TxValueCallback = (tx) => tx.Transaction.BlockHash;
             });
             
             AddField(fields, PresetSearchFieldName.tx_block_number, f =>
@@ -62,15 +62,22 @@ namespace Nethereum.BlockchainStore.Search
                 f.IsSortable = true;
                 f.IsFilterable = true;
                 f.IsFacetable = true;
-                f.TxValueCallback = (tx) => tx.BlockNumber;
+                f.TxValueCallback = (tx) => tx.Transaction.BlockNumber;
                 f.IsSuggester = true;
+            });
+
+            AddField(fields, PresetSearchFieldName.tx_block_timestamp, f =>
+            {
+                f.DataType = typeof(HexBigInteger);
+                f.IsSortable = true;
+                f.TxValueCallback = (tx) => tx.BlockTimestamp;
             });
 
             AddField(fields, PresetSearchFieldName.tx_value, f =>
             {
                 f.DataType = typeof(HexBigInteger);
                 f.IsSortable = true;
-                f.TxValueCallback = (tx) => tx.Value;
+                f.TxValueCallback = (tx) => tx.Transaction.Value;
             });
 
             AddField(fields, PresetSearchFieldName.tx_from, f =>
@@ -80,7 +87,7 @@ namespace Nethereum.BlockchainStore.Search
                 f.IsSortable = true;
                 f.IsFilterable = true;
                 f.IsFacetable = true;
-                f.TxValueCallback = (tx) => tx.From?.ToLower();
+                f.TxValueCallback = (tx) => tx.Transaction.From?.ToLower();
             });
 
             AddField(fields, PresetSearchFieldName.tx_to, f =>
@@ -90,27 +97,27 @@ namespace Nethereum.BlockchainStore.Search
                 f.IsSortable = true;
                 f.IsFilterable = true;
                 f.IsFacetable = true;
-                f.TxValueCallback = (tx) => tx.To?.ToLower();
+                f.TxValueCallback = (tx) => tx.Transaction.To?.ToLower();
             });
 
             AddField(fields, PresetSearchFieldName.tx_gas, f =>
             {
                 f.DataType = typeof(HexBigInteger);
                 f.IsSortable = true;
-                f.TxValueCallback = (tx) => tx.Gas;
+                f.TxValueCallback = (tx) => tx.Transaction.Gas;
             });
 
             AddField(fields, PresetSearchFieldName.tx_gas_price, f =>
             {
                 f.DataType = typeof(HexBigInteger);
                 f.IsSortable = true;
-                f.TxValueCallback = (tx) => tx.GasPrice;
+                f.TxValueCallback = (tx) => tx.Transaction.GasPrice;
             });
 
             AddField(fields, PresetSearchFieldName.tx_input, f =>
             {
                 f.DataType = typeof(string);
-                f.TxValueCallback = (tx) => tx.Input;
+                f.TxValueCallback = (tx) => tx.Transaction.Input;
             });
 
             AddField(fields, PresetSearchFieldName.tx_nonce, f =>
@@ -119,7 +126,7 @@ namespace Nethereum.BlockchainStore.Search
                 f.IsSearchable = true;
                 f.IsSortable = true;
                 f.IsFilterable = true;
-                f.TxValueCallback = (tx) => tx.Nonce;
+                f.TxValueCallback = (tx) => tx.Transaction.Nonce;
             });
 
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainStore.Search
 {
@@ -48,7 +49,7 @@ namespace Nethereum.BlockchainStore.Search
 
         public Func<FilterLog, object> LogValueCallback { get; set; }
 
-        public Func<Transaction, object> TxValueCallback { get; set; }
+        public Func<TransactionWithReceipt, object> TxValueCallback { get; set; }
 
         public object GetValue(object dto)
         {
@@ -95,7 +96,7 @@ namespace Nethereum.BlockchainStore.Search
             return childVal;
         }
 
-        public object GetValue<TFunction>(TFunction functionDto, Transaction transaction)
+        public object GetValue<TFunction>(TFunction functionDto, TransactionWithReceipt transaction)
         {
             if (TxValueCallback != null) return TxValueCallback.Invoke(transaction);
             return GetValue(functionDto);

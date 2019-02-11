@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.Search
         where TFunctionMessage : FunctionMessage, new()
     {
         private readonly int _logsPerIndexBatch;
-        private Queue<(Transaction, TFunctionMessage)> _currentBatch = new Queue<(Transaction, TFunctionMessage)>();
+        private Queue<FunctionCall<TFunctionMessage>> _currentBatch = new Queue<FunctionCall<TFunctionMessage>>();
         private readonly IFunctionIndexer<TFunctionMessage> _functionIndexer;
 
         public FunctionIndexTransactionHandler(IFunctionIndexer<TFunctionMessage> functionIndexer, int logsPerIndexBatch = 1)
@@ -52,7 +52,7 @@ namespace Nethereum.BlockchainStore.Search
                     return;
                 }
 
-                _currentBatch.Enqueue((transactionWithReceipt.Transaction, decoded));
+                _currentBatch.Enqueue(new FunctionCall<TFunctionMessage>(transactionWithReceipt, decoded));
                 if (_currentBatch.Count == _logsPerIndexBatch)
                 {
                     await _functionIndexer.IndexAsync(_currentBatch);

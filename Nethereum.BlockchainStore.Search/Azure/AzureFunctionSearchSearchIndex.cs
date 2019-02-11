@@ -4,7 +4,6 @@ using Nethereum.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
@@ -20,9 +19,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
             _searchIndexDefinition = searchIndexDefinition;
         }
 
-        public Task IndexAsync(Transaction tx, TFunctionMessage functionMessage) => IndexAsync(new[]{(tx, functionMessage)});
+        public Task IndexAsync(FunctionCall<TFunctionMessage> transaction) => IndexAsync(new[]{transaction});
 
-        public async Task IndexAsync(IEnumerable<(Transaction tx, TFunctionMessage functionMessage)> transactions)
+        public async Task IndexAsync(IEnumerable<FunctionCall<TFunctionMessage>> transactions)
         {
             var documents = transactions.Select(l => l.ToAzureDocument(_searchIndexDefinition)).ToArray();
             await BatchUpdateAsync(documents);

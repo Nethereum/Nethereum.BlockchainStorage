@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search.Azure
@@ -16,7 +17,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public const string SuggesterName = "sg";
 
         public static object ToAzureDocument<TFunctionMessage>(
-            this (Transaction tx, TFunctionMessage functionMessageDto) transactionAndFunction,
+            this FunctionCall<TFunctionMessage> transactionAndFunction,
             FunctionIndexDefinition<TFunctionMessage> indexDefinition)
             where TFunctionMessage : FunctionMessage, new()
         {
@@ -25,7 +26,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             {
                 var azureField = field.ToAzureField();
 
-                var val = field.GetValue(transactionAndFunction.functionMessageDto, transactionAndFunction.tx)?.ToAzureFieldValue();
+                var val = field.GetValue(transactionAndFunction)?.ToAzureFieldValue();
                 if (val != null)
                 {
                     dictionary.Add(azureField.Name, val);

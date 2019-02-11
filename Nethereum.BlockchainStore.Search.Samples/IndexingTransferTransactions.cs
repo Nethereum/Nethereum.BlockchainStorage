@@ -8,6 +8,7 @@ using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
+using Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples
@@ -66,7 +67,7 @@ namespace Nethereum.BlockchainStore.Search.Samples
                     var blockRange = new BlockRange(3146684, 3146694);
                     await blockchainProcessor.ProcessAsync(blockRange);
 
-                    //ensure we have written the required docs to the index
+                    //ensure we have written the expected docs to the index
                     Assert.Equal(3, await azureFunctionMessageIndexer.DocumentCountAsync());
                 }
 

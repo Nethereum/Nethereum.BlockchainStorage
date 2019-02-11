@@ -2,6 +2,7 @@
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
+using Nethereum.BlockchainProcessing.Handlers;
 using Xunit;
 using Xunit.Sdk;
 
@@ -22,9 +23,9 @@ namespace Nethereum.BlockchainStore.Search.Tests
     public class TransactionContext : Context
     {
         public object Dto;
-        public Transaction Tx;
+        public TransactionWithReceipt Tx;
 
-        public TransactionContext(IndexDefinition index, object dto, Transaction tx)
+        public TransactionContext(IndexDefinition index, object dto, TransactionWithReceipt tx)
             :base(index)
         {
             Tx = tx;
@@ -59,7 +60,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
     public static class SearchIndexAssertionExtensions
     {
 
-        public static TransactionContext Assertions(this IndexDefinition index, object dto, Transaction tx)
+        public static TransactionContext Assertions(this IndexDefinition index, object dto, TransactionWithReceipt tx)
         {
             return new TransactionContext(index, dto, tx);
         }

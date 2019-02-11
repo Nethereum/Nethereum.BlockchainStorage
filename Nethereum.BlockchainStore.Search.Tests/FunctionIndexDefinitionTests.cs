@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
@@ -111,12 +113,13 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 .Fields
                 .Where(f => f.IsPresetSearchField()).ToArray();
 
-            Assert.Equal(12, presetFields.Length);
+            Assert.Equal(13, presetFields.Length);
 
-            var tx = CreateDummyTransaction();
+            var transactionWithReceipt = CreateDummyTransaction();
+            var tx = transactionWithReceipt.Transaction;
 
             searchIndex
-                .Assertions(dto, tx)
+                .Assertions(dto, transactionWithReceipt)
                     .HasField(PresetSearchFieldName.tx_uid,  f =>  
                         f.IsString()
                         .HasFlags(isKey: true, isSortable: true, isSearchable: true)
@@ -137,6 +140,10 @@ namespace Nethereum.BlockchainStore.Search.Tests
                         f.IsHexBigInteger()
                         .HasFlags(isSortable: true, isSearchable: true, isFilterable: true, isFacetable: true)
                         .ReturnsValue(tx.BlockNumber))
+                    .HasField(PresetSearchFieldName.tx_block_timestamp, f =>
+                        f.IsHexBigInteger()
+                        .HasFlags(isSortable: true)
+                        .ReturnsValue(transactionWithReceipt.BlockTimestamp))
                     .HasField(PresetSearchFieldName.tx_value, f =>
                         f.IsHexBigInteger()
                         .HasFlags(isSortable: true)
@@ -178,9 +185,9 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 .Where(f => f.IsPresetSearchField()).ToArray());
         }
 
-        private static Transaction CreateDummyTransaction()
+        private static TransactionWithReceipt CreateDummyTransaction()
         {
-            return new Transaction
+            var tx =  new Transaction
             {
                 Value = new HexBigInteger(1000),
                 Gas = new HexBigInteger(100),
@@ -194,6 +201,9 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 TransactionHash = "0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e05",
                 TransactionIndex = new HexBigInteger(1)
             };
+
+            return new TransactionWithReceipt(tx, new TransactionReceipt(), false,
+                new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
         }
 
         [Fact]

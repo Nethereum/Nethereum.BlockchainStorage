@@ -1,14 +1,9 @@
 ﻿using Moq;
-using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Contracts;
-using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Threading.Tasks;
-using Castle.Components.DictionaryAdapter;
 using Xunit;
-using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.Search.Tests
 {
@@ -90,13 +85,13 @@ namespace Nethereum.BlockchainStore.Search.Tests
             
         }
 
-        private List<(Transaction, TestFunctionMessageDto)> CaptureCallsToIndexer(Mock<IFunctionIndexer<TestFunctionMessageDto>> indexer)
+        private List<FunctionCall<TestFunctionMessageDto>> CaptureCallsToIndexer(Mock<IFunctionIndexer<TestFunctionMessageDto>> indexer)
         {
-            List<(Transaction, TestFunctionMessageDto)> indexedFunctionCalls = new EditableList<(Transaction, TestFunctionMessageDto)>();
+            var indexedFunctionCalls = new List<FunctionCall<TestFunctionMessageDto>>();
 
             indexer
-                .Setup(i => i.IndexAsync(It.IsAny<IEnumerable<(Transaction, TestFunctionMessageDto)>>()))
-                .Returns<IEnumerable<(Transaction, TestFunctionMessageDto)>>(l =>
+                .Setup(i => i.IndexAsync(It.IsAny<IEnumerable<FunctionCall<TestFunctionMessageDto>>>()))
+                .Returns<IEnumerable<FunctionCall<TestFunctionMessageDto>>>(l =>
                 {
                     indexedFunctionCalls.AddRange(l);
                     return Task.CompletedTask;

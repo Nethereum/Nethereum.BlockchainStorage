@@ -16,6 +16,7 @@
         tx_hash,
         tx_index,
         tx_block_number,
+        tx_block_timestamp,
         tx_block_hash,
         tx_to,
         tx_from,
