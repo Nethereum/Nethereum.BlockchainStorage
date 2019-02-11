@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
 {
-    public class FunctionSearchIndexDefinitionTests
+    public class FunctionIndexDefinitionTests
     {
         [Function("Deposit")]
         public class DepositDto
@@ -37,16 +37,14 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void DefinesExpectedName()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
-            var dto = new DepositDto();
-
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             Assert.Equal("Deposit", searchIndex.IndexName);
         }
 
         [Fact]
         public void CanIncludeNonParameterFieldsWithSearchFieldAttribute()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto { Category = "test" };
 
             var categoryField = searchIndex.Field(nameof(dto.Category));
@@ -58,7 +56,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void ParameterFieldsCanBeIgnored()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             Assert.Null(searchIndex.Field(nameof(dto.Approver)));
@@ -67,7 +65,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void APrimaryKeyFieldCanBeConfigured()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             var idField = searchIndex.Field(nameof(dto.Id));
@@ -79,7 +77,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void AllowsSearchCustomisationOfParameterFields()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             var currencyField = searchIndex.Field(nameof(dto.Currency));
@@ -91,7 +89,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillAddParametersToSearchData_ButWillNotBeSearchableByDefault()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(addPresetTransactionFields: false);
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(addPresetTransactionFields: false);
             var dto = new DepositDto();
 
             var amountField = searchIndex.Field(nameof(dto.Amount));
@@ -104,7 +102,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void AddsPresetTransactionRelatedFields()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<EmptyDto>(
+            var searchIndex = new FunctionIndexDefinition<EmptyDto>(
                 addPresetTransactionFields: true);
 
             var dto = new EmptyDto();
@@ -172,7 +170,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void SupportsExcludingPresetTransactionRelatedFields()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<EmptyDto>(
+            var searchIndex = new FunctionIndexDefinition<EmptyDto>(
                 addPresetTransactionFields: false);
 
             Assert.Empty(searchIndex
@@ -201,7 +199,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void UserDefinedPrimaryKeysOverridePresets()
         {
-            var searchIndex = new FunctionSearchIndexDefinition<DepositDto>(
+            var searchIndex = new FunctionIndexDefinition<DepositDto>(
                 addPresetTransactionFields: true);
 
             var dto = new DepositDto();

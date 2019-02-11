@@ -1,18 +1,19 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Contracts;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventSearchTransactionLogHandler<TEvent> : ITransactionLogHandler<TEvent>, IDisposable where TEvent : class, new()
+    public class EventIndexTransactionLogHandler<TEvent> : ITransactionLogHandler<TEvent>, IDisposable where TEvent : class, new()
     {
-        private readonly IIndexer<TEvent> _indexer;
+        private readonly IEventIndexer<TEvent> _indexer;
         private readonly int _logsPerIndexBatch;
-        private ConcurrentQueue<EventLog<TEvent>> _currentBatch = new ConcurrentQueue<EventLog<TEvent>>();
+        private readonly Queue<EventLog<TEvent>> _currentBatch = new Queue<EventLog<TEvent>>();
 
-        public EventSearchTransactionLogHandler(IIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
+        public EventIndexTransactionLogHandler(IEventIndexer<TEvent> indexer, int logsPerIndexBatch = 1)
         {
             _indexer = indexer;
             _logsPerIndexBatch = logsPerIndexBatch;
@@ -20,9 +21,10 @@ namespace Nethereum.BlockchainStore.Search
 
         public void Dispose()
         {
-            if (!_currentBatch.IsEmpty)
+            if (_currentBatch.Any())
             {
                 _indexer.IndexAsync(_currentBatch).Wait();
+                _currentBatch.Clear();
             }
         }
 
@@ -44,7 +46,7 @@ namespace Nethereum.BlockchainStore.Search
                 if (_currentBatch.Count == _logsPerIndexBatch)
                 {
                     await _indexer.IndexAsync(_currentBatch);
-                    _currentBatch = new ConcurrentQueue<EventLog<TEvent>>();
+                    _currentBatch.Clear();
                 }
             }
             catch (Exception)

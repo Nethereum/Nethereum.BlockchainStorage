@@ -9,9 +9,9 @@ namespace Nethereum.BlockchainStore.Search.Tests
 {
     public abstract class Context
     {
-        public SearchIndexDefinition Index;
+        public IndexDefinition Index;
 
-        protected Context(SearchIndexDefinition index)
+        protected Context(IndexDefinition index)
         {
             Index = index;
         }
@@ -24,7 +24,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         public object Dto;
         public Transaction Tx;
 
-        public TransactionContext(SearchIndexDefinition index, object dto, Transaction tx)
+        public TransactionContext(IndexDefinition index, object dto, Transaction tx)
             :base(index)
         {
             Tx = tx;
@@ -42,7 +42,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
     {
         public EventLog<TEvent> EventLog;
 
-        public EventLogContext(SearchIndexDefinition index, EventLog<TEvent> eventLog)
+        public EventLogContext(IndexDefinition index, EventLog<TEvent> eventLog)
             :base(index)
         {
             EventLog = eventLog;
@@ -59,12 +59,12 @@ namespace Nethereum.BlockchainStore.Search.Tests
     public static class SearchIndexAssertionExtensions
     {
 
-        public static TransactionContext Assertions(this SearchIndexDefinition index, object dto, Transaction tx)
+        public static TransactionContext Assertions(this IndexDefinition index, object dto, Transaction tx)
         {
             return new TransactionContext(index, dto, tx);
         }
 
-        public static EventLogContext<TEvent> Assertions<TEvent>(this SearchIndexDefinition index, EventLog<TEvent> eventLog)
+        public static EventLogContext<TEvent> Assertions<TEvent>(this IndexDefinition index, EventLog<TEvent> eventLog)
         {
             return new EventLogContext<TEvent>(index, eventLog);
         }

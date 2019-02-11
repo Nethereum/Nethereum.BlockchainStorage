@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
@@ -14,7 +15,27 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         public const string SuggesterName = "sg";
 
-        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventSearchIndexDefinition<TEvent> indexDefinition) where TEvent : class
+        public static object ToAzureDocument<TFunctionMessage>(
+            this (Transaction tx, TFunctionMessage functionMessageDto) transactionAndFunction,
+            FunctionIndexDefinition<TFunctionMessage> indexDefinition)
+            where TFunctionMessage : FunctionMessage, new()
+        {
+            var dictionary = new Dictionary<string, object>();
+            foreach (var field in indexDefinition.Fields)
+            {
+                var azureField = field.ToAzureField();
+
+                var val = field.GetValue(transactionAndFunction.functionMessageDto, transactionAndFunction.tx)?.ToAzureFieldValue();
+                if (val != null)
+                {
+                    dictionary.Add(azureField.Name, val);
+                }
+            }
+
+            return dictionary;
+        }
+
+        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
         {
             var dictionary = new Dictionary<string, object>();
             foreach (var field in indexDefinition.Fields)
@@ -31,7 +52,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return dictionary;
         }
         
-        public static Index ToAzureIndex(this SearchIndexDefinition searchIndex)
+        public static Index ToAzureIndex(this IndexDefinition searchIndex)
         {
             var index = new Index
             {

@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
 {
-    public class EventSearchTransactionLogHandlerTests
+    public class EventIndexTransactionLogHandlerTests
     {
         [Event("Transfer")]
         public class TransferEvent : IEventDTO
@@ -26,10 +26,12 @@ namespace Nethereum.BlockchainStore.Search.Tests
         }
 
         [Fact]
-        public async Task BatchesUpBeforeSendingToIndex()
+        public async Task SendsToIndexInBatches()
         {
-            var indexer = new Mock<IIndexer<TransferEvent>>();
-            var handler = new EventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2);
+            var indexer = new Mock<IEventIndexer<TransferEvent>>();
+            var indexedLogs = CaptureCallsToIndexer(indexer);
+
+            var handler = new EventIndexTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2);
 
             var transactionLog1 = new Mock<TransactionLogWrapper>();
             var transactionLog2 = new Mock<TransactionLogWrapper>();
@@ -43,15 +45,6 @@ namespace Nethereum.BlockchainStore.Search.Tests
             transactionLog1.Setup(t => t.Decode<TransferEvent>()).Returns(eventLog1);
             transactionLog2.Setup(t => t.Decode<TransferEvent>()).Returns(eventLog2);
 
-            var indexedLogs = new List<EventLog<TransferEvent>>();
-
-            indexer
-                .Setup(i => i.IndexAsync(It.IsAny<IEnumerable<EventLog<TransferEvent>>>()))
-                .Returns<IEnumerable<EventLog<TransferEvent>>>(l =>
-                {
-                    indexedLogs.AddRange(l);
-                    return Task.CompletedTask;
-                });
 
             await handler.HandleAsync(transactionLog1.Object);
             Assert.Empty(indexedLogs);
@@ -64,10 +57,11 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public async Task WhenDisposeIsCalledWillAttemptToIndexPendingItems()
         {
-            var indexedLogs = new List<EventLog<TransferEvent>>();
-            var indexer = new Mock<IIndexer<TransferEvent>>();
+            var indexer = new Mock<IEventIndexer<TransferEvent>>();
+            var indexedLogs = CaptureCallsToIndexer(indexer);
+
             using (var handler =
-                new EventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2))
+                new EventIndexTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2))
             {
 
                 var transactionLog1 = new Mock<TransactionLogWrapper>();
@@ -75,14 +69,6 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
                 var eventLog1 = new EventLog<TransferEvent>(new TransferEvent(), new FilterLog());
                 transactionLog1.Setup(t => t.Decode<TransferEvent>()).Returns(eventLog1);
-
-                indexer
-                    .Setup(i => i.IndexAsync(It.IsAny<IEnumerable<EventLog<TransferEvent>>>()))
-                    .Returns<IEnumerable<EventLog<TransferEvent>>>(l =>
-                    {
-                        indexedLogs.AddRange(l);
-                        return Task.CompletedTask;
-                    });
 
                 await handler.HandleAsync(transactionLog1.Object);
                 Assert.Equal(1, handler.Pending);
@@ -95,13 +81,23 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public async Task WillIgnoreLogsThatDoNotMatchTheEvent()
         {
-            var indexedLogs = new List<EventLog<TransferEvent>>();
-            var indexer = new Mock<IIndexer<TransferEvent>>();
+            var indexer = new Mock<IEventIndexer<TransferEvent>>();
+            var indexedLogs = CaptureCallsToIndexer(indexer);
             var handler =
-                new EventSearchTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 1);
+                new EventIndexTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 1);
 
             var logForAnotherEvent = new Mock<TransactionLogWrapper>();
             logForAnotherEvent.Setup(t => t.IsForEvent<TransferEvent>()).Returns(false);
+
+            await handler.HandleAsync(logForAnotherEvent.Object);
+            Assert.Empty(indexedLogs);
+            Assert.Equal(0, handler.Pending);
+            
+        }
+
+        private List<EventLog<TransferEvent>> CaptureCallsToIndexer(Mock<IEventIndexer<TransferEvent>> indexer)
+        {
+            var indexedLogs = new List<EventLog<TransferEvent>>();
 
             indexer
                 .Setup(i => i.IndexAsync(It.IsAny<IEnumerable<EventLog<TransferEvent>>>()))
@@ -111,10 +107,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
                     return Task.CompletedTask;
                 });
 
-            await handler.HandleAsync(logForAnotherEvent.Object);
-            Assert.Empty(indexedLogs);
-            Assert.Equal(0, handler.Pending);
-            
+            return indexedLogs;
         }
     }
 }

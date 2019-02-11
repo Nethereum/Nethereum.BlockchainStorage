@@ -116,7 +116,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public void ToAzureIndex()
         {
-            var eventSearchDefinition = new SearchIndexDefinition("IndexA")
+            var eventSearchDefinition = new IndexDefinition("IndexA")
             {
                 Fields = new []
                 {
@@ -146,7 +146,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         [Fact]
         public void ToAzureDocument_CreatesDictionaryFromEventLogUsingIndexDefinition()
         {
-            var indexDefinition = new EventSearchIndexDefinition<TransferEvent>();
+            var indexDefinition = new EventIndexDefinition<TransferEvent>();
 
             var eventLog = new EventLog<TransferEvent>(
                 new TransferEvent

@@ -62,7 +62,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void BuildsExpectedIndexForCodeGeneratedEventDto()
         {
-            var searchIndex = new EventSearchIndexDefinition<DepositedEventDTO>();
+            var searchIndex = new EventIndexDefinition<DepositedEventDTO>();
 
             var depositedEventDto = new DepositedEventDTO
             {
@@ -183,7 +183,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void IndexCanIncludeCustomFieldsOutsideOfTheSolidityEvent()
         {
-            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoA>();
+            var searchIndex = new EventIndexDefinition<CustomEventDtoA>();
 
             var customEventDto = new CustomEventDtoA() {Category = "CatA"};
 
@@ -198,7 +198,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void IndexNameCanBeOverridden()
         {
-            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoA>();
+            var searchIndex = new EventIndexDefinition<CustomEventDtoA>();
             Assert.Equal("IndexA", searchIndex.IndexName);
         }
 
@@ -213,7 +213,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void EventParametersCanBeCustomIndexed()
         {
-            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoB>();
+            var searchIndex = new EventIndexDefinition<CustomEventDtoB>();
             var customEventDto = new CustomEventDtoB() {Sender = "Charles"};
             var eventLog = new EventLog<CustomEventDtoB>(customEventDto, null);
 
@@ -233,7 +233,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillExcludeIgnoredFields()
         {
-            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoC>();
+            var searchIndex = new EventIndexDefinition<CustomEventDtoC>();
             Assert.Null(searchIndex.Field("Sender"));
         }
 
@@ -247,7 +247,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillProvideDefaultPropertyName()
         {
-            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoD>();
+            var searchIndex = new EventIndexDefinition<CustomEventDtoD>();
             Assert.NotNull(searchIndex.Field("Sender"));
         }
 
@@ -260,7 +260,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillIndexNewProperties()
         {
-            var searchIndex = new EventSearchIndexDefinition<CustomEventDtoE>();
+            var searchIndex = new EventIndexDefinition<CustomEventDtoE>();
             Assert.NotNull(searchIndex.Field("Sender"));
 
             const string sender = "Test";
@@ -304,7 +304,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void WillIndexDtoWithOnlySearchFieldAttributes()
         {
-            var searchIndex = new EventSearchIndexDefinition<DtoWithoutParameterAttributes>(addPresetEventLogFields: false);
+            var searchIndex = new EventIndexDefinition<DtoWithoutParameterAttributes>(addPresetEventLogFields: false);
 
             var dto = new DtoWithoutParameterAttributes
             {
@@ -366,7 +366,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         [Fact]
         public void StaticPropertiesOnDtoAreIgnored()
         {
-            var searchIndex = new EventSearchIndexDefinition<TransferEvent_Custom>(addPresetEventLogFields:false);
+            var searchIndex = new EventIndexDefinition<TransferEvent_Custom>(addPresetEventLogFields:false);
             Assert.Null(searchIndex.Field("Metadata.CurrentChainUrl"));
         }
     }

@@ -109,10 +109,10 @@ Solidity Contract Excerpt
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 
-                using (var transferIndexer = await azureSearchService.GetOrCreateIndex<TransferEvent_ERC20>(AzureTransferIndexName))
+                using (var transferIndexer = await azureSearchService.GetOrCreateEventIndex<TransferEvent_ERC20>(AzureTransferIndexName))
                 {
                     using (var transferProcessor =
-                        new EventSearchIndexProcessor<TransferEvent_ERC20>(transferIndexer))
+                        new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
                     {
 
                         var logProcessor = new BlockchainLogProcessor(
@@ -157,14 +157,14 @@ Solidity Contract Excerpt
                 //we'll add the custom event first
                 //this will create the index in azure
                 //this has an indexable "value" element and we want that to be searchable in azure
-                var customIndexer = await d.Add(() => searchService.GetOrCreateIndex<TransferEvent_Custom>(AzureTransferIndexName));
-                var customProcessor = d.Add(() => new EventSearchIndexProcessor<TransferEvent_Custom>(customIndexer));
+                var customIndexer = await d.Add(() => searchService.GetOrCreateEventIndex<TransferEvent_Custom>(AzureTransferIndexName));
+                var customProcessor = d.Add(() => new EventIndexProcessor<TransferEvent_Custom>(customIndexer));
 
                 //add the erc 20 event -
                 //this will use the same azure index as the custom event - it won't be re-created or altered
                 //the "value" element will still be indexed in azure despite not being indexed in ethereum
-                var erc20Indexer = await d.Add(() => searchService.GetOrCreateIndex<TransferEvent_ERC20>(AzureTransferIndexName));
-                var erc20Processor = d.Add(() => new EventSearchIndexProcessor<TransferEvent_ERC20>(erc20Indexer));
+                var erc20Indexer = await d.Add(() => searchService.GetOrCreateEventIndex<TransferEvent_ERC20>(AzureTransferIndexName));
+                var erc20Processor = d.Add(() => new EventIndexProcessor<TransferEvent_ERC20>(erc20Indexer));
 
                 var logProcessor = new BlockchainLogProcessor(
                     blockchainProxyService,

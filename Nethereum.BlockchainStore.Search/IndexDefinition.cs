@@ -7,9 +7,9 @@ using System.Reflection;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class SearchIndexDefinition<T> : SearchIndexDefinition where T : class
+    public class IndexDefinition<T> : IndexDefinition where T : class
     {
-        public SearchIndexDefinition(string indexName = null, bool addStandardBlockchainFields = true)
+        public IndexDefinition(string indexName = null, bool addStandardBlockchainFields = true)
         {
             var eventType = typeof(T);
             var searchable = eventType.GetCustomAttribute<SearchIndex>();
@@ -17,6 +17,14 @@ namespace Nethereum.BlockchainStore.Search
             IndexName = indexName ?? searchable?.Name ?? eventType.Name;
 
             LoadFields(addStandardBlockchainFields);
+        }
+
+        protected static void AddField(Dictionary<string, SearchField> fieldDictionary,
+            PresetSearchFieldName name, Action<SearchField> fieldConfigurationAction)
+        {
+            var searchField = new SearchField(name);
+            fieldConfigurationAction(searchField);
+            fieldDictionary.Add(searchField.Name, searchField);
         }
 
         protected void LoadFields(bool addStandardBlockchainFields)
@@ -219,16 +227,16 @@ namespace Nethereum.BlockchainStore.Search
         }
     }
 
-    public class SearchIndexDefinition
+    public class IndexDefinition
     {
         public SearchField[] Fields { get; set; } = Array.Empty<SearchField>();
         public string IndexName { get; protected set; }
 
-        protected SearchIndexDefinition()
+        protected IndexDefinition()
         {
         }
 
-        public SearchIndexDefinition(string indexName)
+        public IndexDefinition(string indexName)
         {
             IndexName = indexName;
         }

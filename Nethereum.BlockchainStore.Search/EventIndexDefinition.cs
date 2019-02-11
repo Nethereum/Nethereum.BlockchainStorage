@@ -6,9 +6,9 @@ using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventSearchIndexDefinition<TEvent> : SearchIndexDefinition<TEvent> where TEvent : class
+    public class EventIndexDefinition<TEvent> : IndexDefinition<TEvent> where TEvent : class
     {
-        public EventSearchIndexDefinition(string indexName = null, bool addPresetEventLogFields = true):
+        public EventIndexDefinition(string indexName = null, bool addPresetEventLogFields = true):
             base(indexName, addPresetEventLogFields)
         {
             var eventType = typeof(TEvent);
@@ -16,14 +16,6 @@ namespace Nethereum.BlockchainStore.Search
             var searchable = eventType.GetCustomAttribute<SearchIndex>();
 
             IndexName = indexName ?? searchable?.Name ?? eventAttribute?.Name ?? eventType.Name;
-        }
-
-        private void AddField(Dictionary<string, SearchField> fieldDictionary,
-            PresetSearchFieldName name, Action<SearchField> fieldConfigurationAction)
-        {
-            var searchField = new SearchField(name);
-            fieldConfigurationAction(searchField);
-            fieldDictionary.Add(searchField.Name, searchField);
         }
 
         protected override void LoadGenericBlockchainFields(Dictionary<string, SearchField> fields)

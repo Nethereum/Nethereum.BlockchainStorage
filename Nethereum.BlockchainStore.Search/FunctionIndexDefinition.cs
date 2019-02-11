@@ -6,10 +6,10 @@ using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class FunctionSearchIndexDefinition<TFunction> : 
-        SearchIndexDefinition<TFunction> where TFunction : class
+    public class FunctionIndexDefinition<TFunction> : 
+        IndexDefinition<TFunction> where TFunction : class
     {
-        public FunctionSearchIndexDefinition(string indexName = null, bool addPresetTransactionFields = true):
+        public FunctionIndexDefinition(string indexName = null, bool addPresetTransactionFields = true):
             base(indexName, addPresetTransactionFields)
         {
             var eventType = typeof(TFunction);
@@ -19,13 +19,6 @@ namespace Nethereum.BlockchainStore.Search
             IndexName = indexName ?? searchable?.Name ?? functionAttribute?.Name ?? eventType.Name;
         }
 
-                private void AddField(Dictionary<string, SearchField> fieldDictionary,
-            PresetSearchFieldName name, Action<SearchField> fieldConfigurationAction)
-        {
-            var searchField = new SearchField(name);
-            fieldConfigurationAction(searchField);
-            fieldDictionary.Add(searchField.Name, searchField);
-        }
 
         protected override void LoadGenericBlockchainFields(Dictionary<string, SearchField> fields)
         {

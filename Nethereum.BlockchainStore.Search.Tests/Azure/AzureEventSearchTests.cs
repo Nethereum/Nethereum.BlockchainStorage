@@ -63,7 +63,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
             var apiKey = appConfig[ApiKeyName];
 
-            var eventSearchIndexDefinition = new EventSearchIndexDefinition<TransferEvent>();
+            var eventSearchIndexDefinition = new EventIndexDefinition<TransferEvent>();
 
             using (var searchService = new AzureEventSearchService(AzureSearchServiceName, apiKey))
             {

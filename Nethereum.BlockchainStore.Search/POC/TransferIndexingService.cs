@@ -71,14 +71,14 @@ Solidity Contract Excerpt
 
         public async Task RunContinually(ulong fromBlockNumber, CancellationToken cancellationToken)
         {
-            var customIndexer = await d.Add(() => searchService.GetOrCreateIndex<TransferEvent_Custom>(transferIndexName));
-            var customProcessor = d.Add(() => new EventSearchIndexProcessor<TransferEvent_Custom>(customIndexer, logsPerIndexBatch: LogsPerIndexBatch));
+            var customIndexer = await d.Add(() => searchService.GetOrCreateEventIndex<TransferEvent_Custom>(transferIndexName));
+            var customProcessor = d.Add(() => new EventIndexProcessor<TransferEvent_Custom>(customIndexer, logsPerIndexBatch: LogsPerIndexBatch));
 
             //add the erc 20 event -
             //this will use the same azure index as the custom event - it won't be re-created or altered
             //the "value" element will still be indexed in azure
-            var erc20Indexer = await d.Add(() => searchService.GetOrCreateIndex<TransferEvent_ERC20>(transferIndexName));
-            var erc20Processor = d.Add(() => new EventSearchIndexProcessor<TransferEvent_ERC20>(erc20Indexer, logsPerIndexBatch: LogsPerIndexBatch));
+            var erc20Indexer = await d.Add(() => searchService.GetOrCreateEventIndex<TransferEvent_ERC20>(transferIndexName));
+            var erc20Processor = d.Add(() => new EventIndexProcessor<TransferEvent_ERC20>(erc20Indexer, logsPerIndexBatch: LogsPerIndexBatch));
 
             var logProcessor = new BlockchainLogProcessor(
                 blockchainProxyService,

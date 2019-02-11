@@ -8,17 +8,17 @@ namespace Nethereum.BlockchainStore.Search
 {
     public static class SearchIndexExtensions
     {
-        public static SearchField Field(this SearchIndexDefinition searchIndex, string name)
+        public static SearchField Field(this IndexDefinition searchIndex, string name)
         {
             return searchIndex.Fields.FirstOrDefault(f => f.Name == name);
         }
 
-        public static SearchField Field(this SearchIndexDefinition searchIndex, PresetSearchFieldName name)
+        public static SearchField Field(this IndexDefinition searchIndex, PresetSearchFieldName name)
         {
             return searchIndex.Field(name.ToString());
         }
 
-        public static SearchField KeyField(this SearchIndexDefinition searchIndex)
+        public static SearchField KeyField(this IndexDefinition searchIndex)
         {
             return searchIndex.Fields.FirstOrDefault(f => f.IsKey);
         }
