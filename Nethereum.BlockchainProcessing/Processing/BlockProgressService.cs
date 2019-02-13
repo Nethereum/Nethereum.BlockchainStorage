@@ -7,17 +7,19 @@ namespace Nethereum.BlockchainProcessing.Processing
     {
         private readonly IBlockchainProxyService _web3;
 
-        public uint MinimumBlockConfirmations = 0;
+        public uint MinimumBlockConfirmations { get; }
 
         public BlockProgressService(
             IBlockchainProxyService web3, 
             ulong defaultStartingBlockNumber, 
-            IBlockProgressRepository blockProgressRepository) : 
+            IBlockProgressRepository blockProgressRepository,
+            uint minimumBlockConfirmations = 0) : 
             base(
             defaultStartingBlockNumber, 
             blockProgressRepository)
         {
             _web3 = web3;
+            MinimumBlockConfirmations = minimumBlockConfirmations;
         }
 
         public override async Task<ulong> GetBlockNumberToProcessTo()

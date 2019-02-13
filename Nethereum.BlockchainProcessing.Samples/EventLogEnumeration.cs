@@ -125,10 +125,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             //this will get the last block on the chain each time a "to" block is requested
             var progressService = new BlockProgressService(
-                blockchainProxyService, 3379061, progressRepository)
-            {
-                MinimumBlockConfirmations = 6 //stay within x blocks of the most recent
-            };
+                blockchainProxyService, 3379061, progressRepository, minimumBlockConfirmations: 6);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
@@ -190,10 +187,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             //this will get the last block on the chain each time a "to" block is requested
             var progressService = new BlockProgressService(
-                blockchainProxyService, 3379061, progressRepository)
-            {
-                MinimumBlockConfirmations = 6 //stay within x blocks of the most recent
-            };
+                blockchainProxyService, 3379061, progressRepository, minimumBlockConfirmations: 6);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
