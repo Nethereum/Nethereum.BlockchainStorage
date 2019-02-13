@@ -14,6 +14,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public int Indexed { get; protected set; }
 
+        public string Name => Index.Name;
+
         protected AzureSearchIndexBase(Index index, ISearchIndexClient indexClient)
         {
             Index = index;

@@ -7,12 +7,12 @@ using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureEventSearchService : IAzureEventSearchService, IAzureTransactionSearchService
+    public class AzureSearchService : IAzureEventSearchService, IAzureFunctionSearchService
     {
         private readonly SearchServiceClient _client;
         private readonly ConcurrentDictionary<string, Index> _azureIndexes;
 
-        public AzureEventSearchService(string serviceName, string searchApiKey)
+        public AzureSearchService(string serviceName, string searchApiKey)
         {
             _client = new SearchServiceClient(serviceName, new SearchCredentials(searchApiKey));
             _azureIndexes = new ConcurrentDictionary<string, Index>();
@@ -40,7 +40,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             where TFunctionMessage : FunctionMessage, new()
         {
             var azureIndex = await GetOrCreateAzureIndex(searchIndexDefinition);
-            return new AzureFunctionSearchSearchIndex<TFunctionMessage>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
+            return new AzureFunctionSearchIndex<TFunctionMessage>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
         }
 
         public Task DeleteIndexAsync(IndexDefinition searchIndex) =>

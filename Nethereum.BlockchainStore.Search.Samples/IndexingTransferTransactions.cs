@@ -47,7 +47,7 @@ namespace Nethereum.BlockchainStore.Search.Samples
         [Fact]
         public async Task IndexingTransferFunctions()
         {
-            using (var azureSearchService = new AzureEventSearchService(AzureSearchServiceName, _azureSearchApiKey))
+            using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 

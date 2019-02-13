@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Search" Version="5.0.3" />
-    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190125-144206" />
+    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190213-163519" />
   </ItemGroup>
 
 </Project>

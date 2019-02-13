@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureFunctionSearchSearchIndex<TFunctionMessage> : 
+    public class AzureFunctionSearchIndex<TFunctionMessage> : 
         AzureSearchIndexBase, 
         IAzureFunctionSearchIndex<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
     {
         private readonly FunctionIndexDefinition<TFunctionMessage> _searchIndexDefinition;
 
-        public AzureFunctionSearchSearchIndex(FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition, Index index, ISearchIndexClient indexClient)
+        public AzureFunctionSearchIndex(FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition, Index index, ISearchIndexClient indexClient)
             :base(index, indexClient)
         {
             _searchIndexDefinition = searchIndexDefinition;

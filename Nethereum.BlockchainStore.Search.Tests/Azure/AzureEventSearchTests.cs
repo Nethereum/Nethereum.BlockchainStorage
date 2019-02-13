@@ -65,7 +65,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
             var eventSearchIndexDefinition = new EventIndexDefinition<TransferEvent>();
 
-            using (var searchService = new AzureEventSearchService(AzureSearchServiceName, apiKey))
+            using (var searchService = new AzureSearchService(AzureSearchServiceName, apiKey))
             {
                 try
                 {
