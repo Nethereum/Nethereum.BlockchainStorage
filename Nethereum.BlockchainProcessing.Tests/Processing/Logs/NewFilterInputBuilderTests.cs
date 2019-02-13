@@ -30,6 +30,20 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             public uint NotAnEventParameter { get; set; }
         }
 
+        [Event("Transfer")]
+        public class TransferEvent_ERC20
+        {
+            [Parameter("address", "_from", 1, true)]
+            public string From { get; set; }
+
+            [Parameter("address", "_to", 2, true)] 
+            public string To { get; set; }
+
+            [Parameter("uint256", "_value", 3, false)]
+            public BigInteger Value { get; set; }
+            
+        }
+
         [Event("TransferEvent_WithEmptyParameterNames")]
         public class TransferEvent_WithEmptyParameterNames
         {
@@ -41,6 +55,34 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             [Parameter("uint256", " ", 3, true)]
             public BigInteger Value { get; set; }
+        }
+
+        [Fact]
+        public void Topic_Value_Array_Length_Always_Equals_Signature_Plus_Count_Of_Indexed_Parameters()
+        {
+            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>().Build();
+            Assert.Equal(3, filter.Topics.Length);
+
+            var filterFrom = new NewFilterInputBuilder<TransferEvent_ERC20>()
+                .AddTopic(tfr => tfr.From, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
+                .Build();
+
+            Assert.Equal(3, filterFrom.Topics.Length);
+
+            var filterTo = new NewFilterInputBuilder<TransferEvent_ERC20>()
+                .AddTopic(tfr => tfr.To, "0xefa70b70b41d77a7cdd8b878f57521d47c064d8c")
+                .Build();
+
+            Assert.Equal(3, filterTo.Topics.Length);
+
+            var filterFromAndTo = new NewFilterInputBuilder<TransferEvent_ERC20>()
+                .AddTopic(tfr => tfr.From, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
+                .AddTopic(tfr => tfr.To, "0xefa70b70b41d77a7cdd8b878f57521d47c064d8c")
+                .Build();
+
+            Assert.Equal(3, filterFromAndTo.Topics.Length);
+
+
         }
 
         [Fact]

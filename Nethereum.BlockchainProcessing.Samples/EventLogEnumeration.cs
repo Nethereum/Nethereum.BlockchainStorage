@@ -6,6 +6,7 @@ using Nethereum.Contracts.Extensions;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -333,7 +334,6 @@ Other contracts may have transfer events with different signatures, this won't w
             Assert.Single(catchAllEventProcessor.ProcessedEvents);
         
         }
-
 
     }
 }

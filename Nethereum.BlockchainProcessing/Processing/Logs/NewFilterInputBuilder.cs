@@ -67,6 +67,31 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 return _eventAbi.CreateFilterInput(contractAddresses, from, to);
             }
 
+            //if the object array exceeds the length of the topics on the abi
+            //the filter no longer works
+
+            //one indexed topic
+            if (_topics.Topic2 == TopicFilter.Empty)
+            {
+                return _eventAbi.CreateFilterInput(
+                    contractAddresses, 
+                    _topics.Topic1.GetValues(), 
+                    from, 
+                    to);
+            }
+
+            //two indexed topics
+            if (_topics.Topic3 == TopicFilter.Empty)
+            {
+                return _eventAbi.CreateFilterInput(
+                    contractAddresses, 
+                    _topics.Topic1.GetValues(), 
+                    _topics.Topic2.GetValues(), 
+                    from, 
+                    to);
+            }
+
+            //three indexed topics
             return _eventAbi.CreateFilterInput(
                 contractAddresses, 
                 _topics.Topic1.GetValues(), 
