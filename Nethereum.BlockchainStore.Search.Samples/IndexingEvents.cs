@@ -6,7 +6,6 @@ using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Threading;
@@ -15,6 +14,7 @@ using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples
 {
+    [Collection("Nethereum.BlockchainStore.Search.Samples")]
     public class IndexingTransferEvents
     {
         /*
@@ -87,7 +87,7 @@ Solidity Contract Excerpt
             [SearchField(IsSearchable = true)]
             public string ChainUrl { get;set; }
 
-            [SearchField(IsSearchable = true)]
+            [SearchField(IsSearchable = true, IsFacetable = true)]
             public string IndexingMachineName { get;set; }
         }
 
@@ -111,7 +111,9 @@ Solidity Contract Excerpt
             _azureSearchApiKey = appConfig[ApiKeyName];
         }
 
-
+        /// <summary>
+        /// Indexing events in the most simple way
+        /// </summary>
         [Fact]
         public async Task StartHere()
         {
@@ -129,7 +131,7 @@ Solidity Contract Excerpt
 
                 Assert.Equal((ulong)11, blocksProcessed);
                 Assert.Equal(1, processor.Indexers.Count);
-                Assert.Equal(6, processor.Indexers[0].Indexed);
+                Assert.Equal(19, processor.Indexers[0].Indexed);
 
                 #region test clean up 
                 await processor.ClearProgress();
@@ -138,6 +140,10 @@ Solidity Contract Excerpt
             }
         }
 
+        /// <summary>
+        /// Demonstrates how to set off a processor to continually index events
+        /// As this is a test which needs to run in a confined time span - this example includes a short circuit
+        /// </summary>
         [Fact]
         public async Task RunContinually()
         {
@@ -160,7 +166,7 @@ Solidity Contract Excerpt
                 await processor.AddEventAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
                 var cancellationToken = new CancellationTokenSource();
-                var escapeHatch = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
+                var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
                 {
                     if (lastRange.To >= maxBlock) // escape hatch!
                     {
@@ -169,7 +175,7 @@ Solidity Contract Excerpt
                 });
 
                 var blocksProcessed = await processor.ProcessAsync(startingBlock, 
-                    ctx: cancellationToken, rangeProcessedCallback: escapeHatch);
+                    ctx: cancellationToken, rangeProcessedCallback: shortCircuit);
 
                 Assert.Equal(expectedBlocks, blocksProcessed);
  
@@ -180,6 +186,11 @@ Solidity Contract Excerpt
             }
         }
 
+        /// <summary>
+        /// Using a filter is an efficient way of processing
+        /// It means the processor only requests relevant events from the chain
+        /// Instead of retrieving all events and evaluating each
+        /// </summary>
         [Fact]
         public async Task WithAFilter()
         {
@@ -214,8 +225,14 @@ Solidity Contract Excerpt
             }
         }
 
+        /// <summary>
+        /// The class AzureEventIndexingProcessor wraps up quite a few components
+        /// This gets you going quick and in many cases will be all you need
+        /// However, these components can be used in isolation for flexibility and extensibility
+        /// This test demonstrates how to do that
+        /// </summary>
         [Fact]
-        public async Task CustomComposition()
+        public async Task UsingTheIndividualComponents()
         {
             TransferMetadata.CurrentChainUrl = BlockchainUrl;
 
@@ -259,6 +276,11 @@ Solidity Contract Excerpt
             }
         }
 
+        /// <summary>
+        /// Some events look similar but have differing number of indexed parameters
+        /// e.g. Transfer is often implemented in slightly different ways
+        /// This demonstrates how to index multiple types of different Transfer events in the same search index
+        /// </summary>
         [Fact]
         public async Task IndexingTransferEventsWithDifferingSignatures()
         {
@@ -297,6 +319,12 @@ Solidity Contract Excerpt
             }
         }
 
+        /// <summary>
+        /// In addition to indexing the data that is the blockchain,
+        /// additional data can be indexed.
+        /// The data could be derived from the current context, or from custom rules or formulas
+        /// This can enrich the search index
+        /// </summary>
         [Fact]
         public async Task IndexingAdditionalInformationPerEvent()
         {
@@ -316,15 +344,16 @@ Solidity Contract Excerpt
 
                 var customIndexer = processor.Indexers[0] as IAzureSearchIndex;
 
-                var query = "0x90df9bcd9608696df90c0baf5faefd2399bba0d2";
-                var searchResult = await customIndexer.SearchAsync(query, new List<string>());
+                var searchByMachineNameQuery = Environment.MachineName;
+                var searchResult = await customIndexer.SearchAsync(searchByMachineNameQuery);
 
-                Assert.Equal(1, searchResult.Count);
+                Assert.Equal(19, searchResult.Count);
 
                 //all should have our custom metadata which is not provided by the blockchain
                 foreach (var result in searchResult.Results)
                 {
-                    Assert.Equal(Environment.MachineName, result.Document["metadata_indexingmachinename"]);
+                    var indexedOnTimestamp = result.Document["metadata_indexedon"];
+                    Assert.NotNull(indexedOnTimestamp);
                 }
 
                 #region test clean up 

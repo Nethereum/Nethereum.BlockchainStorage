@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts;
@@ -9,6 +10,33 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search
 {
+    public class LogProcessorRouter : ILogProcessor
+    {
+        public LogProcessorRouter(IEnumerable<ILogProcessor> processors)
+        {
+            Processors = processors;
+        }
+
+        public IEnumerable<ILogProcessor> Processors { get; }
+
+        public bool IsLogForEvent(FilterLog log)
+        {
+            return Processors.Any(p => p.IsLogForEvent(log));
+        }
+
+        public async Task ProcessLogsAsync(params FilterLog[] eventLogs)
+        {
+            foreach (var log in eventLogs)
+            {
+                foreach (var processor in Processors.Where(p => p.IsLogForEvent(log)))
+                {
+                    await processor.ProcessLogsAsync(log);
+                }
+            }
+        }
+    }
+
+
     public class EventIndexProcessor<TEvent> : ILogProcessor, IDisposable where TEvent : class, new()
     {
         private readonly IEventIndexer<TEvent> _indexer;

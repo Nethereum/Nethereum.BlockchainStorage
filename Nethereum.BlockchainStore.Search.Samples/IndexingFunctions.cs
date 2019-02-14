@@ -13,7 +13,8 @@ using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples
 {
-    public class IndexingFunctionMessages
+    [Collection("Nethereum.BlockchainStore.Search.Samples")]
+    public class IndexingFunctions
     {
         [Function("transfer", "bool")]
         public class TransferFunction: FunctionMessage
@@ -30,7 +31,7 @@ namespace Nethereum.BlockchainStore.Search.Samples
 
         private readonly string _azureSearchApiKey;
 
-        public IndexingFunctionMessages()
+        public IndexingFunctions()
         {
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
