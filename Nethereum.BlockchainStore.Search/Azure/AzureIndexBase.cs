@@ -7,7 +7,7 @@ using Microsoft.Rest.TransientFaultHandling;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public abstract class AzureSearchIndexBase
+    public abstract class AzureIndexBase
     {
         protected readonly Index Index;
         protected readonly ISearchIndexClient IndexClient;
@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public string Name => Index.Name;
 
-        protected AzureSearchIndexBase(Index index, ISearchIndexClient indexClient)
+        protected AzureIndexBase(Index index, ISearchIndexClient indexClient)
         {
             Index = index;
             IndexClient = indexClient;

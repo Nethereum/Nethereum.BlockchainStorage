@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search.Azure
@@ -37,7 +38,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public AzureEventIndexingProcessor(
             IBlockchainProxyService blockchainProxyService, 
-            IAzureEventSearchService searchService, 
+            IAzureEventAndFunctionIndexingService searchService, 
             Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2,
             IEnumerable<NewFilterInput> filters = null,
@@ -53,20 +54,45 @@ namespace Nethereum.BlockchainStore.Search.Azure
             _indexers = new List<IEventIndexer>();
         }
 
-        public IAzureEventSearchService SearchService {get;}
+        public IAzureEventAndFunctionIndexingService SearchService {get;}
         public IBlockchainProxyService BlockchainProxyService { get; }
         public uint MaxBlocksPerBatch { get; }
         public uint MinimumBlockConfirmations { get; }
 
         public IReadOnlyList<IEventIndexer> Indexers => _indexers.AsReadOnly();
         
-        public async Task AddEventAsync<TEvent>(string indexName = null) where TEvent : class, new()
+        /// <summary>
+        /// Creates a function processor containing a function indexer
+        /// This processor can then be inserted into event processors to index related functions
+        /// </summary>
+        /// <typeparam name="TFunctionMessage"></typeparam>
+        /// <param name="indexName"></param>
+        /// <returns></returns>
+        public async Task<IEventFunctionProcessor<TFunctionMessage>> CreateFunctionProcessorAsync<TFunctionMessage>(
+            string indexName = null)
+            where TFunctionMessage : FunctionMessage, new()
         {
-            var index = await SearchService.GetOrCreateEventIndex<TEvent>(indexName);
+            var functionIndexer = await SearchService.GetOrCreateFunctionIndexer<TFunctionMessage>(indexName);
+
+            var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
+
+            var functionProcessor =
+                new EventFunctionProcessor<TFunctionMessage>(BlockchainProxyService, functionHandler);
+
+            return functionProcessor;
+        }
+
+        public async Task<EventIndexProcessor<TEvent>> AddIndexer<TEvent>(
+            string indexName = null, 
+            IEnumerable<IEventFunctionProcessor> functionProcessors = null) where TEvent : class, new()
+        {
+
+            var index = await SearchService.GetOrCreateEventIndexer<TEvent>(indexName);
             _indexers.Add(index);
             
-            var processor = new EventIndexProcessor<TEvent>(index);
+            var processor = new EventIndexProcessor<TEvent>(index, functionProcessors: functionProcessors);
             _logProcessors.Add(processor);
+            return processor;
         }
 
         public async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<uint, BlockRange> rangeProcessedCallback = null)

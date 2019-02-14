@@ -4,15 +4,16 @@ using Nethereum.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.Contracts.Extensions;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureEventSearchSearchIndex<TEvent> : AzureSearchIndexBase, IAzureEventSearchIndex<TEvent> where TEvent : class
+    public class AzureEventIndexer<TEvent> : 
+        AzureIndexBase, IAzureEventIndexer<TEvent> where TEvent : class
     {
         private readonly EventIndexDefinition<TEvent> _eventSearchDefinition;
 
-        public AzureEventSearchSearchIndex(EventIndexDefinition<TEvent> eventSearchDefinition, Index index, ISearchIndexClient indexClient)
+        public AzureEventIndexer(
+            EventIndexDefinition<TEvent> eventSearchDefinition, Index index, ISearchIndexClient indexClient)
         :base(index, indexClient)
         {
             _eventSearchDefinition = eventSearchDefinition;

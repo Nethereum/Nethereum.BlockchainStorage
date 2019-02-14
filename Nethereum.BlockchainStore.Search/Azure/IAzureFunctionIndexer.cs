@@ -3,10 +3,10 @@ using System;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public interface IAzureFunctionSearchIndex<TFunctionMessage> : 
+    public interface IAzureFunctionIndexer<TFunctionMessage> : 
         IDisposable, 
         IFunctionIndexer<TFunctionMessage>, 
-        IAzureSearchIndex
+        IAzureIndex
         where TFunctionMessage : FunctionMessage, new()
     {
 

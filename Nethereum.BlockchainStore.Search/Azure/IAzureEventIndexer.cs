@@ -2,10 +2,10 @@
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public interface IAzureEventSearchIndex<TEvent>: 
+    public interface IAzureEventIndexer<TEvent>: 
         IDisposable, 
         IEventIndexer<TEvent>, 
-        IAzureSearchIndex where TEvent : class
+        IAzureIndex where TEvent : class
     {
     }
 

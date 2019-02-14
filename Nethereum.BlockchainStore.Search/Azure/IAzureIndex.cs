@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public interface IAzureSearchIndex
+    public interface IAzureIndex
     {
         Task<DocumentSearchResult<Dictionary<string, object>>> SearchAsync(string text, IList<string> facets = null);
         Task<DocumentSuggestResult<Dictionary<string, object>>> SuggestAsync(string searchText, bool fuzzy = true);

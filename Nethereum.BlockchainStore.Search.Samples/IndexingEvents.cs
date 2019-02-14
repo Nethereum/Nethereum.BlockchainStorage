@@ -125,7 +125,7 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddEventAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                await processor.AddIndexer<TransferEvent_ERC20>(AzureTransferIndexName);
 
                 var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
@@ -163,7 +163,7 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddEventAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                await processor.AddIndexer<TransferEvent_ERC20>(AzureTransferIndexName);
 
                 var cancellationToken = new CancellationTokenSource();
                 var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
@@ -211,7 +211,7 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddEventAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                await processor.AddIndexer<TransferEvent_ERC20>(AzureTransferIndexName);
 
                 var blocksProcessed = await processor.ProcessAsync(3860820, 3860820);
 
@@ -243,7 +243,7 @@ Solidity Contract Excerpt
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 
-                using (var transferIndexer = await azureSearchService.GetOrCreateEventIndex<TransferEvent_ERC20>(AzureTransferIndexName))
+                using (var transferIndexer = await azureSearchService.GetOrCreateEventIndexer<TransferEvent_ERC20>(AzureTransferIndexName))
                 {
                     using (var transferProcessor =
                         new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
@@ -292,8 +292,8 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddEventAsync<TransferEvent_With3Indexes>(AzureTransferIndexName);
-                await processor.AddEventAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                await processor.AddIndexer<TransferEvent_With3Indexes>(AzureTransferIndexName);
+                await processor.AddIndexer<TransferEvent_ERC20>(AzureTransferIndexName);
 
                 var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
@@ -304,8 +304,8 @@ Solidity Contract Excerpt
 
                 await Task.Delay(5000); // leave time for index
 
-                var customIndexer = processor.Indexers[0] as IAzureSearchIndex;
-                var erc20Indexer = processor.Indexers[1] as IAzureSearchIndex;
+                var customIndexer = processor.Indexers[0] as IAzureIndex;
+                var erc20Indexer = processor.Indexers[1] as IAzureIndex;
                
                 //the indexers wrap the same underlying azure index
                 //this azure index should have documents for both transfer event types
@@ -336,13 +336,13 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddEventAsync<TransferEvent_Extended>(AzureTransferIndexName);
+                await processor.AddIndexer<TransferEvent_Extended>(AzureTransferIndexName);
 
                 await processor.ProcessAsync(3146684, 3146694);
 
                 await Task.Delay(5000); // leave time for index
 
-                var customIndexer = processor.Indexers[0] as IAzureSearchIndex;
+                var customIndexer = processor.Indexers[0] as IAzureIndex;
 
                 var searchByMachineNameQuery = Environment.MachineName;
                 var searchResult = await customIndexer.SearchAsync(searchByMachineNameQuery);

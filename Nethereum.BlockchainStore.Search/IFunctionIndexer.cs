@@ -1,8 +1,6 @@
 ﻿using Nethereum.Contracts;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search
 {
