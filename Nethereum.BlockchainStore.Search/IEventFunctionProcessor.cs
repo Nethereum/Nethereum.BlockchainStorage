@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
-using Nethereum.RPC.Eth.DTOs;
+﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.Contracts;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public interface IEventFunctionProcessor  
+    public interface IEventFunctionProcessor
     {
-        Task Process(FilterLog[] logs);
+        void AddHandler<TEvent>(ITransactionHandler handler);
+        Task ProcessAsync<TEvent>(EventLog<TEvent>[] logs);
     }
 }

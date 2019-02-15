@@ -8,8 +8,6 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         Task<DocumentSearchResult<Dictionary<string, object>>> SearchAsync(string text, IList<string> facets = null);
         Task<DocumentSuggestResult<Dictionary<string, object>>> SuggestAsync(string searchText, bool fuzzy = true);
-        Task<long> DocumentCountAsync();
-
         string Name { get; }
     }
 

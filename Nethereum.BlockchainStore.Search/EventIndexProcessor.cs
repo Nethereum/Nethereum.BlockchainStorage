@@ -5,25 +5,30 @@ using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-
-    public class EventIndexProcessor<TEvent> : ILogProcessor, IDisposable where TEvent : class, new()
+    public interface IEventIndexProcessor<TEvent> : ILogProcessor, IDisposable where TEvent : class, new()
     {
-        private readonly IEventIndexer<TEvent> _indexer;
+        int Pending { get; }
+        IEventIndexer<TEvent> Indexer { get; }
+    }
+
+    public class EventIndexProcessor<TEvent> : IEventIndexProcessor<TEvent> where TEvent : class, new()
+    {
         private readonly int _logsPerIndexBatch;
         private readonly ConcurrentQueue<EventLog<TEvent>> _currentBatch = new ConcurrentQueue<EventLog<TEvent>>();
-        private readonly IEnumerable<IEventFunctionProcessor> _functionProcessors;
+        private readonly IEventFunctionProcessor _functionProcessor;
 
         public EventIndexProcessor(
-            IEventIndexer<TEvent> indexer, 
-            IEnumerable<IEventFunctionProcessor> functionProcessors = null, 
+            IEventIndexer<TEvent> indexer,
+            IEventFunctionProcessor functionProcessor = null,
             int logsPerIndexBatch = 1)
         {
-            _indexer = indexer;
-            _functionProcessors = functionProcessors;
+            Indexer = indexer;
+            _functionProcessor = functionProcessor;
             _logsPerIndexBatch = logsPerIndexBatch;
         }
 
@@ -31,12 +36,14 @@ namespace Nethereum.BlockchainStore.Search
         {
             if (!_currentBatch.IsEmpty)
             {
-                _indexer.IndexAsync(_currentBatch);
+                Indexer.IndexAsync(_currentBatch);
                 _currentBatch.Clear();
             }
         }
 
         public int Pending => _currentBatch.Count;
+
+        public IEventIndexer<TEvent> Indexer { get; }
 
         public bool IsLogForEvent(FilterLog log)
         {
@@ -45,26 +52,23 @@ namespace Nethereum.BlockchainStore.Search
 
         public async Task ProcessLogsAsync(params FilterLog[] eventLogs)
         {
-            DecodeInToBatch(eventLogs);
+            var decoded = DecodeInToBatch(eventLogs);
 
             while (_currentBatch.Count >= _logsPerIndexBatch)
             {
                 List<EventLog<TEvent>> logsToSend = GetLogsToIndex();
 
-                await _indexer.IndexAsync(logsToSend);
+                await Indexer.IndexAsync(logsToSend);
             }
 
-            await ProcessFunctions(eventLogs);
+            await ProcessFunctions(decoded);
         }
 
-        private async Task ProcessFunctions(FilterLog[] eventLogs)
+        private async Task ProcessFunctions(EventLog<TEvent>[] eventLogs)
         {
-            if (_functionProcessors == null) return;
+            if (_functionProcessor == null) return;
 
-            foreach (var functionProcessor in _functionProcessors)
-            {
-                await functionProcessor.Process(eventLogs);
-            }
+            await _functionProcessor.ProcessAsync(eventLogs);
         }
 
         private List<EventLog<TEvent>> GetLogsToIndex()
@@ -81,13 +85,16 @@ namespace Nethereum.BlockchainStore.Search
             return logsToSend;
         }
 
-        private void DecodeInToBatch(FilterLog[] eventLogs)
+        private EventLog<TEvent>[] DecodeInToBatch(FilterLog[] eventLogs)
         {
-            var decoded = TryDecode(eventLogs);
+            var decoded = TryDecode(eventLogs).ToArray();
+
             foreach (var decodedLog in decoded)
             {
                 _currentBatch.Enqueue(decodedLog);
             }
+
+            return decoded;
         }
 
         private IEnumerable<EventLog<TEvent>> TryDecode(FilterLog[] eventLogs)

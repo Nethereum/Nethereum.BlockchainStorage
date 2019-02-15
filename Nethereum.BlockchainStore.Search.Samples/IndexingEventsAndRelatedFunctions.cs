@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
@@ -21,6 +22,7 @@ namespace Nethereum.BlockchainStore.Search.Samples
 
         public const string TransferEventIndexName = "transfer-event";
         public const string TransferFunctionIndexName = "transfer-function";
+        public const string TransferFromFunctionIndexName = "transfer-from-function";
 
         public IndexingEventsAndRelatedFunctions()
         {
@@ -45,6 +47,17 @@ namespace Nethereum.BlockchainStore.Search.Samples
             public BigInteger Value {get; set;}
         }
 
+        [Function("transferFrom", "bool")]
+        public class TransferFromFunction: FunctionMessage
+        {
+            [Parameter("address", "_from", 1)]
+            public string From {get; set;}
+            [Parameter("address", "_to", 2)]
+            public string To {get; set;}
+            [Parameter("uint256", "_value", 3)]
+            public BigInteger Value {get; set;}
+        }
+
         [Event("Transfer")]
         public class TransferEvent_ERC20
         {
@@ -58,9 +71,11 @@ namespace Nethereum.BlockchainStore.Search.Samples
             public BigInteger Value {get; set;}
         }
 
+        // function approve(address spender, uint256 value) external returns (bool);
+        // event Approval(address indexed owner, address indexed spender, uint256 value);
+
         /// <summary>
-        /// Indexes matching events
-        /// Also indexes related functions
+        /// Indexing Transfer events and the Transfer Functions (function inputs) that instigated them
         /// </summary>
         [Fact]
         public async Task IndexTransferEventAndFunction()
@@ -72,34 +87,47 @@ namespace Nethereum.BlockchainStore.Search.Samples
                 await processor.ClearProgress();
                 await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
                 await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
+                await processor.SearchService.DeleteIndexAsync(TransferFromFunctionIndexName);
                 #endregion
 
-                var transferFunctionProcessor =
-                    await processor.CreateFunctionProcessorAsync<TransferFunction>(TransferFunctionIndexName);
+                //reusable function handler which incorporates a function indexer
+                //the function indexer won't do anything yet
+                //it must be linked to an event processor before functions are indexed
+                var transferFunctionHandler =
+                    await processor.CreateFunctionHandlerAsync<TransferFunction>(TransferFunctionIndexName);
 
-                await processor.AddIndexer<TransferEvent_ERC20>(
-                    TransferEventIndexName, new IEventFunctionProcessor[]
+                //reusable function handler which incorporates a function indexer
+                //the function indexer won't do anything yet
+                //it must be linked to an event processor before functions are indexed
+                var transferFromFunctionHandler =
+                    await processor.CreateFunctionHandlerAsync<TransferFromFunction>(TransferFromFunctionIndexName);
+
+                //create an indexer for the transfer event
+                //link our function handlers so that functions related to the event are indexed
+                await processor.AddAsync<TransferEvent_ERC20>(TransferEventIndexName, new ITransactionHandler[]
                 {
-                    transferFunctionProcessor
+                    transferFunctionHandler, transferFromFunctionHandler
                 });
 
+                //process the range
                 await processor.ProcessAsync(3146684, 3146694);
 
                 //allow time for azure indexing to finish
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
                 //ensure we have written to the transfer event index
-                var eventIndexer = await processor.SearchService.GetOrCreateEventIndexer<TransferEvent_ERC20>(TransferEventIndexName);
-                Assert.Equal(19, await eventIndexer.DocumentCountAsync());
+                Assert.Equal(19, await processor.SearchService.CountDocumentsAsync(TransferEventIndexName));
 
                 //ensure we have written to the transfer function index
-                var functionIndexer = await processor.SearchService.GetOrCreateFunctionIndexer<TransferFunction>(TransferFunctionIndexName);
-                Assert.Equal(2, await functionIndexer.DocumentCountAsync());
+                Assert.Equal(2, await processor.SearchService.CountDocumentsAsync(TransferFunctionIndexName));
+
+                Assert.Equal(0, await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName));
 
                 #region test clean up 
                 await processor.ClearProgress();
                 await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
                 await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
+                await processor.SearchService.DeleteIndexAsync(TransferFromFunctionIndexName);
                 #endregion
             }
         }

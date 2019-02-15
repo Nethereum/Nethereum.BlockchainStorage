@@ -9,18 +9,21 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class FunctionIndexTransactionHandler<TFunctionMessage> : 
-        IDisposable, 
-        ITransactionHandler<TFunctionMessage> 
+    /// <summary>
+    /// Decodes function from transaction, ensures the tx does relate to the function and sends to indexer
+    /// </summary>
+    /// <typeparam name="TFunctionMessage">The Function Message DTO describing the signature of the function</typeparam>
+    public class FunctionIndexTransactionHandler<TFunctionMessage> :         
+        IDisposable,
+        ITransactionHandler<TFunctionMessage>
         where TFunctionMessage : FunctionMessage, new()
     {
         private readonly int _logsPerIndexBatch;
-        private Queue<FunctionCall<TFunctionMessage>> _currentBatch = new Queue<FunctionCall<TFunctionMessage>>();
-        private readonly IFunctionIndexer<TFunctionMessage> _functionIndexer;
+        private readonly Queue<FunctionCall<TFunctionMessage>> _currentBatch = new Queue<FunctionCall<TFunctionMessage>>();
 
         public FunctionIndexTransactionHandler(IFunctionIndexer<TFunctionMessage> functionIndexer, int logsPerIndexBatch = 1)
         {
-            _functionIndexer = functionIndexer;
+            FunctionIndexer = functionIndexer;
             _logsPerIndexBatch = logsPerIndexBatch;
         }
 
@@ -28,19 +31,22 @@ namespace Nethereum.BlockchainStore.Search
         {
             if (_currentBatch.Any())
             {
-                _functionIndexer.IndexAsync(_currentBatch).Wait();
+                FunctionIndexer.IndexAsync(_currentBatch).Wait();
                 _currentBatch.Clear();
             }
         }
 
         public int Pending => _currentBatch.Count;
 
-        public Task HandleContractCreationTransactionAsync(ContractCreationTransaction contractCreationTransaction)
-        {
-            return Task.CompletedTask;
-        }
+        public IFunctionIndexer<TFunctionMessage> FunctionIndexer { get; }
 
-        public async Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt)
+        public Task HandleContractCreationTransactionAsync(
+            ContractCreationTransaction contractCreationTransaction) => HandleAsync(contractCreationTransaction);
+
+        public Task HandleTransactionAsync(TransactionWithReceipt transactionWithReceipt) =>
+            HandleAsync(transactionWithReceipt);
+
+        private async Task HandleAsync(TransactionWithReceipt transactionWithReceipt)
         {
             try
             {
@@ -55,7 +61,7 @@ namespace Nethereum.BlockchainStore.Search
                 _currentBatch.Enqueue(new FunctionCall<TFunctionMessage>(transactionWithReceipt, decoded));
                 if (_currentBatch.Count == _logsPerIndexBatch)
                 {
-                    await _functionIndexer.IndexAsync(_currentBatch);
+                    await FunctionIndexer.IndexAsync(_currentBatch);
                     _currentBatch.Clear();
                 }
             }
@@ -64,7 +70,6 @@ namespace Nethereum.BlockchainStore.Search
                 //Error whilst handling transaction log
                 //expected event signature may differ from the expected event.   
             }
-
         }
     }
 }

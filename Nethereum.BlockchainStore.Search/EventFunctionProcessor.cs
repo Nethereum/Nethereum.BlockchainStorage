@@ -1,53 +1,63 @@
-﻿using System;
+﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.RPC.Eth.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Contracts;
-using Nethereum.Contracts.Extensions;
-using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventFunctionProcessor<TFunction> : IEventFunctionProcessor<TFunction>
-        where TFunction : FunctionMessage, new()
+    public class EventFunctionProcessor : IEventFunctionProcessor
     {
+        private readonly IBlockchainProxyService _blockchainProxyService;
+        private readonly Dictionary<Type, List<ITransactionHandler>> _eventToHandlerMapping;
+
         public EventFunctionProcessor(
-            IBlockchainProxyService blockchainProxyService, 
-            ITransactionHandler<TFunction> handler)
+            IBlockchainProxyService blockchainProxyService)
         {
-            BlockchainProxyService = blockchainProxyService;
-            Handler = handler;
+            _blockchainProxyService = blockchainProxyService;
+            _eventToHandlerMapping = new Dictionary<Type, List<ITransactionHandler>>();
         }
 
-        public IBlockchainProxyService BlockchainProxyService { get; }
-        public ITransactionHandler<TFunction> Handler { get; }
-    
-        public async Task Process(FilterLog[] logs)
+        public void AddHandler<TEventType>(ITransactionHandler handler)
         {
+            if (!_eventToHandlerMapping.ContainsKey(typeof(TEventType)))
+            {
+                _eventToHandlerMapping.Add(typeof(TEventType), new List<ITransactionHandler>()); 
+            }
+
+            _eventToHandlerMapping[typeof(TEventType)].Add(handler);
+        }
+
+        public async Task ProcessAsync<TEvent>(EventLog<TEvent>[] logs)
+        {
+            if (!_eventToHandlerMapping.ContainsKey(typeof(TEvent))) return;
+
+            var handlers = _eventToHandlerMapping[typeof(TEvent)];
+
+            if (handlers.Count == 0) return;
+
             List<BlockWithTransactions> blockTransactions = await LoadTransactions(logs);
 
-            foreach (var transactionHash in logs.Select(l => l.TransactionHash).Distinct())
+            foreach (var transactionHash in logs.Select(l => l.Log.TransactionHash).Distinct())
             {
                 if (FindTransactionAndTimestamp(blockTransactions, transactionHash, out Transaction transaction,
                     out Hex.HexTypes.HexBigInteger blockTimestamp))
                 {
-                    if (transaction.IsTransactionForFunctionMessage<TFunction>())
-                    {
-                        await SendToHandler(transactionHash, transaction, blockTimestamp);
-                    }
+                        await SendToHandler(handlers, transactionHash, transaction, blockTimestamp);
                 }
             }
         }
 
-        private async Task SendToHandler(string transactionHash, Transaction transaction, Hex.HexTypes.HexBigInteger blockTimestamp)
+        private async Task SendToHandler(List<ITransactionHandler> handlers, string transactionHash, Transaction transaction, Hex.HexTypes.HexBigInteger blockTimestamp)
         {
-            var receipt = await BlockchainProxyService.GetTransactionReceipt(transactionHash);
+            var receipt = await _blockchainProxyService.GetTransactionReceipt(transactionHash);
 
             if (transaction.IsForContractCreation(receipt))
             {
-                var code = await BlockchainProxyService.GetCode(receipt.ContractAddress);
+                var code = await _blockchainProxyService.GetCode(receipt.ContractAddress);
                 var contractCreationFailure = (code == null) || (code == "0x");
                 var contactCreationTransaction = new ContractCreationTransaction(
                     receipt.ContractAddress,
@@ -57,7 +67,10 @@ namespace Nethereum.BlockchainStore.Search
                     contractCreationFailure,
                     blockTimestamp);
 
-                await Handler.HandleContractCreationTransactionAsync(contactCreationTransaction);
+                foreach (var handler in handlers)
+                {
+                    await handler.HandleContractCreationTransactionAsync(contactCreationTransaction);
+                }
 
             }
             else
@@ -68,7 +81,10 @@ namespace Nethereum.BlockchainStore.Search
                     !receipt.Succeeded(),
                     blockTimestamp);
 
-                await Handler.HandleTransactionAsync(txWithReceipt);
+                foreach (var handler in handlers)
+                {
+                    await handler.HandleTransactionAsync(txWithReceipt);
+                }
             }
         }
 
@@ -78,7 +94,7 @@ namespace Nethereum.BlockchainStore.Search
             {
                 return b.Transactions
                     .Where(t => t.TransactionHash.Equals(transactionHash, StringComparison.OrdinalIgnoreCase))
-                    .Select(t => (b, t))
+                    .Select(t => (b.Timestamp, t))
                     .FirstOrDefault();
             }).FirstOrDefault();
 
@@ -87,19 +103,19 @@ namespace Nethereum.BlockchainStore.Search
 
             if (transactionAndBlock.Item1 == null) return false;
 
+            blockTimestamp = transactionAndBlock.Item1;
             transaction = transactionAndBlock.Item2;
-            blockTimestamp = transactionAndBlock.Item1.Timestamp;
-
+            
             return true;
         }
 
-        private async Task<List<BlockWithTransactions>> LoadTransactions(FilterLog[] logs)
+        private async Task<List<BlockWithTransactions>> LoadTransactions<TEvent>(EventLog<TEvent>[] logs)
         {
             var blockTransactions = new List<BlockWithTransactions>();
 
-            foreach (var blockNumber in logs.Select(l => (ulong)l.BlockNumber.Value).Distinct())
+            foreach (var blockNumber in logs.Select(l => (ulong)l.Log.BlockNumber.Value).Distinct())
             {
-                var blockWithTransactions = await BlockchainProxyService.GetBlockWithTransactionsAsync(blockNumber);
+                var blockWithTransactions = await _blockchainProxyService.GetBlockWithTransactionsAsync(blockNumber);
                 blockTransactions.Add(blockWithTransactions);
             }
 

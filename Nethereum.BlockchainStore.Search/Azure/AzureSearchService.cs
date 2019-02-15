@@ -8,7 +8,7 @@ using Microsoft.Azure.Search.Models;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureSearchService : IAzureEventAndFunctionIndexingService
+    public class AzureSearchService : IAzureSearchService
     {
         private readonly SearchServiceClient _client;
         private readonly ConcurrentDictionary<string, Index> _azureIndexes;
@@ -21,10 +21,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public async Task<IAzureEventIndexer<TEvent>> GetOrCreateEventIndexer<TEvent>(string indexName = null, bool addPresetEventLogFields = true) where TEvent : class
         {
-            return await GetOrCreateIndex(new EventIndexDefinition<TEvent>(indexName, addPresetEventLogFields));
+            return await GetOrCreateEventIndexer(new EventIndexDefinition<TEvent>(indexName, addPresetEventLogFields));
         }
 
-        public async Task<IAzureEventIndexer<TEvent>> GetOrCreateIndex<TEvent>(EventIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
+        public async Task<IAzureEventIndexer<TEvent>> GetOrCreateEventIndexer<TEvent>(EventIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
         {
             var azureIndex = await GetOrCreateAzureIndex(searchIndexDefinition);
             return new AzureEventIndexer<TEvent>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
@@ -33,10 +33,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public async Task<IAzureFunctionIndexer<TFunctionMessage>> GetOrCreateFunctionIndexer<TFunctionMessage>(string indexName = null,bool addPresetEventLogFields = true) 
             where TFunctionMessage : FunctionMessage, new()
         {
-            return await GetOrCreateIndex(new FunctionIndexDefinition<TFunctionMessage>(indexName, addPresetEventLogFields));
+            return await GetOrCreateFunctionIndexer(new FunctionIndexDefinition<TFunctionMessage>(indexName, addPresetEventLogFields));
         }
 
-        public async Task<IAzureFunctionIndexer<TFunctionMessage>> GetOrCreateIndex<TFunctionMessage>(
+        public async Task<IAzureFunctionIndexer<TFunctionMessage>> GetOrCreateFunctionIndexer<TFunctionMessage>(
             FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition) 
             where TFunctionMessage : FunctionMessage, new()
         {
@@ -84,5 +84,12 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return azureIndex;
         }
 
+        public async Task<long> CountDocumentsAsync(string indexName)
+        {
+            using(var client = _client.Indexes.GetClient(indexName))
+            {
+                return await client.Documents.CountAsync();
+            }
+        }
     }
 }
