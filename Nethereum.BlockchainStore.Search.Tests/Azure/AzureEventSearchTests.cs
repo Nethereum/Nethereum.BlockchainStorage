@@ -71,7 +71,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
                 {
                     await searchService.DeleteIndexAsync(eventSearchIndexDefinition);
 
-                    using (var azureIndex = await searchService.GetOrCreateEventIndexer(eventSearchIndexDefinition))
+                    using (var azureIndex = await searchService.CreateEventIndexer(eventSearchIndexDefinition))
                     {
 
                         var transferEventLog = new EventLog<TransferEvent>(

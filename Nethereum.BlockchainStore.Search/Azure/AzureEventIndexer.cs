@@ -7,8 +7,31 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
+
+    public class AzureEventIndexer<TEvent, TSearchDocument>
+    : AzureIndexBase, IAzureEventIndexer<TEvent>
+        where TEvent : class where TSearchDocument : class
+    {
+        private readonly IEventToSearchDocumentMapper<TEvent, TSearchDocument> _mapper;
+
+        public AzureEventIndexer(Index index, ISearchIndexClient indexClient, IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper) : base(index, indexClient)
+        {
+            _mapper = mapper;
+        }
+
+        public Task IndexAsync(EventLog<TEvent> log) => IndexAsync(new[] {log});
+
+        public async Task IndexAsync(IEnumerable<EventLog<TEvent>> logs)
+        {
+            var documents = logs.Select(l => _mapper.Map(l)).ToArray();
+            await BatchUpdateAsync(documents);
+            Indexed += documents.Length;
+        }
+    }
+
     public class AzureEventIndexer<TEvent> : 
-        AzureIndexBase, IAzureEventIndexer<TEvent> where TEvent : class
+        AzureIndexBase, IAzureEventIndexer<TEvent> 
+        where TEvent : class
     {
         private readonly EventIndexDefinition<TEvent> _eventSearchDefinition;
 

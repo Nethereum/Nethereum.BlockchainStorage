@@ -1,10 +1,10 @@
 ﻿using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
+using Nethereum.Contracts;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Nethereum.Contracts;
 using Index = Microsoft.Azure.Search.Models.Index;
-using Microsoft.Azure.Search.Models;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
@@ -19,24 +19,44 @@ namespace Nethereum.BlockchainStore.Search.Azure
             _azureIndexes = new ConcurrentDictionary<string, Index>();
         }
 
-        public async Task<IAzureEventIndexer<TEvent>> GetOrCreateEventIndexer<TEvent>(string indexName = null, bool addPresetEventLogFields = true) where TEvent : class
+        public async Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent>(string indexName = null, bool addPresetEventLogFields = true) where TEvent : class
         {
-            return await GetOrCreateEventIndexer(new EventIndexDefinition<TEvent>(indexName, addPresetEventLogFields));
+            return await CreateEventIndexer(new EventIndexDefinition<TEvent>(indexName, addPresetEventLogFields));
         }
 
-        public async Task<IAzureEventIndexer<TEvent>> GetOrCreateEventIndexer<TEvent>(EventIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
+        public async Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent>(EventIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
         {
             var azureIndex = await GetOrCreateAzureIndex(searchIndexDefinition);
             return new AzureEventIndexer<TEvent>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
         }
 
-        public async Task<IAzureFunctionIndexer<TFunctionMessage>> GetOrCreateFunctionIndexer<TFunctionMessage>(string indexName = null,bool addPresetEventLogFields = true) 
-            where TFunctionMessage : FunctionMessage, new()
+        public async Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(Index index,
+            IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper)
+            where TEvent : class
+            where TSearchDocument : class
         {
-            return await GetOrCreateFunctionIndexer(new FunctionIndexDefinition<TFunctionMessage>(indexName, addPresetEventLogFields));
+            index = await GetOrCreateAzureIndex(index);
+            IAzureEventIndexer<TEvent> indexer = new AzureEventIndexer<TEvent, TSearchDocument>(index, _client.Indexes.GetClient(index.Name), mapper);
+            return indexer;
         }
 
-        public async Task<IAzureFunctionIndexer<TFunctionMessage>> GetOrCreateFunctionIndexer<TFunctionMessage>(
+        public async Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(Index index, Func<EventLog<TEvent>, TSearchDocument> mappingFunc)
+            where TEvent : class, new()
+            where TSearchDocument : class
+        {
+            index = await GetOrCreateAzureIndex(index);
+            var mapper = new EventToSearchDocumentMapper<TEvent, TSearchDocument>(mappingFunc);
+            IAzureEventIndexer<TEvent> indexer = new AzureEventIndexer<TEvent, TSearchDocument>(index, _client.Indexes.GetClient(index.Name), mapper);
+            return indexer;
+        }
+
+        public async Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(string indexName = null,bool addPresetEventLogFields = true) 
+            where TFunctionMessage : FunctionMessage, new()
+        {
+            return await CreateFunctionIndexer(new FunctionIndexDefinition<TFunctionMessage>(indexName, addPresetEventLogFields));
+        }
+
+        public async Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(
             FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition) 
             where TFunctionMessage : FunctionMessage, new()
         {
@@ -76,12 +96,17 @@ namespace Nethereum.BlockchainStore.Search.Azure
         {
             var azureIndex = GetAzureIndex(indexDefinition);
 
-            if (!await _client.Indexes.ExistsAsync(azureIndex.Name))
+            return await GetOrCreateAzureIndex(azureIndex);
+        }
+
+        protected virtual async Task<Index> GetOrCreateAzureIndex(Index index)
+        {
+            if (!await _client.Indexes.ExistsAsync(index.Name))
             {
-                azureIndex = await _client.Indexes.CreateAsync(azureIndex);
+                index = await _client.Indexes.CreateAsync(index);
             }
 
-            return azureIndex;
+            return index;
         }
 
         public async Task<long> CountDocumentsAsync(string indexName)
@@ -91,5 +116,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 return await client.Documents.CountAsync();
             }
         }
+
+
     }
 }

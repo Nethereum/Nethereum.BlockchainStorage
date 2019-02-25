@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Search.Models;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
@@ -70,7 +71,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             string indexName = null)
             where TFunctionMessage : FunctionMessage, new()
         {
-            var functionIndexer = await SearchService.GetOrCreateFunctionIndexer<TFunctionMessage>(indexName);
+            var functionIndexer = await SearchService.CreateFunctionIndexer<TFunctionMessage>(indexName);
             var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
             return functionHandler;
         }
@@ -80,21 +81,32 @@ namespace Nethereum.BlockchainStore.Search.Azure
             IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new()
         {
 
-            var indexer = await SearchService.GetOrCreateEventIndexer<TEvent>(indexName);
+            var indexer = await SearchService.CreateEventIndexer<TEvent>(indexName);
+            _indexers.Add(indexer);
+
+            return CreateProcessor(functionHandlers, indexer);
+        }
+
+        public async Task<IEventIndexProcessor<TEvent>> AddAsync<TEvent, TSearchDocument>(
+            Index index, Func<EventLog<TEvent>, TSearchDocument> mappingFunc,
+            IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new() where TSearchDocument : class, new()
+        {
+
+            var indexer = await SearchService.CreateEventIndexer(index, mappingFunc);
             _indexers.Add(indexer);
             
-            var processor = new EventIndexProcessor<TEvent>(indexer, _functionProcessor);
-            _logProcessors.Add(processor);
+            return CreateProcessor(functionHandlers, indexer);
+        }
 
-            if (functionHandlers != null)
-            {
-                foreach (var functionHandler in functionHandlers)
-                {
-                    _functionProcessor.AddHandler<TEvent>(functionHandler);
-                }
-            }
+        public async Task<IEventIndexProcessor<TEvent>> AddAsync<TEvent, TSearchDocument>(
+            Index index, IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper,
+            IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new() where TSearchDocument : class, new()
+        {
 
-            return processor;
+            var indexer = await SearchService.CreateEventIndexer(index, mapper);
+            _indexers.Add(indexer);
+            
+            return CreateProcessor(functionHandlers, indexer);
         }
 
         public async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<uint, BlockRange> rangeProcessedCallback = null)
@@ -187,6 +199,22 @@ namespace Nethereum.BlockchainStore.Search.Azure
             }
 
             SearchService?.Dispose();
+        }
+
+        private IEventIndexProcessor<TEvent> CreateProcessor<TEvent>(IEnumerable<ITransactionHandler> functionHandlers, IAzureEventIndexer<TEvent> indexer) where TEvent : class, new()
+        {
+            var processor = new EventIndexProcessor<TEvent>(indexer, _functionProcessor);
+            _logProcessors.Add(processor);
+
+            if (functionHandlers != null)
+            {
+                foreach (var functionHandler in functionHandlers)
+                {
+                    _functionProcessor.AddHandler<TEvent>(functionHandler);
+                }
+            }
+
+            return processor;
         }
     }
 }

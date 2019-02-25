@@ -53,7 +53,7 @@ namespace Nethereum.BlockchainStore.Search.Samples
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 
                 using (var azureFunctionMessageIndexer =
-                    await azureSearchService.GetOrCreateFunctionIndexer<TransferFunction>(indexName: AzureTransferIndexName))
+                    await azureSearchService.CreateFunctionIndexer<TransferFunction>(indexName: AzureTransferIndexName))
                 {
                     var transferHandler =
                         new FunctionIndexTransactionHandler<TransferFunction>(azureFunctionMessageIndexer);

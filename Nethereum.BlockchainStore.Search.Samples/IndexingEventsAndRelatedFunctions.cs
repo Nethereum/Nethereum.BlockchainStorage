@@ -75,7 +75,7 @@ namespace Nethereum.BlockchainStore.Search.Samples
         // event Approval(address indexed owner, address indexed spender, uint256 value);
 
         /// <summary>
-        /// Indexing Transfer events and the Transfer Functions (function inputs) that instigated them
+        /// Indexing Transfer events and the input parameters from calls to the 'transfer' or 'transferFrom' function that instigated the event
         /// </summary>
         [Fact]
         public async Task IndexTransferEventAndFunction()
@@ -110,18 +110,19 @@ namespace Nethereum.BlockchainStore.Search.Samples
                 });
 
                 //process the range
-                await processor.ProcessAsync(3146684, 3146694);
+                await processor.ProcessAsync(3900007, 3900030);
 
                 //allow time for azure indexing to finish
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
-                //ensure we have written to the transfer event index
-                Assert.Equal(19, await processor.SearchService.CountDocumentsAsync(TransferEventIndexName));
+                //ensure we have written to the expected indexes
+                long transferEventCount = await processor.SearchService.CountDocumentsAsync(TransferEventIndexName);
+                long transferFunctionCount = await processor.SearchService.CountDocumentsAsync(TransferFunctionIndexName);
+                long transferFromFunctionCount = await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName);
 
-                //ensure we have written to the transfer function index
-                Assert.Equal(2, await processor.SearchService.CountDocumentsAsync(TransferFunctionIndexName));
-
-                Assert.Equal(0, await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName));
+                Assert.Equal(32, transferEventCount);
+                Assert.Equal(1, transferFunctionCount);
+                Assert.Equal(3, transferFromFunctionCount);
 
                 #region test clean up 
                 await processor.ClearProgress();

@@ -6,10 +6,12 @@ using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Search.Models;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples
@@ -141,6 +143,142 @@ Solidity Contract Excerpt
         }
 
         /// <summary>
+        /// An example of a custom DTO based on a transfer event to be stored in the azure index
+        /// </summary>
+        public class CustomTransferSearchDocumentDto
+        {
+            public string From { get; set; }
+            public string To { get; set; }
+            public string Value { get; set; }
+            public string BlockNumber { get; set; }
+            public string TxHash { get; set; }
+            public string LogAddress { get; set; }
+            public int LogIndex { get; set; }
+
+            public string DocumentKey { get; set; }
+        }
+
+        /// <summary>
+        /// An example of a simple event to search document dto mapper
+        /// </summary>
+        public class CustomEventToSearchDocumentMapper :
+            IEventToSearchDocumentMapper<TransferEvent_ERC20, CustomTransferSearchDocumentDto>
+        {
+            public CustomTransferSearchDocumentDto Map(EventLog<TransferEvent_ERC20> from)
+            {
+                return new CustomTransferSearchDocumentDto
+                {
+                    From = from.Event.From,
+                    To = from.Event.To,
+                    Value = from.Event.Value.ToString(),
+                    BlockNumber = from.Log.BlockNumber.Value.ToString(),
+                    TxHash = from.Log.TransactionHash,
+                    LogAddress = from.Log.Address,
+                    LogIndex = (int) from.Log.LogIndex.Value,
+                    DocumentKey = $"{from.Log.TransactionHash}_{from.Log.LogIndex.Value}"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Dictating exactly what you want stored in the index - using a mapping func to translate from the event
+        /// </summary>
+        [Fact]
+        public async Task StoringCustomSearchableDocuments_UsingMapping()
+        {
+            using (var processor =
+                new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
+            {
+                #region test preparation
+                await processor.ClearProgress();
+                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                #endregion
+
+                //create an azure index definition based on a custom Dto
+                //the processor will create the index if it does not already exist
+                var index = new Index {Name = AzureTransferIndexName};
+                index.Fields = new List<Field>();
+                index.Fields.Add(new Field("DocumentKey", DataType.String){IsKey = true});
+                index.Fields.Add(new Field("From", DataType.String){IsSearchable = true, IsFacetable = true});
+                index.Fields.Add(new Field("To", DataType.String){IsSearchable = true, IsFacetable = true});
+                index.Fields.Add(new Field("Value", DataType.String));
+                index.Fields.Add(new Field("BlockNumber", DataType.String));
+                index.Fields.Add(new Field("TxHash", DataType.String));
+                index.Fields.Add(new Field("LogAddress", DataType.String));
+                index.Fields.Add(new Field("LogIndex", DataType.Int64));
+                
+                //inject a mapping func to translate our event to a doc to store in the index
+                await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, (e) => new CustomTransferSearchDocumentDto
+                {
+                    From = e.Event.From,
+                    To = e.Event.To,
+                    Value = e.Event.Value.ToString(),
+                    BlockNumber = e.Log.BlockNumber.Value.ToString(),
+                    TxHash = e.Log.TransactionHash,
+                    LogAddress = e.Log.Address,
+                    LogIndex = (int)e.Log.LogIndex.Value,
+                    DocumentKey = $"{e.Log.TransactionHash}_{e.Log.LogIndex.Value}"
+                });
+
+                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+
+                Assert.Equal((ulong)11, blocksProcessed);
+                Assert.Equal(1, processor.Indexers.Count);
+                Assert.Equal(19, processor.Indexers[0].Indexed);
+
+                #region test clean up 
+                await processor.ClearProgress();
+                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                #endregion
+            }
+        }
+
+        /// <summary>
+        /// Dictating exactly what you want stored in the index - using a custom mapper to translate from the event
+        /// </summary>
+        [Fact]
+        public async Task StoringCustomSearchableDocuments_UsingMapper()
+        {
+            using (var processor =
+                new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
+            {
+                #region test preparation
+                await processor.ClearProgress();
+                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                #endregion
+
+                //create an azure index definition based on a custom Dto
+                //the processor will create the index if it does not already exist
+                var index = new Index {Name = AzureTransferIndexName};
+                index.Fields = new List<Field>();
+                index.Fields.Add(new Field("DocumentKey", DataType.String){IsKey = true});
+                index.Fields.Add(new Field("From", DataType.String){IsSearchable = true, IsFacetable = true});
+                index.Fields.Add(new Field("To", DataType.String){IsSearchable = true, IsFacetable = true});
+                index.Fields.Add(new Field("Value", DataType.String));
+                index.Fields.Add(new Field("BlockNumber", DataType.String));
+                index.Fields.Add(new Field("TxHash", DataType.String));
+                index.Fields.Add(new Field("LogAddress", DataType.String));
+                index.Fields.Add(new Field("LogIndex", DataType.Int64));
+                
+                var mapper = new CustomEventToSearchDocumentMapper();
+
+                //inject a mapping func to translate our event to a doc to store in the index
+                await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, mapper);
+
+                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+
+                Assert.Equal((ulong)11, blocksProcessed);
+                Assert.Equal(1, processor.Indexers.Count);
+                Assert.Equal(19, processor.Indexers[0].Indexed);
+
+                #region test clean up 
+                await processor.ClearProgress();
+                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                #endregion
+            }
+        }
+
+        /// <summary>
         /// Demonstrates how to set off a processor to continually index events
         /// As this is a test which needs to run in a confined time span - this example includes a short circuit
         /// </summary>
@@ -243,7 +381,7 @@ Solidity Contract Excerpt
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 
-                using (var transferIndexer = await azureSearchService.GetOrCreateEventIndexer<TransferEvent_ERC20>(AzureTransferIndexName))
+                using (var transferIndexer = await azureSearchService.CreateEventIndexer<TransferEvent_ERC20>(AzureTransferIndexName))
                 {
                     using (var transferProcessor =
                         new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
