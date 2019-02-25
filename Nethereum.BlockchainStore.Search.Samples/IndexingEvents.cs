@@ -184,7 +184,7 @@ Solidity Contract Excerpt
         /// Dictating exactly what you want stored in the index - using a mapping func to translate from the event
         /// </summary>
         [Fact]
-        public async Task StoringCustomSearchableDocuments_UsingMapping()
+        public async Task StoringCustomSearchDocuments_UsingMapping()
         {
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
@@ -237,7 +237,7 @@ Solidity Contract Excerpt
         /// Dictating exactly what you want stored in the index - using a custom mapper to translate from the event
         /// </summary>
         [Fact]
-        public async Task StoringCustomSearchableDocuments_UsingMapper()
+        public async Task StoringCustomSearchDocuments_UsingMapper()
         {
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))

@@ -2,8 +2,8 @@
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public interface IEventToSearchDocumentMapper<TFrom, TSearchDocument> 
-        where TFrom: class where TSearchDocument : class
+    public interface IEventToSearchDocumentMapper<TFrom, out TSearchDocument> 
+        where TFrom: class where TSearchDocument : class, new()
     {
         TSearchDocument Map(EventLog<TFrom> from);
     }

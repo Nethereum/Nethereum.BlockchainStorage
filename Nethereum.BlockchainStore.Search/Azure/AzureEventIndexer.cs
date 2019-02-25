@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
     public class AzureEventIndexer<TEvent, TSearchDocument>
     : AzureIndexBase, IAzureEventIndexer<TEvent>
-        where TEvent : class where TSearchDocument : class
+        where TEvent : class where TSearchDocument : class, new()
     {
         private readonly IEventToSearchDocumentMapper<TEvent, TSearchDocument> _mapper;
 

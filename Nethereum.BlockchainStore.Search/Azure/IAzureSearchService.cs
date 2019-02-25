@@ -17,11 +17,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>
             (Index index, IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper) 
-            where TEvent : class where TSearchDocument : class;
+            where TEvent : class where TSearchDocument : class, new();
 
         Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>
             (Index index, Func<EventLog<TEvent>, TSearchDocument> mappingFunc) 
-            where TEvent : class, new() where TSearchDocument : class;
+            where TEvent : class where TSearchDocument : class, new();
 
         Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(
             FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition)
@@ -30,6 +30,15 @@ namespace Nethereum.BlockchainStore.Search.Azure
         Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(
             string indexName = null, bool addPresetEventLogFields = true)
             where TFunctionMessage : FunctionMessage, new();
+
+        Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(
+            Index index, IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> mapper)
+            where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class, new();
+
+        Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(
+            Index index, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mapperFunc)
+            where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class, new();
+
 
         Task DeleteIndexAsync(IndexDefinition searchIndex);
         Task DeleteIndexAsync(string indexName);

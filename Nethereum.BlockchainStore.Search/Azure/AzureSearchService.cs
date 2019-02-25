@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public async Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(Index index,
             IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper)
             where TEvent : class
-            where TSearchDocument : class
+            where TSearchDocument : class, new()
         {
             index = await GetOrCreateAzureIndex(index);
             IAzureEventIndexer<TEvent> indexer = new AzureEventIndexer<TEvent, TSearchDocument>(index, _client.Indexes.GetClient(index.Name), mapper);
@@ -41,8 +41,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
         }
 
         public async Task<IAzureEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(Index index, Func<EventLog<TEvent>, TSearchDocument> mappingFunc)
-            where TEvent : class, new()
-            where TSearchDocument : class
+            where TEvent : class
+            where TSearchDocument : class, new()
         {
             index = await GetOrCreateAzureIndex(index);
             var mapper = new EventToSearchDocumentMapper<TEvent, TSearchDocument>(mappingFunc);
@@ -62,6 +62,23 @@ namespace Nethereum.BlockchainStore.Search.Azure
         {
             var azureIndex = await GetOrCreateAzureIndex(searchIndexDefinition);
             return new AzureFunctionIndexer<TFunctionMessage>(searchIndexDefinition, azureIndex, _client.Indexes.GetClient(azureIndex.Name));
+        }
+
+        public async Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(Index index, IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> mapper)
+            where TFunctionMessage : FunctionMessage, new()
+            where TSearchDocument : class, new()
+        {
+            index = await GetOrCreateAzureIndex(index);
+            return new AzureFunctionIndexer<TFunctionMessage, TSearchDocument>(index, _client.Indexes.GetClient(index.Name),  mapper);
+        }
+
+        public async Task<IAzureFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(Index index, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mapperFunc)
+            where TFunctionMessage : FunctionMessage, new()
+            where TSearchDocument : class, new()
+        {
+            index = await GetOrCreateAzureIndex(index);
+            var mapper = new FunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument>(mapperFunc);
+            return new AzureFunctionIndexer<TFunctionMessage, TSearchDocument>(index, _client.Indexes.GetClient(index.Name),  mapper);
         }
 
         public Task DeleteIndexAsync(IndexDefinition searchIndex) =>
@@ -116,7 +133,5 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 return await client.Documents.CountAsync();
             }
         }
-
-
     }
 }

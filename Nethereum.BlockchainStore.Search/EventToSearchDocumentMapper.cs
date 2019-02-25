@@ -4,7 +4,7 @@ using Nethereum.Contracts;
 namespace Nethereum.BlockchainStore.Search
 {
     public class EventToSearchDocumentMapper<TEvent, TSearchDocument> : IEventToSearchDocumentMapper<TEvent, TSearchDocument>
-        where TEvent : class where TSearchDocument : class
+        where TEvent : class where TSearchDocument : class, new()
     {
         private readonly Func<EventLog<TEvent>, TSearchDocument> _mappingFunc;
 

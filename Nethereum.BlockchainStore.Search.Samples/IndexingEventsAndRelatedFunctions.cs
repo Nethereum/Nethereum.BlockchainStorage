@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Search.Models;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainStore.Search.Azure;
@@ -129,6 +130,116 @@ namespace Nethereum.BlockchainStore.Search.Samples
                 await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
                 await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
                 await processor.SearchService.DeleteIndexAsync(TransferFromFunctionIndexName);
+                #endregion
+            }
+        }
+
+        /// <summary>
+        /// a custom dto to define what transfer data is captured in the search index
+        /// </summary>
+        public class CustomTransferEventSearchDocument
+        {
+            public string DocumentKey { get; set; }
+            public string From { get; set; }
+            public string To { get; set; }
+            public string Value { get; set; }
+        }
+
+        /// <summary>
+        /// a custom dto to define what transfer function data is captured in the search index
+        /// </summary>
+        public class CustomTransferFunctionSearchDocument
+        {
+            public string TransactionHash { get; set; }
+            public string BlockNumber { get; set; }
+            public string BlockTimestamp { get; set; }
+            public string To { get; set; }
+            public string Value { get; set; }
+        }
+
+        [Fact]
+        public async Task StoringCustomSearchDocuments()
+        {
+            using (var processor =
+                new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
+            {
+                #region test preparation
+                await processor.ClearProgress();
+                await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
+                await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
+                #endregion
+
+                //define our azure index for transfer function data
+                var transferFunctionIndex = new Index {
+                    Name = TransferFunctionIndexName, 
+                    Fields =
+                new List<Field>
+                {
+                    new Field("TransactionHash", DataType.String) {IsKey = true, IsSearchable = true},
+                    new Field("BlockNumber", DataType.String){IsSearchable = true},
+                    new Field("BlockTimestamp", DataType.String),
+                    new Field("To", DataType.String),
+                    new Field("Value", DataType.String)
+                }};
+
+                //define azure index for transfer event data
+                var transferEventIndex = new Index {
+                    Name = TransferEventIndexName, 
+                    Fields = new List<Field>
+                {
+                    new Field("DocumentKey", DataType.String) {IsKey = true},
+                    new Field("From", DataType.String) {IsSearchable = true, IsFacetable = true},
+                    new Field("To", DataType.String) {IsSearchable = true, IsFacetable = true},
+                    new Field("Value", DataType.String)
+                }};
+
+                //reusable function handler which incorporates a function indexer
+                //the function indexer won't do anything yet
+                //it must be linked to an event processor before functions are indexed
+                var transferFunctionHandler =
+                    await processor.CreateFunctionHandlerAsync<TransferFunction, CustomTransferFunctionSearchDocument>(
+                        transferFunctionIndex, (tx) => new CustomTransferFunctionSearchDocument
+                    {
+                        TransactionHash = tx.Tx.TransactionHash,
+                        BlockNumber = tx.Tx.BlockNumber.Value.ToString(),
+                        BlockTimestamp = tx.Tx.BlockTimestamp.ToString(),
+                        To = tx.Dto.To,
+                        Value = tx.Dto.Value.ToString()
+                    });
+
+
+                //create an indexer for the transfer event
+                //link our function handlers so that functions related to the event are indexed
+                await processor.AddAsync<TransferEvent_ERC20, CustomTransferEventSearchDocument>(
+                    transferEventIndex, (eventLog) => new CustomTransferEventSearchDocument
+                    {
+                        From = eventLog.Event.From,
+                        To = eventLog.Event.To,
+                        Value = eventLog.Event.Value.ToString(),
+                        DocumentKey = $"{eventLog.Log.TransactionHash}_{eventLog.Log.LogIndex.Value}"
+                    }
+                    , new ITransactionHandler[]
+                {
+                    transferFunctionHandler
+                });
+
+                //process the range
+                await processor.ProcessAsync(3146684, 3146694);
+
+                //allow time for azure indexing to finish
+                await Task.Delay(TimeSpan.FromSeconds(5));
+
+                //ensure we have written to the expected indexes
+                long transferEventCount = await processor.SearchService.CountDocumentsAsync(TransferEventIndexName);
+                long transferFunctionCount = await processor.SearchService.CountDocumentsAsync(TransferFunctionIndexName);
+
+                Assert.Equal(19, transferEventCount);
+                Assert.Equal(2, transferFunctionCount);
+
+                #region test clean up 
+                await processor.ClearProgress();
+                await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
+                await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
                 #endregion
             }
         }

@@ -76,6 +76,26 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return functionHandler;
         }
 
+        public async Task<FunctionIndexTransactionHandler<TFunctionMessage>> CreateFunctionHandlerAsync<TFunctionMessage, TSearchDocument>(
+            Index index, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mappingFunc)
+            where TFunctionMessage : FunctionMessage, new()
+            where TSearchDocument : class, new()
+        {
+            var functionIndexer = await SearchService.CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(index, mappingFunc);
+            var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
+            return functionHandler;
+        }
+
+        public async Task<FunctionIndexTransactionHandler<TFunctionMessage>> CreateFunctionHandlerAsync<TFunctionMessage, TSearchDocument>(
+            Index index, IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> mapper)
+            where TFunctionMessage : FunctionMessage, new()
+            where TSearchDocument : class, new()
+        {
+            var functionIndexer = await SearchService.CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(index, mapper);
+            var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
+            return functionHandler;
+        }
+
         public async Task<IEventIndexProcessor<TEvent>> AddAsync<TEvent>(
             string indexName = null,
             IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new()

@@ -7,6 +7,27 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
+    public class AzureFunctionIndexer<TFunctionMessage, TSearchDocument> : AzureIndexBase,
+        IAzureFunctionIndexer<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
+        where TSearchDocument : class, new()
+    {
+        private readonly IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> _mapper;
+
+        public AzureFunctionIndexer(Index index, ISearchIndexClient indexClient, IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> mapper) : base(index, indexClient)
+        {
+            _mapper = mapper;
+        }
+
+        public Task IndexAsync(FunctionCall<TFunctionMessage> transaction) => IndexAsync(new[]{transaction});
+
+        public async Task IndexAsync(IEnumerable<FunctionCall<TFunctionMessage>> transactions)
+        {
+            var documents = transactions.Select(transaction => _mapper.Map(transaction)).ToArray();
+            await BatchUpdateAsync(documents);
+            Indexed += documents.Length;
+        }
+    }
+
     public class AzureFunctionIndexer<TFunctionMessage> : 
         AzureIndexBase, 
         IAzureFunctionIndexer<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
