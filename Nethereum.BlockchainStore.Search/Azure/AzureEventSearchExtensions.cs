@@ -2,13 +2,10 @@
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {

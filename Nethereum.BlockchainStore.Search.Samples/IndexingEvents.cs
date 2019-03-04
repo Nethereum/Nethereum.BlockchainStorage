@@ -197,16 +197,18 @@ Solidity Contract Excerpt
                 //create an azure index definition based on a custom Dto
                 //the processor will create the index if it does not already exist
                 var index = new Index {Name = AzureTransferIndexName};
-                index.Fields = new List<Field>();
-                index.Fields.Add(new Field("DocumentKey", DataType.String){IsKey = true});
-                index.Fields.Add(new Field("From", DataType.String){IsSearchable = true, IsFacetable = true});
-                index.Fields.Add(new Field("To", DataType.String){IsSearchable = true, IsFacetable = true});
-                index.Fields.Add(new Field("Value", DataType.String));
-                index.Fields.Add(new Field("BlockNumber", DataType.String));
-                index.Fields.Add(new Field("TxHash", DataType.String));
-                index.Fields.Add(new Field("LogAddress", DataType.String));
-                index.Fields.Add(new Field("LogIndex", DataType.Int64));
-                
+                index.Fields = new List<Field>
+                {
+                    new Field("DocumentKey", DataType.String) { IsKey = true },
+                    new Field("From", DataType.String) { IsSearchable = true, IsFacetable = true },
+                    new Field("To", DataType.String) { IsSearchable = true, IsFacetable = true },
+                    new Field("Value", DataType.String),
+                    new Field("BlockNumber", DataType.String),
+                    new Field("TxHash", DataType.String),
+                    new Field("LogAddress", DataType.String),
+                    new Field("LogIndex", DataType.Int64)
+                };
+
                 //inject a mapping func to translate our event to a doc to store in the index
                 await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, (e) => new CustomTransferSearchDocumentDto
                 {
@@ -250,16 +252,18 @@ Solidity Contract Excerpt
                 //create an azure index definition based on a custom Dto
                 //the processor will create the index if it does not already exist
                 var index = new Index {Name = AzureTransferIndexName};
-                index.Fields = new List<Field>();
-                index.Fields.Add(new Field("DocumentKey", DataType.String){IsKey = true});
-                index.Fields.Add(new Field("From", DataType.String){IsSearchable = true, IsFacetable = true});
-                index.Fields.Add(new Field("To", DataType.String){IsSearchable = true, IsFacetable = true});
-                index.Fields.Add(new Field("Value", DataType.String));
-                index.Fields.Add(new Field("BlockNumber", DataType.String));
-                index.Fields.Add(new Field("TxHash", DataType.String));
-                index.Fields.Add(new Field("LogAddress", DataType.String));
-                index.Fields.Add(new Field("LogIndex", DataType.Int64));
-                
+                index.Fields = new List<Field>
+                {
+                    new Field("DocumentKey", DataType.String) { IsKey = true },
+                    new Field("From", DataType.String) { IsSearchable = true, IsFacetable = true },
+                    new Field("To", DataType.String) { IsSearchable = true, IsFacetable = true },
+                    new Field("Value", DataType.String),
+                    new Field("BlockNumber", DataType.String),
+                    new Field("TxHash", DataType.String),
+                    new Field("LogAddress", DataType.String),
+                    new Field("LogIndex", DataType.Int64)
+                };
+
                 var mapper = new CustomEventToSearchDocumentMapper();
 
                 //inject a mapping func to translate our event to a doc to store in the index

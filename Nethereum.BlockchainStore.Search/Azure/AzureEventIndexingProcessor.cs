@@ -1,28 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.Search.Models;
+﻿using Microsoft.Azure.Search.Models;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureEventIndexingProcessor : IDisposable
+    public class AzureEventIndexingProcessor : EventIndexingProcessor
     {
-        private readonly List<ILogProcessor> _logProcessors;
-        private readonly List<IIndexer> _indexers;
-        private readonly Func<ulong, ulong?, IBlockProgressService> _blockProgressServiceCallBack;
-        private readonly IEnumerable<NewFilterInput> _filters;
-        private readonly IEventFunctionProcessor _functionProcessor;
-
         public AzureEventIndexingProcessor(
             string serviceName, 
             string searchApiKey, 
@@ -47,41 +36,20 @@ namespace Nethereum.BlockchainStore.Search.Azure
             Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2,
             IEnumerable<NewFilterInput> filters = null,
-            uint minimumBlockConfirmations = 0)
+            uint minimumBlockConfirmations = 0):
+            base(blockchainProxyService, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations )
         {
-            SearchService = searchService;
-            BlockchainProxyService = blockchainProxyService;
-            MaxBlocksPerBatch = maxBlocksPerBatch;
-            _filters = filters;
-            MinimumBlockConfirmations = minimumBlockConfirmations;
-            _blockProgressServiceCallBack = blockProgressServiceCallBack;
-            _logProcessors = new List<ILogProcessor>();
-            _indexers = new List<IIndexer>();
-            _functionProcessor = functionProcessor ?? new EventFunctionProcessor(BlockchainProxyService);
+            AzureSearchService = searchService;
         }
 
-        public IAzureSearchService SearchService {get;}
-        public IBlockchainProxyService BlockchainProxyService { get; }
-        public uint MaxBlocksPerBatch { get; }
-        public uint MinimumBlockConfirmations { get; }
-
-        public IReadOnlyList<IIndexer> Indexers => _indexers.AsReadOnly();
-        
-        public async Task<FunctionIndexTransactionHandler<TFunctionMessage>> CreateFunctionHandlerAsync<TFunctionMessage>(
-            string indexName = null)
-            where TFunctionMessage : FunctionMessage, new()
-        {
-            var functionIndexer = await SearchService.CreateFunctionIndexer<TFunctionMessage>(indexName);
-            var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
-            return functionHandler;
-        }
-
+        public IAzureSearchService AzureSearchService {get;}
+  
         public async Task<FunctionIndexTransactionHandler<TFunctionMessage>> CreateFunctionHandlerAsync<TFunctionMessage, TSearchDocument>(
             Index index, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mappingFunc)
             where TFunctionMessage : FunctionMessage, new()
             where TSearchDocument : class, new()
         {
-            var functionIndexer = await SearchService.CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(index, mappingFunc);
+            var functionIndexer = await AzureSearchService.CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(index, mappingFunc);
             var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
             return functionHandler;
         }
@@ -91,20 +59,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
             where TFunctionMessage : FunctionMessage, new()
             where TSearchDocument : class, new()
         {
-            var functionIndexer = await SearchService.CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(index, mapper);
+            var functionIndexer = await AzureSearchService.CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(index, mapper);
             var functionHandler = new FunctionIndexTransactionHandler<TFunctionMessage>(functionIndexer);
             return functionHandler;
-        }
-
-        public async Task<IEventIndexProcessor<TEvent>> AddAsync<TEvent>(
-            string indexName = null,
-            IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new()
-        {
-
-            var indexer = await SearchService.CreateEventIndexer<TEvent>(indexName);
-            _indexers.Add(indexer);
-
-            return CreateProcessor(functionHandlers, indexer);
         }
 
         public async Task<IEventIndexProcessor<TEvent>> AddAsync<TEvent, TSearchDocument>(
@@ -112,7 +69,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new() where TSearchDocument : class, new()
         {
 
-            var indexer = await SearchService.CreateEventIndexer(index, mappingFunc);
+            var indexer = await AzureSearchService.CreateEventIndexer(index, mappingFunc);
             _indexers.Add(indexer);
             
             return CreateProcessor(functionHandlers, indexer);
@@ -123,118 +80,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
             IEnumerable<ITransactionHandler> functionHandlers = null) where TEvent : class, new() where TSearchDocument : class, new()
         {
 
-            var indexer = await SearchService.CreateEventIndexer(index, mapper);
+            var indexer = await AzureSearchService.CreateEventIndexer(index, mapper);
             _indexers.Add(indexer);
             
             return CreateProcessor(functionHandlers, indexer);
         }
 
-        public async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<uint, BlockRange> rangeProcessedCallback = null)
-        {
-            if(!_logProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
-
-            var logProcessor = new BlockchainLogProcessor(
-                BlockchainProxyService,
-                _logProcessors,
-                _filters);
-
-            IBlockProgressService progressService = CreateProgressService(from, to);
-
-            var batchProcessorService = new BlockchainBatchProcessorService(
-                logProcessor, progressService, maxNumberOfBlocksPerBatch: MaxBlocksPerBatch);
-
-            if (to != null)
-            {
-                return await ProcessRange(ctx, rangeProcessedCallback, batchProcessorService);
-            }
-
-            return await batchProcessorService.ProcessContinuallyAsync(ctx?.Token ?? new CancellationToken(), rangeProcessedCallback);
-            
-        }
-
-        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<uint, BlockRange> rangeProcessedCallback, BlockchainBatchProcessorService batchProcessorService)
-        {
-            uint blockRangesProcessed = 0;
-            ulong blocksProcessed = 0;
-
-            BlockRange? lastBlockRangeProcessed;
-            do
-            {
-                lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx?.Token ?? new CancellationToken());
-
-                if (lastBlockRangeProcessed != null)
-                {
-                    blockRangesProcessed++;
-                    blocksProcessed += lastBlockRangeProcessed.Value.BlockCount;
-                    rangeProcessedCallback?.Invoke(blockRangesProcessed, lastBlockRangeProcessed.Value);
-                }
-
-            } while (lastBlockRangeProcessed != null);
-
-            return blocksProcessed;
-        }
-
-
-        private IBlockProgressService CreateProgressService(ulong from, ulong? to)
-        {
-            if (_blockProgressServiceCallBack != null) return _blockProgressServiceCallBack.Invoke(from, to);
-
-            var progressRepository =
-                new JsonBlockProgressRepository(PathToJsonProgressFile());
-
-            IBlockProgressService progressService = null;
-            if (to == null)
-            {
-                progressService = new BlockProgressService(BlockchainProxyService, from, progressRepository, MinimumBlockConfirmations);
-            }
-            else
-            {
-                progressService = new StaticBlockRangeProgressService(from, to.Value, progressRepository);
-            }
-
-            return progressService;
-        }
-
-        private string PathToJsonProgressFile()
-        {
-            var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), $"{this.GetType().Name}_Progress.json");
-            return progressFileNameAndPath;
-        }
-
-        public Task ClearProgress()
-        {
-            var jsonFile = PathToJsonProgressFile();
-            if (File.Exists(jsonFile)) File.Delete(jsonFile);
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            foreach (var processor in _logProcessors)
-            {
-                if (processor is IDisposable d)
-                {
-                    d.Dispose();
-                }
-            }
-
-            SearchService?.Dispose();
-        }
-
-        private IEventIndexProcessor<TEvent> CreateProcessor<TEvent>(IEnumerable<ITransactionHandler> functionHandlers, IAzureEventIndexer<TEvent> indexer) where TEvent : class, new()
-        {
-            var processor = new EventIndexProcessor<TEvent>(indexer, _functionProcessor);
-            _logProcessors.Add(processor);
-
-            if (functionHandlers != null)
-            {
-                foreach (var functionHandler in functionHandlers)
-                {
-                    _functionProcessor.AddHandler<TEvent>(functionHandler);
-                }
-            }
-
-            return processor;
-        }
     }
 }

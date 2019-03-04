@@ -7,7 +7,7 @@ using Microsoft.Rest.TransientFaultHandling;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public abstract class AzureIndexBase
+    public abstract class AzureIndexBase: IAzureIndex
     {
         protected readonly Index Index;
         protected readonly ISearchIndexClient IndexClient;

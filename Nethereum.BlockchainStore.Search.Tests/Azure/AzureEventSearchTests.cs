@@ -105,11 +105,11 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
                         await Task.Delay(TimeSpan.FromSeconds(5));
 
-                        var suggestion = await azureIndex.SuggestAsync(transferEventLog.Log.BlockNumber.Value.ToString());
+                        var suggestion = await ((IAzureIndex)azureIndex).SuggestAsync(transferEventLog.Log.BlockNumber.Value.ToString());
                         Assert.NotNull(suggestion);
                         Assert.Equal(1, suggestion.Results.Count);
 
-                        var searchResult = await azureIndex.SearchAsync(
+                        var searchResult = await ((IAzureIndex)azureIndex).SearchAsync(
                             transferEventLog.Event.From);
 
                         Assert.NotNull(searchResult);

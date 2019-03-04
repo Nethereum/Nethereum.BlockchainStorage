@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Nethereum.BlockchainStore.Search.Azure
 {
     public class AzureFunctionIndexer<TFunctionMessage, TSearchDocument> : AzureIndexBase,
-        IAzureFunctionIndexer<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
+        IFunctionIndexer<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
         where TSearchDocument : class, new()
     {
         private readonly IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> _mapper;
@@ -30,7 +30,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
     public class AzureFunctionIndexer<TFunctionMessage> : 
         AzureIndexBase, 
-        IAzureFunctionIndexer<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
+        IFunctionIndexer<TFunctionMessage> where TFunctionMessage : FunctionMessage, new()
     {
         private readonly FunctionIndexDefinition<TFunctionMessage> _searchIndexDefinition;
 
