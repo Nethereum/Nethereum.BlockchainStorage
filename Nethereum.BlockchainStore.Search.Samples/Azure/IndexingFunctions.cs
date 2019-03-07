@@ -11,9 +11,9 @@ using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Samples
+namespace Nethereum.BlockchainStore.Search.Samples.Azure
 {
-    [Collection("Nethereum.BlockchainStore.Search.Samples")]
+    [Collection("Nethereum.BlockchainStore.Search.Samples.Azure")]
     public class IndexingFunctions
     {
         [Function("transfer", "bool")]
@@ -52,29 +52,35 @@ namespace Nethereum.BlockchainStore.Search.Samples
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 
-                using (var azureFunctionMessageIndexer =
-                    await azureSearchService.CreateFunctionIndexer<TransferFunction>(indexName: AzureTransferIndexName))
+                try
                 {
-                    var transferHandler =
-                        new FunctionIndexTransactionHandler<TransferFunction>(azureFunctionMessageIndexer);
+                    using (var azureFunctionMessageIndexer =
+                        await azureSearchService.CreateFunctionIndexer<TransferFunction>(
+                            indexName: AzureTransferIndexName))
+                    {
+                        var transferHandler =
+                            new FunctionIndexTransactionHandler<TransferFunction>(azureFunctionMessageIndexer);
 
-                    var web3 = new Web3.Web3("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
-                    var blockchainProxy = new BlockchainProxyService(web3);
-                    var handlers = new HandlerContainer {TransactionHandler = transferHandler};
-                    var blockProcessor = BlockProcessorFactory.Create(blockchainProxy, handlers);
-                    var processingStrategy = new ProcessingStrategy(blockProcessor);
-                    var blockchainProcessor = new BlockchainProcessor(processingStrategy);
+                        var web3 = new Web3.Web3("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+                        var blockchainProxy = new BlockchainProxyService(web3);
+                        var handlers = new HandlerContainer {TransactionHandler = transferHandler};
+                        var blockProcessor = BlockProcessorFactory.Create(blockchainProxy, handlers);
+                        var processingStrategy = new ProcessingStrategy(blockProcessor);
+                        var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 
-                    var blockRange = new BlockRange(3146684, 3146694);
-                    await blockchainProcessor.ProcessAsync(blockRange);
+                        var blockRange = new BlockRange(3146684, 3146694);
+                        await blockchainProcessor.ProcessAsync(blockRange);
 
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                        await Task.Delay(TimeSpan.FromSeconds(5));
 
-                    //ensure we have written the expected docs to the index
-                    Assert.Equal(3, await azureFunctionMessageIndexer.DocumentCountAsync());
+                        //ensure we have written the expected docs to the index
+                        Assert.Equal(3, await azureFunctionMessageIndexer.DocumentCountAsync());
+                    }
                 }
-
-                await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
+                finally
+                {
+                    await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
+                }
             }
 
 

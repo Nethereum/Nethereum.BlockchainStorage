@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Search.Models;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Search.Samples
+namespace Nethereum.BlockchainStore.Search.Samples.Azure
 {
-    [Collection("Nethereum.BlockchainStore.Search.Samples")]
+    [Collection("Nethereum.BlockchainStore.Search.Samples.Azure")]
     public class IndexingTransferEvents
     {
         /*
@@ -127,18 +127,23 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                try
+                {
+                    await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
-                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+                    var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
-                Assert.Equal((ulong)11, blocksProcessed);
-                Assert.Equal(1, processor.Indexers.Count);
-                Assert.Equal(19, processor.Indexers[0].Indexed);
-
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal(1, processor.Indexers.Count);
+                    Assert.Equal(19, processor.Indexers[0].Indexed);
+                }
+                finally
+                {
+                    #region test clean up 
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                    #endregion
+                }
             }
         }
 
@@ -209,29 +214,38 @@ Solidity Contract Excerpt
                     new Field("LogIndex", DataType.Int64)
                 };
 
-                //inject a mapping func to translate our event to a doc to store in the index
-                await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, (e) => new CustomTransferSearchDocumentDto
+                try
                 {
-                    From = e.Event.From,
-                    To = e.Event.To,
-                    Value = e.Event.Value.ToString(),
-                    BlockNumber = e.Log.BlockNumber.Value.ToString(),
-                    TxHash = e.Log.TransactionHash,
-                    LogAddress = e.Log.Address,
-                    LogIndex = (int)e.Log.LogIndex.Value,
-                    DocumentKey = $"{e.Log.TransactionHash}_{e.Log.LogIndex.Value}"
-                });
+                    //inject a mapping func to translate our event to a doc to store in the index
+                    await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, (e) =>
+                        new CustomTransferSearchDocumentDto
+                        {
+                            From = e.Event.From,
+                            To = e.Event.To,
+                            Value = e.Event.Value.ToString(),
+                            BlockNumber = e.Log.BlockNumber.Value.ToString(),
+                            TxHash = e.Log.TransactionHash,
+                            LogAddress = e.Log.Address,
+                            LogIndex = (int) e.Log.LogIndex.Value,
+                            DocumentKey = $"{e.Log.TransactionHash}_{e.Log.LogIndex.Value}"
+                        });
 
-                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+                    var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
-                Assert.Equal((ulong)11, blocksProcessed);
-                Assert.Equal(1, processor.Indexers.Count);
-                Assert.Equal(19, processor.Indexers[0].Indexed);
+                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal(1, processor.Indexers.Count);
+                    Assert.Equal(19, processor.Indexers[0].Indexed);
+                }
+                finally
+                {
 
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    #region test clean up 
+
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+
+                    #endregion
+                }
             }
         }
 
@@ -266,19 +280,27 @@ Solidity Contract Excerpt
 
                 var mapper = new CustomEventToSearchDocumentMapper();
 
-                //inject a mapping func to translate our event to a doc to store in the index
-                await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, mapper);
+                try
+                {
+                    //inject a mapping func to translate our event to a doc to store in the index
+                    await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(index, mapper);
 
-                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+                    var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
-                Assert.Equal((ulong)11, blocksProcessed);
-                Assert.Equal(1, processor.Indexers.Count);
-                Assert.Equal(19, processor.Indexers[0].Indexed);
+                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal(1, processor.Indexers.Count);
+                    Assert.Equal(19, processor.Indexers[0].Indexed);
+                }
+                finally
+                {
 
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    #region test clean up 
+
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+
+                    #endregion
+                }
             }
         }
 
@@ -305,26 +327,31 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
-
-                var cancellationToken = new CancellationTokenSource();
-                var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
+                try
                 {
-                    if (lastRange.To >= maxBlock) // escape hatch!
+                    await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+
+                    var cancellationToken = new CancellationTokenSource();
+                    var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
                     {
-                        cancellationToken.Cancel();
-                    }
-                });
+                        if (lastRange.To >= maxBlock) // escape hatch!
+                        {
+                            cancellationToken.Cancel();
+                        }
+                    });
 
-                var blocksProcessed = await processor.ProcessAsync(startingBlock, 
-                    ctx: cancellationToken, rangeProcessedCallback: shortCircuit);
+                    var blocksProcessed = await processor.ProcessAsync(startingBlock,
+                        ctx: cancellationToken, rangeProcessedCallback: shortCircuit);
 
-                Assert.Equal(expectedBlocks, blocksProcessed);
- 
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    Assert.Equal(expectedBlocks, blocksProcessed);
+                }
+                finally
+                {
+                    #region test clean up 
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                    #endregion
+                }
             }
         }
 
@@ -340,30 +367,37 @@ Solidity Contract Excerpt
                 .AddTopic(tfr => tfr.To, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
                 .Build(contractAddress: "0x3678FbEFC663FC28336b93A1FA397B67ae42114d",
                     blockRange: new BlockRange(3860820, 3860820));
-            
+
             using (var processor =
                 new AzureEventIndexingProcessor(
-                    AzureSearchServiceName, 
-                    _azureSearchApiKey, 
-                    BlockchainUrl, 
+                    AzureSearchServiceName,
+                    _azureSearchApiKey,
+                    BlockchainUrl,
                     filters: new[] {filter}))
             {
                 #region test preparation
+
                 await processor.ClearProgress();
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+
                 #endregion
 
-                await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                try
+                {
+                    await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
-                var blocksProcessed = await processor.ProcessAsync(3860820, 3860820);
+                    var blocksProcessed = await processor.ProcessAsync(3860820, 3860820);
 
-                Assert.Equal((ulong)1, blocksProcessed);
-                Assert.Equal(1, processor.Indexers[0].Indexed);
-
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    Assert.Equal((ulong) 1, blocksProcessed);
+                    Assert.Equal(1, processor.Indexers[0].Indexed);
+                }
+                finally
+                {
+                    #region test clean up 
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                    #endregion
+                }
             }
         }
 
@@ -385,36 +419,43 @@ Solidity Contract Excerpt
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
 
-                using (var transferIndexer = await azureSearchService.CreateEventIndexer<TransferEvent_ERC20>(AzureTransferIndexName))
+
+                try
                 {
-                    using (var transferProcessor =
-                        new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
+                    using (var transferIndexer =
+                        await azureSearchService.CreateEventIndexer<TransferEvent_ERC20>(AzureTransferIndexName))
                     {
-
-                        var logProcessor = new BlockchainLogProcessor(
-                            blockchainProxyService,
-                            new ILogProcessor[] {transferProcessor});
-
-                        var progressRepository =
-                            new JsonBlockProgressRepository(CreateJsonFileToHoldProgress());
-
-                        var progressService = new StaticBlockRangeProgressService(
-                            3146684, 3146694, progressRepository);
-
-                        var batchProcessorService = new BlockchainBatchProcessorService(
-                            logProcessor, progressService, maxNumberOfBlocksPerBatch: 2);
-
-                        BlockRange? lastBlockRangeProcessed;
-                        do
+                        using (var transferProcessor =
+                            new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
                         {
-                            lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync();
-                        } while (lastBlockRangeProcessed != null);
 
-                        Assert.Equal(19, transferIndexer.Indexed);
+                            var logProcessor = new BlockchainLogProcessor(
+                                blockchainProxyService,
+                                new ILogProcessor[] {transferProcessor});
+
+                            var progressRepository =
+                                new JsonBlockProgressRepository(CreateJsonFileToHoldProgress());
+
+                            var progressService = new StaticBlockRangeProgressService(
+                                3146684, 3146694, progressRepository);
+
+                            var batchProcessorService = new BlockchainBatchProcessorService(
+                                logProcessor, progressService, maxNumberOfBlocksPerBatch: 2);
+
+                            BlockRange? lastBlockRangeProcessed;
+                            do
+                            {
+                                lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync();
+                            } while (lastBlockRangeProcessed != null);
+
+                            Assert.Equal(19, transferIndexer.Indexed);
+                        }
                     }
                 }
-
-                await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
+                finally
+                {
+                    await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
+                }
             }
         }
 
@@ -434,30 +475,35 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddAsync<TransferEvent_With3Indexes>(AzureTransferIndexName);
-                await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                try
+                {
+                    await processor.AddAsync<TransferEvent_With3Indexes>(AzureTransferIndexName);
+                    await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
-                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+                    var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
-                Assert.Equal((ulong)11, blocksProcessed);
-                Assert.Equal(2, processor.Indexers.Count);
-                Assert.Equal(6, processor.Indexers[0].Indexed);
-                Assert.Equal(19, processor.Indexers[1].Indexed);
+                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal(2, processor.Indexers.Count);
+                    Assert.Equal(6, processor.Indexers[0].Indexed);
+                    Assert.Equal(19, processor.Indexers[1].Indexed);
 
-                await Task.Delay(5000); // leave time for index
+                    await Task.Delay(5000); // leave time for index
 
-                var customIndexer = processor.Indexers[0] as IIndexer;
-                var erc20Indexer = processor.Indexers[1] as IIndexer;
-               
-                //the indexers wrap the same underlying azure index
-                //this azure index should have documents for both transfer event types
-                Assert.Equal(25, await erc20Indexer.DocumentCountAsync());
-                Assert.Equal(25, await customIndexer.DocumentCountAsync());
+                    var customIndexer = processor.Indexers[0] as IIndexer;
+                    var erc20Indexer = processor.Indexers[1] as IIndexer;
 
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    //the indexers wrap the same underlying azure index
+                    //this azure index should have documents for both transfer event types
+                    Assert.Equal(25, await erc20Indexer.DocumentCountAsync());
+                    Assert.Equal(25, await customIndexer.DocumentCountAsync());
+                }
+                finally
+                {
+                    #region test clean up 
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                    #endregion
+                }
             }
         }
 
@@ -478,30 +524,36 @@ Solidity Contract Excerpt
                 await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
                 #endregion
 
-                await processor.AddAsync<TransferEvent_Extended>(AzureTransferIndexName);
-
-                await processor.ProcessAsync(3146684, 3146694);
-
-                await Task.Delay(5000); // leave time for index
-
-                var customIndexer = processor.Indexers[0] as IAzureIndex;
-
-                var searchByMachineNameQuery = Environment.MachineName;
-                var searchResult = await customIndexer.SearchAsync(searchByMachineNameQuery);
-
-                Assert.Equal(19, searchResult.Count);
-
-                //all should have our custom metadata which is not provided by the blockchain
-                foreach (var result in searchResult.Results)
+                try
                 {
-                    var indexedOnTimestamp = result.Document["metadata_indexedon"];
-                    Assert.NotNull(indexedOnTimestamp);
-                }
 
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                    await processor.AddAsync<TransferEvent_Extended>(AzureTransferIndexName);
+
+                    await processor.ProcessAsync(3146684, 3146694);
+
+                    await Task.Delay(5000); // leave time for index
+
+                    var customIndexer = processor.Indexers[0] as IAzureIndex;
+
+                    var searchByMachineNameQuery = Environment.MachineName;
+                    var searchResult = await customIndexer.SearchAsync(searchByMachineNameQuery);
+
+                    Assert.Equal(19, searchResult.Count);
+
+                    //all should have our custom metadata which is not provided by the blockchain
+                    foreach (var result in searchResult.Results)
+                    {
+                        var indexedOnTimestamp = result.Document["metadata_indexedon"];
+                        Assert.NotNull(indexedOnTimestamp);
+                    }
+                }
+                finally
+                {
+                    #region test clean up 
+                    await processor.ClearProgress();
+                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+                    #endregion
+                }
             }
         }
     
