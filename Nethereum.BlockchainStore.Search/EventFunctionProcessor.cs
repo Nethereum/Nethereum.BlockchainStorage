@@ -94,17 +94,17 @@ namespace Nethereum.BlockchainStore.Search
             {
                 return b.Transactions
                     .Where(t => t.TransactionHash.Equals(transactionHash, StringComparison.OrdinalIgnoreCase))
-                    .Select(t => (b.Timestamp, t))
+                    .Select(t => new { timestamp = b.Timestamp, transaction = t})
                     .FirstOrDefault();
             }).FirstOrDefault();
 
             transaction = null;
             blockTimestamp = null;
 
-            if (transactionAndBlock.Item1 == null) return false;
+            if (transactionAndBlock.transaction == null) return false;
 
-            blockTimestamp = transactionAndBlock.Item1;
-            transaction = transactionAndBlock.Item2;
+            blockTimestamp = transactionAndBlock.timestamp;
+            transaction = transactionAndBlock.transaction;
             
             return true;
         }

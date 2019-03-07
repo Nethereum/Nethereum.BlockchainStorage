@@ -52,9 +52,7 @@ namespace Nethereum.BlockchainStore.Search
         public static Type GetItemTypeFromListOfT(this Type listType)
         {
             var underlyingListType = listType.GetUnderlyingGenericListType();
-            return underlyingListType == null ? 
-                null : 
-                underlyingListType.GetGenericArguments().FirstOrDefault();
+            return underlyingListType?.GetGenericArguments().FirstOrDefault();
         }
 
         public static Type GetItemTypeFromArrayOrListOfT(this Type arrayOrListType)

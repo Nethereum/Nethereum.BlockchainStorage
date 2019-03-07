@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using Nethereum.Contracts;
 using System;
 using System.Collections.Concurrent;
