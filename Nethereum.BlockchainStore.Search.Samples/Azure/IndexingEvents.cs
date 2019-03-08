@@ -122,66 +122,20 @@ Solidity Contract Excerpt
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
-
+                await ClearDown(processor);
                 try
                 {
-                    await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
+                    var transferEventProcessor = await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
                     var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
-                    Assert.Equal((ulong) 11, blocksProcessed);
-                    Assert.Equal(1, processor.Indexers.Count);
-                    Assert.Equal(19, processor.Indexers[0].Indexed);
+                    Assert.Equal((ulong)11, blocksProcessed);
+                    Assert.Equal(19, transferEventProcessor.Indexer.Indexed);
                 }
                 finally
                 {
-                    #region test clean up 
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                    #endregion
+                    await ClearDown(processor);
                 }
-            }
-        }
-
-        /// <summary>
-        /// An example of a custom DTO based on a transfer event to be stored in the azure index
-        /// </summary>
-        public class CustomTransferSearchDocumentDto
-        {
-            public string From { get; set; }
-            public string To { get; set; }
-            public string Value { get; set; }
-            public string BlockNumber { get; set; }
-            public string TxHash { get; set; }
-            public string LogAddress { get; set; }
-            public int LogIndex { get; set; }
-
-            public string DocumentKey { get; set; }
-        }
-
-        /// <summary>
-        /// An example of a simple event to search document dto mapper
-        /// </summary>
-        public class CustomEventToSearchDocumentMapper :
-            IEventToSearchDocumentMapper<TransferEvent_ERC20, CustomTransferSearchDocumentDto>
-        {
-            public CustomTransferSearchDocumentDto Map(EventLog<TransferEvent_ERC20> from)
-            {
-                return new CustomTransferSearchDocumentDto
-                {
-                    From = from.Event.From,
-                    To = from.Event.To,
-                    Value = from.Event.Value.ToString(),
-                    BlockNumber = from.Log.BlockNumber.Value.ToString(),
-                    TxHash = from.Log.TransactionHash,
-                    LogAddress = from.Log.Address,
-                    LogIndex = (int) from.Log.LogIndex.Value,
-                    DocumentKey = $"{from.Log.TransactionHash}_{from.Log.LogIndex.Value}"
-                };
             }
         }
 
@@ -194,25 +148,11 @@ Solidity Contract Excerpt
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                await ClearDown(processor);
 
                 //create an azure index definition based on a custom Dto
                 //the processor will create the index if it does not already exist
-                var index = new Index {Name = AzureTransferIndexName};
-                index.Fields = new List<Field>
-                {
-                    new Field("DocumentKey", DataType.String) { IsKey = true },
-                    new Field("From", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("To", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("Value", DataType.String),
-                    new Field("BlockNumber", DataType.String),
-                    new Field("TxHash", DataType.String),
-                    new Field("LogAddress", DataType.String),
-                    new Field("LogIndex", DataType.Int64)
-                };
+                Index index = CreateAzureIndexDefinition();
 
                 try
                 {
@@ -226,25 +166,19 @@ Solidity Contract Excerpt
                             BlockNumber = e.Log.BlockNumber.Value.ToString(),
                             TxHash = e.Log.TransactionHash,
                             LogAddress = e.Log.Address,
-                            LogIndex = (int) e.Log.LogIndex.Value,
+                            LogIndex = (int)e.Log.LogIndex.Value,
                             DocumentKey = $"{e.Log.TransactionHash}_{e.Log.LogIndex.Value}"
                         });
 
                     var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
 
-                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal((ulong)11, blocksProcessed);
                     Assert.Equal(1, processor.Indexers.Count);
                     Assert.Equal(19, processor.Indexers[0].Indexed);
                 }
                 finally
                 {
-
-                    #region test clean up 
-
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }
@@ -258,25 +192,11 @@ Solidity Contract Excerpt
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                await ClearDown(processor);
 
                 //create an azure index definition based on a custom Dto
                 //the processor will create the index if it does not already exist
-                var index = new Index {Name = AzureTransferIndexName};
-                index.Fields = new List<Field>
-                {
-                    new Field("DocumentKey", DataType.String) { IsKey = true },
-                    new Field("From", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("To", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("Value", DataType.String),
-                    new Field("BlockNumber", DataType.String),
-                    new Field("TxHash", DataType.String),
-                    new Field("LogAddress", DataType.String),
-                    new Field("LogIndex", DataType.Int64)
-                };
+                var index = CreateAzureIndexDefinition();
 
                 var mapper = new CustomEventToSearchDocumentMapper();
 
@@ -293,13 +213,7 @@ Solidity Contract Excerpt
                 }
                 finally
                 {
-
-                    #region test clean up 
-
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }
@@ -322,10 +236,7 @@ Solidity Contract Excerpt
                 new AzureEventIndexingProcessor(
                     AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl, maxBlocksPerBatch: 1, minBlockConfirmations: 0))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                await ClearDown(processor);
 
                 try
                 {
@@ -347,10 +258,7 @@ Solidity Contract Excerpt
                 }
                 finally
                 {
-                    #region test clean up 
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }
@@ -375,12 +283,7 @@ Solidity Contract Excerpt
                     BlockchainUrl,
                     filters: new[] {filter}))
             {
-                #region test preparation
-
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-
-                #endregion
+                await ClearDown(processor);
 
                 try
                 {
@@ -393,10 +296,7 @@ Solidity Contract Excerpt
                 }
                 finally
                 {
-                    #region test clean up 
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }
@@ -418,7 +318,6 @@ Solidity Contract Excerpt
             using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
             {
                 await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
-
 
                 try
                 {
@@ -470,10 +369,7 @@ Solidity Contract Excerpt
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                await ClearDown(processor);
 
                 try
                 {
@@ -499,10 +395,7 @@ Solidity Contract Excerpt
                 }
                 finally
                 {
-                    #region test clean up 
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }
@@ -519,21 +412,18 @@ Solidity Contract Excerpt
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                #endregion
+                await ClearDown(processor);
 
                 try
                 {
 
-                    await processor.AddAsync<TransferEvent_Extended>(AzureTransferIndexName);
+                    var transferEventProcessor = await processor.AddAsync<TransferEvent_Extended>(AzureTransferIndexName);
 
                     await processor.ProcessAsync(3146684, 3146694);
 
                     await Task.Delay(5000); // leave time for index
 
-                    var customIndexer = processor.Indexers[0] as IAzureIndex;
+                    var customIndexer = transferEventProcessor.Indexer as IAzureIndex;
 
                     var searchByMachineNameQuery = Environment.MachineName;
                     var searchResult = await customIndexer.SearchAsync(searchByMachineNameQuery);
@@ -549,13 +439,72 @@ Solidity Contract Excerpt
                 }
                 finally
                 {
-                    #region test clean up 
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }
+
+        private static async Task ClearDown(AzureEventIndexingProcessor processor)
+        {
+            await processor.ClearProgress();
+            await processor.SearchService.DeleteIndexAsync(AzureTransferIndexName);
+        }
+
+        /// <summary>
+        /// An example of a custom DTO based on a transfer event to be stored in the azure index
+        /// </summary>
+        public class CustomTransferSearchDocumentDto
+        {
+            public string From { get; set; }
+            public string To { get; set; }
+            public string Value { get; set; }
+            public string BlockNumber { get; set; }
+            public string TxHash { get; set; }
+            public string LogAddress { get; set; }
+            public int LogIndex { get; set; }
+
+            public string DocumentKey { get; set; }
+        }
+
+        /// <summary>
+        /// An example of a simple event to search document dto mapper
+        /// </summary>
+        public class CustomEventToSearchDocumentMapper :
+            IEventToSearchDocumentMapper<TransferEvent_ERC20, CustomTransferSearchDocumentDto>
+        {
+            public CustomTransferSearchDocumentDto Map(EventLog<TransferEvent_ERC20> from)
+            {
+                return new CustomTransferSearchDocumentDto
+                {
+                    From = from.Event.From,
+                    To = from.Event.To,
+                    Value = from.Event.Value.ToString(),
+                    BlockNumber = from.Log.BlockNumber.Value.ToString(),
+                    TxHash = from.Log.TransactionHash,
+                    LogAddress = from.Log.Address,
+                    LogIndex = (int) from.Log.LogIndex.Value,
+                    DocumentKey = $"{from.Log.TransactionHash}_{from.Log.LogIndex.Value}"
+                };
+            }
+        }
+
+        private static Index CreateAzureIndexDefinition()
+        {
+            var index = new Index { Name = AzureTransferIndexName };
+            index.Fields = new List<Field>
+                {
+                    new Field("DocumentKey", DataType.String) { IsKey = true },
+                    new Field("From", DataType.String) { IsSearchable = true, IsFacetable = true },
+                    new Field("To", DataType.String) { IsSearchable = true, IsFacetable = true },
+                    new Field("Value", DataType.String),
+                    new Field("BlockNumber", DataType.String),
+                    new Field("TxHash", DataType.String),
+                    new Field("LogAddress", DataType.String),
+                    new Field("LogIndex", DataType.Int64)
+                };
+            return index;
+        }
+
     
         private static string CreateJsonFileToHoldProgress()
         {

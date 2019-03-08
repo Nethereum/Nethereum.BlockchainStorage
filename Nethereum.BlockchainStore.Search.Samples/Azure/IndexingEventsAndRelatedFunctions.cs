@@ -84,13 +84,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
-                await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
-                await processor.SearchService.DeleteIndexAsync(TransferFromFunctionIndexName);
-                #endregion
-
+                await ClearDown(processor);
                 try
                 {
                     //reusable function handler which incorporates a function indexer
@@ -131,17 +125,19 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                 }
                 finally
                 {
-
-                    #region test clean up 
-
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
-                    await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
-                    await processor.SearchService.DeleteIndexAsync(TransferFromFunctionIndexName);
-
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
+        }
+
+        private static async Task ClearDown(AzureEventIndexingProcessor processor)
+        {
+            #region test preparation
+            await processor.ClearProgress();
+            await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
+            await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
+            await processor.SearchService.DeleteIndexAsync(TransferFromFunctionIndexName);
+            #endregion
         }
 
         /// <summary>
@@ -173,11 +169,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
             using (var processor =
                 new AzureEventIndexingProcessor(AzureSearchServiceName, _azureSearchApiKey, BlockchainUrl))
             {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
-                await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
-                #endregion
+                await ClearDown(processor);
 
                 try
                 {
@@ -256,14 +248,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                 }
                 finally
                 {
-
-                    #region test clean up 
-
-                    await processor.ClearProgress();
-                    await processor.SearchService.DeleteIndexAsync(TransferEventIndexName);
-                    await processor.SearchService.DeleteIndexAsync(TransferFunctionIndexName);
-
-                    #endregion
+                    await ClearDown(processor);
                 }
             }
         }

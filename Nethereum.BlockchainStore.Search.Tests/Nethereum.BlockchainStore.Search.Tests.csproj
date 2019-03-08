@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ElasticSearch\" />
+  </ItemGroup>
+
 </Project>

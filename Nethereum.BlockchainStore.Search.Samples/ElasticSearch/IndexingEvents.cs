@@ -44,9 +44,9 @@ Solidity Contract Excerpt
             public const string AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY";
         }
 
-        private string AwsSecretAccessKey;
-        private string AwsAccessKeyId;
-        private string AwsElasticSearchUrl;
+        private readonly string _awsSecretAccessKey;
+        private readonly string _awsAccessKeyId;
+        private readonly string _awsElasticSearchUrl;
 
         public IndexingEvents()
         {
@@ -62,13 +62,13 @@ Solidity Contract Excerpt
             ConfigurationUtils.SetEnvironment("development");
 
             //use the command line to set your azure search api key
-            //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"
+            //e.g. dotnet user-secrets set "AWS_ACCESS_KEY_ID" "<put key here>"
             var appConfig = ConfigurationUtils
                 .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainStore.Search.Samples");
 
-            AwsAccessKeyId = appConfig[ConfigurationKeyNames.AWS_ACCESS_KEY_ID];
-            AwsSecretAccessKey = appConfig[ConfigurationKeyNames.AWS_SECRET_ACCESS_KEY];
-            AwsElasticSearchUrl = appConfig[ConfigurationKeyNames.AWSElasticSearchUrl];
+            _awsAccessKeyId = appConfig[ConfigurationKeyNames.AWS_ACCESS_KEY_ID];
+            _awsSecretAccessKey = appConfig[ConfigurationKeyNames.AWS_SECRET_ACCESS_KEY];
+            _awsElasticSearchUrl = appConfig[ConfigurationKeyNames.AWSElasticSearchUrl];
         }
 
         /// <summary>
@@ -80,40 +80,81 @@ Solidity Contract Excerpt
         [Fact]
         public async Task StartHere()
         {
-            #region AWS Elastic Client Setup
-            var httpConnection = new AwsHttpConnection(
-                new BasicAWSCredentials(AwsAccessKeyId, AwsSecretAccessKey), RegionEndpoint.USEast2);
+            ElasticClient elasticClient = CreateElasticClient();
 
-            var pool = new SingleNodeConnectionPool(new Uri(AwsElasticSearchUrl));
+            using (var processor = new ElasticEventIndexingProcessor(elasticClient, BlockchainUrl))
+            {
+                await ClearDown(processor);
+                try
+                {
+                    // subscribe to transfer events
+                    var transferEventProcessor = await processor.AddAsync<TransferEvent_ERC20>(TransferIndexName);
+
+                    var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+
+                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal(19, transferEventProcessor.Indexer.Indexed);
+
+                    await Task.Delay(TimeSpan.FromSeconds(5)); // allow time for indexing
+                    Assert.Equal(19, await transferEventProcessor.Indexer.DocumentCountAsync());
+                }
+                finally
+                {
+                    await ClearDown(processor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Dictating exactly what you want stored in the index - using a custom mapper to translate to a search document
+        /// </summary>
+        [Fact]
+        public async Task StoringCustomSearchDocuments_UsingMapper()
+        {
+            ElasticClient elasticClient = CreateElasticClient();
+
+            using (var processor = new ElasticEventIndexingProcessor(elasticClient, BlockchainUrl))
+            {
+                await ClearDown(processor);
+
+                try
+                {
+                    var mapper = new CustomEventToSearchDocumentMapper();
+
+                    // subscribe to transfer events
+                    // inject a mapper to translate the event DTO to a search document DTO
+                    var transferEventProcessor = await processor
+                        .AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(
+                        TransferIndexName, mapper);
+
+                    var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
+
+                    Assert.Equal((ulong) 11, blocksProcessed);
+                    Assert.Equal(19, transferEventProcessor.Indexer.Indexed);
+                }
+                finally
+                {
+                    await ClearDown(processor);
+                }
+            }
+        }
+
+        private static async Task ClearDown(ElasticEventIndexingProcessor processor)
+        {
+            #region test preparation
+            await processor.ClearProgress();
+            await processor.SearchService.DeleteIndexAsync(TransferIndexName);
+            #endregion
+        }
+
+        private ElasticClient CreateElasticClient()
+        {
+            var httpConnection = new AwsHttpConnection(
+                new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey), RegionEndpoint.USEast2);
+            var pool = new SingleNodeConnectionPool(new Uri(_awsElasticSearchUrl));
             var config = new ConnectionSettings(pool, httpConnection);
             var elasticClient = new ElasticClient(config);
-            #endregion 
-
-            using (var processor =
-                new ElasticEventIndexingProcessor(
-                    elasticClient, BlockchainUrl))
-            {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(TransferIndexName);
-                #endregion
-
-                var transferIndexProcessor = await processor.AddAsync<TransferEvent_ERC20>(TransferIndexName);
-
-                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
-
-                Assert.Equal((ulong)11, blocksProcessed);
-                Assert.Equal(1, processor.Indexers.Count);
-                Assert.Equal(19, processor.Indexers[0].Indexed);
-
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                Assert.Equal(19, await transferIndexProcessor.Indexer.DocumentCountAsync());
-
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(TransferIndexName);
-                #endregion
-            }
+            return elasticClient;
         }
 
         /// <summary>
@@ -159,46 +200,6 @@ Solidity Contract Excerpt
             }
         }
 
-        /// <summary>
-        /// Dictating exactly what you want stored in the index - using a custom mapper to translate to a search document
-        /// </summary>
-        [Fact]
-        public async Task StoringCustomSearchDocuments_UsingMapper()
-        {
-            #region AWS Elastic Client Setup
-            var httpConnection = new AwsHttpConnection(
-                new BasicAWSCredentials(AwsAccessKeyId, AwsSecretAccessKey), RegionEndpoint.USEast2);
 
-            var pool = new SingleNodeConnectionPool(new Uri(AwsElasticSearchUrl));
-            var config = new ConnectionSettings(pool, httpConnection);
-            var elasticClient = new ElasticClient(config);
-            #endregion 
-
-            using (var processor =
-                new ElasticEventIndexingProcessor(
-                    elasticClient, BlockchainUrl))
-            {
-                #region test preparation
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(TransferIndexName);
-                #endregion
-
-                var mapper = new CustomEventToSearchDocumentMapper();
-
-                //inject a mapping func to translate our event to a doc to store in the index
-                await processor.AddAsync<TransferEvent_ERC20, CustomTransferSearchDocumentDto>(TransferIndexName, mapper);
-
-                var blocksProcessed = await processor.ProcessAsync(3146684, 3146694);
-
-                Assert.Equal((ulong)11, blocksProcessed);
-                Assert.Equal(1, processor.Indexers.Count);
-                Assert.Equal(19, processor.Indexers[0].Indexed);
-
-                #region test clean up 
-                await processor.ClearProgress();
-                await processor.SearchService.DeleteIndexAsync(TransferIndexName);
-                #endregion
-            }
-        }
     }
 }

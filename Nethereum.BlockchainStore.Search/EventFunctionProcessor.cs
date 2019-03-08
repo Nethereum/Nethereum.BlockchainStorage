@@ -101,7 +101,7 @@ namespace Nethereum.BlockchainStore.Search
             transaction = null;
             blockTimestamp = null;
 
-            if (transactionAndBlock.transaction == null) return false;
+            if (transactionAndBlock?.transaction == null) return false;
 
             blockTimestamp = transactionAndBlock.timestamp;
             transaction = transactionAndBlock.transaction;
