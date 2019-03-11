@@ -26,16 +26,26 @@ namespace Nethereum.BlockchainProcessing.Processing
             return Task.FromResult(_progress.To);
         }
 
-        public Task UpsertProgressAsync(ulong blockNumber)
+        public async Task UpsertProgressAsync(ulong blockNumber)
         {
             _progress.To = blockNumber;
-            Persist();
-            return Task.CompletedTask;
+            await PersistAsync();
         }
 
         private void Persist()
         {
             File.WriteAllText(JsonFileNameAndPath, JsonConvert.SerializeObject(_progress));
+        }
+
+        private async Task PersistAsync()
+        {
+            using(var textWriter = File.CreateText(JsonFileNameAndPath))
+            {
+                using(var jsonWriter = new JsonTextWriter(textWriter))
+                {
+                    await jsonWriter.WriteRawValueAsync(JsonConvert.SerializeObject(_progress));
+                }
+            }
         }
 
         private void Initialise()
