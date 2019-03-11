@@ -2,6 +2,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.AzureTables.Repositories;
 using Nethereum.BlockchainStore.Repositories;
 
@@ -84,6 +85,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
         public ITransactionLogRepository CreateTransactionLogRepository() => new TransactionLogRepository(GetTransactionsLogTable());
         public ITransactionRepository CreateTransactionRepository() => new TransactionRepository(GetTransactionsTable());
         public ITransactionVMStackRepository CreateTransactionVmStackRepository() => new TransactionVMStackRepository(GetTransactionsVmStackTable());
+        public IBlockProgressRepository CreateBlockProgressRepository() => new BlockProgressRepository(GetCountersTable());
 
         public async Task DeleteAllTables()
         {
