@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Store Ethereum blockchain data using Entity Framework core.  This package only contains the base components.  Use the other DB specific packages available for Sqlite, SqlServer etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>

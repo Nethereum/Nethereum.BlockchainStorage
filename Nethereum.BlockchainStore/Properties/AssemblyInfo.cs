@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("Nethereum.BlockchainStore")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A set of base classes and interfaces to enable storage of Ehtereum block chain data.  Other DB specific packages are available and depend on this library.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Nethereum.BlockchainStore")]

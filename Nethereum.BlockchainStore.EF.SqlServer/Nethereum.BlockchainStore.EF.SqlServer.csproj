@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Store Ethereum blockchain data in Sql Server using Entity Framework (not core).</Description>
   </PropertyGroup>
 
   <ItemGroup>

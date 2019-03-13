@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Add Ethereum block chain data to Azure or Elastic Search.  Easily index events and transactions with minimal config. Data can be auto mapped to search documents or create your own search DTO's and mapping.  Supports filtering to ensure you only index what you want.</Description>
+    <PackageProjectUrl>https://github.com/Nethereum/Nethereum.BlockchainStorage/tree/master/Nethereum.BlockchainStore.Search</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

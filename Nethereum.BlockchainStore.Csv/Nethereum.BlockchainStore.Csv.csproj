@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <UserSecretsId>Nethereum.BlockchainStore.Csv.UserSecrets</UserSecretsId>
+    <Description>Store Ethereum blockchain data in CSV format.</Description>
   </PropertyGroup>
 
   <ItemGroup>

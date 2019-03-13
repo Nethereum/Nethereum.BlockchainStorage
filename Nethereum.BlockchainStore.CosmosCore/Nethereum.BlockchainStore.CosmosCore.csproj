@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <UserSecretsId>Nethereum.BlockchainStore.CosmosCore.UserSecrets</UserSecretsId>
+    <Description>Store Ethereum block chain data in Azure Cosmos Db.</Description>
   </PropertyGroup>
 
   <ItemGroup>

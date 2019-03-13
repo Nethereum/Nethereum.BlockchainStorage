@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Contains common data mapping between entities and Nethereum.RPC DTO's for use in the Nethereum.Blockchain storage packages.</Description>
   </PropertyGroup>
 
   <ItemGroup>
