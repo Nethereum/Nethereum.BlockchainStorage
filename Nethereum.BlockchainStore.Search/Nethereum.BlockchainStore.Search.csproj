@@ -12,7 +12,7 @@
     <PackageReference Include="Elasticsearch.Net.Aws" Version="6.1.0" />
     <PackageReference Include="Microsoft.Azure.Search" Version="5.0.3" />
     <PackageReference Include="NEST" Version="6.5.0" />
-    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.0.0-CI-20190213-163519" />
+    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.1.2" />
   </ItemGroup>
 
 </Project>
