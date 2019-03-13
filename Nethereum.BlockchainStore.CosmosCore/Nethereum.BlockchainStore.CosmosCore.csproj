@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	<Authors>Dave Whiffin</Authors>
     <UserSecretsId>Nethereum.BlockchainStore.CosmosCore.UserSecrets</UserSecretsId>
   </PropertyGroup>
 
