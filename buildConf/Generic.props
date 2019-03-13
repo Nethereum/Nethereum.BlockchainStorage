@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-   <PackageTags>Netherum;Ethereum;Blockchain;Blockchain Storage</PackageTags>
+   <PackageTags>Netherum;Ethereum;Blockchain;Blockchain Storage;Blockchain Indexer</PackageTags>
    <PackageIconUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/logos/logo64x64.png</PackageIconUrl>
    <PackageProjectUrl>https://nethereum.com</PackageProjectUrl>
    <PackageLicenseUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/LICENSE.md</PackageLicenseUrl>
