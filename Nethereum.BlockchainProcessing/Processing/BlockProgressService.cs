@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         public uint MinimumBlockConfirmations { get; }
 
         public BlockProgressService(
-            IBlockchainProxyService web3, 
+            IBlockchainProxyService blockchainProxyService, 
             ulong defaultStartingBlockNumber, 
             IBlockProgressRepository blockProgressRepository,
             uint minimumBlockConfirmations = 0) : 
@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             defaultStartingBlockNumber, 
             blockProgressRepository)
         {
-            _web3 = web3;
+            _web3 = blockchainProxyService;
             MinimumBlockConfirmations = minimumBlockConfirmations;
         }
 

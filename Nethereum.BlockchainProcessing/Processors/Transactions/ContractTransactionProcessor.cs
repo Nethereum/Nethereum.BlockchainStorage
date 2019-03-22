@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
                         .GetTransactionVmStack(transactionHash)
                         .ConfigureAwait(false);
                 }
-                catch(Exception x)
+                catch(Exception)
                 {
                     
                 }

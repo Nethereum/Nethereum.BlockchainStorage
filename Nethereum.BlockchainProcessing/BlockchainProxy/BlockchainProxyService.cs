@@ -11,12 +11,15 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
     public class BlockchainProxyService: IBlockchainProxyService
     {
+        ContractQueryHelper _queryHelper;
+
         public BlockchainProxyService(string url):this(new Web3.Web3(url))
         {}
 
         public BlockchainProxyService(Web3.Web3 web3)
         {
             Web3 = web3;
+            _queryHelper = new ContractQueryHelper(web3);
         }
 
         private Web3.Web3 Web3 { get; }
@@ -87,6 +90,10 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
                 return null;
             });
         }
+
+        public Task<object> Query(string contractAddress, string contractABI, string functionSignature, object[] functionInputs = null) => 
+            _queryHelper.Query(contractAddress, contractABI, functionSignature, functionInputs);
+        
 
         private async Task<T> Wrap<T>(Func<Task<T>> web3Request, int attempts = 1)
         {

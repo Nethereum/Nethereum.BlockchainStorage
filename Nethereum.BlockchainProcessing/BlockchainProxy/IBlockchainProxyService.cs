@@ -5,7 +5,8 @@
         ITransactionProxy,
         IGetCode,
         IGetTransactionVMStack,
-        IEventLogProxy
+        IEventLogProxy,
+        IContractQuery
     {
 
     }
