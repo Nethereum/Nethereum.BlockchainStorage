@@ -66,7 +66,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             IEventProcessingConfigurationDb configDb = CreateMockDb();
 
             var blockchainProxy = new BlockchainProxyService(new Web3.Web3(BlockchainUrl));
-            var eventHandlerFactory = new DecodedEventHandlerFactory(configDb, blockchainProxy);
+            var eventHandlerFactory = new DecodedEventHandlerFactory(configDb, configDb, blockchainProxy);
             var processorFactory = new EventProcessorFactory(configDb, eventHandlerFactory);
             var eventProcessors = await processorFactory.GetLogProcessorsAsync(PartitionId);
             var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventProcessors);
@@ -141,22 +141,66 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
                 new DecodedEventHandlerDto
                 {
-                    Id = 2, Disabled = false, EventSubscriptionId = 1, HandlerType = EventHandlerType.Queue, Order = 2
+                    Id = 2, Disabled = false, EventSubscriptionId = 1, HandlerType = EventHandlerType.ContractQuery, Order = 2
                 },
 
                 new DecodedEventHandlerDto
                 {
-                    Id = 3, Disabled = false, EventSubscriptionId = 2, HandlerType = EventHandlerType.Aggregate, Order = 1
+                    Id = 3, Disabled = false, EventSubscriptionId = 1, HandlerType = EventHandlerType.ContractQuery, Order = 3
                 },
 
                 new DecodedEventHandlerDto
                 {
-                    Id = 4, Disabled = false, EventSubscriptionId = 2, HandlerType = EventHandlerType.Queue, Order = 2
+                    Id = 4, Disabled = false, EventSubscriptionId = 1, HandlerType = EventHandlerType.Queue, Order = 4
                 },
 
                 new DecodedEventHandlerDto
                 {
-                    Id = 5, Disabled = false, EventSubscriptionId = 3, HandlerType = EventHandlerType.Queue, Order = 1
+                    Id = 5, Disabled = false, EventSubscriptionId = 2, HandlerType = EventHandlerType.Aggregate, Order = 1
+                },
+
+                new DecodedEventHandlerDto
+                {
+                    Id = 6, Disabled = false, EventSubscriptionId = 2, HandlerType = EventHandlerType.Queue, Order = 2
+                },
+
+                new DecodedEventHandlerDto
+                {
+                    Id = 7, Disabled = false, EventSubscriptionId = 3, HandlerType = EventHandlerType.Queue, Order = 1
+                }
+            };
+
+            var contractQueries = new ContractQueryDto[]
+            {
+                new ContractQueryDto 
+                {
+                    Id = 1,
+                    DecodedEventHandlerId = 2, 
+                    ContractId = 1, 
+                    ContractAddressSource = ContractAddressSource.EventAddress, 
+                    EventStateOutputName = "TokenName",
+                    FunctionSignature = "06fdde03" // name
+                },
+                new ContractQueryDto 
+                {
+                    Id = 2,
+                    DecodedEventHandlerId = 3, 
+                    ContractId = 1, 
+                    ContractAddressSource = ContractAddressSource.EventAddress, 
+                    EventStateOutputName = "FromAddressCurrentBalance",
+                    FunctionSignature = "70a08231" // balanceOf
+                }
+            };
+
+            var contractQueryParameters = new ContractQueryParameterDto[]
+            {
+                new ContractQueryParameterDto
+                {
+                    Id = 1,
+                    ContractQueryId = 2,
+                    Order = 1,
+                    Source = EventValueSource.EventParameters,
+                    EventParameterNumber = 1 // transfer from
                 }
             };
 
@@ -204,8 +248,46 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Callback<EventSubscriptionStateDto>((state) =>  eventSubscriptionStateContainer[state.EventSubscriptionId] = state)
                 .Returns(Task.CompletedTask);
 
+            configDb
+                .Setup(d => d.GetContractQueryAsync(It.IsAny<long>()))
+                .Returns<long>((eventHandlerId) =>
+                {
+                    var contractQuery = contractQueries.FirstOrDefault(c => c.DecodedEventHandlerId == eventHandlerId);
+                    if(contractQuery == null) throw new System.ArgumentException($"Could not find Contract Query Configuration for Event Handler Id: {eventHandlerId}");
+                    var contract = contracts.FirstOrDefault(c => c.Id == contractQuery.ContractId);
+                    if(contract == null) throw new System.ArgumentException($"Could not find Contract Query Id: {contractQuery.Id}, Contract Id: {contractQuery.ContractId}");
+                    var parameters = contractQueryParameters.Where(p => p.ContractQueryId == contractQuery.Id);
+
+                    ContractQueryConfiguration config = CreateContractQueryConfiguration(contractQuery, contract, parameters);
+
+                    return Task.FromResult(config);
+                });
+
             return configDb.Object;
 
+        }
+
+        private static ContractQueryConfiguration CreateContractQueryConfiguration(ContractQueryDto contractQuery, ContractDto contract, IEnumerable<ContractQueryParameterDto> parameters)
+        {
+            return new ContractQueryConfiguration
+            {
+                ContractABI = contract.Abi,
+                ContractAddress = contractQuery.ContractAddress,
+                ContractAddressParameterNumber = contractQuery.ContractAddressParameterNumber,
+                ContractAddressSource = contractQuery.ContractAddressSource,
+                ContractAddressStateVariableName = contractQuery.ContractAddressStateVariableName,
+                EventStateOutputName = contractQuery.EventStateOutputName,
+                FunctionSignature = contractQuery.FunctionSignature,
+                SubscriptionStateOutputName = contractQuery.SubscriptionStateOutputName,
+                Parameters = parameters.Select(p => new ContractQueryParameter
+                {
+                    Order = p.Order,
+                    EventParameterNumber = p.EventParameterNumber,
+                    EventStateName = p.EventStateName,
+                    Source = p.Source,
+                    Value = p.Value
+                }).ToArray()
+            };
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
             State.Increment(STATE_KEY_AGGREGATOR_INVOCATIONS);
-            decodedEvent.Aggregates[STATE_KEY_AGGREGATOR_INVOCATIONS] = InvocationCount;
+            decodedEvent.State[STATE_KEY_AGGREGATOR_INVOCATIONS] = InvocationCount;
             return Task.FromResult(true);
         }
     }

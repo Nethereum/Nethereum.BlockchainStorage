@@ -7,13 +7,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class DecodedEvent
     {
-        public Dictionary<string, object> Aggregates {get;set;} = new Dictionary<string, object>();
-        public Dictionary<string, object> Metadata {get;set;} = new Dictionary<string, object>();
-        public EventLog<List<ParameterOutput>> Log { get; set; }
+        public Dictionary<string, object> State {get;set;} = new Dictionary<string, object>();
+        public EventLog<List<ParameterOutput>> EventLog { get; set; }
 
         public static DecodedEvent Empty()
         {
-            return new DecodedEvent{Log = new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), new FilterLog())};
+            return new DecodedEvent{EventLog = new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), new FilterLog())};
         }
     }
 }

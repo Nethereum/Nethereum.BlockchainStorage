@@ -76,24 +76,40 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public long DecodedEventHandlerId {get;set;}
 
+        public ContractAddressSource ContractAddressSource {get;set; }
+
         public long ContractId {get;set;}
 
-        public string FunctionSignature {get;set;} 
-
-        public string[] OutputVariableNames {get;set;}
-
-        public string[] ArgumentVariableNames {get;set;}
+        public string FunctionSignature {get;set;}
 
         public string ContractAddress {get; set;}
 
-        public string ContractAddressVariableName {get;set;}
+        public int? ContractAddressParameterNumber {get;set;}
 
-        public ContractAddressSource AddressLookupBehaviour {get;set;}
+        public string ContractAddressStateVariableName {get;set;}
 
+        public string EventStateOutputName {get;set;}
+        public string SubscriptionStateOutputName {get;set;}
+
+    }
+
+    public class ContractQueryParameterDto: DbRow
+    {
+        public long ContractQueryId {get;set;}
+        public int Order {get;set;}
+        public EventValueSource Source {get;set;}
+        public object Value {get;set;}
+        public int EventParameterNumber {get;set;}
+        public string EventStateName {get;set;}
     }
 
     public enum ContractAddressSource
     {
-        Static, EventAddress, EventParameter, EventMetaData
+        Static, EventAddress, EventParameter, EventState
+    }
+
+    public enum EventValueSource
+    {
+        Static, EventAddress, EventParameters, EventState
     }
 }

@@ -18,13 +18,16 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
         public DecodedEventHandlerFactory(
             IEventSubscriptionStateFactory stateFactory, 
+            IEventContractQueryFactory contractQueryFactory,
             IContractQuery contractQueryHandler)
         {
             StateFactory = stateFactory;
+            ContractQueryFactory = contractQueryFactory;
             ContractQueryHandler = contractQueryHandler;
         }
 
         public IEventSubscriptionStateFactory StateFactory { get; }
+        public IEventContractQueryFactory ContractQueryFactory { get; }
         public IContractQuery ContractQueryHandler { get; }
 
         public async Task<IDecodedEventHandler> CreateAsync(DecodedEventHandlerDto config)
@@ -40,8 +43,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventHandlerType.Aggregate:
                     return new EventAggregator(state);
                 case EventHandlerType.ContractQuery:
-                    //TODO: build query configuration
-                    return new ContractQuery(ContractQueryHandler, state, new ContractQueryConfiguration());
+                    var queryConfig = await ContractQueryFactory.GetContractQueryAsync(config.Id);
+                    return new ContractQueryEventHandler(ContractQueryHandler, state, queryConfig);
                 case EventHandlerType.Queue:
                     return new InMemoryEventQueue();
                 default:

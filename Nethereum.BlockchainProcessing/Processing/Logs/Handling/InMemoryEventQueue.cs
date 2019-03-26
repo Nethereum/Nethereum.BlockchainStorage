@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
@@ -10,6 +12,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
             _queue.Enqueue(decodedEvent);
+
+            Debug.Write(JsonConvert.SerializeObject(decodedEvent));
+
             return Task.FromResult(true);
         }
     }

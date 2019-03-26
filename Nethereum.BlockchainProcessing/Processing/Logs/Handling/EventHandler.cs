@@ -28,15 +28,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             {
                 var decodedEvent = log.ToDecodedEvent(abi);
 
-                decodedEvent.Metadata["SubscriberId"] = SubscriberId;
-                decodedEvent.Metadata["EventSubscriptionId"] = EventSubscriptionId;
-                decodedEvent.Metadata["EventAbiName"] = abi?.Name;
+                decodedEvent.State["SubscriberId"] = SubscriberId;
+                decodedEvent.State["EventSubscriptionId"] = EventSubscriptionId;
 
-                Debug.Write(JsonConvert.SerializeObject(decodedEvent));
-                Debug.WriteLine("");
-
-                foreach(var handler in Handlers)
+                foreach (var handler in Handlers)
                 {
+                    decodedEvent.State["HandlerInvocations"] = 1 + (int)decodedEvent.State["HandlerInvocations"];
+
                     if (!await handler.HandleAsync(decodedEvent))
                     {
                         break;
@@ -44,5 +42,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 }
             }
         }
+
+
     }
 }

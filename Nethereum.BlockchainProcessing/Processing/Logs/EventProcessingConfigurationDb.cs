@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
@@ -89,6 +90,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         public Task SaveAsync(EventSubscriptionStateDto state)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<ContractQueryConfiguration> GetContractQueryAsync(long eventSubscriptionId)
         {
             throw new System.NotImplementedException();
         }
