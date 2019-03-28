@@ -10,8 +10,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class EventAggregator : IDecodedEventHandler
     {
-        public const string STATE_KEY_AGGREGATOR_INVOCATIONS = "AggregatorInvocations";
-        public int InvocationCount => State.GetInt(STATE_KEY_AGGREGATOR_INVOCATIONS);
         public EventSubscriptionStateDto State { get; }
         public EventAggregatorConfiguration Configuration { get; }
 
@@ -23,9 +21,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
         public Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            State.Increment(STATE_KEY_AGGREGATOR_INVOCATIONS);
-            decodedEvent.State[STATE_KEY_AGGREGATOR_INVOCATIONS] = InvocationCount;
-
             switch (Configuration.Operation)
             {
                 case AggregatorOperation.Count:

@@ -3,6 +3,7 @@ using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -170,6 +171,28 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             var parameterConditions = new ParameterConditionDto[]{};
 
+            var eventAggregatorConfigurations = new EventAggregatorConfigurationDto[]
+            {
+                new EventAggregatorConfigurationDto
+                {
+                    Id = 1,
+                    DecodedEventHandlerId = 1,
+                    Destination = AggregatorDestination.EventSubscriptionState,
+                    Operation = AggregatorOperation.Sum,
+                    Source = AggregatorSource.EventParameter,
+                    EventParameterNumber = 3, 
+                    OutputName = "ValueSubTotal"
+                },
+                new EventAggregatorConfigurationDto
+                {
+                    Id = 2,
+                    DecodedEventHandlerId = 5,
+                    Destination = AggregatorDestination.EventSubscriptionState,
+                    Operation = AggregatorOperation.Count,
+                    OutputName = "MatchCount"
+                }
+            };
+
             configDb
                 .Setup(d => d.GetSubscribersAsync(It.IsAny<long>()))
                 .Returns<long>((partitionId) => Task.FromResult(subscribers.Where(s => s.PartitionId == partitionId).ToArray()));
@@ -217,21 +240,45 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns<long>((eventHandlerId) =>
                 {
                     var contractQuery = contractQueries.FirstOrDefault(c => c.DecodedEventHandlerId == eventHandlerId);
-                    if(contractQuery == null) throw new System.ArgumentException($"Could not find Contract Query Configuration for Event Handler Id: {eventHandlerId}");
+                    if(contractQuery == null) throw new ArgumentException($"Could not find Contract Query Configuration for Event Handler Id: {eventHandlerId}");
                     var contract = contracts.FirstOrDefault(c => c.Id == contractQuery.ContractId);
-                    if(contract == null) throw new System.ArgumentException($"Could not find Contract Query Id: {contractQuery.Id}, Contract Id: {contractQuery.ContractId}");
+                    if(contract == null) throw new ArgumentException($"Could not find Contract Query Id: {contractQuery.Id}, Contract Id: {contractQuery.ContractId}");
                     var parameters = contractQueryParameters.Where(p => p.ContractQueryId == contractQuery.Id);
 
-                    ContractQueryConfiguration config = CreateContractQueryConfiguration(contractQuery, contract, parameters);
+                    ContractQueryConfiguration config = Map(contractQuery, contract, parameters);
+
+                    return Task.FromResult(config);
+                });
+
+            configDb
+                .Setup(d => d.GetEventAggregationConfiguration(It.IsAny<long>()))
+                .Returns<long>((eventHandlerId) =>
+                {
+                    var dto = eventAggregatorConfigurations.FirstOrDefault(c => c.DecodedEventHandlerId == eventHandlerId);
+                    if (dto == null) throw new ArgumentException($"Could not find Event Aggregator Configuration for Event Handler Id: {eventHandlerId}");
+
+                    EventAggregatorConfiguration config = Map(dto);
 
                     return Task.FromResult(config);
                 });
 
             return configDb.Object;
-
         }
 
-        private static ContractQueryConfiguration CreateContractQueryConfiguration(ContractQueryDto contractQuery, ContractDto contract, IEnumerable<ContractQueryParameterDto> parameters)
+        private static EventAggregatorConfiguration Map(EventAggregatorConfigurationDto dto)
+        {
+            return new EventAggregatorConfiguration
+            {
+                Destination = dto.Destination,
+                EventParameterNumber = dto.EventParameterNumber,
+                InputName = dto.InputName,
+                Operation = dto.Operation,
+                OutputName = dto.OutputName,
+                Source = dto.Source
+            };
+        }
+
+        private static ContractQueryConfiguration Map(ContractQueryDto contractQuery, ContractDto contract, IEnumerable<ContractQueryParameterDto> parameters)
         {
             return new ContractQueryConfiguration
             {

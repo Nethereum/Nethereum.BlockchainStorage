@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using System.Collections.Generic;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
@@ -103,6 +104,18 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public string EventStateName {get;set;}
     }
 
+    public class EventAggregatorConfigurationDto: DbRow
+    {
+        public long DecodedEventHandlerId {get;set;}
+        public AggregatorSource Source {get;set;}
+        public AggregatorOperation Operation {get;set;}
+        public AggregatorDestination Destination {get;set;}
+        public int EventParameterNumber {get;set;}
+        public string InputName {get;set;}
+        public string OutputName {get;set;}
+
+    }
+
     public enum ContractAddressSource
     {
         Static, EventAddress, EventParameter, EventState
@@ -111,5 +124,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     public enum EventValueSource
     {
         Static, EventAddress, EventParameters, EventState
+    }
+
+    public enum AggregatorDestination
+    {
+        EventState, EventSubscriptionState
+    }
+
+    public enum AggregatorOperation
+    {
+        //max, latest, min??
+        Count, Sum, AddToList
+    }
+
+    public enum AggregatorSource
+    {
+        EventParameter, EventState
     }
 }
