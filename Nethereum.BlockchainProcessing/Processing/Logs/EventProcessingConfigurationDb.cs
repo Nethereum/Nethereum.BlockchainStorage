@@ -94,7 +94,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             throw new System.NotImplementedException();
         }
 
-        public Task<ContractQueryConfiguration> GetContractQueryAsync(long eventSubscriptionId)
+        public Task<ContractQueryConfiguration> GetContractQueryConfigurationAsync(long eventSubscriptionId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<EventAggregatorConfiguration> GetEventAggregationConfiguration(long eventSubscriptionId)
         {
             throw new System.NotImplementedException();
         }

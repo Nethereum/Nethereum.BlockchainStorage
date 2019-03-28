@@ -6,7 +6,6 @@ using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,41 +19,6 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         private const string BlockchainUrl = "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60";
 
         [Fact]
-        public async Task DynamicContractQuerying_NoParams_Returns_uint256()
-        {
-            var signature_totalSupply = "18160ddd";
-            var contractAddress = "0x78c1301520edff0bb14314c64987a71fa5efa407";
-            var blockchainProxyService = new BlockchainProxyService(BlockchainUrl);
-            var decoded = await blockchainProxyService.Query(contractAddress, StandardContractAbi, signature_totalSupply);
-            Assert.IsType<BigInteger>(decoded);
-
-           //  Nethereum.Util.UnitConversion.Convert.FromWei(accountTotal, UnitConversion.EthUnit.Ether)
-        }
-
-        [Fact]
-        public async Task DynamicContractQuerying_NoParams_Returns_string()
-        {
-            var signature_name = "06fdde03";
-            var contractAddress = "0x78c1301520edff0bb14314c64987a71fa5efa407";
-
-            var blockchainProxyService = new BlockchainProxyService(BlockchainUrl);
-            var decoded = await blockchainProxyService.Query(contractAddress, StandardContractAbi, signature_name);
-            Assert.Equal("JGX", decoded);  
-        }
-
-        [Fact]
-        public async Task DynamicContractQuerying_AddressParam_Returns_uint256()
-        {
-            var signature_balanceOf = "70a08231"; 
-            var contractAddress = "0x78c1301520edff0bb14314c64987a71fa5efa407";
-            var functionInput = new object[]{"0xa13210c21fbbed075ec210a71b477a81cb3da7d8"}; // _owner parameter - type: address
-
-            var blockchainProxyService = new BlockchainProxyService(BlockchainUrl);
-            var decoded = await blockchainProxyService.Query(contractAddress, StandardContractAbi, signature_balanceOf, functionInput);
-            Assert.IsType<BigInteger>(decoded);
-        }
-
-        [Fact]
         public async Task WebJobExample()
         {
             const long PartitionId = 1;
@@ -66,7 +30,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             IEventProcessingConfigurationDb configDb = CreateMockDb();
 
             var blockchainProxy = new BlockchainProxyService(new Web3.Web3(BlockchainUrl));
-            var eventHandlerFactory = new DecodedEventHandlerFactory(configDb, configDb, blockchainProxy);
+            var eventHandlerFactory = new DecodedEventHandlerFactory(blockchainProxy, configDb);
             var processorFactory = new EventProcessorFactory(configDb, eventHandlerFactory);
             var eventProcessors = await processorFactory.GetLogProcessorsAsync(PartitionId);
             var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventProcessors);
@@ -249,7 +213,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns(Task.CompletedTask);
 
             configDb
-                .Setup(d => d.GetContractQueryAsync(It.IsAny<long>()))
+                .Setup(d => d.GetContractQueryConfigurationAsync(It.IsAny<long>()))
                 .Returns<long>((eventHandlerId) =>
                 {
                     var contractQuery = contractQueries.FirstOrDefault(c => c.DecodedEventHandlerId == eventHandlerId);

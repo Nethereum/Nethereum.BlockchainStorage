@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public interface IEventProcessingConfigurationDb: IEventSubscriptionStateFactory, IEventContractQueryFactory
+    public interface IEventProcessingConfigurationDb: IEventSubscriptionStateFactory, IEventContractQueryConfigurationFactory, IEventAggregatorConfigurationFactory
     {
         Task<ContractDto> GetContractAsync(long contractId);
         Task<EventAddressDto[]> GetEventAddressesAsync(long eventSubscriptionId);

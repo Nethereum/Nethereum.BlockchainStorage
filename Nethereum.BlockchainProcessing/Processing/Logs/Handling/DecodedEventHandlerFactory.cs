@@ -6,29 +6,32 @@ using System.Threading.Tasks;
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
 
-    public interface IDecodedEventHandlerConfigurationFactory
-    {
-        Task<EventSubscriptionStateDto> GetEventSubscriptionStateAsync(long eventSubscriptionId);
-        Task SaveAsync(EventSubscriptionStateDto state);
-    }
-
     public class DecodedEventHandlerFactory: IDecodedEventHandlerFactory
     {
         Dictionary<long, EventSubscriptionStateDto> _stateDictionary = new Dictionary<long, EventSubscriptionStateDto>();
 
+        public DecodedEventHandlerFactory(IBlockchainProxyService blockchainProxy, IEventProcessingConfigurationDb configDb)
+            :this(configDb, configDb, blockchainProxy,  configDb)
+        {
+
+        }
+
         public DecodedEventHandlerFactory(
             IEventSubscriptionStateFactory stateFactory, 
-            IEventContractQueryFactory contractQueryFactory,
-            IContractQuery contractQueryHandler)
+            IEventContractQueryConfigurationFactory contractQueryFactory,
+            IContractQuery contractQueryHandler,
+            IEventAggregatorConfigurationFactory eventAggregatorConfigurationFactory)
         {
             StateFactory = stateFactory;
             ContractQueryFactory = contractQueryFactory;
             ContractQueryHandler = contractQueryHandler;
+            EventAggregatorConfigurationFactory = eventAggregatorConfigurationFactory;
         }
 
         public IEventSubscriptionStateFactory StateFactory { get; }
-        public IEventContractQueryFactory ContractQueryFactory { get; }
+        public IEventContractQueryConfigurationFactory ContractQueryFactory { get; }
         public IContractQuery ContractQueryHandler { get; }
+        public IEventAggregatorConfigurationFactory EventAggregatorConfigurationFactory { get; }
 
         public async Task<IDecodedEventHandler> CreateAsync(DecodedEventHandlerDto config)
         { 
@@ -41,9 +44,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventHandlerType.Rule:
                     return new EventRule(state);
                 case EventHandlerType.Aggregate:
-                    return new EventAggregator(state);
+                    var aggregatorConfig = await EventAggregatorConfigurationFactory.GetEventAggregationConfiguration(config.Id);
+                    return new EventAggregator(state, aggregatorConfig);
                 case EventHandlerType.ContractQuery:
-                    var queryConfig = await ContractQueryFactory.GetContractQueryAsync(config.Id);
+                    var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(config.Id);
                     return new ContractQueryEventHandler(ContractQueryHandler, state, queryConfig);
                 case EventHandlerType.Queue:
                     return new InMemoryEventQueue();
