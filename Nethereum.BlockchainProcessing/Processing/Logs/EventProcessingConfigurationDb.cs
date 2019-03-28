@@ -47,11 +47,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return Task.FromResult(subscriptions);
         }
 
-        public Task<EventAddressDto[]> GetEventAddressesAsync(long eventSubscriptionId)
+        public Task<EventSubscriptionAddressDto[]> GetEventAddressesAsync(long eventSubscriptionId)
         {
-            var eventAddressDtos = new EventAddressDto[]
+            var eventAddressDtos = new EventSubscriptionAddressDto[]
             {
-                new EventAddressDto
+                new EventSubscriptionAddressDto
                 {
                     Address = "",
                     EventSubscriptionId = eventSubscriptionId,

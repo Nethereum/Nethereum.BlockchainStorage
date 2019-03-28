@@ -43,7 +43,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public string Name {get;set;}
     }
 
-    public class EventAddressDto: DbRow
+    public class EventSubscriptionAddressDto: DbRow
     {
         public long EventSubscriptionId {get;set;}
         public string Address {get;set;}

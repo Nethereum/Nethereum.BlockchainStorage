@@ -25,9 +25,9 @@
             };
         }
         
-        public static EventAddressDto CreateEventAddress(this EventSubscriptionDto eventSubscription, int id, string address)
+        public static EventSubscriptionAddressDto CreateEventAddress(this EventSubscriptionDto eventSubscription, int id, string address)
         {
-            return new EventAddressDto
+            return new EventSubscriptionAddressDto
             {
                 Id = id,
                 Address = address,
