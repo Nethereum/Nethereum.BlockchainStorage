@@ -15,6 +15,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public List<ParameterConditionDto> ParameterConditions = new List<ParameterConditionDto>();
         public List<EventAggregatorConfigurationDto> EventAggregators = new List<EventAggregatorConfigurationDto>();
         public Dictionary<long, EventSubscriptionStateDto> EventSubscriptionStates = new Dictionary<long, EventSubscriptionStateDto>();
+        public List<SubscriberQueueConfigurationDto> SubscriberQueues = new List<SubscriberQueueConfigurationDto>();
+
+        public SubscriberQueueConfigurationDto Add(SubscriberQueueConfigurationDto dto)
+        {
+            SubscriberQueues.Add(dto);
+            return dto;
+        }
 
         public EventAggregatorConfigurationDto Add(EventAggregatorConfigurationDto dto)
         {

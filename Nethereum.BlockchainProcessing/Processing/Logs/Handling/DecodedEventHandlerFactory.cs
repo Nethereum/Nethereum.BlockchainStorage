@@ -1,6 +1,7 @@
 ﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
@@ -10,8 +11,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     {
         Dictionary<long, EventSubscriptionStateDto> _stateDictionary = new Dictionary<long, EventSubscriptionStateDto>();
 
-        public DecodedEventHandlerFactory(IBlockchainProxyService blockchainProxy, IEventProcessingConfigurationDb configDb)
-            :this(configDb, configDb, blockchainProxy,  configDb, blockchainProxy)
+        public DecodedEventHandlerFactory(IBlockchainProxyService blockchainProxy, IEventProcessingConfigurationDb configDb, ISubscriberQueueFactory subscriberQueueFactory)
+            :this(configDb, configDb, blockchainProxy,  configDb, blockchainProxy, subscriberQueueFactory)
         {
 
         }
@@ -21,13 +22,15 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IEventContractQueryConfigurationFactory contractQueryFactory,
             IContractQuery contractQueryHandler,
             IEventAggregatorConfigurationFactory eventAggregatorConfigurationFactory,
-            IGetTransactionByHash getTransactionProxy)
+            IGetTransactionByHash getTransactionProxy,
+            ISubscriberQueueFactory subscriberQueueFactory)
         {
             StateFactory = stateFactory;
             ContractQueryFactory = contractQueryFactory;
             ContractQueryHandler = contractQueryHandler;
             EventAggregatorConfigurationFactory = eventAggregatorConfigurationFactory;
             GetTransactionProxy = getTransactionProxy;
+            SubscriberQueueFactory = subscriberQueueFactory;
         }
 
         public IEventSubscriptionStateFactory StateFactory { get; }
@@ -35,6 +38,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public IContractQuery ContractQueryHandler { get; }
         public IEventAggregatorConfigurationFactory EventAggregatorConfigurationFactory { get; }
         public IGetTransactionByHash GetTransactionProxy { get; }
+        public ISubscriberQueueFactory SubscriberQueueFactory { get; }
 
         public async Task<IDecodedEventHandler> CreateAsync(DecodedEventHandlerDto config)
         { 
@@ -53,7 +57,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(config.Id);
                     return new ContractQueryEventHandler(ContractQueryHandler, state, queryConfig);
                 case EventHandlerType.Queue:
-                    return new InMemoryEventQueue();
+                    var queue = await SubscriberQueueFactory.GetSubscriberQueueAsync(config.SubscriberQueueId);
+                    return new QueueHandler(queue);
                 case EventHandlerType.GetTransaction:
                     return new GetTransactionEventHandler(GetTransactionProxy);
                 default:

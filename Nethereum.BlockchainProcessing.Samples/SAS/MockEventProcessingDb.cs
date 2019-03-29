@@ -37,6 +37,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
+            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            {
+                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                SubscriberId = nosey.Id,
+                Name = "subscriber-nosey"
+            });
+
             var catchAnyEventForAddressSubscription = repo.Add(
                 nosey.CreateEventSubscription(id.Next<EventSubscriptionDto>()));
 
@@ -84,7 +91,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Id = id.Next<DecodedEventHandlerDto>(),
                 EventSubscriptionId = catchAnyEventForAddressSubscription.Id,
                 HandlerType = EventHandlerType.Queue,
-                Order = 2
+                Order = 2,
+                SubscriberQueueId = queue.Id
             });
         }
 
@@ -96,6 +104,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Disabled = false,
                 Name = "George",
                 PartitionId = partitionId
+            });
+
+            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            {
+                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                SubscriberId = george.Id,
+                Name = "subscriber-george"
             });
 
             var standardContract = repo.Add(george.CreateContract(id.Next<ContractDto>(), "StandardContract", StandardContractAbi));
@@ -123,7 +138,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Id = id.Next<DecodedEventHandlerDto>(),
                 EventSubscriptionId = transferEventSubscription.Id,
                 HandlerType = EventHandlerType.Queue,
-                Order = 2
+                Order = 2,
+                SubscriberQueueId = queue.Id
             });
         }
 
@@ -135,6 +151,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Disabled = false,
                 Name = "Harry",
                 PartitionId = partitionId
+            });
+
+            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            {
+                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                SubscriberId = harry.Id,
+                Name = "subscriber-harry"
             });
 
             var standardContract = repo.Add(
@@ -220,7 +243,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Id = id.Next<DecodedEventHandlerDto>(),
                 EventSubscriptionId = transferSubscription.Id,
                 HandlerType = EventHandlerType.Queue,
-                Order = 4
+                Order = 4,
+                SubscriberQueueId = queue.Id
             });
         }
 
@@ -293,6 +317,15 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     EventAggregatorConfiguration config = Map(dto);
 
                     return Task.FromResult(config);
+                });
+
+            configDb
+                .Setup(d => d.GetSubscriberQueueAsync(It.IsAny<long>()))
+                .Returns<long>((subscriberQueueId) =>
+                {
+                    var dto = repo.SubscriberQueues.FirstOrDefault(q => q.Id == subscriberQueueId);
+                    if (dto == null) throw new ArgumentException($"Could not find Subscriber Queue Id: {subscriberQueueId}");
+                    return Task.FromResult(dto);
                 });
 
             return configDb.Object;

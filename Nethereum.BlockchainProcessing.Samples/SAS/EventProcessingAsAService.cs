@@ -1,13 +1,13 @@
-﻿using Moq;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
+﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
+using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
@@ -19,6 +19,16 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         [Fact]
         public async Task WebJobExample()
         {
+
+             ConfigurationUtils.SetEnvironment("development");
+
+            //use the command line to set your azure search api key
+            //e.g. dotnet user-secrets set "AzureStorageConnectionString" "<put key here>"
+            var appConfig = ConfigurationUtils
+                .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainProcessing.Samples");
+
+            var azureStorageConnectionString = appConfig["AzureStorageConnectionString"];
+
             const long PartitionId = 1;
             string JsonProgressFilePath = Path.Combine(Path.GetTempPath(), "WebJobExampleBlockProcess.json");
             if(File.Exists(JsonProgressFilePath)) File.Delete(JsonProgressFilePath);
@@ -30,7 +40,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var blockchainProxy = new BlockchainProxyService(web3);
-            var eventHandlerFactory = new DecodedEventHandlerFactory(blockchainProxy, configDb);
+            var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
+            var eventHandlerFactory = new DecodedEventHandlerFactory(blockchainProxy, configDb, subscriberQueueFactory);
             var processorFactory = new EventProcessorFactory(configDb, eventHandlerFactory);
             var eventProcessors = await processorFactory.GetLogProcessorsAsync(PartitionId);
             var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventProcessors);

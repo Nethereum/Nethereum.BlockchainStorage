@@ -33,6 +33,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long EventSubscriptionId {get;set;}
 
         public EventHandlerType HandlerType {get;set;}
+
+        public long SubscriberQueueId {get;set;}
     }
 
     public class ContractDto: DbRow
@@ -139,4 +141,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         EventParameter, EventState, TransactionHash, BlockNumber
     }
+
+    public class SubscriberQueueConfigurationDto: DbRow
+    {
+        public bool Disabled {get;set;}
+        public long SubscriberId {get;set;}
+        public string Name {get;set;}
+    }
+
 }

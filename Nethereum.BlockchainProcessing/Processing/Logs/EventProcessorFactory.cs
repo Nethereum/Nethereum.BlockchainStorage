@@ -46,6 +46,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             var addressMatcher = await CreateEventAddressMatcherAsync(eventSubscription);
             var parameterMatcher = await CreateParameterMatcherAsync(eventSubscription);
             var matcher = new EventMatcher(eventAbi, addressMatcher, parameterMatcher);
+
             EventHandler handler = await CreateEventHandler(eventSubscription);
 
             var processor = new LogProcessor(matcher, handler);
