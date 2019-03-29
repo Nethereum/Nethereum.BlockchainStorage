@@ -96,7 +96,7 @@ Solidity Contract Excerpt
         public const string ApiKeyName = "AzureSearchApiKey";
         public const string AzureSearchServiceName = "blockchainsearch";
         public const string AzureTransferIndexName = "transfer";
-        private const string BlockchainUrl = "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60";
+        private const string BlockchainUrl = TestConfiguration.BlockchainUrls.Infura.Rinkeby;
         private readonly string _azureSearchApiKey;
 
         public IndexingTransferEvents()

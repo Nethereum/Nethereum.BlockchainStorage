@@ -35,7 +35,7 @@ Solidity Contract Excerpt
         }
 
         private const string TransferIndexName = "transfer";
-        private const string BlockchainUrl = "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60";
+        private const string BlockchainUrl = TestConfiguration.BlockchainUrls.Infura.Rinkeby;
 
         public static class ConfigurationKeyNames
         {
