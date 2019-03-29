@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
     {
         public const string ApiKeyName = "AzureSearchApiKey";
         public const string AzureSearchServiceName = "blockchainsearch";
-        private const string BlockchainUrl = TestConfiguration.BlockchainUrls.Infura.Rinkeby
+        private const string BlockchainUrl = TestConfiguration.BlockchainUrls.Infura.Rinkeby;
         private readonly string _azureSearchApiKey;
 
         public const string TransferEventIndexName = "transfer-event";
