@@ -116,6 +116,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     return GetInputValueFromEventParameter(decodedEvent);
                 case AggregatorSource.EventState:
                     return GetValueFromEventState(decodedEvent, Configuration.InputName, null);
+                case AggregatorSource.TransactionHash:
+                    return decodedEvent.EventLog.Log.TransactionHash;
+                case AggregatorSource.BlockNumber:
+                    return decodedEvent.EventLog.Log.BlockNumber;
                 default:
                     return null;
             }

@@ -14,6 +14,46 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {
     public class ParameterConditionTests
     {
+        public class ParameterGreaterOrEqualTests
+        {
+            [Fact]
+            public void BigIntegers()
+            {
+                var actualValue = BigInteger.One;
+
+                EventLog<List<ParameterOutput>> eventLog = EventLogWithParameter(1, "uint256", actualValue);
+
+                var condition = new ParameterGreaterOrEqual(1, "1");
+                Assert.True(condition.IsTrue(eventLog));
+
+                condition = new ParameterGreaterOrEqual(1, "2");
+                Assert.False(condition.IsTrue(eventLog));
+
+                condition = new ParameterGreaterOrEqual(1, "0");
+                Assert.True(condition.IsTrue(eventLog));
+            }
+        }
+
+        public class ParameterLessOrEqualTests
+        {
+            [Fact]
+            public void BigIntegers()
+            {
+                var actualValue = BigInteger.One;
+
+                EventLog<List<ParameterOutput>> eventLog = EventLogWithParameter(1, "uint256", actualValue);
+
+                var condition = new ParameterLessOrEqual(1, "1");
+                Assert.True(condition.IsTrue(eventLog));
+
+                condition = new ParameterLessOrEqual(1, "2");
+                Assert.True(condition.IsTrue(eventLog));
+
+                condition = new ParameterLessOrEqual(1, "0");
+                Assert.False(condition.IsTrue(eventLog));
+            }
+        }
+
         public class ParameterEqualsTests
         {
 
@@ -84,21 +124,23 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             }
 
 
-            private static EventLog<List<ParameterOutput>> EventLogWithParameter(int parameterOrder, string type, object val)
-            {
-                var parameterValues = new List<ParameterOutput>
-                {
-                    new ParameterOutput
-                    {
-                        Parameter = new ABI.Model.Parameter(type, parameterOrder),
-                        Result = val
-                    }
-                };
 
-                var log = new FilterLog();
-                var eventLog = new EventLog<List<ParameterOutput>>(parameterValues, log);
-                return eventLog;
-            }
+        }
+
+        private static EventLog<List<ParameterOutput>> EventLogWithParameter(int parameterOrder, string type, object val)
+        {
+            var parameterValues = new List<ParameterOutput>
+            {
+                new ParameterOutput
+                {
+                    Parameter = new ABI.Model.Parameter(type, parameterOrder),
+                    Result = val
+                }
+            };
+
+            var log = new FilterLog();
+            var eventLog = new EventLog<List<ParameterOutput>>(parameterValues, log);
+            return eventLog;
         }
     }
 }

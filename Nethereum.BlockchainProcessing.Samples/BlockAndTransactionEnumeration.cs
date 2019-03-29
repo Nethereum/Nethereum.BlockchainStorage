@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task Run()
         {
-            var blockchainProxy = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transactionHandler = new SimpleTransactionHandler();
             var handlers = new HandlerContainer{ TransactionHandler = transactionHandler};
 

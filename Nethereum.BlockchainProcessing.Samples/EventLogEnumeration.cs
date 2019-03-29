@@ -80,7 +80,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task RunOnce()
         {
-            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
@@ -110,7 +110,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task RunContinually()
         {
-            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var transferEventProcessor = new TransferEventProcessor();
@@ -164,7 +164,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task Filtering_By_Many_Values()
         {
-            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
@@ -231,7 +231,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task TargetSpecificEventAndIndexedValueForAnyContract()
         {
-            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
@@ -272,7 +272,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task UsingFilterInputBuilder()
         {
-            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
 
@@ -301,7 +301,7 @@ Other contracts may have transfer events with different signatures, this won't w
         [Fact]
         public async Task TargetSpecificEventForSpecificContracts()
         {
-            var blockchainProxyService = new BlockchainProxyService("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};

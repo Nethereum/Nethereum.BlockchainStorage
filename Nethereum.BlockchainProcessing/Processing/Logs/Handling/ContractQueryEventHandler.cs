@@ -102,6 +102,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     return GetAddressFromEventParameter(decodedEvent);
                 case ContractAddressSource.EventState:
                     return GetAddressFromEventMetaData(decodedEvent);
+                case ContractAddressSource.TransactionFrom:
+                    return decodedEvent.Transaction?.From;
+                case ContractAddressSource.TransactionTo:
+                    return decodedEvent.Transaction?.To;
                 default:
                     return null;
 

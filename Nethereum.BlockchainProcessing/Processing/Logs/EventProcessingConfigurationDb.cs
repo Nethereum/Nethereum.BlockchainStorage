@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 {
                     PartitionId = partitionId,
                     Id = 0,
-                    OrganisationName = ""
+                    Name = ""
                 }
             };
 

@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             {
                 "rinkeby",
                 new BlockchainSourceConfiguration(
-                    blockchainUrl: "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60", 
+                    blockchainUrl: "https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c", 
                     name: "rinkeby"){MinimumBlockNumber = 2830143}
             }
         };

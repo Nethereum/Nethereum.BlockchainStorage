@@ -10,6 +10,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public Dictionary<string, object> State {get;set;} = new Dictionary<string, object>();
         public EventLog<List<ParameterOutput>> EventLog { get; set; }
 
+        public Transaction Transaction {get;set;}
+
         public static DecodedEvent Empty()
         {
             return new DecodedEvent{EventLog = new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), new FilterLog())};

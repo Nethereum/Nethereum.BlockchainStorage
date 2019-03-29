@@ -70,6 +70,32 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             await ExecuteAndVerify(CONTRACT_TO_QUERY);
         }
 
+        [Fact]
+        public async Task CanBeTransactionFromAddress()
+        {
+            const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
+            const string STATE_VARIABLE_NAME = "ContractAddressToQuery";
+
+            queryConfig.ContractAddressSource = ContractAddressSource.TransactionFrom;
+            queryConfig.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
+            decodedEvent.Transaction = new RPC.Eth.DTOs.Transaction{From = CONTRACT_TO_QUERY };
+        
+            await ExecuteAndVerify(CONTRACT_TO_QUERY);
+        }
+
+        [Fact]
+        public async Task CanBeTransactionToAddress()
+        {
+            const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
+            const string STATE_VARIABLE_NAME = "ContractAddressToQuery";
+
+            queryConfig.ContractAddressSource = ContractAddressSource.TransactionTo;
+            queryConfig.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
+            decodedEvent.Transaction = new RPC.Eth.DTOs.Transaction{To = CONTRACT_TO_QUERY };
+        
+            await ExecuteAndVerify(CONTRACT_TO_QUERY);
+        }
+
         private async Task ExecuteAndVerify(string CONTRACT_TO_QUERY)
         {
             Assert.True(await contractQueryEventHandler.HandleAsync(decodedEvent));

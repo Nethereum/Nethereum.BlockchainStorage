@@ -1,0 +1,39 @@
+https://mermaidjs.github.io/mermaid-live-editor
+
+sequenceDiagram
+participant B as Blockchain Proxy
+participant P as Blockchain Log Processor
+participant L as Log Processor
+participant M as Event Matcher
+participant H as Event Handler
+Note over B: (web3 abstraction)
+Note over P: AKA Service For
+Note over P: Logs in Block Range
+P -> L: Has many log processors
+L -> M: Each processor has 1 matcher
+L -> H: Each processor has many handlers
+P ->> B: Get All Logs For Block Range
+B -->> P: Return logs
+loop For Each Log
+loop For Each Processor
+P ->> L: Is Log For Event
+L ->> M: Is Match?
+Note over L,M: address / event sig / event val
+M -->> L: Return Match Result
+L -->> P: Return Matching Result
+alt Is Match
+ P -> P: Add to Batch
+end
+end
+end
+loop over Each Processor
+P ->> L: Process Batch
+loop For Each Log
+loop For Each Handler
+        L ->> H: Invoke handler chain
+        activate H
+        Note over L,H: Aggregate / Query / Queue / Notify etc
+end
+end
+end
+

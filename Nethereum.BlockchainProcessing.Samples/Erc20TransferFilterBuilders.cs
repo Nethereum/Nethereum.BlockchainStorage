@@ -136,7 +136,7 @@ namespace Nethereum.BlockchainProcessing.Samples
 
         private static async Task Verify(RPC.Eth.DTOs.NewFilterInput filter, List<(string, int)> expectedLogs)
         {
-            var proxy = new Web3.Web3("https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60");
+            var proxy = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var logs = await proxy.Eth.Filters.GetLogs.SendRequestAsync(filter);
 
             Assert.NotEmpty(logs);

@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         Dictionary<long, EventSubscriptionStateDto> _stateDictionary = new Dictionary<long, EventSubscriptionStateDto>();
 
         public DecodedEventHandlerFactory(IBlockchainProxyService blockchainProxy, IEventProcessingConfigurationDb configDb)
-            :this(configDb, configDb, blockchainProxy,  configDb)
+            :this(configDb, configDb, blockchainProxy,  configDb, blockchainProxy)
         {
 
         }
@@ -20,18 +20,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IEventSubscriptionStateFactory stateFactory, 
             IEventContractQueryConfigurationFactory contractQueryFactory,
             IContractQuery contractQueryHandler,
-            IEventAggregatorConfigurationFactory eventAggregatorConfigurationFactory)
+            IEventAggregatorConfigurationFactory eventAggregatorConfigurationFactory,
+            IGetTransactionByHash getTransactionProxy)
         {
             StateFactory = stateFactory;
             ContractQueryFactory = contractQueryFactory;
             ContractQueryHandler = contractQueryHandler;
             EventAggregatorConfigurationFactory = eventAggregatorConfigurationFactory;
+            GetTransactionProxy = getTransactionProxy;
         }
 
         public IEventSubscriptionStateFactory StateFactory { get; }
         public IEventContractQueryConfigurationFactory ContractQueryFactory { get; }
         public IContractQuery ContractQueryHandler { get; }
         public IEventAggregatorConfigurationFactory EventAggregatorConfigurationFactory { get; }
+        public IGetTransactionByHash GetTransactionProxy { get; }
 
         public async Task<IDecodedEventHandler> CreateAsync(DecodedEventHandlerDto config)
         { 
@@ -51,6 +54,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     return new ContractQueryEventHandler(ContractQueryHandler, state, queryConfig);
                 case EventHandlerType.Queue:
                     return new InMemoryEventQueue();
+                case EventHandlerType.GetTransaction:
+                    return new GetTransactionEventHandler(GetTransactionProxy);
                 default:
                     throw new ArgumentException("unsupported handler type");
             }

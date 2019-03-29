@@ -3,10 +3,12 @@ using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using Nethereum.Hex.HexTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -14,9 +16,6 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
     public class EventProcessingAsAService
     {
-
-        private const string BlockchainUrl = "https://rinkeby.infura.io/v3/25e7b6dfc51040b3bfc0e47317d38f60";
-
         [Fact]
         public async Task WebJobExample()
         {
@@ -26,9 +25,11 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             const ulong MinimumBlockNumber = 4063361;
             const uint MaxBlocksPerBatch = 10;
 
-            IEventProcessingConfigurationDb configDb = MockEventProcessingDb.CreateMockDb();
+            var repo = new MockEventProcessingRepository();
+            IEventProcessingConfigurationDb configDb = MockEventProcessingDb.Create(repo);
 
-            var blockchainProxy = new BlockchainProxyService(new Web3.Web3(BlockchainUrl));
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var blockchainProxy = new BlockchainProxyService(web3);
             var eventHandlerFactory = new DecodedEventHandlerFactory(blockchainProxy, configDb);
             var processorFactory = new EventProcessorFactory(configDb, eventHandlerFactory);
             var eventProcessors = await processorFactory.GetLogProcessorsAsync(PartitionId);
@@ -44,6 +45,21 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             Assert.NotNull(rangeProcessed);
             Assert.Equal((ulong)11, rangeProcessed.Value.BlockCount);
+
+            var subscriptionState1 = repo.EventSubscriptionStates[1]; // interested in transfers with contract queries and aggregations
+            var subscriptionState2 = repo.EventSubscriptionStates[2]; // interested in transfers with simple aggregation
+            var subscriptionState3 = repo.EventSubscriptionStates[3]; // interested in any event for a specific address
+
+            Assert.Equal("4009000000002040652615", subscriptionState1.Values["RunningTotalForTransferValue"].ToString());
+            Assert.Equal((uint)19, subscriptionState2.Values["CurrentTransferCount"]);
+
+            var txForSpecificAddress = (List<string>)subscriptionState3.Values["AllTransactionHashes"];
+            Assert.Equal("0x362bcbc78a5cc6156e8d24d95bee6b8f53d7821083940434d2191feba477ae0e", txForSpecificAddress[0]);
+            Assert.Equal("0xe63e9422dedf84d0ce13f9f75ebfd86333ce917b2572925fbdd51b51caf89b77", txForSpecificAddress[1]);
+
+            var blockNumbersForSpecificAddress = (List<HexBigInteger>)subscriptionState3.Values["AllBlockNumbers"];
+            Assert.Equal((BigInteger)4063362, blockNumbersForSpecificAddress[0].Value);
+            Assert.Equal((BigInteger)4063362, blockNumbersForSpecificAddress[1].Value);
         }
 
 

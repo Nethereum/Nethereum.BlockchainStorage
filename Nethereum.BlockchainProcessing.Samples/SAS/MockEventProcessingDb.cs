@@ -8,117 +8,93 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
-    public class MockEventProcessingDb
+    public partial class MockEventProcessingDb
     {
         private static readonly string StandardContractAbi = "[{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'','type':'address'}],'name':'balances','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'','type':'address'},{'name':'','type':'address'}],'name':'allowed','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'remaining','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'inputs':[{'name':'_initialAmount','type':'uint256'},{'name':'_tokenName','type':'string'},{'name':'_decimalUnits','type':'uint8'},{'name':'_tokenSymbol','type':'string'}],'payable':false,'stateMutability':'nonpayable','type':'constructor'},{'anonymous':false,'inputs':[{'indexed':true,'name':'_from','type':'address'},{'indexed':true,'name':'_to','type':'address'},{'indexed':false,'name':'_value','type':'uint256'}],'name':'Transfer','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'_owner','type':'address'},{'indexed':true,'name':'_spender','type':'address'},{'indexed':false,'name':'_value','type':'uint256'}],'name':'Approval','type':'event'}]";
         private static readonly string TransferEventSignature = "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
-        public class MockDbDataRepository
+        public static IEventProcessingConfigurationDb Create(MockEventProcessingRepository repo)
         {
-            public List<SubscriberDto> Subscribers = new List<SubscriberDto>();
-            public List<ContractDto> Contracts = new List<ContractDto>();
-            public List<EventSubscriptionDto> EventSubscriptions = new List<EventSubscriptionDto>();
-            public List<EventSubscriptionAddressDto> EventAddresses = new List<EventSubscriptionAddressDto>();
-            public List<DecodedEventHandlerDto> DecodedEventHandlers = new List<DecodedEventHandlerDto>();
-            public List<ContractQueryDto> ContractQueries = new List<ContractQueryDto>();
-            public List<ContractQueryParameterDto> ContractQueryParameters = new List<ContractQueryParameterDto>();
-            public List<ParameterConditionDto> ParameterConditions = new List<ParameterConditionDto>();
-            public List<EventAggregatorConfigurationDto> EventAggregators = new List<EventAggregatorConfigurationDto>();
-            public Dictionary<long, EventSubscriptionStateDto> EventSubscriptionStates = new Dictionary<long, EventSubscriptionStateDto>();
-
-            public EventAggregatorConfigurationDto Add(EventAggregatorConfigurationDto dto)
-            {
-                EventAggregators.Add(dto);
-                return dto;
-            }
-
-            public DecodedEventHandlerDto Add(DecodedEventHandlerDto dto)
-            {
-                DecodedEventHandlers.Add(dto);
-                return dto;
-            }
-
-            public SubscriberDto Add(SubscriberDto dto)
-            {
-                Subscribers.Add(dto);
-                return dto;
-            }
-
-            public EventSubscriptionDto Add(EventSubscriptionDto dto)
-            {
-                EventSubscriptions.Add(dto);
-                return dto;
-            }
-
-            public ContractDto Add(ContractDto dto)
-            {
-                Contracts.Add(dto);
-                return dto;
-            }
-
-            public ContractQueryDto Add(ContractQueryDto dto)
-            {
-                ContractQueries.Add(dto);
-                return dto;
-            }
-
-            public ContractQueryParameterDto Add(ContractQueryParameterDto dto)
-            {
-                ContractQueryParameters.Add(dto);
-                return dto;
-            }
-        }
-
-        public static IEventProcessingConfigurationDb CreateMockDb()
-        {
-            var repo = new MockDbDataRepository();
-
-            const long Partition1 = 1;
+            const long PartitionId = 1;
             var idGenerator = new IdGenerator();
 
-            AddHarry(Partition1, idGenerator, repo);
-            AddGeorge(Partition1, idGenerator, repo);
-            AddNosey(Partition1, idGenerator, repo);
+            AddHarry(PartitionId, idGenerator, repo);
+            AddGeorge(PartitionId, idGenerator, repo);
+            AddNosey(PartitionId, idGenerator, repo);
 
             var db = MockAllQueries(repo);
       
             return db;
         }
 
-        public static void AddNosey(long partitionId, IdGenerator id, MockDbDataRepository repo)
+        public static void AddNosey(long partitionId, IdGenerator id, MockEventProcessingRepository repo)
         { 
             var nosey = repo.Add(new SubscriberDto
             {
                 Id = id.Next<SubscriberDto>(),
                 Disabled = false,
-                OrganisationName = "Nosey",
+                Name = "Nosey",
                 PartitionId = partitionId
             });
 
             var catchAnyEventForAddressSubscription = repo.Add(
                 nosey.CreateEventSubscription(id.Next<EventSubscriptionDto>()));
 
-            repo.EventAddresses.Add(new EventSubscriptionAddressDto { 
+            repo.Add(new EventSubscriptionAddressDto { 
                 Id = id.Next<EventSubscriptionAddressDto>(), 
                 EventSubscriptionId = catchAnyEventForAddressSubscription.Id, 
                 Address = "0x924442a66cfd812308791872c4b242440c108e19" });
+
+            var txHashTracker = repo.Add(new DecodedEventHandlerDto
+            {
+                Id = id.Next<DecodedEventHandlerDto>(),
+                EventSubscriptionId = catchAnyEventForAddressSubscription.Id,
+                HandlerType = EventHandlerType.Aggregate,
+                Order = 1
+            });
+
+            repo.Add(new EventAggregatorConfigurationDto
+            {
+                DecodedEventHandlerId = txHashTracker.Id,
+                Source = AggregatorSource.TransactionHash,
+                Destination = AggregatorDestination.EventSubscriptionState,
+                OutputName = "AllTransactionHashes",
+                Operation = AggregatorOperation.AddToList
+            });
+
+            var blockTracker = repo.Add(new DecodedEventHandlerDto
+            {
+                Id = id.Next<DecodedEventHandlerDto>(),
+                EventSubscriptionId = catchAnyEventForAddressSubscription.Id,
+                HandlerType = EventHandlerType.Aggregate,
+                Order = 2
+            });
+
+            repo.Add(new EventAggregatorConfigurationDto
+            {
+                DecodedEventHandlerId = blockTracker.Id,
+                Source = AggregatorSource.BlockNumber,
+                Destination = AggregatorDestination.EventSubscriptionState,
+                OutputName = "AllBlockNumbers",
+                Operation = AggregatorOperation.AddToList
+            });
 
             repo.Add(new DecodedEventHandlerDto
             {
                 Id = id.Next<DecodedEventHandlerDto>(),
                 EventSubscriptionId = catchAnyEventForAddressSubscription.Id,
                 HandlerType = EventHandlerType.Queue,
-                Order = 1
+                Order = 2
             });
         }
 
-        public static void AddGeorge(long partitionId, IdGenerator id, MockDbDataRepository repo)
+        public static void AddGeorge(long partitionId, IdGenerator id, MockEventProcessingRepository repo)
         { 
             var george = repo.Add(new SubscriberDto
             {
                 Id = id.Next<SubscriberDto>(),
                 Disabled = false,
-                OrganisationName = "George",
+                Name = "George",
                 PartitionId = partitionId
             });
 
@@ -151,13 +127,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             });
         }
 
-        public static void AddHarry(long partitionId, IdGenerator id, MockDbDataRepository repo)
+        public static void AddHarry(long partitionId, IdGenerator id, MockEventProcessingRepository repo)
         { 
             var harry = repo.Add(new SubscriberDto
             {
                 Id = id.Next<SubscriberDto>(),
                 Disabled = false,
-                OrganisationName = "Harry",
+                Name = "Harry",
                 PartitionId = partitionId
             });
 
@@ -166,6 +142,14 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             var transferSubscription = repo.Add(
                 harry.CreateEventSubscription(id.Next<EventSubscriptionDto>(), standardContract.Id, TransferEventSignature));
+
+            var getTransactionHandler = repo.Add(new DecodedEventHandlerDto
+            {
+                Id = id.Next<DecodedEventHandlerDto>(),
+                EventSubscriptionId = transferSubscription.Id,
+                HandlerType = EventHandlerType.GetTransaction,
+                Order = 0
+            });
 
             var transferValueRunningTotalHandler = repo.Add(new DecodedEventHandlerDto
             {
@@ -240,7 +224,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             });
         }
 
-        private static IEventProcessingConfigurationDb MockAllQueries(MockDbDataRepository repo)
+        private static IEventProcessingConfigurationDb MockAllQueries(MockEventProcessingRepository repo)
         {
             Mock<IEventProcessingConfigurationDb> configDb = new Mock<IEventProcessingConfigurationDb>();
 
@@ -258,7 +242,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             configDb
                 .Setup(d => d.GetEventAddressesAsync(It.IsAny<long>()))
-                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.EventAddresses.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
+                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.EventSubscriptionAddresses.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
 
             configDb
                 .Setup(d => d.GetParameterConditionsAsync(It.IsAny<long>()))

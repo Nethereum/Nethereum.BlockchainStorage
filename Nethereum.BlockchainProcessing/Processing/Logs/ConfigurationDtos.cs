@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public bool Disabled {get;set;}
         public long PartitionId {get;set;}
-        public string OrganisationName {get;set;}
+        public string Name {get;set;}
     }
 
     public class EventSubscriptionDto: DbRow
@@ -32,8 +32,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public bool Disabled {get;set;}
         public long EventSubscriptionId {get;set;}
 
-        // see EventHandlerType
-        public string HandlerType {get;set;}
+        public EventHandlerType HandlerType {get;set;}
     }
 
     public class ContractDto: DbRow
@@ -113,12 +112,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public int EventParameterNumber {get;set;}
         public string InputName {get;set;}
         public string OutputName {get;set;}
-
     }
 
     public enum ContractAddressSource
     {
-        Static, EventAddress, EventParameter, EventState
+        Static, EventAddress, EventParameter, EventState, TransactionFrom, TransactionTo
     }
 
     public enum EventValueSource
@@ -139,6 +137,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     public enum AggregatorSource
     {
-        EventParameter, EventState
+        EventParameter, EventState, TransactionHash, BlockNumber
     }
 }
