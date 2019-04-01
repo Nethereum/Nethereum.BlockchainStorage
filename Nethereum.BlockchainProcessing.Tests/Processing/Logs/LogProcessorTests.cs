@@ -15,25 +15,25 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
     {
         private readonly Mock<IEventMatcher> _matcher = new Mock<IEventMatcher>();
         private readonly Mock<IEventHandler> _handler = new Mock<IEventHandler>();
-        private readonly LogProcessor _processor;
+        private readonly EventSubscription _processor;
         private readonly EventABI _eventAbi = new EventABI("test");
 
         public LogProcessorTests()
         {
             _matcher.Setup(m => m.Abi).Returns(_eventAbi);
-            _processor = new LogProcessor(_matcher.Object, _handler.Object);
+            _processor = new EventSubscription(_matcher.Object, _handler.Object);
         }
 
         [Fact]
         public void MatcherCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new LogProcessor(null, _handler.Object));
+            Assert.Throws<ArgumentNullException>(() => new EventSubscription(null, _handler.Object));
         }
 
         [Fact]
         public void HandlerCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new LogProcessor(_matcher.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new EventSubscription(_matcher.Object, null));
         }
 
         [Theory]

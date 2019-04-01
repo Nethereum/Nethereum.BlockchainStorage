@@ -9,13 +9,25 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public List<ContractDto> Contracts = new List<ContractDto>();
         public List<EventSubscriptionDto> EventSubscriptions = new List<EventSubscriptionDto>();
         public List<EventSubscriptionAddressDto> EventSubscriptionAddresses = new List<EventSubscriptionAddressDto>();
-        public List<DecodedEventHandlerDto> DecodedEventHandlers = new List<DecodedEventHandlerDto>();
+        public List<EventHandlerDto> DecodedEventHandlers = new List<EventHandlerDto>();
         public List<ContractQueryDto> ContractQueries = new List<ContractQueryDto>();
         public List<ContractQueryParameterDto> ContractQueryParameters = new List<ContractQueryParameterDto>();
         public List<ParameterConditionDto> ParameterConditions = new List<ParameterConditionDto>();
         public List<EventAggregatorConfigurationDto> EventAggregators = new List<EventAggregatorConfigurationDto>();
         public Dictionary<long, EventSubscriptionStateDto> EventSubscriptionStates = new Dictionary<long, EventSubscriptionStateDto>();
         public List<SubscriberQueueConfigurationDto> SubscriberQueues = new List<SubscriberQueueConfigurationDto>();
+        public List<SubscriberSearchIndexConfigurationDto> SubscriberSearchIndexes = new List<SubscriberSearchIndexConfigurationDto>();
+
+        public EventSubscriptionStateDto GetEventSubscriptionState(long eventSubscriptionId)
+        {
+            return EventSubscriptionStates[eventSubscriptionId];
+        }
+
+        public SubscriberSearchIndexConfigurationDto Add(SubscriberSearchIndexConfigurationDto dto)
+        {
+            SubscriberSearchIndexes.Add(dto);
+            return dto;
+        }
 
         public SubscriberQueueConfigurationDto Add(SubscriberQueueConfigurationDto dto)
         {
@@ -29,7 +41,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             return dto;
         }
 
-        public DecodedEventHandlerDto Add(DecodedEventHandlerDto dto)
+        public EventHandlerDto Add(EventHandlerDto dto)
         {
             DecodedEventHandlers.Add(dto);
             return dto;

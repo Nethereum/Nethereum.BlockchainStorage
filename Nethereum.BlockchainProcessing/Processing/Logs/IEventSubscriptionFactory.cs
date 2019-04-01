@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public interface ILogProcessorFactory
+    public interface IEventSubscriptionFactory
     {
-        Task<List<ILogProcessor>> GetLogProcessorsAsync(long partitionId);
+        Task<List<IEventSubscription>> LoadAsync(long partitionId);
     }
 }

@@ -8,39 +8,39 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class EventProcessorFactory : ILogProcessorFactory
+    public class EventSubscriptionFactory : IEventSubscriptionFactory
     {
         private readonly ABIDeserialiser _abiDeserializer = new ABIDeserialiser();
         IEventProcessingConfigurationDb _db;
         private readonly IDecodedEventHandlerFactory _decodedEventHandlerFactory;
 
-        public EventProcessorFactory(IEventProcessingConfigurationDb db, IDecodedEventHandlerFactory decodedEventHandlerFactory)
+        public EventSubscriptionFactory(IEventProcessingConfigurationDb db, IDecodedEventHandlerFactory decodedEventHandlerFactory)
         {
             _db = db;
             _decodedEventHandlerFactory = decodedEventHandlerFactory;
         }
 
-        public async Task<List<ILogProcessor>> GetLogProcessorsAsync(long partitionId)
+        public async Task<List<IEventSubscription>> LoadAsync(long partitionId)
         {
-            var subscribers = await _db.GetSubscribersAsync(partitionId);
+            var subscriberConfigurations = await _db.GetSubscribersAsync(partitionId);
 
-            var processors = new List<ILogProcessor>(subscribers.Length);
+            var processors = new List<IEventSubscription>(subscriberConfigurations.Length);
 
-            foreach (var subscriber in subscribers)
+            foreach (var subscriberConfiguration in subscriberConfigurations)
             {
-                var eventSubscriptions = await _db.GetEventSubscriptionsAsync(subscriber.Id);
+                var eventSubscriptionConfigurations = await _db.GetEventSubscriptionsAsync(subscriberConfiguration.Id);
 
-                foreach (var eventSubscription in eventSubscriptions)
+                foreach (var eventSubscriptionConfig in eventSubscriptionConfigurations)
                 {
-                    var processor = await CreateLogProcessorAsync(eventSubscription);
-                    processors.Add(processor);
+                    var eventSubscription = await LoadEventSubscriptionsAsync(eventSubscriptionConfig);
+                    processors.Add(eventSubscription);
                 }
             }
 
             return processors;
         }
 
-        private async Task<LogProcessor> CreateLogProcessorAsync(EventSubscriptionDto eventSubscription)
+        private async Task<EventSubscription> LoadEventSubscriptionsAsync(EventSubscriptionDto eventSubscription)
         {
             var eventAbi = await GetEventAbiAsync(eventSubscription);
             var addressMatcher = await CreateEventAddressMatcherAsync(eventSubscription);
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
             EventHandler handler = await CreateEventHandler(eventSubscription);
 
-            var processor = new LogProcessor(matcher, handler);
+            var processor = new EventSubscription(eventSubscription.Id, eventSubscription.SubscriberId, matcher, handler);
             return processor;
         }
 

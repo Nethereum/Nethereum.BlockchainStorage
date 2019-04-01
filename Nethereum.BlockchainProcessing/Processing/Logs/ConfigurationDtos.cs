@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     }
 
-    public class DecodedEventHandlerDto : DbRow
+    public class EventHandlerDto : DbRow
     {
         public int Order {get;set;}
         public bool Disabled {get;set;}
@@ -35,6 +35,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public EventHandlerType HandlerType {get;set;}
 
         public long SubscriberQueueId {get;set;}
+
+        public long SubscriberSearchIndexId {get;set;}
     }
 
     public class ContractDto: DbRow
@@ -143,6 +145,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     }
 
     public class SubscriberQueueConfigurationDto: DbRow
+    {
+        public bool Disabled {get;set;}
+        public long SubscriberId {get;set;}
+        public string Name {get;set;}
+    }
+
+    public class SubscriberSearchIndexConfigurationDto: DbRow
     {
         public bool Disabled {get;set;}
         public long SubscriberId {get;set;}

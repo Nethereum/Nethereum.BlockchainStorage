@@ -2,6 +2,6 @@
 {
     public enum EventHandlerType
     {
-        Rule, Aggregate, Queue, ContractQuery, GetTransaction
+        Rule, Aggregate, Queue, ContractQuery, GetTransaction, Index
     }
 }

@@ -4,6 +4,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public interface IEventAggregatorConfigurationFactory
     {
-        Task<EventAggregatorConfiguration> GetEventAggregationConfiguration(long eventSubscriptionId);
+        Task<EventAggregatorConfiguration> GetEventAggregationConfigurationAsync(long eventSubscriptionId);
     }
 }

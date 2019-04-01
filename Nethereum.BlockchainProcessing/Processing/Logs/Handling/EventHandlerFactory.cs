@@ -7,23 +7,34 @@ using System.Threading.Tasks;
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
 
-    public class DecodedEventHandlerFactory: IDecodedEventHandlerFactory
+    public class EventHandlerFactory: IDecodedEventHandlerFactory
     {
         Dictionary<long, EventSubscriptionStateDto> _stateDictionary = new Dictionary<long, EventSubscriptionStateDto>();
 
-        public DecodedEventHandlerFactory(IBlockchainProxyService blockchainProxy, IEventProcessingConfigurationDb configDb, ISubscriberQueueFactory subscriberQueueFactory)
-            :this(configDb, configDb, blockchainProxy,  configDb, blockchainProxy, subscriberQueueFactory)
+        public EventHandlerFactory(
+            IBlockchainProxyService blockchainProxy, 
+            IEventProcessingConfigurationDb configDb, 
+            ISubscriberQueueFactory subscriberQueueFactory,
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory)
+            :this(
+                 configDb, 
+                 configDb, 
+                 blockchainProxy,  
+                 configDb, 
+                 blockchainProxy, 
+                 subscriberQueueFactory,
+                 subscriberSearchIndexFactory)
         {
-
         }
 
-        public DecodedEventHandlerFactory(
+        public EventHandlerFactory(
             IEventSubscriptionStateFactory stateFactory, 
             IEventContractQueryConfigurationFactory contractQueryFactory,
             IContractQuery contractQueryHandler,
             IEventAggregatorConfigurationFactory eventAggregatorConfigurationFactory,
             IGetTransactionByHash getTransactionProxy,
-            ISubscriberQueueFactory subscriberQueueFactory)
+            ISubscriberQueueFactory subscriberQueueFactory,
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory)
         {
             StateFactory = stateFactory;
             ContractQueryFactory = contractQueryFactory;
@@ -31,6 +42,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             EventAggregatorConfigurationFactory = eventAggregatorConfigurationFactory;
             GetTransactionProxy = getTransactionProxy;
             SubscriberQueueFactory = subscriberQueueFactory;
+            SubscriberSearchIndexFactory = subscriberSearchIndexFactory;
         }
 
         public IEventSubscriptionStateFactory StateFactory { get; }
@@ -39,8 +51,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public IEventAggregatorConfigurationFactory EventAggregatorConfigurationFactory { get; }
         public IGetTransactionByHash GetTransactionProxy { get; }
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
+        public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
 
-        public async Task<IDecodedEventHandler> CreateAsync(DecodedEventHandlerDto config)
+        public async Task<IDecodedEventHandler> CreateAsync(EventHandlerDto config)
         { 
             var state = await StateFactory.GetEventSubscriptionStateAsync(config.EventSubscriptionId);
 
@@ -51,7 +64,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventHandlerType.Rule:
                     return new EventRule(state);
                 case EventHandlerType.Aggregate:
-                    var aggregatorConfig = await EventAggregatorConfigurationFactory.GetEventAggregationConfiguration(config.Id);
+                    var aggregatorConfig = await EventAggregatorConfigurationFactory.GetEventAggregationConfigurationAsync(config.Id);
                     return new EventAggregator(state, aggregatorConfig);
                 case EventHandlerType.ContractQuery:
                     var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(config.Id);
@@ -61,6 +74,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     return new QueueHandler(queue);
                 case EventHandlerType.GetTransaction:
                     return new GetTransactionEventHandler(GetTransactionProxy);
+                case EventHandlerType.Index:
+                    var searchIndex = await SubscriberSearchIndexFactory.GetSubscriberSearchIndexAsync(config.SubscriberSearchIndexId);
+                    return new SearchIndexHandler(searchIndex);
                 default:
                     throw new ArgumentException("unsupported handler type");
             }

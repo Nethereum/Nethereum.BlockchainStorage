@@ -6,20 +6,26 @@ using System.Threading.Tasks;
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     /// <summary>
-    /// a dynamically loaded processor
+    /// a dynamically loaded subscription
     /// Designed to be instantiated from DB configuration data
     /// </summary>
 
-    public class LogProcessor : ILogProcessor
+    public class EventSubscription : IEventSubscription
     {
         private readonly IEventMatcher _matcher;
         private readonly IEventHandler _handler;
 
-        public LogProcessor(IEventMatcher matcher, IEventHandler handler)
+        public EventSubscription(long id, long subscriberId, IEventMatcher matcher, IEventHandler handler)
         {
+            Id = id;
+            SubscriberId = subscriberId;
             _matcher = matcher ?? throw new System.ArgumentNullException(nameof(matcher));
             _handler = handler ?? throw new System.ArgumentNullException(nameof(handler));
         }
+
+        public long SubscriberId {get; }
+
+        public long Id {get; }
 
         public bool IsLogForEvent(FilterLog log)
         {
