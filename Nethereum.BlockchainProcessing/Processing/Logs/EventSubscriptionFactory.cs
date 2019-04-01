@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     public class EventSubscriptionFactory : IEventSubscriptionFactory
     {
         private readonly ABIDeserialiser _abiDeserializer = new ABIDeserialiser();
-        IEventProcessingConfigurationDb _db;
+        private readonly IEventProcessingConfigurationDb _db;
         private readonly IEventHandlerFactory _decodedEventHandlerFactory;
 
         public EventSubscriptionFactory(IEventProcessingConfigurationDb db, IEventHandlerFactory decodedEventHandlerFactory)
