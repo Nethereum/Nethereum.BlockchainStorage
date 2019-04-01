@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            await SubscriberQueue.AddMessage(decodedEvent);
+            await SubscriberQueue.AddMessageAsync(decodedEvent);
             return true;
         }
     }

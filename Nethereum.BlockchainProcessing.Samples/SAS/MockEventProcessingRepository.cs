@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
     public class MockEventProcessingRepository
     {
         public List<SubscriberDto> Subscribers = new List<SubscriberDto>();
-        public List<ContractDto> Contracts = new List<ContractDto>();
+        public List<SubscriberContractDto> Contracts = new List<SubscriberContractDto>();
         public List<EventSubscriptionDto> EventSubscriptions = new List<EventSubscriptionDto>();
         public List<EventSubscriptionAddressDto> EventSubscriptionAddresses = new List<EventSubscriptionAddressDto>();
         public List<EventHandlerDto> DecodedEventHandlers = new List<EventHandlerDto>();
@@ -59,7 +59,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             return dto;
         }
 
-        public ContractDto Add(ContractDto dto)
+        public SubscriberContractDto Add(SubscriberContractDto dto)
         {
             Contracts.Add(dto);
             return dto;

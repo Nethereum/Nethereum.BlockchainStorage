@@ -3,6 +3,7 @@ using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
@@ -38,8 +39,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // load subscribers and event subscriptions
             var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
+            var eventMatcherFactory = new EventMatcherFactory(configDb);
             var eventHandlerFactory = new EventHandlerFactory(blockchainProxy, configDb, subscriberQueueFactory, subscriberSearchIndexFactory);
-            var eventSubscriptionFactory = new EventSubscriptionFactory(configDb, eventHandlerFactory);
+            var eventSubscriptionFactory = new EventSubscriptionFactory(configDb, eventMatcherFactory, eventHandlerFactory);
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PartitionId);
 
             // load service

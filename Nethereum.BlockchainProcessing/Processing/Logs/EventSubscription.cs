@@ -12,29 +12,30 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     public class EventSubscription : IEventSubscription
     {
-        private readonly IEventMatcher _matcher;
-        private readonly IEventHandlerCoordinator _handler;
-
         public EventSubscription(long id, long subscriberId, IEventMatcher matcher, IEventHandlerCoordinator handler)
         {
             Id = id;
             SubscriberId = subscriberId;
-            _matcher = matcher ?? throw new System.ArgumentNullException(nameof(matcher));
-            _handler = handler ?? throw new System.ArgumentNullException(nameof(handler));
+            Matcher = matcher ?? throw new System.ArgumentNullException(nameof(matcher));
+            Handler = handler ?? throw new System.ArgumentNullException(nameof(handler));
         }
 
         public long SubscriberId {get; }
 
         public long Id {get; }
 
+        public IEventHandlerCoordinator Handler { get; }
+
+        public IEventMatcher Matcher { get; }
+
         public bool IsLogForEvent(FilterLog log)
         {
-            return _matcher.IsMatch(log);
+            return Matcher.IsMatch(log);
         }
 
         public Task ProcessLogsAsync(params FilterLog[] eventLogs)
         {
-            return _handler.HandleAsync(_matcher.Abi, eventLogs);
+            return Handler.HandleAsync(Matcher.Abi, eventLogs);
         }
     }
 }

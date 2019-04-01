@@ -39,7 +39,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long SubscriberSearchIndexId {get;set;}
     }
 
-    public class ContractDto: DbRow
+    public class SubscriberContractDto: DbRow
     {
         public long SubscriberId {get;set;}
         public string Abi {get;set;}
@@ -57,8 +57,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public long EventSubscriptionId {get;set;}
         public int ParameterOrder {get;set;}
-        public string Operator {get;set;}
+        public ParameterConditionOperator Operator {get;set;}
         public string Value {get;set;}
+    }
+
+    public enum ParameterConditionOperator
+    {
+        Equals, GreaterOrEqual, LessOrEqual
     }
 
     public class EventSubscriptionStateDto : DbRow
@@ -78,7 +83,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     public class ContractQueryDto: DbRow
     {
-        public long DecodedEventHandlerId {get;set;}
+        public long EventHandlerId {get;set;}
 
         public ContractAddressSource ContractAddressSource {get;set; }
 
@@ -109,7 +114,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     public class EventAggregatorConfigurationDto: DbRow
     {
-        public long DecodedEventHandlerId {get;set;}
+        public long EventHandlerId {get;set;}
         public AggregatorSource Source {get;set;}
         public AggregatorOperation Operation {get;set;}
         public AggregatorDestination Destination {get;set;}

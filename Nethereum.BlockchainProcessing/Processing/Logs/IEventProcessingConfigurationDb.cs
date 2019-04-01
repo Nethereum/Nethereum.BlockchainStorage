@@ -10,12 +10,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         ISubscriberQueueConfigurationFactory,
         ISubscriberSearchIndexConfigurationFactory
     {
-        Task<ContractDto> GetContractAsync(long contractId);
-        Task<EventSubscriptionAddressDto[]> GetEventAddressesAsync(long eventSubscriptionId);
+        Task<SubscriberContractDto> GetContractAsync(long contractId);
+        Task<EventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId);
         Task<EventSubscriptionDto[]> GetEventSubscriptionsAsync(long subscriberId);
         Task<ParameterConditionDto[]> GetParameterConditionsAsync(long eventSubscriptionId);
         Task<SubscriberDto[]> GetSubscribersAsync(long partitionId);
-        Task<EventHandlerDto[]> GetDecodedEventHandlers(long eventSubscriptionId);
+        Task<EventHandlerDto[]> GetEventHandlers(long eventSubscriptionId);
 
     }
 }

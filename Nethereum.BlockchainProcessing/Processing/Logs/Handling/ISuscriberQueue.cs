@@ -5,6 +5,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public interface ISubscriberQueue
     {
         string Name {get;}
-        Task AddMessage(DecodedEvent decodedEvent);
+        Task AddMessageAsync(object content);
     }
 }

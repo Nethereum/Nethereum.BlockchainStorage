@@ -45,9 +45,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Name = "subscriber-transfer_indexer"
             });
 
-            var contract = repo.Add(new ContractDto
+            var contract = repo.Add(new SubscriberContractDto
             {
-                Id = id.Next<ContractDto>(),
+                Id = id.Next<SubscriberContractDto>(),
                 SubscriberId = indexer.Id,
                 Abi = StandardContractAbi,
                 Name = "StandardContract"
@@ -111,7 +111,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             repo.Add(new EventAggregatorConfigurationDto
             {
-                DecodedEventHandlerId = txHashTracker.Id,
+                EventHandlerId = txHashTracker.Id,
                 Source = AggregatorSource.TransactionHash,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 OutputName = "AllTransactionHashes",
@@ -128,7 +128,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             repo.Add(new EventAggregatorConfigurationDto
             {
-                DecodedEventHandlerId = blockTracker.Id,
+                EventHandlerId = blockTracker.Id,
                 Source = AggregatorSource.BlockNumber,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 OutputName = "AllBlockNumbers",
@@ -163,9 +163,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             });
 
             var standardContract = repo.Add(              
-                new ContractDto
+                new SubscriberContractDto
                 {
-                    Id = id.Next<ContractDto>(),
+                    Id = id.Next<SubscriberContractDto>(),
                     SubscriberId = george.Id,
                     Name = "StandardContract",
                     Abi = StandardContractAbi
@@ -191,7 +191,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             repo.Add(new EventAggregatorConfigurationDto
             {
                 Id = id.Next<EventAggregatorConfigurationDto>(),
-                DecodedEventHandlerId = transferCountHandler.Id,
+                EventHandlerId = transferCountHandler.Id,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 Operation = AggregatorOperation.Count,
                 OutputName = "CurrentTransferCount"
@@ -225,9 +225,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             });
 
             var standardContract = repo.Add(
-                      new ContractDto
+                      new SubscriberContractDto
                       {
-                          Id = id.Next<ContractDto>(),
+                          Id = id.Next<SubscriberContractDto>(),
                           SubscriberId = harry.Id,
                           Name = "StandardContract",
                           Abi = StandardContractAbi
@@ -261,7 +261,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             repo.Add(new EventAggregatorConfigurationDto
             {
                 Id = id.Next<EventAggregatorConfigurationDto>(),
-                DecodedEventHandlerId = transferValueRunningTotalHandler.Id,
+                EventHandlerId = transferValueRunningTotalHandler.Id,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 Operation = AggregatorOperation.Sum,
                 Source = AggregatorSource.EventParameter,
@@ -280,7 +280,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             repo.Add(new ContractQueryDto
             {
                 Id = id.Next<ContractQueryDto>(),
-                DecodedEventHandlerId = getTokenHandler.Id,
+                EventHandlerId = getTokenHandler.Id,
                 ContractId = standardContract.Id,
                 ContractAddressSource = ContractAddressSource.EventAddress,
                 EventStateOutputName = "TokenName",
@@ -298,7 +298,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var getBalanceQuery = repo.Add(new ContractQueryDto
             {
                 Id = id.Next<ContractQueryDto>(),
-                DecodedEventHandlerId = getBalanceHandler.Id,
+                EventHandlerId = getBalanceHandler.Id,
                 ContractId = 1,
                 ContractAddressSource = ContractAddressSource.EventAddress,
                 EventStateOutputName = "FromAddressCurrentBalance",
@@ -341,7 +341,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns<long>((contractId) => Task.FromResult(repo.Contracts.Where(s => s.Id == contractId).FirstOrDefault()));
 
             configDb
-                .Setup(d => d.GetEventAddressesAsync(It.IsAny<long>()))
+                .Setup(d => d.GetEventSubscriptionAddressesAsync(It.IsAny<long>()))
                 .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.EventSubscriptionAddresses.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
 
             configDb
@@ -349,7 +349,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.ParameterConditions.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
 
             configDb
-                .Setup(d => d.GetDecodedEventHandlers(It.IsAny<long>()))
+                .Setup(d => d.GetEventHandlers(It.IsAny<long>()))
                 .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.DecodedEventHandlers.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
 
             configDb
@@ -372,7 +372,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Setup(d => d.GetContractQueryConfigurationAsync(It.IsAny<long>()))
                 .Returns<long>((eventHandlerId) =>
                 {
-                    var contractQuery = repo.ContractQueries.FirstOrDefault(c => c.DecodedEventHandlerId == eventHandlerId);
+                    var contractQuery = repo.ContractQueries.FirstOrDefault(c => c.EventHandlerId == eventHandlerId);
                     if (contractQuery == null) throw new ArgumentException($"Could not find Contract Query Configuration for Event Handler Id: {eventHandlerId}");
                     var contract = repo.Contracts.FirstOrDefault(c => c.Id == contractQuery.ContractId);
                     if (contract == null) throw new ArgumentException($"Could not find Contract Query Id: {contractQuery.Id}, Contract Id: {contractQuery.ContractId}");
@@ -387,7 +387,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Setup(d => d.GetEventAggregationConfigurationAsync(It.IsAny<long>()))
                 .Returns<long>((eventHandlerId) =>
                 {
-                    var dto = repo.EventAggregators.FirstOrDefault(c => c.DecodedEventHandlerId == eventHandlerId);
+                    var dto = repo.EventAggregators.FirstOrDefault(c => c.EventHandlerId == eventHandlerId);
                     if (dto == null) throw new ArgumentException($"Could not find Event Aggregator Configuration for Event Handler Id: {eventHandlerId}");
 
                     EventAggregatorConfiguration config = Map(dto);
@@ -429,7 +429,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             };
         }
 
-        private static ContractQueryConfiguration Map(ContractQueryDto contractQuery, ContractDto contract, IEnumerable<ContractQueryParameterDto> parameters)
+        private static ContractQueryConfiguration Map(ContractQueryDto contractQuery, SubscriberContractDto contract, IEnumerable<ContractQueryParameterDto> parameters)
         {
             return new ContractQueryConfiguration
             {

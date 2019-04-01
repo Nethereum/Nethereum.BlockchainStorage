@@ -52,7 +52,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
         public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
 
-        public async Task<IEventHandler> CreateAsync(EventHandlerDto config)
+        public async Task<IEventHandler> LoadAsync(EventHandlerDto config)
         { 
             var state = await StateFactory.GetEventSubscriptionStateAsync(config.EventSubscriptionId);
 
