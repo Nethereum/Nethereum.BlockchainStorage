@@ -2,9 +2,9 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface IDecodedEventHandlerFactory
+    public interface IEventHandlerFactory
     {
-        Task<IDecodedEventHandler> CreateAsync(EventHandlerDto config);
+        Task<IEventHandler> CreateAsync(EventHandlerDto config);
         Task SaveStateAsync();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface IDecodedEventHandlerConfigurationFactory
+    public interface IEventHandlerConfigurationFactory
     {
         Task<EventSubscriptionStateDto> GetEventSubscriptionStateAsync(long eventSubscriptionId);
         Task SaveAsync(EventSubscriptionStateDto state);

@@ -13,9 +13,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     public class EventSubscription : IEventSubscription
     {
         private readonly IEventMatcher _matcher;
-        private readonly IEventHandler _handler;
+        private readonly IEventHandlerCoordinator _handler;
 
-        public EventSubscription(long id, long subscriberId, IEventMatcher matcher, IEventHandler handler)
+        public EventSubscription(long id, long subscriberId, IEventMatcher matcher, IEventHandlerCoordinator handler)
         {
             Id = id;
             SubscriberId = subscriberId;

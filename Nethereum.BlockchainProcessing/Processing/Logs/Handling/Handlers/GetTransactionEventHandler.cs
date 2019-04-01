@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class GetTransactionEventHandler : IDecodedEventHandler
+    public class GetTransactionEventHandler : IEventHandler
     {
         public GetTransactionEventHandler(IGetTransactionByHash proxy)
         {

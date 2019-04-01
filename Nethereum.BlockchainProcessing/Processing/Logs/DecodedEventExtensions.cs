@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public static class ParameterOutputExtensions
+    public static class DecodedEventExtensions
     {
-       public static DecodedEvent  ToDecodedEvent(this FilterLog log, EventABI abi)
+       public static DecodedEvent ToDecodedEvent(this FilterLog log, EventABI abi = null)
         {
             var decodedParameterOutputs = abi?.DecodeEventDefaultTopics(log) ?? new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), log);
             var decodedEvent = new DecodedEvent{EventLog = decodedParameterOutputs};
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             decodedEvent.State["EventAbiName"] = abi?.Name;
             decodedEvent.State["EventSignature"] = abi?.Sha3Signature;
             decodedEvent.State["TransactionHash"] = log.TransactionHash;
-            decodedEvent.State["LogIndex"] = log.LogIndex.Value;
+            decodedEvent.State["LogIndex"] = log.LogIndex?.Value;
             decodedEvent.State["HandlerInvocations"] = 0;
             decodedEvent.State["UtcNowMs"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }

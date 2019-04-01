@@ -11,29 +11,41 @@ using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {
-    public class LogProcessorTests
+    public class EventSubscriptionTests
     {
         private readonly Mock<IEventMatcher> _matcher = new Mock<IEventMatcher>();
-        private readonly Mock<IEventHandler> _handler = new Mock<IEventHandler>();
-        private readonly EventSubscription _processor;
+        private readonly Mock<IEventHandlerCoordinator> _handler = new Mock<IEventHandlerCoordinator>();
+        private readonly EventSubscription _eventSubscription;
         private readonly EventABI _eventAbi = new EventABI("test");
 
-        public LogProcessorTests()
+        public EventSubscriptionTests()
         {
             _matcher.Setup(m => m.Abi).Returns(_eventAbi);
-            _processor = new EventSubscription(_matcher.Object, _handler.Object);
+            _eventSubscription = new EventSubscription(id: 1, subscriberId: 2, _matcher.Object, _handler.Object);
+        }
+
+        [Fact]
+        public void HasCorrectId()
+        {
+            Assert.Equal(1, _eventSubscription.Id);
+        }
+
+        [Fact]
+        public void HasCorrectSubscriberId()
+        {
+            Assert.Equal(2, _eventSubscription.SubscriberId);
         }
 
         [Fact]
         public void MatcherCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new EventSubscription(null, _handler.Object));
+            Assert.Throws<ArgumentNullException>(() => new EventSubscription(1, 1, null, _handler.Object));
         }
 
         [Fact]
         public void HandlerCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new EventSubscription(_matcher.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new EventSubscription(1, 1, _matcher.Object, null));
         }
 
         [Theory]
@@ -44,7 +56,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var log = new FilterLog();
             _matcher.Setup(m => m.IsMatch(log)).Returns(match);
 
-            Assert.Equal(match, _processor.IsLogForEvent(log));
+            Assert.Equal(match, _eventSubscription.IsLogForEvent(log));
         }
 
         [Fact]
@@ -62,7 +74,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 return Task.CompletedTask;
             });
 
-            await _processor.ProcessLogsAsync(logs);
+            await _eventSubscription.ProcessLogsAsync(logs);
 
             Assert.Equal(logs, logsHandled);
         }

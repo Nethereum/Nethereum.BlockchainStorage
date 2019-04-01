@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
 
-    public class ContractQueryEventHandler : IDecodedEventHandler
+    public class ContractQueryEventHandler : IEventHandler
     {
         public ContractQueryEventHandler(IContractQuery contractQueryProxy, EventSubscriptionStateDto state, ContractQueryConfiguration queryConfig)
         {

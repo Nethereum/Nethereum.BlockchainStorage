@@ -1,6 +1,5 @@
 ﻿using Moq;
 using Nethereum.ABI.Model;
-using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.RPC.Eth.DTOs;
 using Xunit;

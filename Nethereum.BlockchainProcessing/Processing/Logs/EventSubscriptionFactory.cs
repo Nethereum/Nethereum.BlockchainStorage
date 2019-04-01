@@ -12,9 +12,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         private readonly ABIDeserialiser _abiDeserializer = new ABIDeserialiser();
         IEventProcessingConfigurationDb _db;
-        private readonly IDecodedEventHandlerFactory _decodedEventHandlerFactory;
+        private readonly IEventHandlerFactory _decodedEventHandlerFactory;
 
-        public EventSubscriptionFactory(IEventProcessingConfigurationDb db, IDecodedEventHandlerFactory decodedEventHandlerFactory)
+        public EventSubscriptionFactory(IEventProcessingConfigurationDb db, IEventHandlerFactory decodedEventHandlerFactory)
         {
             _db = db;
             _decodedEventHandlerFactory = decodedEventHandlerFactory;
@@ -47,23 +47,23 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             var parameterMatcher = await CreateParameterMatcherAsync(eventSubscription);
             var matcher = new EventMatcher(eventAbi, addressMatcher, parameterMatcher);
 
-            EventHandler handler = await CreateEventHandler(eventSubscription);
+            EventHandlerCoordinator handler = await CreateEventHandler(eventSubscription);
 
             var processor = new EventSubscription(eventSubscription.Id, eventSubscription.SubscriberId, matcher, handler);
             return processor;
         }
 
-        private async Task<EventHandler> CreateEventHandler(EventSubscriptionDto eventSubscription)
+        private async Task<EventHandlerCoordinator> CreateEventHandler(EventSubscriptionDto eventSubscription)
         {
             var handlerConfiguration = await _db.GetDecodedEventHandlers(eventSubscription.Id);
 
-            var handlers = new List<IDecodedEventHandler>(handlerConfiguration.Length);
+            var handlers = new List<IEventHandler>(handlerConfiguration.Length);
             foreach(var configItem in handlerConfiguration.OrderBy(h => h.Order))
             {
                 handlers.Add(await _decodedEventHandlerFactory.CreateAsync(configItem));
             }
 
-            return new EventHandler(subscriberId: eventSubscription.SubscriberId, eventSubscriptionId: eventSubscription.Id, handlers);
+            return new EventHandlerCoordinator(subscriberId: eventSubscription.SubscriberId, eventSubscriptionId: eventSubscription.Id, handlers);
         }
 
         private async Task<EventParameterMatcher> CreateParameterMatcherAsync(EventSubscriptionDto eventSubscription)

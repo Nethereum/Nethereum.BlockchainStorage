@@ -2,7 +2,7 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class SearchIndexHandler : IDecodedEventHandler
+    public class SearchIndexHandler : IEventHandler
     {
         public SearchIndexHandler(ISubscriberSearchIndex subscriberSearchIndex)
         {

@@ -1,13 +1,12 @@
 ﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
 
-    public class EventHandlerFactory: IDecodedEventHandlerFactory
+    public class EventHandlerFactory: IEventHandlerFactory
     {
         Dictionary<long, EventSubscriptionStateDto> _stateDictionary = new Dictionary<long, EventSubscriptionStateDto>();
 
@@ -53,7 +52,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
         public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
 
-        public async Task<IDecodedEventHandler> CreateAsync(EventHandlerDto config)
+        public async Task<IEventHandler> CreateAsync(EventHandlerDto config)
         { 
             var state = await StateFactory.GetEventSubscriptionStateAsync(config.EventSubscriptionId);
 

@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class EventHandler : IEventHandler
+    public class EventHandlerCoordinator : IEventHandlerCoordinator
     {
-        public EventHandler(long subscriberId = 0, long eventSubscriptionId = 0, IEnumerable<IDecodedEventHandler> handlers = null)
+        public EventHandlerCoordinator(long subscriberId = 0, long eventSubscriptionId = 0, IEnumerable<IEventHandler> handlers = null)
         {
             SubscriberId = subscriberId;
             EventSubscriptionId = eventSubscriptionId;
-            Handlers = handlers ?? Array.Empty<IDecodedEventHandler>();
+            Handlers = handlers ?? Array.Empty<IEventHandler>();
         }
 
         public long SubscriberId { get; }
         public long EventSubscriptionId { get; }
-        public IEnumerable<IDecodedEventHandler> Handlers { get; }
+        public IEnumerable<IEventHandler> Handlers { get; }
 
         public async Task HandleAsync(EventABI abi, params FilterLog[] eventLogs)
         {

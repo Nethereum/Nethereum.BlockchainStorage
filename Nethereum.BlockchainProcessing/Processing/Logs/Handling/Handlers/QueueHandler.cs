@@ -2,7 +2,7 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class QueueHandler : IDecodedEventHandler
+    public class QueueHandler : IEventHandler
     {
         public QueueHandler(ISubscriberQueue subscriberQueue)
         {
