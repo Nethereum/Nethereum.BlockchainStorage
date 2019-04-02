@@ -21,7 +21,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public EventSubscriptionTests()
         {
             _matcher.Setup(m => m.Abi).Returns(_eventAbi);
-            _eventSubscription = new EventSubscription(id: 1, subscriberId: 2, _matcher.Object, _handler.Object);
+            _eventSubscription = new EventSubscription(id: 1, subscriberId: 2, matcher: _matcher.Object, handler: _handler.Object);
         }
 
         [Fact]
