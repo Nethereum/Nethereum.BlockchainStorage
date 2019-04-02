@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var handlers = new IEventHandler[]{mockHandler.Object};
 
             EventHandlerCoordinator coordinator = new EventHandlerCoordinator(subscriberId:1, eventSubscriptionId:99, handlers: handlers);
-            await coordinator.HandleAsync(abi: null, new RPC.Eth.DTOs.FilterLog{});
+            await coordinator.HandleAsync(null, new RPC.Eth.DTOs.FilterLog{});
 
             Assert.Single(eventsHandled);
         }
@@ -56,7 +56,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             EventHandlerCoordinator coordinator = new EventHandlerCoordinator(subscriberId:1, eventSubscriptionId:99, handlers: handlers);
 
             var logs = new []{new RPC.Eth.DTOs.FilterLog{}};
-            await coordinator.HandleAsync(abi: null, logs);
+            await coordinator.HandleAsync(null, logs);
 
             Assert.Single(eventsHandled);
             Assert.Equal(coordinator.SubscriberId, eventsHandled[0].State["SubscriberId"]);
@@ -89,7 +89,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             EventHandlerCoordinator coordinator = new EventHandlerCoordinator(subscriberId:1, eventSubscriptionId:99, handlers: handlers);
 
             var logs = new []{new RPC.Eth.DTOs.FilterLog{}};
-            await coordinator.HandleAsync(abi: null, logs);
+            await coordinator.HandleAsync(null, logs);
 
             Assert.Single(handlerOneEvents);
             Assert.Empty(handlerTwoEvents);
