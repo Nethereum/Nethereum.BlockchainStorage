@@ -87,10 +87,10 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
                     EventParameterNumber = 2}
             };
 
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput{
                     Result = APPROVE_ADDRESS, Parameter = new Parameter("address", 1) });
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput{
                     Result = APPROVE_AMOUNT, Parameter = new Parameter("uint256", 2) });
 
@@ -115,7 +115,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
                     EventParameterNumber = 2}
             };
 
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput{
                     Result = APPROVE_AMOUNT, Parameter = new Parameter("uint256", 2) });
 

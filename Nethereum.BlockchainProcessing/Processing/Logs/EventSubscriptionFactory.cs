@@ -59,7 +59,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 handlers.Add(await DecodedEventHandlerFactory.LoadAsync(configItem));
             }
 
-            return new EventHandlerCoordinator(subscriberId: eventSubscription.SubscriberId, eventSubscriptionId: eventSubscription.Id, handlers);
+            return new EventHandlerCoordinator(
+                eventSubscription.SubscriberId, 
+                eventSubscription.Id, 
+                handlers);
         }
 
     }

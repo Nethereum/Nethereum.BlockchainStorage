@@ -14,6 +14,7 @@ namespace Nethereum.BlockchainStore.Search
             (string indexName = null, bool addPresetEventLogFields = true) 
             where TEvent : class;
 
+
         Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(
             FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition)
             where TFunctionMessage : FunctionMessage, new();

@@ -1,15 +1,17 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Configuration;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
+using Nethereum.BlockchainStore.AzureTables.Bootstrap;
+using Nethereum.BlockchainStore.AzureTables.Repositories;
+using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,8 +23,10 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         [Fact]
         public async Task WebJobExample()
         {
-            string azureStorageConnectionString = GetAzureStorageConnectionString();
-            string jsonProgressFilePath = GetJsonFileForProgress();
+            var config = LoadConfig();
+            string azureStorageConnectionString = GetAzureStorageConnectionString(config);
+            string azureSearchKey = config["AzureSearchApiKey"];
+            const string AZURE_SEARCH_SERVICE_NAME = "blockchainsearch";
 
             const long PartitionId = 1;
             const ulong MinimumBlockNumber = 4063361;
@@ -34,25 +38,35 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var blockchainProxy = new BlockchainProxyService(web3);
 
-            List<DecodedEvent> indexedEvents = new List<DecodedEvent>();
-            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = MockSubscriberSearchIndexFactory(indexedEvents);
+            IAzureSearchService searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = new AzureSubscriberSearchIndexFactory(configDb, searchService);
+
+            var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
+            var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PartitionId}");
 
             // load subscribers and event subscriptions
-            var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
             var eventMatcherFactory = new EventMatcherFactory(configDb);
             var eventHandlerFactory = new EventHandlerFactory(blockchainProxy, configDb, subscriberQueueFactory, subscriberSearchIndexFactory);
             var eventSubscriptionFactory = new EventSubscriptionFactory(configDb, eventMatcherFactory, eventHandlerFactory);
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PartitionId);
 
             // load service
+            var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
             var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions);
-            var jsonProgressRepository = new JsonBlockProgressRepository(jsonProgressFilePath);
-            var progressService = new BlockProgressService(blockchainProxy, MinimumBlockNumber, jsonProgressRepository);
+            var progressService = new BlockProgressService(blockchainProxy, MinimumBlockNumber, blockProgressRepo);
             var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MaxBlocksPerBatch);
 
             // execute
-            var ctx = new System.Threading.CancellationTokenSource();
-            var rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
+            BlockRange? rangeProcessed;
+            try
+            {
+                var ctx = new System.Threading.CancellationTokenSource();
+                rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
+            }
+            finally
+            {
+                await ClearDown(storageCloudSetup, searchService, subscriberQueueFactory);
+            }
 
             // save event subscription state
             await eventHandlerFactory.SaveStateAsync();
@@ -76,27 +90,22 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             Assert.Equal((BigInteger)4063362, blockNumbersForSpecificAddress[0].Value);
             Assert.Equal((BigInteger)4063362, blockNumbersForSpecificAddress[1].Value);
 
-            Assert.Equal(19, indexedEvents.Count);
         }
 
-        private static ISubscriberSearchIndexFactory MockSubscriberSearchIndexFactory(List<DecodedEvent> indexedEvents)
+        private async Task ClearDown(CloudTableSetup cloudTableSetup, IAzureSearchService searchService, AzureSubscriberQueueFactory subscriberQueueFactory)
         {
-            var mockSearchIndex = new Mock<ISubscriberSearchIndex>();
-            mockSearchIndex.Setup(i => i.Index(It.IsAny<DecodedEvent>())).Callback<DecodedEvent>(e => indexedEvents.Add(e)).Returns(Task.CompletedTask);
-            var mockSearchIndexFactory = new Mock<ISubscriberSearchIndexFactory>();
-            mockSearchIndexFactory.Setup(f => f.GetSubscriberSearchIndexAsync(It.IsAny<long>())).ReturnsAsync(mockSearchIndex.Object);
-            var subscriberSearchIndexFactory = mockSearchIndexFactory.Object;
-            return subscriberSearchIndexFactory;
+            await searchService.DeleteIndexAsync("subscriber-transfer-indexer");
+
+            foreach(var queue in new []{"subscriber-george", "subscriber-harry", "subscriber-nosey"})
+            {
+                var qRef = subscriberQueueFactory.CloudQueueClient.GetQueueReference(queue);
+                await qRef.DeleteIfExistsAsync();
+            }
+
+            await cloudTableSetup.GetCountersTable().DeleteIfExistsAsync();
         }
 
-        private static string GetJsonFileForProgress()
-        {
-            string JsonProgressFilePath = Path.Combine(Path.GetTempPath(), "WebJobExampleBlockProcess.json");
-            if (File.Exists(JsonProgressFilePath)) File.Delete(JsonProgressFilePath);
-            return JsonProgressFilePath;
-        }
-
-        private static string GetAzureStorageConnectionString()
+        private static IConfigurationRoot LoadConfig()
         {
             ConfigurationUtils.SetEnvironment("development");
 
@@ -105,6 +114,11 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var appConfig = ConfigurationUtils
                 .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainProcessing.Samples");
 
+            return appConfig;
+        }
+
+        private static string GetAzureStorageConnectionString(IConfigurationRoot appConfig)
+        {
             var azureStorageConnectionString = appConfig["AzureStorageConnectionString"];
             return azureStorageConnectionString;
         }

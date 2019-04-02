@@ -37,7 +37,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
 
             queryConfig.ContractAddressSource = ContractAddressSource.EventAddress;
-            decodedEvent.EventLog.Log.Address = CONTRACT_TO_QUERY;
+            decodedEvent.Log.Address = CONTRACT_TO_QUERY;
 
             await ExecuteAndVerify(CONTRACT_TO_QUERY);
         }
@@ -50,7 +50,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
 
             queryConfig.ContractAddressSource = ContractAddressSource.EventParameter;
             queryConfig.ContractAddressParameterNumber = PARAMETER_NUMBER;
-            decodedEvent.EventLog.Event.Add(new ParameterOutput{
+            decodedEvent.Event.Add(new ParameterOutput{
                 Result = CONTRACT_TO_QUERY, 
                 Parameter = new Parameter("address", PARAMETER_NUMBER)});
 

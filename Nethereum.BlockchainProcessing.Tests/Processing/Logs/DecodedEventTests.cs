@@ -15,9 +15,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var log = new FilterLog{};
             var decodedEvent = log.ToDecodedEvent();
 
-            Assert.NotNull(decodedEvent.EventLog);
-            Assert.Empty(decodedEvent.EventLog.Event);
-            Assert.Same(log, decodedEvent.EventLog.Log);
+            Assert.NotNull(decodedEvent);
+            Assert.Empty(decodedEvent.Event);
+            Assert.Same(log, decodedEvent.Log);
 
             Assert.Null(decodedEvent.State["EventAbiName"]);
             Assert.Null(decodedEvent.State["EventSignature"]);
@@ -33,8 +33,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var log = TestData.Contracts.StandardContract.SampleTransferLog();
             var decodedEvent = log.ToDecodedEvent(TestData.Contracts.StandardContract.TransferEventAbi);
 
-            Assert.NotNull(decodedEvent.EventLog);
-            Assert.Same(log, decodedEvent.EventLog.Log);
+            Assert.NotNull(decodedEvent);
+            Assert.Same(log, decodedEvent.Log);
 
             Assert.Equal("Transfer", decodedEvent.State["EventAbiName"]);
             Assert.Equal(TestData.Contracts.StandardContract.TransferEventSignature, decodedEvent.State["EventSignature"]);
@@ -43,13 +43,13 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             Assert.Equal(0, decodedEvent.State["HandlerInvocations"]);
             Assert.True(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() >= ((long) decodedEvent.State["UtcNowMs"]));
 
-            Assert.Equal(3,decodedEvent.EventLog.Event.Count);
+            Assert.Equal(3,decodedEvent.Event.Count);
 
-            var param1 = decodedEvent.EventLog.Event.FirstOrDefault(p => p.Parameter.Order == 1);
+            var param1 = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == 1);
             Assert.Equal("0x12890d2cce102216644c59dae5baed380d84830c", param1.Result);
-            var param2 = decodedEvent.EventLog.Event.FirstOrDefault(p => p.Parameter.Order == 2);
+            var param2 = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == 2);
             Assert.Equal("0x13f022d72158410433cbd66f5dd8bf6d2d129924", param2.Result);
-            var param3 = decodedEvent.EventLog.Event.FirstOrDefault(p => p.Parameter.Order == 3);
+            var param3 = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == 3);
             Assert.Equal(new BigInteger(1000), param3.Result);
         }
     }

@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
             for(var i = 0; i < 3; i++)
             {
                 var  decodedEvent = DecodedEvent.Empty();
-                decodedEvent.EventLog.Event.Add(
+                decodedEvent.Event.Add(
                 new ParameterOutput 
                 { 
                     Result = (BigInteger)101, 
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
             EventSubscriptionState.Values[OUTPUT_NAME] = (BigInteger)202;
 
             var  decodedEvent = DecodedEvent.Empty();
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput 
                 { 
                     Result = (BigInteger)101, 

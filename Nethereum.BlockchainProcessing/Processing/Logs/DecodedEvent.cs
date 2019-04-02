@@ -5,16 +5,20 @@ using System.Collections.Generic;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class DecodedEvent
+    public class DecodedEvent: EventLog<List<ParameterOutput>>
     {
+        public DecodedEvent(List<ParameterOutput> outputs, FilterLog log):base(outputs, log)
+        {
+
+        }
+
         public Dictionary<string, object> State {get;set;} = new Dictionary<string, object>();
-        public EventLog<List<ParameterOutput>> EventLog { get; set; }
 
         public Transaction Transaction {get;set;}
 
         public static DecodedEvent Empty()
         {
-            return new DecodedEvent{EventLog = new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), new FilterLog())};
+            return new DecodedEvent(new List<ParameterOutput>(), new FilterLog());
         }
     }
 }

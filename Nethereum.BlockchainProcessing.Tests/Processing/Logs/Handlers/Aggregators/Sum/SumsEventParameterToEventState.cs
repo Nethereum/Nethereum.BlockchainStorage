@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         public override async Task CreatesAndIncrementsSum()
         {
             var  decodedEvent = DecodedEvent.Empty();
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput 
                 { 
                     Result = (BigInteger)101, 
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         {
             var  decodedEvent = DecodedEvent.Empty();
             decodedEvent.State[OUTPUT_NAME] = (BigInteger)202;
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput 
                 { 
                     Result = (BigInteger)101, 

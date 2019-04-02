@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            decodedEvent.Transaction = await Proxy.GetTransactionByHash(decodedEvent.EventLog.Log.TransactionHash);
+            decodedEvent.Transaction = await Proxy.GetTransactionByHash(decodedEvent.Log.TransactionHash);
             return true;
         }
     }

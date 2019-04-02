@@ -37,7 +37,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
                     EventParameterNumber = 1}
             };
 
-            decodedEvent.EventLog.Event.Add(
+            decodedEvent.Event.Add(
                 new ParameterOutput 
                 { 
                     Result = OWNER_ADDRESS, 
@@ -75,7 +75,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
                     Source = EventValueSource.EventAddress}
             };
 
-            decodedEvent.EventLog.Log.Address  = OWNER_ADDRESS;
+            decodedEvent.Log.Address  = OWNER_ADDRESS;
 
             var result = await contractQueryEventHandler.HandleAsync(decodedEvent);
 
