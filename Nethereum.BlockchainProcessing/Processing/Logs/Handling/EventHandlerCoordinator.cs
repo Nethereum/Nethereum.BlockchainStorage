@@ -26,7 +26,19 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
             foreach(var log in eventLogs)
             {
-                var decodedEvent = log.ToDecodedEvent(abi);
+                DecodedEvent decodedEvent = null;
+                try
+                {
+                    decodedEvent = log.ToDecodedEvent(abi);
+                }
+                catch(Exception x)
+                {
+                    if(x.Message.StartsWith("Number of indexes don't match the number of topics"))
+                    {
+                        return;
+                    }
+                    throw;
+                }
 
                 decodedEvent.State["SubscriberId"] = SubscriberId;
                 decodedEvent.State["EventSubscriptionId"] = EventSubscriptionId;

@@ -117,9 +117,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case AggregatorSource.EventState:
                     return GetValueFromEventState(decodedEvent, Configuration.InputName, null);
                 case AggregatorSource.TransactionHash:
-                    return decodedEvent.EventLog.Log.TransactionHash;
+                    return decodedEvent.Log.TransactionHash;
                 case AggregatorSource.BlockNumber:
-                    return decodedEvent.EventLog.Log.BlockNumber;
+                    return decodedEvent.Log.BlockNumber;
                 default:
                     return null;
             }
@@ -229,7 +229,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
             if(Configuration.EventParameterNumber < 1) return null;
 
-            var parameter = decodedEvent.EventLog.Event.FirstOrDefault(p => p.Parameter.Order == Configuration.EventParameterNumber);
+            var parameter = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == Configuration.EventParameterNumber);
             
             return parameter?.Result;
         }

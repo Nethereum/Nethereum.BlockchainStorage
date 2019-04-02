@@ -42,7 +42,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             {
                 Id = id.Next<SubscriberSearchIndexConfigurationDto>(),
                 SubscriberId = indexer.Id,
-                Name = "subscriber-transfer_indexer"
+                Name = "subscriber-transfer-indexer"
             });
 
             var contract = repo.Add(new SubscriberContractDto

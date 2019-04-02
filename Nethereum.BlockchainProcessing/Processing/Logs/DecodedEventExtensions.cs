@@ -10,10 +10,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public static class DecodedEventExtensions
     {
-       public static DecodedEvent ToDecodedEvent(this FilterLog log, EventABI abi = null)
+        public static DecodedEvent ToDecodedEvent(this FilterLog log, EventABI abi = null)
         {
             var decodedParameterOutputs = abi?.DecodeEventDefaultTopics(log) ?? new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), log);
-            var decodedEvent = new DecodedEvent{EventLog = decodedParameterOutputs};
+            var decodedEvent = new DecodedEvent(decodedParameterOutputs.Event, decodedParameterOutputs.Log);
             decodedEvent.AddStateData(abi, log);
             return decodedEvent;
         }

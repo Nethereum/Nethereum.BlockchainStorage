@@ -65,7 +65,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventValueSource.Static:
                     return functionParameter.Value;
                 case EventValueSource.EventAddress:
-                    return decodedEvent.EventLog.Log.Address;
+                    return decodedEvent.Log.Address;
                 case EventValueSource.EventParameters:
                     return GetFunctionInputFromEventParameter(functionParameter, decodedEvent);
                 case EventValueSource.EventState:
@@ -87,7 +87,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
             if(functionParameter.EventParameterNumber < 1) return null;
 
-            return decodedEvent.EventLog.Event.FirstOrDefault(p => p.Parameter.Order == functionParameter.EventParameterNumber )?.Result;
+            return decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == functionParameter.EventParameterNumber )?.Result;
         }
 
         private string GetContractAddress(DecodedEvent decodedEvent)
@@ -97,7 +97,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case ContractAddressSource.Static:
                     return Config.ContractAddress;
                 case ContractAddressSource.EventAddress:
-                    return decodedEvent.EventLog.Log.Address;
+                    return decodedEvent.Log.Address;
                 case ContractAddressSource.EventParameter:
                     return GetAddressFromEventParameter(decodedEvent);
                 case ContractAddressSource.EventState:
@@ -116,7 +116,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
             if(Config.ContractAddressParameterNumber > 0)
             {
-                var matchingEventParameter = decodedEvent.EventLog.Event.FirstOrDefault(p => p.Parameter.Order == Config.ContractAddressParameterNumber);
+                var matchingEventParameter = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == Config.ContractAddressParameterNumber);
                 if(matchingEventParameter != null && matchingEventParameter.Result is string a)
                 {
                     return a;
