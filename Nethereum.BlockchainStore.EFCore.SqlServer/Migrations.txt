@@ -1,0 +1,13 @@
+Notes regarding EF core migration commands
+
+SET ENVIRONMENTAL VARIABLE
+open new command prompt
+setx BlockchainDbStorageDesignTimeSchema localhost
+
+APPLYING MIGRATIONS (ENSURE ENVIRONMENTAL VARIABLE IS SET FIRST)
+open a new command prompt
+navigate to Nethereum.BlockchainStore.SqlServer
+
+dotnet ef migrations remove -f
+dotnet ef migrations add Migration1
+dotnet ef database update

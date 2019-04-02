@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Nethereum.BlockchainStore.CosmosCore.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "--Blockchain rinkeby --ASPNETCORE_ENVIRONMENT development"
+    }
+  }
+}
