@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
   </ItemGroup>
 
@@ -15,7 +16,6 @@
     <PackageReference Include="Elasticsearch.Net.Aws" Version="6.1.0" />
     <PackageReference Include="Microsoft.Azure.Search" Version="5.0.3" />
     <PackageReference Include="NEST" Version="6.5.0" />
-    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.1.2" />
   </ItemGroup>
 
 </Project>
