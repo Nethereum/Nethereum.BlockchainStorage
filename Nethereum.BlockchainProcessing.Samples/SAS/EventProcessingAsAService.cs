@@ -6,7 +6,6 @@ using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
-using Nethereum.BlockchainStore.AzureTables.Repositories;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
@@ -20,17 +19,17 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
     public class EventProcessingAsAService
     {
+        const long PARTITION = 1;
+        const ulong MIN_BLOCK_NUMBER = 4063361;
+        const uint MAX_BLOCKS_PER_BATCH = 10;
+        const string AZURE_SEARCH_SERVICE_NAME = "blockchainsearch";
+
         [Fact]
         public async Task WebJobExample()
         {
             var config = LoadConfig();
-            string azureStorageConnectionString = GetAzureStorageConnectionString(config);
+            string azureStorageConnectionString = config["AzureStorageConnectionString"];
             string azureSearchKey = config["AzureSearchApiKey"];
-            const string AZURE_SEARCH_SERVICE_NAME = "blockchainsearch";
-
-            const long PartitionId = 1;
-            const ulong MinimumBlockNumber = 4063361;
-            const uint MaxBlocksPerBatch = 10;
 
             var configRepo = new MockEventProcessingRepository();
             IEventProcessingConfigurationDb configDb = MockEventProcessingDb.Create(configRepo);
@@ -38,23 +37,25 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var blockchainProxy = new BlockchainProxyService(web3);
 
-            IAzureSearchService searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
-            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = new AzureSubscriberSearchIndexFactory(configDb, searchService);
+            // search components
+            var searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
+            var subscriberSearchIndexFactory = new AzureSubscriberSearchIndexFactory(configDb, searchService);
 
+            // queue components
             var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
-            var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PartitionId}");
+            var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PARTITION}");
 
             // load subscribers and event subscriptions
             var eventMatcherFactory = new EventMatcherFactory(configDb);
             var eventHandlerFactory = new EventHandlerFactory(blockchainProxy, configDb, subscriberQueueFactory, subscriberSearchIndexFactory);
             var eventSubscriptionFactory = new EventSubscriptionFactory(configDb, eventMatcherFactory, eventHandlerFactory);
-            List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PartitionId);
+            List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PARTITION);
 
             // load service
             var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
             var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions);
-            var progressService = new BlockProgressService(blockchainProxy, MinimumBlockNumber, blockProgressRepo);
-            var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MaxBlocksPerBatch);
+            var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute
             BlockRange? rangeProcessed;
@@ -115,12 +116,6 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainProcessing.Samples");
 
             return appConfig;
-        }
-
-        private static string GetAzureStorageConnectionString(IConfigurationRoot appConfig)
-        {
-            var azureStorageConnectionString = appConfig["AzureStorageConnectionString"];
-            return azureStorageConnectionString;
         }
     }
 }
