@@ -97,7 +97,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         {
             await searchService.DeleteIndexAsync("subscriber-transfer-indexer");
 
-            foreach(var queue in new []{"subscriber-george", "subscriber-harry", "subscriber-nosey"})
+            foreach (var queue in new[] { "subscriber-george", "subscriber-harry", "subscriber-nosey" })
             {
                 var qRef = subscriberQueueFactory.CloudQueueClient.GetQueueReference(queue);
                 await qRef.DeleteIfExistsAsync();
