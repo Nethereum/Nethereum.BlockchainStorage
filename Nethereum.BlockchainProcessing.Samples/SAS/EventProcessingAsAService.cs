@@ -95,7 +95,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
         private async Task ClearDown(CloudTableSetup cloudTableSetup, IAzureSearchService searchService, AzureSubscriberQueueFactory subscriberQueueFactory)
         {
-            await searchService.DeleteIndexAsync("subscriber-transfer-indexer");
+          await searchService.DeleteIndexAsync("subscriber-transfer-indexer");
 
             foreach(var queue in new []{"subscriber-george", "subscriber-harry", "subscriber-nosey"})
             {
