@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A7C2B9B7-E71D-45D7-B9D9-3852BD66DF52}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		STORAGE_README.md = STORAGE_README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Samples", "Nethereum.BlockchainProcessing.Samples\Nethereum.BlockchainProcessing.Samples.csproj", "{F1A48AE3-DF66-4E26-BC31-07F8D00B0CA8}"
