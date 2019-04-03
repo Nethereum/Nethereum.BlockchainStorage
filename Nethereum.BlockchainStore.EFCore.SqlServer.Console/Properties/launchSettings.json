@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Nethereum.BlockchainStore.SqlServer.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "--Blockchain rinkeby --DbSchema rinkeby --FromBlock 3137143"
+    }
+  }
+}

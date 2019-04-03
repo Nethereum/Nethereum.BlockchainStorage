@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
+  <PropertyGroup>
+    <Authors>Juan Blanco, Dave Whiffin</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Contains DTO's to represent blockchain data for storage.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+  
+</Project>

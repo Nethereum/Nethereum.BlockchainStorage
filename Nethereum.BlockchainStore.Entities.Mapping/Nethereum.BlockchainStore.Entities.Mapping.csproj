@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
+  <PropertyGroup>
+    <Authors>Dave Whiffin</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Contains common data mapping between entities and Nethereum.RPC DTO's for use in the Nethereum.Blockchain storage packages.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
+  </ItemGroup>
+
+</Project>
