@@ -36,11 +36,11 @@ Create simple or complex filters to isolate and process the data you want with m
 
 In addition to the processors there are a library of tools and components that can be used separately.
 
-**Related projects**
+**Storage and Search**
 
 The following projects build on the processing library to provide pluggable off the shelf and re-usable components.
-* Blockchain storage, store chain data - includes adapters for Azure Table Storage, CSV, SQL Server, Sqlite, Cosmos.  https://github.com/Nethereum/Nethereum.BlockchainStorage/
-* Azure Search - index chain data easily  https://github.com/Nethereum/Nethereum.BlockchainStorage/tree/master/Nethereum.BlockchainStore.Search.Samples
+* Blockchain storage, store chain data - includes adapters for Azure Table Storage, CSV, SQL Server, Sqlite, Cosmos.  https://github.com/Nethereum/Nethereum.BlockchainProcessing/tree/master/Storage
+* Azure Search - index chain data easily  https://github.com/Nethereum/Nethereum.BlockchainProcessing/tree/master/Storage/Nethereum.BlockchainStore.Search.Samples
 
 **WHERE DO I START?**
 
