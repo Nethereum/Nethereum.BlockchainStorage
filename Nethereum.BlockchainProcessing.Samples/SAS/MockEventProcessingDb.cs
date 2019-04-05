@@ -375,19 +375,30 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.DecodedEventHandlers.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
 
             configDb
-                .Setup(d => d.GetEventSubscriptionStateAsync(It.IsAny<long>()))
+                .Setup(d => d.GetOrCreateEventSubscriptionState(It.IsAny<long>()))
                 .Returns<long>((eventSubscriptionId) =>
                 {
-                    if (!repo.EventSubscriptionStates.ContainsKey(eventSubscriptionId))
+                    var state = repo.GetEventSubscriptionState(eventSubscriptionId);
+                    if(state == null)
                     {
-                        repo.EventSubscriptionStates.Add(eventSubscriptionId, new EventSubscriptionStateDto(eventSubscriptionId));
+                        state = repo.Add(new EventSubscriptionStateDto(eventSubscriptionId));
                     }
-                    return Task.FromResult(repo.EventSubscriptionStates[eventSubscriptionId]);
+                    return Task.FromResult(state);
                 });
 
             configDb
-                .Setup(d => d.SaveAsync(It.IsAny<EventSubscriptionStateDto>()))
-                .Callback<EventSubscriptionStateDto>((state) => repo.EventSubscriptionStates[state.EventSubscriptionId] = state)
+                .Setup(d => d.SaveAsync(It.IsAny<IEnumerable<EventSubscriptionStateDto>>()))
+                .Callback<IEnumerable<EventSubscriptionStateDto>>((states) =>
+                { 
+                    foreach(var state in states)
+                    { 
+                        //simulate an update
+                        //this is in memory so not really representative
+                        var existing = repo.EventSubscriptionStates.FirstOrDefault(s => s.EventSubscriptionId == state.EventSubscriptionId);
+                        var index = repo.EventSubscriptionStates.IndexOf(existing);
+                        repo.EventSubscriptionStates[index] = state;
+                    }
+                 })
                 .Returns(Task.CompletedTask);
 
             configDb

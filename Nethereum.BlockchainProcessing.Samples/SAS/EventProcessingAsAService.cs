@@ -11,6 +11,7 @@ using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
@@ -72,8 +73,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }
 
             // save event subscription state
-            await eventHandlerFactory.SaveStateAsync();
-
+            await configDb.SaveAsync(eventSubscriptions.Select(s => s.State));
+            
             // assertions
             Assert.NotNull(rangeProcessed);
             Assert.Equal((ulong)11, rangeProcessed.Value.BlockCount);

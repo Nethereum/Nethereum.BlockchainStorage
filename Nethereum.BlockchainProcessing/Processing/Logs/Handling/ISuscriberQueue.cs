@@ -2,7 +2,7 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface ISubscriberQueue
+    public interface IQueue
     {
         string Name {get;}
         Task AddMessageAsync(object content);

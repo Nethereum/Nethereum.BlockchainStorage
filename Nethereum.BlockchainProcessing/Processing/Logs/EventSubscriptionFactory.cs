@@ -46,19 +46,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         private async Task<EventSubscription> LoadEventSubscriptionsAsync(EventSubscriptionDto eventSubscription)
         {
             var matcher = await EventMatcherFactory.LoadAsync(eventSubscription);
-            var handler = await CreateEventHandler(eventSubscription);
+            var state = await Db.GetOrCreateEventSubscriptionState(eventSubscription.Id);
+            var handler = await CreateEventHandler(eventSubscription, state);
+            
 
-            return new EventSubscription(eventSubscription.Id, eventSubscription.SubscriberId, matcher, handler);
+            return new EventSubscription(eventSubscription.Id, eventSubscription.SubscriberId, matcher, handler, state);
         }
 
-        private async Task<EventHandlerCoordinator> CreateEventHandler(EventSubscriptionDto eventSubscription)
+        private async Task<EventHandlerCoordinator> CreateEventHandler(EventSubscriptionDto eventSubscription, EventSubscriptionStateDto state)
         {
             var handlerConfiguration = await Db.GetEventHandlers(eventSubscription.Id);
 
             var handlers = new List<IEventHandler>(handlerConfiguration.Length);
             foreach(var configItem in handlerConfiguration.Where(c => !c.Disabled).OrderBy(h => h.Order))
             {
-                handlers.Add(await DecodedEventHandlerFactory.LoadAsync(configItem));
+                handlers.Add(await DecodedEventHandlerFactory.LoadAsync(configItem, state));
             }
 
             return new EventHandlerCoordinator(

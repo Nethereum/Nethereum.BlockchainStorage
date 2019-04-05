@@ -20,6 +20,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         SubscriberDto _subscriberOneConfig;
         EventSubscriptionDto _eventSubscriptionConfig;
+        EventSubscriptionStateDto _eventSubscriptionStateConfig;
         EventHandlerDto _eventHandlerConfig;
 
 
@@ -44,13 +45,19 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 EventSubscriptionId = _eventSubscriptionConfig.Id,
                 HandlerType = EventHandlerType.Queue  
             };
+            _eventSubscriptionStateConfig = new EventSubscriptionStateDto
+            {
+                Id = 1,
+                EventSubscriptionId = _eventSubscriptionConfig.Id
+            };
 
             _mockDb.Setup(d => d.GetSubscribersAsync(PARTITION_ID)).ReturnsAsync(new []{_subscriberOneConfig});
             _mockDb.Setup(d => d.GetEventSubscriptionsAsync(_subscriberOneConfig.Id)).ReturnsAsync(new []{_eventSubscriptionConfig});
             _mockDb.Setup(d => d.GetEventHandlers(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_eventHandlerConfig });
+            _mockDb.Setup(d => d.GetOrCreateEventSubscriptionState(_eventSubscriptionConfig.Id)).ReturnsAsync(_eventSubscriptionStateConfig);
 
+            _mockEventHandlerFactory.Setup(f => f.LoadAsync(_eventHandlerConfig, _eventSubscriptionStateConfig)).ReturnsAsync(_mockEventHandler.Object);
             _mockEventMatcherFactory.Setup(f => f.LoadAsync(_eventSubscriptionConfig)).ReturnsAsync(_mockEventMatcher.Object);
-            _mockEventHandlerFactory.Setup(f => f.LoadAsync(_eventHandlerConfig)).ReturnsAsync(_mockEventHandler.Object);
         }
 
         [Fact]

@@ -4,5 +4,7 @@
     {
         long Id {get;}
         long SubscriberId {get;}
+
+        EventSubscriptionStateDto State { get; }
     }
 }

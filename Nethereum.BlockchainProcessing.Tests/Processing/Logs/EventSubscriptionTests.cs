@@ -17,11 +17,17 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         private readonly Mock<IEventHandlerCoordinator> _handler = new Mock<IEventHandlerCoordinator>();
         private readonly EventSubscription _eventSubscription;
         private readonly EventABI _eventAbi = new EventABI("test");
+        private readonly EventSubscriptionStateDto _eventSubscriptionState = new EventSubscriptionStateDto();
 
         public EventSubscriptionTests()
         {
             _matcher.Setup(m => m.Abi).Returns(_eventAbi);
-            _eventSubscription = new EventSubscription(id: 1, subscriberId: 2, matcher: _matcher.Object, handler: _handler.Object);
+            _eventSubscription = new EventSubscription(
+                id: 1, 
+                subscriberId: 2, 
+                matcher: _matcher.Object, 
+                handler: _handler.Object, 
+                state: _eventSubscriptionState);
         }
 
         [Fact]
@@ -39,13 +45,13 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public void MatcherCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new EventSubscription(1, 1, null, _handler.Object));
+            Assert.Throws<ArgumentNullException>(() => new EventSubscription(1, 1, null, _handler.Object, _eventSubscriptionState));
         }
 
         [Fact]
         public void HandlerCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new EventSubscription(1, 1, _matcher.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new EventSubscription(1, 1, _matcher.Object, null, _eventSubscriptionState));
         }
 
         [Theory]

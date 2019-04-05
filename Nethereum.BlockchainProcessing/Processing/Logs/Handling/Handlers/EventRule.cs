@@ -1,24 +1,256 @@
-﻿using System.Threading.Tasks;
+﻿using Nethereum.Hex.HexTypes;
+using System;
+using System.Linq;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class EventRule : IEventHandler
+    public class EventRuleConfiguration
     {
-        public long Id { get; }
+        // string equals
+        // number equals
+        // number greater or equal
+        // number less or equal
+        // x many iterations (modulus)
 
-        public EventRule(long id, EventSubscriptionStateDto state)
+        //input source
+        //input parameter name
+
+        public EventRuleSource Source { get;set;}
+        public EventRuleType Type { get;set;}
+
+        public string InputName { get;set;}
+
+        public int EventParameterNumber { get;set;}
+
+        public string Value { get;set;}
+    }
+
+    public enum EventRuleSource
+    {
+        Static, EventParameter, EventState, EventSubscriptionState
+    }
+
+    public enum EventRuleType
+    {
+        Equals, GreaterOrEqualTo, LessThanOrEqualTo, Modulus, Empty
+    }
+
+
+    public class EventRule : EventHandlerBase, IEventHandler
+    {
+        public EventRule(long id, EventSubscriptionStateDto state, EventRuleConfiguration configuration) :base(id, state)
         {
-            Id = id;
-            State = state;
+            Configuration = configuration;
         }
 
-        public EventSubscriptionStateDto State { get; }
+        public EventRuleConfiguration Configuration { get; }
 
         public Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            //TODO: Apply some config driven logic based on event or cumulative state
-            //option to return false to prevent further handlers from being invoked
-            throw new System.NotImplementedException("EventRule is yet to be implemented");
+            var inputValue = GetInputValue(decodedEvent);
+
+            var isTrue = IsTrue(inputValue);
+
+            return Task.FromResult(isTrue);
+        }
+
+        private bool IsTrue(object inputValue)
+        {
+            switch (Configuration.Type)
+            {
+                case EventRuleType.Empty:
+                    return IsEmpty(inputValue);
+                case EventRuleType.Equals:
+                    return IsEqual(inputValue);
+                case EventRuleType.GreaterOrEqualTo:
+                    return IsGreatorOrEqualTo(inputValue);
+                case EventRuleType.LessThanOrEqualTo:
+                    return IsLessThanOrEqualTo(inputValue);
+                case EventRuleType.Modulus:
+                    return IsModulus(inputValue);
+                default:
+                    return false;
+            }
+        }
+
+        private bool IsModulus(object inputValue)
+        {
+            if (inputValue == null) return false;
+
+            if(!long.TryParse(Configuration.Value, out long modulus))
+            {
+                return false;
+            }
+
+            if(modulus == 0) return false;
+
+            if (inputValue is int inputValAsInt)
+            {
+                return (inputValAsInt % modulus) == 0;
+            }
+
+            if (inputValue is long inputValAsLong)
+            {
+                return (inputValAsLong % modulus) == 0;
+            }
+
+            if (inputValue is BigInteger inputValAsBigInteger)
+            {
+                return (inputValAsBigInteger % modulus) == 0;
+            }
+
+            if (inputValue is HexBigInteger inputValAsHexBigInt)
+            {
+                return (inputValAsHexBigInt.Value % modulus) == 0;
+            }
+
+            return false;
+        }
+
+        private bool IsLessThanOrEqualTo(object inputValue)
+        {
+            if (inputValue == null) return false;
+
+            if (!BigInteger.TryParse(Configuration.Value, out BigInteger valAsBi))
+            {
+                return false;
+            }
+
+            if (inputValue is int inputValAsInt)
+            {
+                return inputValAsInt <= valAsBi;
+            }
+
+            if (inputValue is long inputValAsLong)
+            {
+                return inputValAsLong <= valAsBi;
+            }
+
+            if (inputValue is BigInteger inputValAsBigInteger)
+            {
+                return inputValAsBigInteger <= valAsBi;
+            }
+
+            if (inputValue is HexBigInteger inputValAsHexBigInt)
+            {
+                return inputValAsHexBigInt.Value <= valAsBi;
+            }
+
+            return false;
+        }
+
+        private bool IsGreatorOrEqualTo(object inputValue)
+        {
+            if (inputValue == null) return false;
+
+            if (!BigInteger.TryParse(Configuration.Value, out BigInteger valAsBi))
+            {
+                return false;
+            }
+
+            if (inputValue is int inputValAsInt)
+            {
+                return inputValAsInt >= valAsBi;
+            }
+
+            if (inputValue is long inputValAsLong)
+            {
+                return inputValAsLong >= valAsBi;
+            }
+
+            if (inputValue is BigInteger inputValAsBigInteger)
+            {
+                return inputValAsBigInteger >= valAsBi;
+            }
+
+            if (inputValue is HexBigInteger inputValAsHexBigInt)
+            {
+                return inputValAsHexBigInt.Value >= valAsBi;
+            }
+
+            return false;
+        }
+
+        private bool IsEqual(object inputValue)
+        {
+            if(inputValue == null) return false;
+
+            if(inputValue is String s)
+            {
+                return s == Configuration.Value;
+            }
+
+            if (!BigInteger.TryParse(Configuration.Value, out BigInteger valAsBi))
+            {
+                return false;
+            }
+
+            if (inputValue is int inputValAsInt)
+            {
+                return valAsBi == inputValAsInt;
+            }
+
+            if (inputValue is long inputValAsLong)
+            {
+                return valAsBi == inputValAsLong;
+            }
+
+            if (inputValue is BigInteger inputValAsBigInteger)
+            {
+                return valAsBi == inputValAsBigInteger;
+            }
+
+            if (inputValue is HexBigInteger inputValAsHexBigInt)
+            {
+                return valAsBi == inputValAsHexBigInt.Value;
+            }
+
+            return false;
+        }
+
+        private bool IsEmpty(object inputValue)
+        {
+            if(inputValue == null) return true;
+            if(inputValue is string str) return string.IsNullOrEmpty(str);
+
+            return false;
+        }
+
+        private object GetInputValue(DecodedEvent decodedEvent)
+        {
+            switch (Configuration.Source)
+            {
+                case EventRuleSource.Static:
+                    return Configuration.Value;
+                case EventRuleSource.EventState:
+                    return GetValueFromEventState(decodedEvent);
+                case EventRuleSource.EventSubscriptionState:
+                    return GetValueFromEventSubscriptionState();
+                case EventRuleSource.EventParameter:
+                    return GetEventParameterValue(decodedEvent);
+                default:
+                    return null;
+            }
+        }
+
+        private object GetValueFromEventSubscriptionState()
+        {
+            State.Values.TryGetValue(Configuration.InputName, out object val);
+            return val;
+        }
+
+        private object GetValueFromEventState(DecodedEvent decodedEvent)
+        {
+            decodedEvent.State.TryGetValue(Configuration.InputName, out object val);
+            return val;
+        }
+
+        private object GetEventParameterValue(DecodedEvent decodedEvent)
+        {
+            var parameter = decodedEvent.Event?.FirstOrDefault(p => p.Parameter.Order == Configuration.EventParameterNumber);
+            return parameter?.Result;
         }
     }
 }

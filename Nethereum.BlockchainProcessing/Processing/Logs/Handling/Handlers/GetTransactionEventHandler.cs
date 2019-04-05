@@ -3,13 +3,11 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class GetTransactionEventHandler : IEventHandler
+    public class GetTransactionEventHandler : EventHandlerBase, IEventHandler
     {
-        public long Id { get; }
-
-        public GetTransactionEventHandler(long id, IGetTransactionByHash proxy)
+        public GetTransactionEventHandler(long id, EventSubscriptionStateDto state, IGetTransactionByHash proxy)
+            :base(id, state)
         {
-            Id = id;
             Proxy = proxy;
         }
 

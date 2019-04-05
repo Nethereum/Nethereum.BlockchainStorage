@@ -16,10 +16,10 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
         }
 
         public ISubscriberQueueConfigurationFactory QueueConfigurationFactory { get; }
-        public CloudStorageAccount CloudStorageAccount { get; set; }
-        public CloudQueueClient CloudQueueClient { get; set; }
+        public CloudStorageAccount CloudStorageAccount { get; }
+        public CloudQueueClient CloudQueueClient { get; }
 
-        public async Task<ISubscriberQueue> GetSubscriberQueueAsync(long subscriberQueueId)
+        public async Task<IQueue> GetSubscriberQueueAsync(long subscriberQueueId)
         {
             var queueConfig = await QueueConfigurationFactory.GetSubscriberQueueAsync(subscriberQueueId);
             if(queueConfig.Disabled) throw new Exception($"Subscriber Queue ({subscriberQueueId}) is disabled");
@@ -28,7 +28,7 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 
             await queueReference.CreateIfNotExistsAsync();
 
-            return new AzureSubscriberQueue(queueReference);
+            return new AzureQueue(queueReference);
         }
     }
 }

@@ -8,16 +8,14 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class EventAggregator : IEventHandler
+
+    public class EventAggregator : EventHandlerBase, IEventHandler
     {
-        public long Id { get; }
-        public EventSubscriptionStateDto State { get; }
         public EventAggregatorConfiguration Configuration { get; }
 
-        public EventAggregator(long id, EventSubscriptionStateDto state, EventAggregatorConfiguration aggregatorConfiguration)
+        public EventAggregator(long id, EventSubscriptionStateDto state, EventAggregatorConfiguration aggregatorConfiguration):
+            base(id, state)
         {
-            Id = id;
-            State = state;
             Configuration = aggregatorConfiguration;
         }
 

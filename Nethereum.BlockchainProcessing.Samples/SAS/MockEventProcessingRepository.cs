@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
@@ -14,13 +15,20 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public List<ContractQueryParameterDto> ContractQueryParameters = new List<ContractQueryParameterDto>();
         public List<ParameterConditionDto> ParameterConditions = new List<ParameterConditionDto>();
         public List<EventAggregatorConfigurationDto> EventAggregators = new List<EventAggregatorConfigurationDto>();
-        public Dictionary<long, EventSubscriptionStateDto> EventSubscriptionStates = new Dictionary<long, EventSubscriptionStateDto>();
+        public List<EventSubscriptionStateDto> EventSubscriptionStates = new List<EventSubscriptionStateDto>();
         public List<SubscriberQueueConfigurationDto> SubscriberQueues = new List<SubscriberQueueConfigurationDto>();
         public List<SubscriberSearchIndexConfigurationDto> SubscriberSearchIndexes = new List<SubscriberSearchIndexConfigurationDto>();
         public List<EventHandlerHistoryDto> EventHandlerHistories = new List<EventHandlerHistoryDto>();
+        
         public EventSubscriptionStateDto GetEventSubscriptionState(long eventSubscriptionId)
         {
-            return EventSubscriptionStates[eventSubscriptionId];
+            return EventSubscriptionStates.FirstOrDefault(s => s.EventSubscriptionId == eventSubscriptionId);
+        }
+
+        public EventSubscriptionStateDto Add(EventSubscriptionStateDto dto)
+        {
+            EventSubscriptionStates.Add(dto);
+            return dto;
         }
 
         public EventHandlerHistoryDto Add(EventHandlerHistoryDto dto)

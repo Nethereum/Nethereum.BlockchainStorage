@@ -12,12 +12,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     public class EventSubscription : IEventSubscription
     {
-        public EventSubscription(long id, long subscriberId, IEventMatcher matcher, IEventHandlerCoordinator handler)
+        public EventSubscription(long id, long subscriberId, IEventMatcher matcher, IEventHandlerCoordinator handler, EventSubscriptionStateDto state)
         {
             Id = id;
             SubscriberId = subscriberId;
             Matcher = matcher ?? throw new System.ArgumentNullException(nameof(matcher));
             Handler = handler ?? throw new System.ArgumentNullException(nameof(handler));
+            State = state;
         }
 
         public long SubscriberId {get; }
@@ -25,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long Id {get; }
 
         public IEventHandlerCoordinator Handler { get; }
-
+        public EventSubscriptionStateDto State { get; }
         public IEventMatcher Matcher { get; }
 
         public bool IsLogForEvent(FilterLog log)

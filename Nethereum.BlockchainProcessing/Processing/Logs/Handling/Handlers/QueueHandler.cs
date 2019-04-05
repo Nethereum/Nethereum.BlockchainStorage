@@ -2,20 +2,18 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public class QueueHandler : IEventHandler
+    public class QueueHandler : EventHandlerBase, IEventHandler
     {
-        public long Id { get; }
-        public QueueHandler(long id, ISubscriberQueue subscriberQueue)
+        public QueueHandler(long id, EventSubscriptionStateDto state, IQueue queue):base(id, state)
         {
-            Id = id;
-            SubscriberQueue = subscriberQueue;
+            Queue = queue;
         }
 
-        public ISubscriberQueue SubscriberQueue { get; }
+        public IQueue Queue { get; }
 
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            await SubscriberQueue.AddMessageAsync(decodedEvent);
+            await Queue.AddMessageAsync(decodedEvent);
             return true;
         }
     }

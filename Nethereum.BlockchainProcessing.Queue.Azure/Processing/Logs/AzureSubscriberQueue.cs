@@ -1,26 +1,26 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
-using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 {
-    public class AzureSubscriberQueue : ISubscriberQueue
+    public class AzureQueue : IQueue
     {
-        public AzureSubscriberQueue(CloudQueue cloudQueue)
+        public AzureQueue(CloudQueue cloudQueue)
         {
             CloudQueue = cloudQueue;
-            Name = cloudQueue.Name;
         }
 
-        public string Name {get; }
+        public string Name => CloudQueue.Name;
 
         public CloudQueue CloudQueue { get; }
 
         public async Task AddMessageAsync(object content)
         {
-            await CloudQueue.AddMessageAsync(new CloudQueueMessage(JsonConvert.SerializeObject(content)));
+            var contentAsJson = JsonConvert.SerializeObject(content);
+            var message = new CloudQueueMessage(contentAsJson);
+            await CloudQueue.AddMessageAsync(message);
         }
     }
 }

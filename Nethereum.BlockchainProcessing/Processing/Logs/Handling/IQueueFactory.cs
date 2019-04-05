@@ -4,6 +4,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public interface ISubscriberQueueFactory
     {
-        Task<ISubscriberQueue> GetSubscriberQueueAsync(long subscriberQueueId);
+        Task<IQueue> GetSubscriberQueueAsync(long subscriberQueueId);
     }
 }
