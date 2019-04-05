@@ -5,8 +5,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class GetTransactionEventHandler : IEventHandler
     {
-        public GetTransactionEventHandler(IGetTransactionByHash proxy)
+        public long Id { get; }
+
+        public GetTransactionEventHandler(long id, IGetTransactionByHash proxy)
         {
+            Id = id;
             Proxy = proxy;
         }
 

@@ -163,4 +163,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public string Name {get;set;}
     }
 
+    public class EventHandlerHistoryDto: DbRow
+    {
+        public long SubscriberId {get;set; }
+        public long EventSubscriptionId {get;set; }
+        public long EventHandlerId {get;set; }
+        public string EventKey { get;set;}
+    }
+
 }

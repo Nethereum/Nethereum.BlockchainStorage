@@ -56,7 +56,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             var mockContractQuery =  MockContractQuery(FAKE_QUERY_RESULT, (actualArgs) => actualQueryArgs = actualArgs);
 
             subscriptionState = new EventSubscriptionStateDto();
-            contractQueryEventHandler = new ContractQueryEventHandler(mockContractQuery, subscriptionState, queryConfig);
+            contractQueryEventHandler = new ContractQueryEventHandler(1, mockContractQuery, subscriptionState, queryConfig);
         }
     }
 }

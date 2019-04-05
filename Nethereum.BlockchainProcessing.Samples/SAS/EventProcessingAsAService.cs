@@ -43,7 +43,6 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // queue components
             var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
-            var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PARTITION}");
 
             // load subscribers and event subscriptions
             var eventMatcherFactory = new EventMatcherFactory(configDb);
@@ -51,10 +50,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var eventSubscriptionFactory = new EventSubscriptionFactory(configDb, eventMatcherFactory, eventHandlerFactory);
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PARTITION);
 
-            // load service
+            // progress repo
+            var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PARTITION}");
             var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions);
+
+            // load service
             var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions);
             var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute

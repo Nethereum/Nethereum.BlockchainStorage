@@ -8,7 +8,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         IEventContractQueryConfigurationFactory, 
         IEventAggregatorConfigurationFactory,
         ISubscriberQueueConfigurationFactory,
-        ISubscriberSearchIndexConfigurationFactory
+        ISubscriberSearchIndexConfigurationFactory,
+        IEventHandlerHistoryDb
     {
         Task<SubscriberContractDto> GetContractAsync(long contractId);
         Task<EventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId);

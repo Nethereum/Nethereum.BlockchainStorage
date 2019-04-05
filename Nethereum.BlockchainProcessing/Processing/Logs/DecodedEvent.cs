@@ -9,12 +9,14 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public DecodedEvent(List<ParameterOutput> outputs, FilterLog log):base(outputs, log)
         {
-
+            Key = $"{log?.BlockNumber?.Value}_{ log?.TransactionHash}_{ log?.LogIndex?.Value}";
         }
 
         public Dictionary<string, object> State {get;set;} = new Dictionary<string, object>();
 
         public Transaction Transaction {get;set;}
+
+        public string Key {get; }
 
         public static DecodedEvent Empty()
         {

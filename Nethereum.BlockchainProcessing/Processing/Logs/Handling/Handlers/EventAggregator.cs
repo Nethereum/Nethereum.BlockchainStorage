@@ -10,11 +10,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class EventAggregator : IEventHandler
     {
+        public long Id { get; }
         public EventSubscriptionStateDto State { get; }
         public EventAggregatorConfiguration Configuration { get; }
 
-        public EventAggregator(EventSubscriptionStateDto state, EventAggregatorConfiguration aggregatorConfiguration)
+        public EventAggregator(long id, EventSubscriptionStateDto state, EventAggregatorConfiguration aggregatorConfiguration)
         {
+            Id = id;
             State = state;
             Configuration = aggregatorConfiguration;
         }

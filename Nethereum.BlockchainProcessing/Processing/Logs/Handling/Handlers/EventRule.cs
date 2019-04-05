@@ -4,8 +4,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class EventRule : IEventHandler
     {
-        public EventRule(EventSubscriptionStateDto state)
+        public long Id { get; }
+
+        public EventRule(long id, EventSubscriptionStateDto state)
         {
+            Id = id;
             State = state;
         }
 

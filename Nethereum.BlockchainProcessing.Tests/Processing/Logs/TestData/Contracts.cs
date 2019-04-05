@@ -16,13 +16,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.TestData
             public static readonly string Abi = "[{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'','type':'address'}],'name':'balances','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'','type':'address'},{'name':'','type':'address'}],'name':'allowed','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'remaining','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'inputs':[{'name':'_initialAmount','type':'uint256'},{'name':'_tokenName','type':'string'},{'name':'_decimalUnits','type':'uint8'},{'name':'_tokenSymbol','type':'string'}],'payable':false,'stateMutability':'nonpayable','type':'constructor'},{'anonymous':false,'inputs':[{'indexed':true,'name':'_from','type':'address'},{'indexed':true,'name':'_to','type':'address'},{'indexed':false,'name':'_value','type':'uint256'}],'name':'Transfer','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'_owner','type':'address'},{'indexed':true,'name':'_spender','type':'address'},{'indexed':false,'name':'_value','type':'uint256'}],'name':'Approval','type':'event'}]";
             public static readonly string TransferEventSignature = "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
-            public static ContractABI ContractAbi = new ABIDeserialiser().DeserialiseContract(Abi);
+            public static readonly ContractABI ContractAbi = new ABIDeserialiser().DeserialiseContract(Abi);
 
-            public static EventABI TransferEventAbi = ContractAbi.Events.First(e => e.Sha3Signature == TransferEventSignature);
+            public static readonly EventABI TransferEventAbi = ContractAbi.Events.First(e => e.Sha3Signature == TransferEventSignature);
 
-            public static FilterLog SampleTransferLog()
-        {
-            var log = JObject.Parse(
+            private static readonly JObject SampleTransferLogAsJObject = JObject.Parse(
                 $@"{{
   'address': '0x243e72b69141f6af525a9a5fd939668ee9f2b354',
   'topics': [
@@ -37,11 +35,13 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.TestData
   'blockHash': '0x58dab5a71037752b36e0a6af02f290fbc3dc5b2abf88d88f2c04defd9b8fb03b',
   'logIndex': '0x0',
   'removed': false
-}}").ToObject<FilterLog>();
+}}");
 
-            return log;
+            public static FilterLog SampleTransferLog()
+        {
+            return SampleTransferLogAsJObject.ToObject<FilterLog>();
         }
-        }
+    }
         
     }
 }

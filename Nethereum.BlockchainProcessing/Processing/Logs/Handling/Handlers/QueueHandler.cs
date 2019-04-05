@@ -4,8 +4,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class QueueHandler : IEventHandler
     {
-        public QueueHandler(ISubscriberQueue subscriberQueue)
+        public long Id { get; }
+        public QueueHandler(long id, ISubscriberQueue subscriberQueue)
         {
+            Id = id;
             SubscriberQueue = subscriberQueue;
         }
 

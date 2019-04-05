@@ -5,6 +5,7 @@ using Nethereum.Contracts.Extensions;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
@@ -12,7 +13,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public static DecodedEvent ToDecodedEvent(this FilterLog log, EventABI abi = null)
         {
-            var decodedParameterOutputs = abi?.DecodeEventDefaultTopics(log) ?? new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), log);
+            var decodedParameterOutputs = abi?.DecodeEventDefaultTopics(log) ?? 
+                new EventLog<List<ParameterOutput>>(new List<ParameterOutput>(), log);
+
             var decodedEvent = new DecodedEvent(decodedParameterOutputs.Event, decodedParameterOutputs.Log);
             decodedEvent.AddStateData(abi, log);
             return decodedEvent;

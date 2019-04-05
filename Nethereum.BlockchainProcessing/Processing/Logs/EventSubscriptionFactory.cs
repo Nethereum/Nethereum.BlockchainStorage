@@ -8,28 +8,30 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class EventSubscriptionFactory : IEventSubscriptionFactory
     {
-        private readonly IEventProcessingConfigurationDb _db;
-
         public IEventMatcherFactory EventMatcherFactory { get; }
 
         public IEventHandlerFactory DecodedEventHandlerFactory { get; }
+        public IEventProcessingConfigurationDb Db { get; }
 
-        public EventSubscriptionFactory(IEventProcessingConfigurationDb db, IEventMatcherFactory eventMatcherFactory, IEventHandlerFactory decodedEventHandlerFactory)
+        public EventSubscriptionFactory(
+            IEventProcessingConfigurationDb db, 
+            IEventMatcherFactory eventMatcherFactory, 
+            IEventHandlerFactory decodedEventHandlerFactory)
         {
-            _db = db;
+            Db = db;
             EventMatcherFactory = eventMatcherFactory;
             DecodedEventHandlerFactory = decodedEventHandlerFactory;
         }
 
         public async Task<List<IEventSubscription>> LoadAsync(long partitionId)
         {
-            var subscriberConfigurations = await _db.GetSubscribersAsync(partitionId);
+            var subscriberConfigurations = await Db.GetSubscribersAsync(partitionId);
 
             var eventSubscriptions = new List<IEventSubscription>(subscriberConfigurations.Length);
 
             foreach (var subscriberConfiguration in subscriberConfigurations.Where(c => !c.Disabled))
             {
-                var eventSubscriptionConfigurations = await _db.GetEventSubscriptionsAsync(subscriberConfiguration.Id);
+                var eventSubscriptionConfigurations = await Db.GetEventSubscriptionsAsync(subscriberConfiguration.Id);
 
                 foreach (var eventSubscriptionConfig in eventSubscriptionConfigurations.Where(s => !s.Disabled))
                 {
@@ -51,7 +53,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         private async Task<EventHandlerCoordinator> CreateEventHandler(EventSubscriptionDto eventSubscription)
         {
-            var handlerConfiguration = await _db.GetEventHandlers(eventSubscription.Id);
+            var handlerConfiguration = await Db.GetEventHandlers(eventSubscription.Id);
 
             var handlers = new List<IEventHandler>(handlerConfiguration.Length);
             foreach(var configItem in handlerConfiguration.Where(c => !c.Disabled).OrderBy(h => h.Order))
@@ -60,6 +62,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             }
 
             return new EventHandlerCoordinator(
+                Db,
                 eventSubscription.SubscriberId, 
                 eventSubscription.Id, 
                 handlers);

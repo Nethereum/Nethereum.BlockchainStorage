@@ -7,13 +7,19 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
     public class ContractQueryEventHandler : IEventHandler
     {
-        public ContractQueryEventHandler(IContractQuery contractQueryProxy, EventSubscriptionStateDto state, ContractQueryConfiguration queryConfig)
+        public ContractQueryEventHandler(
+            long id,
+            IContractQuery contractQueryProxy, 
+            EventSubscriptionStateDto state, 
+            ContractQueryConfiguration queryConfig)
         {
+            Id = id;
             Proxy = contractQueryProxy ?? throw new System.ArgumentNullException(nameof(contractQueryProxy));
             Config = queryConfig ?? throw new System.ArgumentNullException(nameof(queryConfig));
             State = state ?? throw new System.ArgumentNullException(nameof(state));
         }
 
+        public long Id { get;}
         public IContractQuery Proxy { get; }
         public ContractQueryConfiguration Config { get; }
         public EventSubscriptionStateDto State { get; }

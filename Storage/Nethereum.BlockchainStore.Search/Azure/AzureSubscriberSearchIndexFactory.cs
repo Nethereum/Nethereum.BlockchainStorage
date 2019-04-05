@@ -36,15 +36,32 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
     public class EventToGenericSearchDocMapper : IEventToSearchDocumentMapper<List<ParameterOutput>, GenericEventLogSearchDocument>
     {
+        public static class Fields
+        {
+            public const string DocumentKey = "document_key";
+            public const string BlockNumber = "block_number";
+            public const string TxHash = "transaction_hash";
+            public const string LogAddress = "log_address";
+            public const string LogIndex = "log_index";
+            public const string StateValuePrefix = "state_value_";
+            public const string EventParameterPrefix = "event_parameter_";
+
+            public static string EventParameter(int order) => $"{EventParameterPrefix}{order}";
+            public static string StateValue(int order) => $"{StateValuePrefix}{order}";
+
+            public const int EventParameterCount = 10;
+            public const int StateValueCount = 10;
+        }
+
         public GenericEventLogSearchDocument Map(EventLog<List<ParameterOutput>> from)
         {
             var searchDoc = new GenericEventLogSearchDocument();
 
-            searchDoc["DocumentKey"] = $"{from.Log.TransactionHash}_{from.Log.LogIndex.Value}";
-            searchDoc["BlockNumber"] = from.Log.BlockNumber?.Value.ToAzureFieldValue();
-            searchDoc["TxHash"] = from.Log.TransactionHash;
-            searchDoc["LogAddress"] = from.Log.Address;
-            searchDoc["LogIndex"] = from.Log.LogIndex.Value.ToAzureFieldValue();
+            searchDoc[Fields.DocumentKey] = $"{from.Log.TransactionHash}_{from.Log.LogIndex.Value}";
+            searchDoc[Fields.BlockNumber] = from.Log.BlockNumber?.Value.ToAzureFieldValue();
+            searchDoc[Fields.TxHash] = from.Log.TransactionHash;
+            searchDoc[Fields.LogAddress] = from.Log.Address;
+            searchDoc[Fields.LogIndex] = from.Log.LogIndex.Value.ToAzureFieldValue();
 
             if (from is DecodedEvent decodedEvent)
             {
@@ -52,13 +69,13 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 foreach (var key in decodedEvent.State.Keys)
                 {
                     count++;
-                    searchDoc[$"stateVal{count}"] = $"{key}:{decodedEvent.State[key]?.ToAzureFieldValue()}";
+                    searchDoc[Fields.StateValue(count)] = $"{key}:{decodedEvent.State[key]?.ToAzureFieldValue()}";
                 }
             }
 
             foreach (var parameterOutput in from.Event.OrderBy(p => p.Parameter.Order))
             {
-                var key = $"eventParam{parameterOutput.Parameter.Order}";
+                var key = Fields.EventParameter(parameterOutput.Parameter.Order);
                 var prefix = string.IsNullOrEmpty(parameterOutput.Parameter.Name) ? parameterOutput.Parameter.Order.ToString() : parameterOutput.Parameter.Name;
                 searchDoc[key] = $"{prefix}:{parameterOutput.Result?.ToAzureFieldValue()}";
             }
@@ -73,36 +90,27 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 Name = indexName,
                 Fields = new List<Field>
                 {
-                    new Field("DocumentKey", DataType.String) { IsKey = true },
+                    new Field(Fields.DocumentKey, DataType.String) { IsKey = true },
 
-                    new Field("BlockNumber", DataType.String){IsSearchable = true },
-                    new Field("TxHash", DataType.String){IsSearchable = true },
-                    new Field("LogAddress", DataType.String){IsSearchable = true },
-                    new Field("LogIndex", DataType.String),
-
-                    new Field("eventParam1", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("eventParam2", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("eventParam3", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("eventParam4", DataType.String) {  },
-                    new Field("eventParam5", DataType.String) { },
-                    new Field("eventParam6", DataType.String) {  },
-                    new Field("eventParam7", DataType.String) {  },
-                    new Field("eventParam8", DataType.String) {  },
-                    new Field("eventParam9", DataType.String) {  },
-                    new Field("eventParam10", DataType.String) {  },
-
-                    new Field("stateVal1", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("stateVal2", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("stateVal3", DataType.String) { IsSearchable = true, IsFacetable = true },
-                    new Field("stateVal4", DataType.String) {  },
-                    new Field("stateVal5", DataType.String) { },
-                    new Field("stateVal6", DataType.String) {  },
-                    new Field("stateVal7", DataType.String) {  },
-                    new Field("stateVal8", DataType.String) {  },
-                    new Field("stateVal9", DataType.String) {  },
-                    new Field("stateVal10", DataType.String) {  }
+                    new Field(Fields.BlockNumber, DataType.String){IsSearchable = true },
+                    new Field(Fields.TxHash, DataType.String){IsSearchable = true },
+                    new Field(Fields.LogAddress, DataType.String){IsSearchable = true },
+                    new Field(Fields.LogIndex, DataType.String)
                 }
             };
+
+            for(var i = 1; i< (Fields.EventParameterCount + 1); i++) 
+            {
+                bool searchAble = i < 4;
+                index.Fields.Add(new Field(Fields.EventParameter(i), DataType.String) { IsSearchable = searchAble, IsFacetable = searchAble });
+            }
+
+            for (var i = 1; i < (Fields.StateValueCount + 1); i++)
+            {
+                bool searchAble = i < 4;
+                index.Fields.Add(new Field(Fields.StateValue(i), DataType.String) { IsSearchable = searchAble, IsFacetable = searchAble });
+            }
+
             return index;
         }
     }

@@ -61,21 +61,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             switch (config.HandlerType)
             {
                 case EventHandlerType.Rule:
-                    return new EventRule(state);
+                    return new EventRule(config.Id, state);
                 case EventHandlerType.Aggregate:
                     var aggregatorConfig = await EventAggregatorConfigurationFactory.GetEventAggregationConfigurationAsync(config.Id);
-                    return new EventAggregator(state, aggregatorConfig);
+                    return new EventAggregator(config.Id, state, aggregatorConfig);
                 case EventHandlerType.ContractQuery:
                     var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(config.Id);
-                    return new ContractQueryEventHandler(ContractQueryHandler, state, queryConfig);
+                    return new ContractQueryEventHandler(config.Id, ContractQueryHandler, state, queryConfig);
                 case EventHandlerType.Queue:
                     var queue = await SubscriberQueueFactory.GetSubscriberQueueAsync(config.SubscriberQueueId);
-                    return new QueueHandler(queue);
+                    return new QueueHandler(config.Id, queue);
                 case EventHandlerType.GetTransaction:
-                    return new GetTransactionEventHandler(GetTransactionProxy);
+                    return new GetTransactionEventHandler(config.Id, GetTransactionProxy);
                 case EventHandlerType.Index:
                     var searchIndex = await SubscriberSearchIndexFactory.GetSubscriberSearchIndexAsync(config.SubscriberSearchIndexId);
-                    return new SearchIndexHandler(searchIndex);
+                    return new SearchIndexHandler(config.Id, searchIndex);
                 default:
                     throw new ArgumentException("unsupported handler type");
             }

@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         {
             AggregatorConfig = CreateConfiguration();
             EventSubscriptionState = new EventSubscriptionStateDto();
-            Aggregator = new EventAggregator(EventSubscriptionState, AggregatorConfig);
+            Aggregator = new EventAggregator(1, EventSubscriptionState, AggregatorConfig);
         }
     }
 }

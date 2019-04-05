@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             AddNosey(PartitionId, idGenerator, repo);
             AddTransferIndexer(PartitionId, idGenerator, repo);
 
-            var db = MockAllQueries(repo);
+            var db = MockAllQueries(repo, idGenerator);
       
             return db;
         }
@@ -324,9 +324,31 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             });
         }
 
-        private static IEventProcessingConfigurationDb MockAllQueries(MockEventProcessingRepository repo)
+        private static IEventProcessingConfigurationDb MockAllQueries(MockEventProcessingRepository repo, IdGenerator id)
         {
             Mock<IEventProcessingConfigurationDb> configDb = new Mock<IEventProcessingConfigurationDb>();
+
+            configDb.Setup(h => h.AddEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns<long, string>((eventHandlerId, eventKey) =>
+                {
+                    repo.Add(new EventHandlerHistoryDto
+                    {
+                        Id = id.Next<EventHandlerHistoryDto>(),
+                        EventHandlerId = eventHandlerId,
+                        EventKey = eventKey
+                    });
+                    return Task.CompletedTask;
+                });
+
+            configDb.Setup(h => h.ContainsEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns<long, string>((eventHandlerId, eventKey) =>
+                {
+                    var exists = repo.EventHandlerHistories.Any(h => 
+                    h.EventHandlerId == eventHandlerId && 
+                    h.EventKey == eventKey);
+
+                    return Task.FromResult(exists);
+                });
 
             configDb
                 .Setup(d => d.GetSubscribersAsync(It.IsAny<long>()))

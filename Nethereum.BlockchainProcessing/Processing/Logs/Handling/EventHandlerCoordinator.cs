@@ -1,23 +1,27 @@
 ﻿using Nethereum.ABI.Model;
 using Nethereum.RPC.Eth.DTOs;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class EventHandlerCoordinator : IEventHandlerCoordinator
     {
-        public EventHandlerCoordinator(long subscriberId = 0, long eventSubscriptionId = 0, IEnumerable<IEventHandler> handlers = null)
+        public EventHandlerCoordinator(
+            IEventHandlerHistoryDb eventHandlerHistory, 
+            long subscriberId = 0, 
+            long eventSubscriptionId = 0, 
+            IEnumerable<IEventHandler> handlers = null)
         {
+            History = eventHandlerHistory;
             SubscriberId = subscriberId;
             EventSubscriptionId = eventSubscriptionId;
             Handlers = handlers ?? Array.Empty<IEventHandler>();
         }
 
+        public IEventHandlerHistoryDb History { get; }
         public long SubscriberId { get; }
         public long EventSubscriptionId { get; }
         public IEnumerable<IEventHandler> Handlers { get; }
@@ -26,32 +30,56 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
             foreach(var log in eventLogs)
             {
-                DecodedEvent decodedEvent = null;
-                try
+                if (!TryDecode(abi, log, out DecodedEvent decodedEvent))
                 {
-                    decodedEvent = log.ToDecodedEvent(abi);
-                }
-                catch(Exception x)
-                {
-                    if(x.Message.StartsWith("Number of indexes don't match the number of topics"))
-                    {
-                        return;
-                    }
-                    throw;
+                    continue;
                 }
 
-                decodedEvent.State["SubscriberId"] = SubscriberId;
-                decodedEvent.State["EventSubscriptionId"] = EventSubscriptionId;
+                SetStateValues(decodedEvent);
 
-                foreach (var handler in Handlers)
+                await InvokeHandlers(decodedEvent);
+            }
+        }
+
+        private async Task InvokeHandlers(DecodedEvent decodedEvent)
+        {
+            foreach (var handler in Handlers)
+            {
+                if (await History.ContainsEventHandlerHistory(handler.Id, decodedEvent.Key))
                 {
-                    decodedEvent.State["HandlerInvocations"] = 1 + (int)decodedEvent.State["HandlerInvocations"];
-
-                    if (!await handler.HandleAsync(decodedEvent))
-                    {
-                        break;
-                    }
+                    continue;
                 }
+
+                decodedEvent.State["HandlerInvocations"] = 1 + (int)decodedEvent.State["HandlerInvocations"];
+
+                var invokeNextHandler = await handler.HandleAsync(decodedEvent);
+
+                await History.AddEventHandlerHistory(handler.Id, decodedEvent.Key);
+
+                if (!invokeNextHandler)
+                {
+                    break;
+                }
+            }
+        }
+
+        private void SetStateValues(DecodedEvent decodedEvent)
+        {
+            decodedEvent.State["SubscriberId"] = SubscriberId;
+            decodedEvent.State["EventSubscriptionId"] = EventSubscriptionId;
+        }
+
+        private bool TryDecode(EventABI abi, FilterLog log, out DecodedEvent decodedEvent)
+        {
+            decodedEvent = null;
+            try
+            {
+                decodedEvent = log.ToDecodedEvent(abi);
+                return true;
+            }
+            catch (Exception x) when (x.Message.StartsWith("Number of indexes don't match the number of topics"))
+            {
+                return false;
             }
         }
 
