@@ -1,7 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processors;
-using Nethereum.Contracts;
+﻿using Nethereum.Contracts;
 using Nethereum.Contracts.Extensions;
-using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Handlers
@@ -11,7 +9,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
         public TransactionLogWrapper()
         {}
 
-        public TransactionLogWrapper(Transaction transaction, TransactionReceipt receipt, Log log)
+        public TransactionLogWrapper(Transaction transaction, TransactionReceipt receipt, FilterLog log)
         {
             Transaction = transaction;
             Receipt = receipt;
@@ -20,10 +18,10 @@ namespace Nethereum.BlockchainProcessing.Handlers
 
         public Transaction Transaction { get; private set; }
         public TransactionReceipt Receipt { get; private set; }
-        public Log Log { get; private set; }
+        public FilterLog Log { get; private set; }
         public long LogIndex => Log == null ? -1 : (long)Log.LogIndex.Value;
         public string Address => Log?.Address;
-        public string EventSignature => Log?.EventSignature;
+        public string EventSignature => Log?.EventSignature();
 
         public virtual bool IsForEvent<TEvent>() where TEvent : new()
         {

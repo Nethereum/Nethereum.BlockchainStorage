@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
     public class EventRuleConfiguration
     {

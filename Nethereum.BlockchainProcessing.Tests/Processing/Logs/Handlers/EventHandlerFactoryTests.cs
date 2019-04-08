@@ -1,7 +1,10 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -19,6 +22,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
         Mock<ISubscriberQueueFactory> _subscriberQueueFactory = new Mock<ISubscriberQueueFactory>();
         Mock<ISubscriberSearchIndexFactory> _subscriberSearchIndexFactory = new Mock<ISubscriberSearchIndexFactory>();
         Mock<IEventRuleConfigurationFactory> _eventRuleConfigurationFactory = new Mock<IEventRuleConfigurationFactory>();
+        Mock<ISubscriberRepositoryFactory> _subscriberRepositoryFactory = new Mock<ISubscriberRepositoryFactory>();
 
         EventSubscriptionStateDto _eventSubscriptionStateDto = new EventSubscriptionStateDto();
         Mock<IEventSubscription> _mockEventSubscription;
@@ -33,7 +37,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 _getTransactionProxy.Object, 
                 _subscriberQueueFactory.Object, 
                 _subscriberSearchIndexFactory.Object,
-                _eventRuleConfigurationFactory.Object);
+                _eventRuleConfigurationFactory.Object,
+                _subscriberRepositoryFactory.Object);
 
             _mockEventSubscription = new Mock<IEventSubscription>();
             _mockEventSubscription.Setup(s => s.State).Returns(_eventSubscriptionStateDto);
@@ -131,6 +136,32 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
             Assert.Equal(config.Id, queueHandler.Id);
             Assert.Same(_mockEventSubscription.Object, queueHandler.Subscription);
             Assert.Same(queue.Object, queueHandler.Queue);
+        }
+
+        [Fact]
+        public async Task Store()
+        {
+            var config = new EventHandlerDto
+            {
+                Id = 50,
+                EventSubscriptionId = 99,
+                HandlerType = EventHandlerType.Store,
+                SubscriberQueueId = 33
+            };
+
+            var repo = new Mock<ILogHandler>();
+
+            _subscriberRepositoryFactory
+                .Setup(f => f.GetLogRepositoryAsync(config.SubscriberRepositoryId))
+                .ReturnsAsync(repo.Object);
+
+            var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);
+
+            var repositoryHandler = handler as RepositoryHandler;
+            Assert.NotNull(repositoryHandler);
+            Assert.Equal(config.Id, repositoryHandler.Id);
+            Assert.Same(_mockEventSubscription.Object, repositoryHandler.Subscription);
+            Assert.Same(repo.Object, repositoryHandler.LogHandler);
         }
 
         [Fact]

@@ -1,7 +1,7 @@
 ﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
     public class GetTransactionEventHandler : EventHandlerBase, IEventHandler
     {

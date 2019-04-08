@@ -1,4 +1,4 @@
-﻿namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
+﻿namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
     public abstract class EventHandlerBase
     {

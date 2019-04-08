@@ -40,7 +40,7 @@ namespace Nethereum.BlockchainProcessing.Processors
             {
                 if (receipt.Logs[i] is JObject log)
                 {
-                    var typedLog = log.ToObject<Log>();
+                    var typedLog = log.ToObject<FilterLog>();
 
                     yield return
                         new TransactionLogWrapper(transaction, receipt, typedLog);

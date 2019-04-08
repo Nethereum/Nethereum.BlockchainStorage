@@ -12,7 +12,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 
         public TransactionLogRepositoryTests(ITransactionLogRepository repo)
         {
-            this._repo = repo;
+            _repo = repo;
         }
 
         public async Task RunAsync()
@@ -45,7 +45,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                         '{topic2}',
                         '{topic3}'
                     ]
-                }}").ToObject<Log>();
+                }}").ToObject<FilterLog>();
 
             await _repo.UpsertAsync(log);
 

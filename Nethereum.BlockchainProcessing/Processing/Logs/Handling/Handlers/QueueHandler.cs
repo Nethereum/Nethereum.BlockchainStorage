@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
     public class QueueHandler : EventHandlerBase, IEventHandler
     {

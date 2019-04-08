@@ -4,29 +4,22 @@ using Nethereum.Contracts;
 
 namespace Nethereum.RPC.Eth.DTOs
 {
-    public class Log: FilterLog
+    public static class LogExtensions
     {
-        public string EventSignature => GetTopic(0);
-        public string IndexedVal1 => GetTopic(1);
-        public string IndexedVal2 => GetTopic(2);
-        public string IndexedVal3 => GetTopic(3);
-
-        private string GetTopic(int number)
+        public static string EventSignature(this FilterLog log) => log.GetTopic(0);
+        public static string IndexedVal1(this FilterLog log) => log.GetTopic(1);
+        public static string IndexedVal2(this FilterLog log) => log.GetTopic(2);
+        public static string IndexedVal3(this FilterLog log) => log.GetTopic(3);
+        private static string GetTopic(this FilterLog log, int number)
         {
-            if (Topics == null) return null;
+            if (log.Topics == null) return null;
 
-            if (Topics.Length > number)
-                return Topics[number].ToString();
+            if (log.Topics.Length > number)
+                return log.Topics[number].ToString();
 
             return null;
         }
 
-        public T DecodeEvent<T>(Event eventHandler) where T: new()
-        {
-            if (!eventHandler.IsLogForEvent(this)) return default(T);
-
-            var decoder = new EventTopicDecoder();
-            return decoder.DecodeTopics<T>(Topics, Data);
-        }
     }
+
 }

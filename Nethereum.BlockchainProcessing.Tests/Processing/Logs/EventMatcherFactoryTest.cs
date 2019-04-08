@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
     public class EventMatcherFactoryTest
     {
         EventMatcherFactory _factory;
-        Mock<IEventProcessingConfigurationDb> _mockDb;
+        Mock<IEventProcessingConfigurationRepository> _mockDb;
 
         SubscriberDto _subscriberOneConfig;
         SubscriberContractDto _contractDto;
@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         public EventMatcherFactoryTest()
         {
-            _mockDb = new Mock<IEventProcessingConfigurationDb>();
+            _mockDb = new Mock<IEventProcessingConfigurationRepository>();
             _factory = new EventMatcherFactory(_mockDb.Object);
 
             _subscriberOneConfig = new SubscriberDto{Id = 1};

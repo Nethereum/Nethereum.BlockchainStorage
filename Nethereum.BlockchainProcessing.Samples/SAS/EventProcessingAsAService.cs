@@ -2,10 +2,9 @@
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
-using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
-using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
+using Nethereum.BlockchainStore.AzureTables.Factories;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
@@ -32,24 +31,30 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
             string azureSearchKey = config["AzureSearchApiKey"];
 
-            var configRepo = new MockEventProcessingRepository();
-            IEventProcessingConfigurationDb configDb = MockEventProcessingDb.Create(configRepo);
+            var configurationContext = new MockEventProcessingContext();
+            IEventProcessingConfigurationRepository configurationRepository = MockEventProcessingDb.Create(configurationContext);
 
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var blockchainProxy = new BlockchainProxyService(web3);
 
             // search components
             var searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
-            var searchIndexFactory = new AzureSubscriberSearchIndexFactory(configDb, searchService);
+            var searchIndexFactory = new AzureSubscriberSearchIndexFactory(configurationRepository, searchService);
 
             // queue components
-            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
+            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configurationRepository);
+
+            // subscriber repository
+            var repositoryFactory = new AzureTablesSubscriberRepositoryFactory(azureStorageConnectionString, configurationRepository);
 
             // load subscribers and event subscriptions
-            var eventSubscriptionFactory = new EventSubscriptionFactory(blockchainProxy, configDb, queueFactory, searchIndexFactory);
+            var eventSubscriptionFactory = new EventSubscriptionFactory(
+                blockchainProxy, configurationRepository, queueFactory, searchIndexFactory, repositoryFactory);
+
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PARTITION);
 
             // progress repo (dictates which block ranges to process next)
+            // maintain separate progress per partition via a prefix
             var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PARTITION}");
             var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
 
@@ -67,19 +72,19 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }
             finally
             {
-                await ClearDown(configRepo, storageCloudSetup, searchService, queueFactory);
+                await ClearDown(configurationContext, storageCloudSetup, searchService, queueFactory, repositoryFactory);
             }
 
             // save event subscription state
-            await configDb.UpsertAsync(eventSubscriptions.Select(s => s.State));
+            await configurationRepository.UpsertAsync(eventSubscriptions.Select(s => s.State));
             
             // assertions
             Assert.NotNull(rangeProcessed);
             Assert.Equal((ulong)11, rangeProcessed.Value.BlockCount);
 
-            var subscriptionState1 = configRepo.GetEventSubscriptionState(eventSubscriptionId: 1); // interested in transfers with contract queries and aggregations
-            var subscriptionState2 = configRepo.GetEventSubscriptionState(eventSubscriptionId: 2); // interested in transfers with simple aggregation
-            var subscriptionState3 = configRepo.GetEventSubscriptionState(eventSubscriptionId: 3); // interested in any event for a specific address
+            var subscriptionState1 = configurationContext.GetEventSubscriptionState(eventSubscriptionId: 1); // interested in transfers with contract queries and aggregations
+            var subscriptionState2 = configurationContext.GetEventSubscriptionState(eventSubscriptionId: 2); // interested in transfers with simple aggregation
+            var subscriptionState3 = configurationContext.GetEventSubscriptionState(eventSubscriptionId: 3); // interested in any event for a specific address
 
             Assert.Equal("4009000000002040652615", subscriptionState1.Values["RunningTotalForTransferValue"].ToString());
             Assert.Equal((uint)19, subscriptionState2.Values["CurrentTransferCount"]);
@@ -95,10 +100,11 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         }
 
         private async Task ClearDown(
-            MockEventProcessingRepository repo, 
+            MockEventProcessingContext repo, 
             CloudTableSetup cloudTableSetup, 
             IAzureSearchService searchService, 
-            AzureSubscriberQueueFactory subscriberQueueFactory)
+            AzureSubscriberQueueFactory subscriberQueueFactory,
+            AzureTablesSubscriberRepositoryFactory azureTablesSubscriberRepositoryFactory)
         {
             foreach(var index in repo.SubscriberSearchIndexes) 
             { 
@@ -112,6 +118,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }
 
             await cloudTableSetup.GetCountersTable().DeleteIfExistsAsync();
+
+            await azureTablesSubscriberRepositoryFactory.DeleteTablesAsync();
         }
 
         private static IConfigurationRoot LoadConfig()

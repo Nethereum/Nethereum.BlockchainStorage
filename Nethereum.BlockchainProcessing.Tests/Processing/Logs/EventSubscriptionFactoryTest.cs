@@ -12,7 +12,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
     {
         const int PARTITION_ID = 99;
         EventSubscriptionFactory _factory;
-        Mock<IEventProcessingConfigurationDb> _mockDb;
+        Mock<IEventProcessingConfigurationRepository> _mockDb;
         Mock<IEventHandlerFactory> _mockEventHandlerFactory;
         Mock<IEventMatcherFactory> _mockEventMatcherFactory;
         Mock<IEventHandler> _mockEventHandler;
@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         public EventSubscriptionFactoryTest()
         {
-            _mockDb = new Mock<IEventProcessingConfigurationDb>();
+            _mockDb = new Mock<IEventProcessingConfigurationRepository>();
             _mockEventHandlerFactory = new Mock<IEventHandlerFactory>();
             _mockEventMatcherFactory = new Mock<IEventMatcherFactory>();
             _factory = new EventSubscriptionFactory(_mockDb.Object, _mockEventMatcherFactory.Object, _mockEventHandlerFactory.Object);

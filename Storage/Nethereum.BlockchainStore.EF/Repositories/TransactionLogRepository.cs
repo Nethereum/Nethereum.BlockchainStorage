@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task UpsertAsync(Log log)
+        public async Task UpsertAsync(FilterLog log)
         {
             using (var context = _contextFactory.CreateContext())
             {

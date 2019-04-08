@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;

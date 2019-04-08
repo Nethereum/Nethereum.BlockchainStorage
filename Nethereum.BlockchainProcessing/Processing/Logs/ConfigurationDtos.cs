@@ -37,6 +37,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long SubscriberQueueId {get;set;}
 
         public long SubscriberSearchIndexId {get;set;}
+
+        public long SubscriberRepositoryId { get;set;}
     }
 
     public class SubscriberContractDto: DbRow
@@ -161,6 +163,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public bool Disabled {get;set;}
         public long SubscriberId {get;set;}
         public string Name {get;set;}
+    }
+
+    public class SubscriberRepositoryConfigurationDto : DbRow
+    {
+        public bool Disabled { get; set; }
+        public long SubscriberId { get; set; }
+        public string Name { get; set; }
     }
 
     public class EventHandlerHistoryDto: DbRow

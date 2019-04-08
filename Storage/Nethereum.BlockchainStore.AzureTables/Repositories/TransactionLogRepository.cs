@@ -21,7 +21,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return results.Result as TransactionLog;
         }
 
-        public async Task UpsertAsync(Log log)
+        public async Task UpsertAsync(FilterLog log)
         {
             var entity = TransactionLog.CreateTransactionLog(log);
 

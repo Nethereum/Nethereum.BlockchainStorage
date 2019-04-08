@@ -13,14 +13,14 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         EventToGenericSearchDocMapper eventToGenericSearchDocMapper = new EventToGenericSearchDocMapper();
         public AzureSubscriberSearchIndexFactory(
-            IEventProcessingConfigurationDb eventProcessingConfigurationDb,
+            IEventProcessingConfigurationRepository eventProcessingConfigurationDb,
             IAzureSearchService searchService)
         {
             EventProcessingConfigurationDb = eventProcessingConfigurationDb;
             SearchService = searchService;
         }
 
-        public IEventProcessingConfigurationDb EventProcessingConfigurationDb { get; }
+        public IEventProcessingConfigurationRepository EventProcessingConfigurationDb { get; }
         public IAzureSearchService SearchService { get; }
 
         public async Task<ISubscriberSearchIndex> GetSubscriberSearchIndexAsync(long subscriberSearchIndexId)

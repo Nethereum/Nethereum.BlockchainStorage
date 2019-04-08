@@ -9,12 +9,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
     {
         private readonly ABIDeserialiser _abiDeserializer = new ABIDeserialiser();
 
-        public EventMatcherFactory(IEventProcessingConfigurationDb db)
+        public EventMatcherFactory(IEventProcessingConfigurationRepository configurationRepository)
         {
-            _db = db;
+            _repo = configurationRepository;
         }
 
-        private IEventProcessingConfigurationDb _db { get; }
+        private IEventProcessingConfigurationRepository _repo { get; }
 
         public async Task<IEventMatcher> LoadAsync(EventSubscriptionDto eventSubscription)
         {
@@ -27,7 +27,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 
         private async Task<EventParameterMatcher> CreateParameterMatcherAsync(EventSubscriptionDto eventSubscription)
         {
-            var parameterConditionDtos = await _db.GetParameterConditionsAsync(eventSubscription.Id);
+            var parameterConditionDtos = await _repo.GetParameterConditionsAsync(eventSubscription.Id);
             var parameterConditions = parameterConditionDtos.Select(c => ParameterCondition.Create(c.ParameterOrder, c.Operator, c.Value));
             var parameterMatcher = new EventParameterMatcher(parameterConditions);
             return parameterMatcher;
@@ -35,7 +35,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 
         private async Task<EventAddressMatcher> CreateEventAddressMatcherAsync(EventSubscriptionDto eventSubscription)
         {
-            var addressDtos = await _db.GetEventSubscriptionAddressesAsync(eventSubscription.Id);
+            var addressDtos = await _repo.GetEventSubscriptionAddressesAsync(eventSubscription.Id);
             var addressMatcher = new EventAddressMatcher(addressDtos.Select(a => a.Address));
             return addressMatcher;
         }
@@ -47,7 +47,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
                 return null;
             }
 
-            var contractDto = await _db.GetContractAsync(eventSubscription.ContractId.Value);
+            var contractDto = await _repo.GetContractAsync(eventSubscription.ContractId.Value);
 
             ContractABI contractAbi = contractDto.Abi == null ? null : _abiDeserializer.DeserialiseContract(contractDto.Abi);
             EventABI eventAbi = contractAbi == null ? null : contractAbi.Events.FirstOrDefault(e => e.Sha3Signature == eventSubscription.EventSignature);

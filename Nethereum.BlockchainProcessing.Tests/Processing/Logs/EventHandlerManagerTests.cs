@@ -191,10 +191,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         private static IEventSubscription CreateMockSubscription(out List<DecodedEvent> eventsHandled, IEnumerable<IEventHandler> handlers = null)
         {
-            var mockSubscription = new Mock<IEventSubscription>();
-
-            var state = new EventSubscriptionStateDto();
-            mockSubscription.Setup(s => s.State).Returns(state);
+            Mock<IEventSubscription> mockSubscription = CreateMockSubscription();
 
             eventsHandled = new List<DecodedEvent>();
             handlers = handlers ?? new IEventHandler[] { CreateMockEventHandler(eventsHandled).Object };
@@ -204,10 +201,17 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         private static IEventSubscription CreateMockSubscription(IEnumerable<IEventHandler> handlers = null)
         {
-            var mockSubscription = new Mock<IEventSubscription>();
+            var mockSubscription = CreateMockSubscription();
             mockSubscription.Setup(s => s.EventHandlers).Returns(handlers);
             return mockSubscription.Object;
         }
 
+        private static Mock<IEventSubscription> CreateMockSubscription()
+        {
+            var mockSubscription = new Mock<IEventSubscription>();
+            var state = new EventSubscriptionStateDto();
+            mockSubscription.Setup(s => s.State).Returns(state);
+            return mockSubscription;
+        }
     }
 }

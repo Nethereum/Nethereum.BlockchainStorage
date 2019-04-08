@@ -1,4 +1,6 @@
 ﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
 using System;
 using System.Threading.Tasks;
 
@@ -9,18 +11,20 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     {
         public EventHandlerFactory(
             IBlockchainProxyService blockchainProxy, 
-            IEventProcessingConfigurationDb configDb, 
+            IEventProcessingConfigurationRepository configRepo, 
             ISubscriberQueueFactory subscriberQueueFactory,
-            ISubscriberSearchIndexFactory subscriberSearchIndexFactory)
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory,
+            ISubscriberRepositoryFactory subscriberRepositoryFactory)
             :this(
-                 configDb, 
-                 configDb, 
+                 configRepo, 
+                 configRepo, 
                  blockchainProxy,  
-                 configDb, 
+                 configRepo, 
                  blockchainProxy, 
                  subscriberQueueFactory,
                  subscriberSearchIndexFactory,
-                 configDb)
+                 configRepo,
+                 subscriberRepositoryFactory)
         {
         }
 
@@ -32,7 +36,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IGetTransactionByHash getTransactionProxy,
             ISubscriberQueueFactory subscriberQueueFactory,
             ISubscriberSearchIndexFactory subscriberSearchIndexFactory,
-            IEventRuleConfigurationFactory eventRuleConfigurationFactory)
+            IEventRuleConfigurationFactory eventRuleConfigurationFactory,
+            ISubscriberRepositoryFactory subscriberRepositoryFactory)
         {
             StateFactory = stateFactory;
             ContractQueryFactory = contractQueryFactory;
@@ -42,6 +47,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             SubscriberQueueFactory = subscriberQueueFactory;
             SubscriberSearchIndexFactory = subscriberSearchIndexFactory;
             EventRuleConfigurationFactory = eventRuleConfigurationFactory;
+            SubscriberRepositoryFactory = subscriberRepositoryFactory;
         }
 
         public IEventSubscriptionStateFactory StateFactory { get; }
@@ -52,6 +58,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
         public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
         public IEventRuleConfigurationFactory EventRuleConfigurationFactory { get; }
+        public ISubscriberRepositoryFactory SubscriberRepositoryFactory { get; }
 
         public async Task<IEventHandler> LoadAsync(IEventSubscription subscription, EventHandlerDto config)
         { 
@@ -74,6 +81,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventHandlerType.Index:
                     var searchIndex = await SubscriberSearchIndexFactory.GetSubscriberSearchIndexAsync(config.SubscriberSearchIndexId);
                     return new SearchIndexHandler(subscription, config.Id, searchIndex);
+                case EventHandlerType.Store:
+                    var logRepository = await SubscriberRepositoryFactory.GetLogRepositoryAsync(config.SubscriberRepositoryId);
+                    return new RepositoryHandler(subscription, config.Id, logRepository);
                 default:
                     throw new ArgumentException("unsupported handler type");
             }
