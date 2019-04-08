@@ -119,8 +119,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public AggregatorOperation Operation {get;set;}
         public AggregatorDestination Destination {get;set;}
         public int EventParameterNumber {get;set;}
-        public string InputName {get;set;}
-        public string OutputName {get;set;}
+        public string SourceKey {get;set;}
+        public string OutputKey {get;set;}
     }
 
     public enum ContractAddressSource
@@ -169,6 +169,30 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long EventSubscriptionId {get;set; }
         public long EventHandlerId {get;set; }
         public string EventKey { get;set;}
+    }
+
+    public class EventRuleConfigurationDto: DbRow
+    {
+        public long EventHandlerId { get;set;}
+
+        public EventRuleSource Source { get; set; }
+        public EventRuleType Type { get; set; }
+
+        public string SourceKey { get; set; }
+
+        public int EventParameterNumber { get; set; }
+
+        public string Value { get; set; }
+    }
+
+    public enum EventRuleSource
+    {
+        Static, EventParameter, EventState, EventSubscriptionState
+    }
+
+    public enum EventRuleType
+    {
+        Equals, GreaterOrEqualTo, LessThanOrEqualTo, Modulus, Empty
     }
 
 }

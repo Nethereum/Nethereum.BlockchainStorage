@@ -2,13 +2,13 @@
 {
     public abstract class EventHandlerBase
     {
+        public IEventSubscription Subscription { get; }
         public long Id { get; }
-        public EventSubscriptionStateDto State { get; }
 
-        protected EventHandlerBase(long id, EventSubscriptionStateDto state)
+        protected EventHandlerBase(IEventSubscription subscription, long id)
         {
+            Subscription = subscription;
             Id = id;
-            State = state;
         }
     }
 }

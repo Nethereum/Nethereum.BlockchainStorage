@@ -40,18 +40,16 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // search components
             var searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
-            var subscriberSearchIndexFactory = new AzureSubscriberSearchIndexFactory(configDb, searchService);
+            var searchIndexFactory = new AzureSubscriberSearchIndexFactory(configDb, searchService);
 
             // queue components
-            var subscriberQueueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
+            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configDb);
 
             // load subscribers and event subscriptions
-            var eventMatcherFactory = new EventMatcherFactory(configDb);
-            var eventHandlerFactory = new EventHandlerFactory(blockchainProxy, configDb, subscriberQueueFactory, subscriberSearchIndexFactory);
-            var eventSubscriptionFactory = new EventSubscriptionFactory(configDb, eventMatcherFactory, eventHandlerFactory);
+            var eventSubscriptionFactory = new EventSubscriptionFactory(blockchainProxy, configDb, queueFactory, searchIndexFactory);
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PARTITION);
 
-            // progress repo
+            // progress repo (dictates which block ranges to process next)
             var storageCloudSetup = new CloudTableSetup(azureStorageConnectionString, prefix: $"Partition{PARTITION}");
             var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
 
@@ -69,11 +67,11 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }
             finally
             {
-                await ClearDown(storageCloudSetup, searchService, subscriberQueueFactory);
+                await ClearDown(configRepo, storageCloudSetup, searchService, queueFactory);
             }
 
             // save event subscription state
-            await configDb.SaveAsync(eventSubscriptions.Select(s => s.State));
+            await configDb.UpsertAsync(eventSubscriptions.Select(s => s.State));
             
             // assertions
             Assert.NotNull(rangeProcessed);
@@ -96,13 +94,20 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
         }
 
-        private async Task ClearDown(CloudTableSetup cloudTableSetup, IAzureSearchService searchService, AzureSubscriberQueueFactory subscriberQueueFactory)
+        private async Task ClearDown(
+            MockEventProcessingRepository repo, 
+            CloudTableSetup cloudTableSetup, 
+            IAzureSearchService searchService, 
+            AzureSubscriberQueueFactory subscriberQueueFactory)
         {
-            await searchService.DeleteIndexAsync("subscriber-transfer-indexer");
+            foreach(var index in repo.SubscriberSearchIndexes) 
+            { 
+                await searchService.DeleteIndexAsync(index.Name);
+            }
 
-            foreach (var queue in new[] { "subscriber-george", "subscriber-harry", "subscriber-nosey" })
+            foreach (var queue in repo.SubscriberSearchIndexes)
             {
-                var qRef = subscriberQueueFactory.CloudQueueClient.GetQueueReference(queue);
+                var qRef = subscriberQueueFactory.CloudQueueClient.GetQueueReference(queue.Name);
                 await qRef.DeleteIfExistsAsync();
             }
 

@@ -19,10 +19,17 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public List<SubscriberQueueConfigurationDto> SubscriberQueues = new List<SubscriberQueueConfigurationDto>();
         public List<SubscriberSearchIndexConfigurationDto> SubscriberSearchIndexes = new List<SubscriberSearchIndexConfigurationDto>();
         public List<EventHandlerHistoryDto> EventHandlerHistories = new List<EventHandlerHistoryDto>();
-        
+        public List<EventRuleConfigurationDto> EventRuleConfigurations = new List<EventRuleConfigurationDto>();
+
         public EventSubscriptionStateDto GetEventSubscriptionState(long eventSubscriptionId)
         {
             return EventSubscriptionStates.FirstOrDefault(s => s.EventSubscriptionId == eventSubscriptionId);
+        }
+
+        public EventRuleConfigurationDto Add(EventRuleConfigurationDto dto)
+        {
+            EventRuleConfigurations.Add(dto);
+            return dto;
         }
 
         public EventSubscriptionStateDto Add(EventSubscriptionStateDto dto)

@@ -4,8 +4,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class SearchIndexHandler : EventHandlerBase, IEventHandler
     {
-        public SearchIndexHandler(long id, EventSubscriptionStateDto state, ISubscriberSearchIndex subscriberSearchIndex)
-            :base(id, state)
+        public SearchIndexHandler(IEventSubscription subscription, long id, ISubscriberSearchIndex subscriberSearchIndex)
+            :base(subscription, id)
         {
             SubscriberSearchIndex = subscriberSearchIndex;
         }

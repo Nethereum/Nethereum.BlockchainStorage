@@ -4,7 +4,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class QueueHandler : EventHandlerBase, IEventHandler
     {
-        public QueueHandler(long id, EventSubscriptionStateDto state, IQueue queue):base(id, state)
+        public QueueHandler(IEventSubscription subscription, long id, IQueue queue)
+            :base(subscription, id)
         {
             Queue = queue;
         }

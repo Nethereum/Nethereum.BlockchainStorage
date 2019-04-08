@@ -54,9 +54,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             _mockDb.Setup(d => d.GetSubscribersAsync(PARTITION_ID)).ReturnsAsync(new []{_subscriberOneConfig});
             _mockDb.Setup(d => d.GetEventSubscriptionsAsync(_subscriberOneConfig.Id)).ReturnsAsync(new []{_eventSubscriptionConfig});
             _mockDb.Setup(d => d.GetEventHandlers(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_eventHandlerConfig });
-            _mockDb.Setup(d => d.GetOrCreateEventSubscriptionState(_eventSubscriptionConfig.Id)).ReturnsAsync(_eventSubscriptionStateConfig);
+            _mockDb.Setup(d => d.GetOrCreateEventSubscriptionStateAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(_eventSubscriptionStateConfig);
 
-            _mockEventHandlerFactory.Setup(f => f.LoadAsync(_eventHandlerConfig, _eventSubscriptionStateConfig)).ReturnsAsync(_mockEventHandler.Object);
+            _mockEventHandlerFactory.Setup(f => f.LoadAsync(It.IsAny<IEventSubscription>(), _eventHandlerConfig)).ReturnsAsync(_mockEventHandler.Object);
             _mockEventMatcherFactory.Setup(f => f.LoadAsync(_eventSubscriptionConfig)).ReturnsAsync(_mockEventMatcher.Object);
         }
 
@@ -73,10 +73,10 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             Assert.NotNull(eventSubscription);
 
             Assert.Same(eventSubscription.Matcher, _mockEventMatcher.Object);
+            Assert.Same(_mockEventHandler.Object, eventSubscription.EventHandlers.FirstOrDefault());
 
-            var eventHandlerCoordinator = eventSubscription.Handler as EventHandlerCoordinator;
+            var eventHandlerCoordinator = eventSubscription.HandlerManager as EventHandlerManager;
             Assert.NotNull(eventHandlerCoordinator);
-            Assert.Same(_mockEventHandler.Object, eventHandlerCoordinator.Handlers.FirstOrDefault());
         }
 
         [Fact]
@@ -104,9 +104,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var eventSubscription = eventSubscriptions[0] as EventSubscription;
             Assert.NotNull(eventSubscription);
 
-            var eventHandlerCoordinator = eventSubscription.Handler as EventHandlerCoordinator;
+            var eventHandlerCoordinator = eventSubscription.HandlerManager as EventHandlerManager;
             Assert.NotNull(eventHandlerCoordinator);
-            Assert.Empty(eventHandlerCoordinator.Handlers);
+            Assert.Empty(eventSubscription.EventHandlers);
         }
 
     }

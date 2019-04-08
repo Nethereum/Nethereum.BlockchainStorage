@@ -8,15 +8,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class EventRuleConfiguration
     {
-        // string equals
-        // number equals
-        // number greater or equal
-        // number less or equal
-        // x many iterations (modulus)
-
-        //input source
-        //input parameter name
-
         public EventRuleSource Source { get;set;}
         public EventRuleType Type { get;set;}
 
@@ -27,20 +18,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public string Value { get;set;}
     }
 
-    public enum EventRuleSource
-    {
-        Static, EventParameter, EventState, EventSubscriptionState
-    }
-
-    public enum EventRuleType
-    {
-        Equals, GreaterOrEqualTo, LessThanOrEqualTo, Modulus, Empty
-    }
-
 
     public class EventRule : EventHandlerBase, IEventHandler
     {
-        public EventRule(long id, EventSubscriptionStateDto state, EventRuleConfiguration configuration) :base(id, state)
+        public EventRule(IEventSubscription subscription, long id, EventRuleConfiguration configuration) :base(subscription, id)
         {
             Configuration = configuration;
         }
@@ -237,7 +218,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
         private object GetValueFromEventSubscriptionState()
         {
-            State.Values.TryGetValue(Configuration.InputName, out object val);
+            Subscription.State.Values.TryGetValue(Configuration.InputName, out object val);
             return val;
         }
 

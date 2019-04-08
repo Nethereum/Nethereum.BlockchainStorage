@@ -46,6 +46,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         protected ContractQueryConfiguration queryConfig;
         protected EventSubscriptionStateDto subscriptionState;
         protected QueryArgs actualQueryArgs;
+        protected Mock<IEventSubscription> MockEventSubscription;
 
         public ContractQueryBaseTest(ContractQueryConfiguration queryConfig)
         {
@@ -56,7 +57,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             var mockContractQuery =  MockContractQuery(FAKE_QUERY_RESULT, (actualArgs) => actualQueryArgs = actualArgs);
 
             subscriptionState = new EventSubscriptionStateDto();
-            contractQueryEventHandler = new ContractQueryEventHandler(1, mockContractQuery, subscriptionState, queryConfig);
+            MockEventSubscription = new Mock<IEventSubscription>();
+            MockEventSubscription.Setup(s => s.State).Returns(subscriptionState);
+            contractQueryEventHandler = new ContractQueryEventHandler(MockEventSubscription.Object, 1, mockContractQuery, queryConfig);
         }
     }
 }

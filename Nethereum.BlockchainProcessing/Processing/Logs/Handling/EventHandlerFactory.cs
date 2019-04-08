@@ -53,27 +53,27 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
         public IEventRuleConfigurationFactory EventRuleConfigurationFactory { get; }
 
-        public async Task<IEventHandler> LoadAsync(EventHandlerDto config, EventSubscriptionStateDto state)
+        public async Task<IEventHandler> LoadAsync(IEventSubscription subscription, EventHandlerDto config)
         { 
             switch (config.HandlerType)
             {
                 case EventHandlerType.Rule:
                     var ruleConfig = await EventRuleConfigurationFactory.GetEventRuleConfigurationAsync(config.Id);
-                    return new EventRule(config.Id, state, ruleConfig);
+                    return new EventRule(subscription, config.Id, ruleConfig);
                 case EventHandlerType.Aggregate:
                     var aggregatorConfig = await EventAggregatorConfigurationFactory.GetEventAggregationConfigurationAsync(config.Id);
-                    return new EventAggregator(config.Id, state, aggregatorConfig);
+                    return new EventAggregator(subscription, config.Id, aggregatorConfig);
                 case EventHandlerType.ContractQuery:
                     var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(config.Id);
-                    return new ContractQueryEventHandler(config.Id, ContractQueryHandler, state, queryConfig);
+                    return new ContractQueryEventHandler(subscription, config.Id, ContractQueryHandler, queryConfig);
                 case EventHandlerType.Queue:
                     var queue = await SubscriberQueueFactory.GetSubscriberQueueAsync(config.SubscriberQueueId);
-                    return new QueueHandler(config.Id, state, queue);
+                    return new QueueHandler(subscription, config.Id, queue);
                 case EventHandlerType.GetTransaction:
-                    return new GetTransactionEventHandler(config.Id, state, GetTransactionProxy);
+                    return new GetTransactionEventHandler(subscription, config.Id, GetTransactionProxy);
                 case EventHandlerType.Index:
                     var searchIndex = await SubscriberSearchIndexFactory.GetSubscriberSearchIndexAsync(config.SubscriberSearchIndexId);
-                    return new SearchIndexHandler(config.Id, state, searchIndex);
+                    return new SearchIndexHandler(subscription, config.Id, searchIndex);
                 default:
                     throw new ArgumentException("unsupported handler type");
             }

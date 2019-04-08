@@ -13,8 +13,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     {
         public EventAggregatorConfiguration Configuration { get; }
 
-        public EventAggregator(long id, EventSubscriptionStateDto state, EventAggregatorConfiguration aggregatorConfiguration):
-            base(id, state)
+        public EventAggregator(IEventSubscription subscription, long id, EventAggregatorConfiguration aggregatorConfiguration):
+            base(subscription, id)
         {
             Configuration = aggregatorConfiguration;
         }
@@ -83,8 +83,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
            if(string.IsNullOrEmpty(key)) return defaultValue;
 
-            return State.Values.ContainsKey(key) ? 
-                State.Values[key] : defaultValue;
+            return Subscription.State.Values.ContainsKey(key) ? 
+                Subscription.State.Values[key] : defaultValue;
         }
 
         private object GetValueFromEventState(DecodedEvent decodedEvent, string key, object defaultValue)
@@ -133,7 +133,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     decodedEvent.State[Configuration.OutputName] = outputValue;
                     break;
                 case AggregatorDestination.EventSubscriptionState:
-                    State.Values[Configuration.OutputName] = outputValue;
+                    Subscription.State.Values[Configuration.OutputName] = outputValue;
                     break;
             }
         }

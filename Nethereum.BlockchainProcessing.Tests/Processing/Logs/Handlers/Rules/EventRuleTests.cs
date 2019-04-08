@@ -1,4 +1,5 @@
-﻿using Nethereum.ABI.Model;
+﻿using Moq;
+using Nethereum.ABI.Model;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Hex.HexTypes;
@@ -15,6 +16,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
         EventSubscriptionStateDto _eventSubscriptionState = new EventSubscriptionStateDto();
         FilterLog _sampleTransferLog = TestData.Contracts.StandardContract.SampleTransferLog();
         EventABI _transferEventAbi = TestData.Contracts.StandardContract.TransferEventAbi;
+        Mock<IEventSubscription> _mockEventSubscription = new Mock<IEventSubscription>();
 
         [Fact]
         public async Task IsEmpty()
@@ -26,7 +28,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
                 EventParameterNumber = 1
             };
 
-            var rule = new EventRule(1, _eventSubscriptionState, config);
+            var rule = new EventRule(_mockEventSubscription.Object, 1, config);
 
             var decodedEvent = _sampleTransferLog.ToDecodedEvent(_transferEventAbi);
             Assert.False(await rule.HandleAsync(decodedEvent));
@@ -87,7 +89,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
                 Value = valAsString
             };
 
-            var rule = new EventRule(1, _eventSubscriptionState, config);
+            var rule = new EventRule(_mockEventSubscription.Object, 1, config);
 
             var decodedEvent = _sampleTransferLog.ToDecodedEvent(_transferEventAbi);
             decodedEvent.Event.First(p => p.Parameter.Order == config.EventParameterNumber).Result = val;
@@ -159,7 +161,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
                 Value = minValueAsString
             };
 
-            var rule = new EventRule(1, _eventSubscriptionState, config);
+            var rule = new EventRule(_mockEventSubscription.Object, 1, config);
 
             var decodedEvent = _sampleTransferLog.ToDecodedEvent(_transferEventAbi);
             decodedEvent.Event.First(p => p.Parameter.Order == config.EventParameterNumber).Result = minValue;
@@ -233,7 +235,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
                 Value = maxValueAsString
             };
 
-            var rule = new EventRule(1, _eventSubscriptionState, config);
+            var rule = new EventRule(_mockEventSubscription.Object, 1, config);
 
             var decodedEvent = _sampleTransferLog.ToDecodedEvent(_transferEventAbi);
             decodedEvent.Event.First(p => p.Parameter.Order == config.EventParameterNumber).Result = maxValue;
@@ -288,7 +290,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
                 Value = modulusAsString
             };
 
-            var rule = new EventRule(1, _eventSubscriptionState, config);
+            var rule = new EventRule(_mockEventSubscription.Object, 1, config);
 
             var decodedEvent = _sampleTransferLog.ToDecodedEvent(_transferEventAbi);
             decodedEvent.Event.First(p => p.Parameter.Order == config.EventParameterNumber).Result = modulusOf;

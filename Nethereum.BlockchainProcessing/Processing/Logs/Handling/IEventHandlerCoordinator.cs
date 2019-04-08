@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface IEventHandlerCoordinator
+    public interface IEventHandlerManager
     { 
-        Task HandleAsync(EventABI eventAbi, params FilterLog[] eventLogs);
+        Task HandleAsync(IEventSubscription subscription, EventABI eventAbi, params FilterLog[] eventLogs);
     }
 }

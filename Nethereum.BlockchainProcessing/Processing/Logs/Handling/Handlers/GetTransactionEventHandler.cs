@@ -5,8 +5,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public class GetTransactionEventHandler : EventHandlerBase, IEventHandler
     {
-        public GetTransactionEventHandler(long id, EventSubscriptionStateDto state, IGetTransactionByHash proxy)
-            :base(id, state)
+        public GetTransactionEventHandler(IEventSubscription subscription, long id, IGetTransactionByHash proxy)
+            :base(subscription, id)
         {
             Proxy = proxy;
         }

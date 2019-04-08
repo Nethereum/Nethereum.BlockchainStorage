@@ -21,20 +21,21 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             AddHarry(PartitionId, idGenerator, repo);
             AddGeorge(PartitionId, idGenerator, repo);
             AddNosey(PartitionId, idGenerator, repo);
-            AddTransferIndexer(PartitionId, idGenerator, repo);
+            AddIan(PartitionId, idGenerator, repo);
+            AddEric(PartitionId, idGenerator, repo);
 
             var db = MockAllQueries(repo, idGenerator);
       
             return db;
         }
 
-        public static void AddTransferIndexer(long partitionId, IdGenerator id, MockEventProcessingRepository repo)
+        public static void AddIan(long partitionId, IdGenerator id, MockEventProcessingRepository repo)
         { 
             var indexer = repo.Add(new SubscriberDto
             {
                 Id = id.Next<SubscriberDto>(),
                 Disabled = false,
-                Name = "Transfer Indexer",
+                Name = "Ian",
                 PartitionId = partitionId
             });
 
@@ -42,7 +43,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             {
                 Id = id.Next<SubscriberSearchIndexConfigurationDto>(),
                 SubscriberId = indexer.Id,
-                Name = "subscriber-transfer-indexer"
+                Name = "subscriber-transfer-ian"
             });
 
             var contract = repo.Add(new SubscriberContractDto
@@ -69,6 +70,68 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 HandlerType = EventHandlerType.Index,
                 Order = 2,
                 SubscriberSearchIndexId = searchIndex.Id
+            });
+        }
+
+        public static void AddEric(long partitionId, IdGenerator id, MockEventProcessingRepository repo)
+        {
+            var indexer = repo.Add(new SubscriberDto
+            {
+                Id = id.Next<SubscriberDto>(),
+                Disabled = false,
+                Name = "Eric",
+                PartitionId = partitionId
+            });
+
+            var contract = repo.Add(new SubscriberContractDto
+            {
+                Id = id.Next<SubscriberContractDto>(),
+                SubscriberId = indexer.Id,
+                Abi = StandardContractAbi,
+                Name = "StandardContract"
+            });
+
+            var catchAllTransfersSubscription = repo.Add(
+                new EventSubscriptionDto
+                {
+                    Id = id.Next<EventSubscriptionDto>(),
+                    SubscriberId = indexer.Id,
+                    ContractId = contract.Id,
+                    EventSignature = TransferEventSignature
+                });
+
+            var ruleHandler = repo.Add(new EventHandlerDto
+            {
+                Id = id.Next<EventHandlerDto>(),
+                EventSubscriptionId = catchAllTransfersSubscription.Id,
+                HandlerType = EventHandlerType.Rule,
+                Order = 1
+            });
+
+            repo.Add(new EventRuleConfigurationDto
+            {
+                Id = id.Next<EventRuleConfigurationDto>(),
+                EventHandlerId = ruleHandler.Id,
+                Type = EventRuleType.Modulus,
+                Source = EventRuleSource.EventSubscriptionState,
+                SourceKey = "EventsHandled",
+                Value = "10"
+            });
+
+            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            {
+                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                SubscriberId = indexer.Id,
+                Name = "subscriber-transfer-eric"
+            });
+
+            repo.Add(new EventHandlerDto
+            {
+                Id = id.Next<EventHandlerDto>(),
+                EventSubscriptionId = catchAllTransfersSubscription.Id,
+                HandlerType = EventHandlerType.Queue,
+                Order = 2,
+                SubscriberQueueId = queue.Id
             });
         }
 
@@ -114,7 +177,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 EventHandlerId = txHashTracker.Id,
                 Source = AggregatorSource.TransactionHash,
                 Destination = AggregatorDestination.EventSubscriptionState,
-                OutputName = "AllTransactionHashes",
+                OutputKey = "AllTransactionHashes",
                 Operation = AggregatorOperation.AddToList
             });
 
@@ -131,7 +194,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 EventHandlerId = blockTracker.Id,
                 Source = AggregatorSource.BlockNumber,
                 Destination = AggregatorDestination.EventSubscriptionState,
-                OutputName = "AllBlockNumbers",
+                OutputKey = "AllBlockNumbers",
                 Operation = AggregatorOperation.AddToList
             });
 
@@ -194,7 +257,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 EventHandlerId = transferCountHandler.Id,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 Operation = AggregatorOperation.Count,
-                OutputName = "CurrentTransferCount"
+                OutputKey = "CurrentTransferCount"
             });
 
             repo.Add(new EventHandlerDto
@@ -266,7 +329,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Operation = AggregatorOperation.Sum,
                 Source = AggregatorSource.EventParameter,
                 EventParameterNumber = 3,
-                OutputName = "RunningTotalForTransferValue"
+                OutputKey = "RunningTotalForTransferValue"
             });
 
             var getTokenHandler = repo.Add(new EventHandlerDto
@@ -375,7 +438,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.DecodedEventHandlers.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
 
             configDb
-                .Setup(d => d.GetOrCreateEventSubscriptionState(It.IsAny<long>()))
+                .Setup(d => d.GetOrCreateEventSubscriptionStateAsync(It.IsAny<long>()))
                 .Returns<long>((eventSubscriptionId) =>
                 {
                     var state = repo.GetEventSubscriptionState(eventSubscriptionId);
@@ -387,7 +450,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 });
 
             configDb
-                .Setup(d => d.SaveAsync(It.IsAny<IEnumerable<EventSubscriptionStateDto>>()))
+                .Setup(d => d.UpsertAsync(It.IsAny<IEnumerable<EventSubscriptionStateDto>>()))
                 .Callback<IEnumerable<EventSubscriptionStateDto>>((states) =>
                 { 
                     foreach(var state in states)
@@ -444,9 +507,30 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     if (dto == null) throw new ArgumentException($"Could not find Subscriber Search Index Id: {subscriberSearchIndexId}");
                     return Task.FromResult(dto);
                 });
+
+            configDb
+                .Setup(d => d.GetEventRuleConfigurationAsync(It.IsAny<long>()))
+                .Returns<long>((eventHandlerId) =>
+                {
+                    var dto = repo.EventRuleConfigurations.FirstOrDefault(c => c.EventHandlerId == eventHandlerId);
+                    if (dto == null) throw new ArgumentException($"Could not find EventRuleConfiguration for Event Handler Id: {eventHandlerId}");
+                    return Task.FromResult(Map(dto));
+                });
                 
 
             return configDb.Object;
+        }
+
+        private static EventRuleConfiguration Map(EventRuleConfigurationDto dto)
+        {
+            return new EventRuleConfiguration
+            {
+                EventParameterNumber = dto.EventParameterNumber,
+                InputName = dto.SourceKey,
+                Source = dto.Source,
+                Type = dto.Type,
+                Value = dto.Value
+            };
         }
 
         private static EventAggregatorConfiguration Map(EventAggregatorConfigurationDto dto)
@@ -455,9 +539,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             {
                 Destination = dto.Destination,
                 EventParameterNumber = dto.EventParameterNumber,
-                InputName = dto.InputName,
+                InputName = dto.SourceKey,
                 Operation = dto.Operation,
-                OutputName = dto.OutputName,
+                OutputName = dto.OutputKey,
                 Source = dto.Source
             };
         }

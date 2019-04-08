@@ -8,10 +8,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public class ContractQueryEventHandler : EventHandlerBase, IEventHandler
     {
         public ContractQueryEventHandler(
+            IEventSubscription subscription, 
             long id,
             IContractQuery contractQueryProxy, 
-            EventSubscriptionStateDto state, 
-            ContractQueryConfiguration queryConfig):base(id, state)
+            ContractQueryConfiguration queryConfig):base(subscription, id)
         {
             Proxy = contractQueryProxy ?? throw new System.ArgumentNullException(nameof(contractQueryProxy));
             Configuration = queryConfig ?? throw new System.ArgumentNullException(nameof(queryConfig));
@@ -36,7 +36,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
             if (!string.IsNullOrEmpty(Configuration.SubscriptionStateOutputName))
             {
-                State.Set(Configuration.SubscriptionStateOutputName, result);
+                Subscription.State.Set(Configuration.SubscriptionStateOutputName, result);
             }
 
             return true;

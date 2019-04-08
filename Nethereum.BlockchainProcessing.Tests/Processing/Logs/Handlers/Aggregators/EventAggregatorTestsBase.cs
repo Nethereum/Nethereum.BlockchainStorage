@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processing.Logs;
+﻿using Moq;
+using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregators
@@ -8,14 +9,16 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         protected EventAggregatorConfiguration AggregatorConfig;
         protected EventSubscriptionStateDto EventSubscriptionState;
         protected EventAggregator Aggregator;
-
+        protected Mock<IEventSubscription> MockEventSubscription;
         protected abstract EventAggregatorConfiguration CreateConfiguration();
 
         public EventAggregatorTestsBase()
         {
+            MockEventSubscription = new Mock<IEventSubscription>();
             AggregatorConfig = CreateConfiguration();
             EventSubscriptionState = new EventSubscriptionStateDto();
-            Aggregator = new EventAggregator(1, EventSubscriptionState, AggregatorConfig);
+            MockEventSubscription.Setup(s => s.State).Returns(EventSubscriptionState);
+            Aggregator = new EventAggregator(MockEventSubscription.Object, 1, AggregatorConfig);
         }
     }
 }

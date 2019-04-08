@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,17 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public IEventHandlerFactory DecodedEventHandlerFactory { get; }
         public IEventProcessingConfigurationDb Db { get; }
+
+        public EventSubscriptionFactory(
+            IBlockchainProxyService blockchainProxy,
+            IEventProcessingConfigurationDb db,
+            ISubscriberQueueFactory subscriberQueueFactory,
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory):this(
+                db, 
+                new EventMatcherFactory(db), 
+                new EventHandlerFactory(blockchainProxy, db, subscriberQueueFactory, subscriberSearchIndexFactory))
+        {
+        }
 
         public EventSubscriptionFactory(
             IEventProcessingConfigurationDb db, 
@@ -43,31 +55,29 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return eventSubscriptions;
         }
 
-        private async Task<EventSubscription> LoadEventSubscriptionsAsync(EventSubscriptionDto eventSubscription)
+        private async Task<EventSubscription> LoadEventSubscriptionsAsync(EventSubscriptionDto subscriptionConfig)
         {
-            var matcher = await EventMatcherFactory.LoadAsync(eventSubscription);
-            var state = await Db.GetOrCreateEventSubscriptionState(eventSubscription.Id);
-            var handler = await CreateEventHandler(eventSubscription, state);
-            
+            var matcher = await EventMatcherFactory.LoadAsync(subscriptionConfig);
+            var state = await Db.GetOrCreateEventSubscriptionStateAsync(subscriptionConfig.Id);
+            var handlerCoOrdinator = new EventHandlerManager(Db);
 
-            return new EventSubscription(eventSubscription.Id, eventSubscription.SubscriberId, matcher, handler, state);
+            var subscription = new EventSubscription(
+                subscriptionConfig.Id, subscriptionConfig.SubscriberId, matcher, handlerCoOrdinator, state);
+
+            await AddEventHandlers(subscription);
+
+            return subscription;
         }
 
-        private async Task<EventHandlerCoordinator> CreateEventHandler(EventSubscriptionDto eventSubscription, EventSubscriptionStateDto state)
+        private async Task AddEventHandlers(EventSubscription eventSubscription)
         {
             var handlerConfiguration = await Db.GetEventHandlers(eventSubscription.Id);
 
-            var handlers = new List<IEventHandler>(handlerConfiguration.Length);
             foreach(var configItem in handlerConfiguration.Where(c => !c.Disabled).OrderBy(h => h.Order))
             {
-                handlers.Add(await DecodedEventHandlerFactory.LoadAsync(configItem, state));
+                eventSubscription.AddHandler(await DecodedEventHandlerFactory.LoadAsync(eventSubscription, configItem));
             }
 
-            return new EventHandlerCoordinator(
-                Db,
-                eventSubscription.SubscriberId, 
-                eventSubscription.Id, 
-                handlers);
         }
 
     }
