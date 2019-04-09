@@ -13,6 +13,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
     {
         private static readonly string StandardContractAbi = "[{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'','type':'address'}],'name':'balances','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'','type':'address'},{'name':'','type':'address'}],'name':'allowed','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'success','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'remaining','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'inputs':[{'name':'_initialAmount','type':'uint256'},{'name':'_tokenName','type':'string'},{'name':'_decimalUnits','type':'uint8'},{'name':'_tokenSymbol','type':'string'}],'payable':false,'stateMutability':'nonpayable','type':'constructor'},{'anonymous':false,'inputs':[{'indexed':true,'name':'_from','type':'address'},{'indexed':true,'name':'_to','type':'address'},{'indexed':false,'name':'_value','type':'uint256'}],'name':'Transfer','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'_owner','type':'address'},{'indexed':true,'name':'_spender','type':'address'},{'indexed':false,'name':'_value','type':'uint256'}],'name':'Approval','type':'event'}]";
         private static readonly string TransferEventSignature = "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+        public static readonly string ApprovalEventSignature = "8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
+
 
         public static IEventProcessingConfigurationRepository Create(MockEventProcessingContext repo)
         {
@@ -25,6 +27,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             AddIan(PartitionId, idGenerator, repo);
             AddEric(PartitionId, idGenerator, repo);
             AddCharlie(PartitionId, idGenerator, repo);
+            AddMary(PartitionId, idGenerator, repo);
 
             var db = MockAllQueries(repo, idGenerator);
       
@@ -312,6 +315,51 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 EventSubscriptionId = transferEventSubscription.Id,
                 HandlerType = EventHandlerType.Queue,
                 Order = 2,
+                SubscriberQueueId = queue.Id
+            });
+        }
+
+        public static void AddMary(long partitionId, IdGenerator id, MockEventProcessingContext repo)
+        {
+            var subscriber = repo.Add(new SubscriberDto
+            {
+                Id = id.Next<SubscriberDto>(),
+                Disabled = false,
+                Name = "Mary",
+                PartitionId = partitionId
+            });
+
+            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            {
+                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                SubscriberId = subscriber.Id,
+                Name = "subscriber-mary"
+            });
+
+            var standardContract = repo.Add(
+                new SubscriberContractDto
+                {
+                    Id = id.Next<SubscriberContractDto>(),
+                    SubscriberId = subscriber.Id,
+                    Name = "StandardContract",
+                    Abi = StandardContractAbi
+                });
+
+            var anyEventSubscription = repo.Add(
+                new EventSubscriptionDto
+                {
+                    Id = id.Next<EventSubscriptionDto>(),
+                    SubscriberId = subscriber.Id,
+                    ContractId = standardContract.Id,
+                    CatchAllContractEvents = true
+                });
+
+            repo.Add(new EventHandlerDto
+            {
+                Id = id.Next<EventHandlerDto>(),
+                EventSubscriptionId = anyEventSubscription.Id,
+                HandlerType = EventHandlerType.Queue,
+                Order = 1,
                 SubscriberQueueId = queue.Id
             });
         }
