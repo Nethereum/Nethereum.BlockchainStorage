@@ -17,12 +17,13 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         private readonly Mock<IEventHandlerManager> _handler = new Mock<IEventHandlerManager>();
         private readonly EventSubscription _eventSubscription;
         private readonly EventABI _eventAbi = new EventABI("test");
+        private readonly EventABI[] _eventAbis;
         private readonly EventSubscriptionStateDto _eventSubscriptionState = new EventSubscriptionStateDto();
 
         public EventSubscriptionTests()
         {
-
-            _matcher.Setup(m => m.Abi).Returns(_eventAbi);
+            _eventAbis = new[] {_eventAbi};
+            _matcher.Setup(m => m.Abis).Returns(_eventAbis);
             _eventSubscription = new EventSubscription(
                 id: 1, 
                 subscriberId: 2, 
@@ -74,8 +75,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var logsHandled = new List<FilterLog>();
 
             _handler
-                .Setup(m => m.HandleAsync(_eventSubscription, _eventAbi, logs))
-                .Returns<IEventSubscription, EventABI, FilterLog[]>((subscription, abi, l) => 
+                .Setup(m => m.HandleAsync(_eventSubscription, _eventAbis, logs))
+                .Returns<IEventSubscription, EventABI[], FilterLog[]>((subscription, abi, l) => 
             {
                 logsHandled.AddRange(l);
                 return Task.CompletedTask;

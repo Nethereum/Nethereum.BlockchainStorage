@@ -58,7 +58,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public Task ProcessLogsAsync(params FilterLog[] eventLogs)
         {
             State.Increment("HandlerInvocations");
-            return HandlerManager.HandleAsync(this, Matcher.Abi, eventLogs);
+            return HandlerManager.HandleAsync(this, Matcher.Abis, eventLogs);
         }
     }
 }

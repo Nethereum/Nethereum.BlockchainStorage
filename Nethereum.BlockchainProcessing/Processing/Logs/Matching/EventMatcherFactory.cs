@@ -18,10 +18,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 
         public async Task<IEventMatcher> LoadAsync(EventSubscriptionDto eventSubscription)
         {
-            var eventAbi = await GetEventAbiAsync(eventSubscription);
+            var eventAbis = await GetEventAbisAsync(eventSubscription);
             var addressMatcher = await CreateEventAddressMatcherAsync(eventSubscription);
             var parameterMatcher = await CreateParameterMatcherAsync(eventSubscription);
-            var matcher = new EventMatcher(eventAbi, addressMatcher, parameterMatcher);
+            var matcher = new EventMatcher(eventAbis, addressMatcher, parameterMatcher);
             return matcher;
         }
 
@@ -40,18 +40,26 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
             return addressMatcher;
         }
 
-        private async Task<EventABI> GetEventAbiAsync(EventSubscriptionDto eventSubscription)
+        private async Task<EventABI[]> GetEventAbisAsync(EventSubscriptionDto eventSubscription)
         {
-            if (eventSubscription.ContractId == null || eventSubscription.EventSignature == null)
+            if(eventSubscription.ContractId == null) return null;
+
+            if (!eventSubscription.CatchAllContractEvents && eventSubscription.EventSignatures.Count == 0)
             {
                 return null;
             }
 
             var contractDto = await _repo.GetContractAsync(eventSubscription.ContractId.Value);
-
             ContractABI contractAbi = contractDto.Abi == null ? null : _abiDeserializer.DeserialiseContract(contractDto.Abi);
-            EventABI eventAbi = contractAbi == null ? null : contractAbi.Events.FirstOrDefault(e => e.Sha3Signature == eventSubscription.EventSignature);
-            return eventAbi;
+
+            if(contractAbi == null) return null;
+
+            if (eventSubscription.CatchAllContractEvents)
+            {
+                return contractAbi.Events;
+            }
+
+            return contractAbi.Events.Where(e => eventSubscription.EventSignatures.Contains(e.Sha3Signature)).ToArray();
         }
     }
 }

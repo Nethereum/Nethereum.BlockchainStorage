@@ -12,24 +12,34 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
     public class EventMatcher : IEventMatcher
     {
         public EventMatcher(
-            EventABI eventAbi = null,
+            EventABI[] eventAbis = null,
             IEventAddressMatcher addressMatcher = null,
             IEventParameterMatcher parameterMatcher = null)
         {
-            Abi = eventAbi;
+            Abis = eventAbis;
             AddressMatcher = addressMatcher;
             ParameterMatcher = parameterMatcher;
         }
 
-        public EventABI Abi { get; }
+        public EventABI[] Abis { get; }
         public IEventAddressMatcher AddressMatcher { get; }
         public IEventParameterMatcher ParameterMatcher { get; }
 
+        private bool MatchesEventSignature(FilterLog log)
+        {
+            foreach(var abi in Abis)
+            {
+                if (log.IsLogForEvent(abi.Sha3Signature)) return true;
+            }
+
+            return false;
+        }
+
         public bool IsMatch(FilterLog log)
         {
-            if (Abi != null)
+            if (Abis?.Length > 0)
             {
-                if (!log.IsLogForEvent(Abi.Sha3Signature)) return false;
+                if (!MatchesEventSignature(log)) return false;
             }
 
             if (AddressMatcher != null)
@@ -37,9 +47,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
                 if (!AddressMatcher.IsMatch(log)) return false;
             }
 
-            if (Abi != null && ParameterMatcher != null)
+            if (Abis?.Length > 0 && ParameterMatcher != null)
             {
-                if(!ParameterMatcher.IsMatch(Abi, log)) return false;
+                if(!ParameterMatcher.IsMatch(Abis, log)) return false;
             }
 
             return true;

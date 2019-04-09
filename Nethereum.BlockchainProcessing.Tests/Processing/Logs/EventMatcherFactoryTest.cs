@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Nethereum.ABI.Model;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 Id = 1, 
                 SubscriberId = _subscriberOneConfig.Id, 
                 ContractId = _contractDto.Id, 
-                EventSignature = TestData.Contracts.StandardContract.TransferEventSignature
+                EventSignatures = new []{TestData.Contracts.StandardContract.TransferEventSignature }.ToList()
             };
             _addressesConfig = new EventSubscriptionAddressDto
             {
@@ -65,7 +66,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var eventMatcher = await _factory.LoadAsync(_eventSubscriptionConfig) as EventMatcher;
 
             Assert.NotNull(eventMatcher);
-            Assert.Equal(TestData.Contracts.StandardContract.TransferEventSignature, eventMatcher.Abi.Sha3Signature);
+            Assert.Equal(TestData.Contracts.StandardContract.TransferEventSignature, eventMatcher.Abis.First().Sha3Signature);
 
             var eventAddressMatcher = eventMatcher.AddressMatcher as EventAddressMatcher;
             Assert.Single(eventAddressMatcher.AddressesToMatch);
@@ -76,6 +77,30 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var parameterEquals = parameterMatcher.ParameterConditions.First() as ParameterEquals;
             Assert.Equal(_parameterConditionConfig.ParameterOrder, parameterEquals.ParameterOrder);
             Assert.Equal(_parameterConditionConfig.Value, parameterEquals.ExpectedValue);
+        }
+
+        [Fact]
+        public async Task CatchAllEventsForContract_LoadsAllContractEventAbis()
+        {
+            _eventSubscriptionConfig.CatchAllContractEvents = true;
+            _eventSubscriptionConfig.EventSignatures = null;
+
+            var eventMatcher = await _factory.LoadAsync(_eventSubscriptionConfig) as EventMatcher;
+
+            Assert.Equal(
+                TestData.Contracts.StandardContract.ContractAbi.Events.Select(e => e.Sha3Signature), 
+                eventMatcher.Abis.Select(e => e.Sha3Signature));
+        }
+
+        [Fact]
+        public async Task SupportsANullContract()
+        {
+            _eventSubscriptionConfig.ContractId = null;
+            _eventSubscriptionConfig.EventSignatures = null;
+
+            var eventMatcher = await _factory.LoadAsync(_eventSubscriptionConfig) as EventMatcher;
+
+            Assert.Null(eventMatcher.Abis);
         }
 
     }

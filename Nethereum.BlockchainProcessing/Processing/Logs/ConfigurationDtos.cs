@@ -22,7 +22,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long SubscriberId {get;set;}
         public long? ContractId {get;set;}
 
-        public string EventSignature {get;set;}
+        public bool CatchAllContractEvents { get;set;}
+        public List<string> EventSignatures {get;set;} = new List<string>();
 
     }
 

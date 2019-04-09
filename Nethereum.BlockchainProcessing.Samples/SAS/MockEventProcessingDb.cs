@@ -62,7 +62,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     Id = id.Next<EventSubscriptionDto>(),
                     SubscriberId = indexer.Id,
                     ContractId = contract.Id,
-                    EventSignature = TransferEventSignature
+                    EventSignatures = new List<string>(new []{TransferEventSignature })
                 });
 
             repo.Add(new EventHandlerDto
@@ -106,7 +106,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     Id = id.Next<EventSubscriptionDto>(),
                     SubscriberId = subscriber.Id,
                     ContractId = contract.Id,
-                    EventSignature = TransferEventSignature
+                    EventSignatures = new List<string>(new []{TransferEventSignature })
                 });
 
             repo.Add(new EventHandlerDto
@@ -143,7 +143,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     Id = id.Next<EventSubscriptionDto>(),
                     SubscriberId = subscriber.Id,
                     ContractId = contract.Id,
-                    EventSignature = TransferEventSignature
+                    EventSignatures = new List<string>(new []{TransferEventSignature })
                 });
 
             var ruleHandler = repo.Add(new EventHandlerDto
@@ -286,7 +286,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     Id = id.Next<EventSubscriptionDto>(),
                     SubscriberId = subscriber.Id,
                     ContractId = standardContract.Id,
-                    EventSignature = TransferEventSignature
+                    EventSignatures = new List<string>(new[] { TransferEventSignature })
                 });
 
             var transferCountHandler = repo.Add(new EventHandlerDto
@@ -348,7 +348,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                         Id = id.Next<EventSubscriptionDto>(),
                         SubscriberId = subscriber.Id,
                         ContractId = standardContract.Id,
-                        EventSignature = TransferEventSignature
+                        EventSignatures = new List<string>(new[] { TransferEventSignature })
                     });
                     
             var getTransactionHandler = repo.Add(new EventHandlerDto

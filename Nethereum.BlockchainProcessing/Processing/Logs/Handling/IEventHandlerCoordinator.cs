@@ -6,6 +6,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public interface IEventHandlerManager
     { 
-        Task HandleAsync(IEventSubscription subscription, EventABI eventAbi, params FilterLog[] eventLogs);
+        Task HandleAsync(IEventSubscription subscription, EventABI[] eventAbis, params FilterLog[] eventLogs);
     }
 }

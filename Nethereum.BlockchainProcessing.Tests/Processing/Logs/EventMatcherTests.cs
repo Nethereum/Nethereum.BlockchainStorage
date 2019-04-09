@@ -9,7 +9,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
     public class EventMatcherTests
     {
         FilterLog _log = TestData.Contracts.StandardContract.SampleTransferLog();
-        EventABI _eventAbi = TestData.Contracts.StandardContract.TransferEventAbi;
+        EventABI[] _eventAbis = new []{TestData.Contracts.StandardContract.TransferEventAbi };
 
         [Fact]
         public void GivenNoMatchersWillReturnTrue()
@@ -21,14 +21,29 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public void GivenOnlyTheEventAbi_MatchesEventSignature()
         {
-            var matcher = new EventMatcher(_eventAbi);
+            var matcher = new EventMatcher(_eventAbis);
+            Assert.True(matcher.IsMatch(_log));
+        }
+
+        [Fact]
+        public void GivenManyEventAbis_MatchesFirstEventSignature()
+        {
+            EventABI[] eventAbis = new[] { 
+                TestData.Contracts.StandardContract.ApprovalEventAbi, 
+                TestData.Contracts.StandardContract.TransferEventAbi };
+
+            var matcher = new EventMatcher(eventAbis);
             Assert.True(matcher.IsMatch(_log));
         }
 
         [Fact]
         public void DoesNotMisMatchEventSignature()
         {
-            var matcher = new EventMatcher(_eventAbi);
+            EventABI[] eventAbis = new[] {
+                TestData.Contracts.StandardContract.ApprovalEventAbi,
+                TestData.Contracts.StandardContract.TransferEventAbi };
+
+            var matcher = new EventMatcher(eventAbis);
             _log.Topics[0] = "0xedf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
             Assert.False(matcher.IsMatch(_log));
         }
@@ -56,7 +71,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         {
             var addressMatcher = new Mock<IEventAddressMatcher>();
             addressMatcher.Setup(a => a.IsMatch(_log)).Returns(true);
-            var matcher = new EventMatcher(_eventAbi, addressMatcher.Object);
+            var matcher = new EventMatcher(_eventAbis, addressMatcher.Object);
             Assert.True(matcher.IsMatch(_log));
         }
 
@@ -66,9 +81,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var addressMatcher = new Mock<IEventAddressMatcher>();
             addressMatcher.Setup(a => a.IsMatch(_log)).Returns(true);
             var parameterMatcher = new Mock<IEventParameterMatcher>();
-            parameterMatcher.Setup(p => p.IsMatch(_eventAbi, _log)).Returns(true);
+            parameterMatcher.Setup(p => p.IsMatch(_eventAbis, _log)).Returns(true);
 
-            var matcher = new EventMatcher(_eventAbi, addressMatcher.Object, parameterMatcher.Object);
+            var matcher = new EventMatcher(_eventAbis, addressMatcher.Object, parameterMatcher.Object);
             Assert.True(matcher.IsMatch(_log));
         }
 
@@ -78,11 +93,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var addressMatcher = new Mock<IEventAddressMatcher>();
             addressMatcher.Setup(a => a.IsMatch(_log)).Returns(true);
             var parameterMatcher = new Mock<IEventParameterMatcher>();
-            parameterMatcher.Setup(p => p.IsMatch(_eventAbi, _log)).Returns(true);
+            parameterMatcher.Setup(p => p.IsMatch(_eventAbis, _log)).Returns(true);
 
 
             _log.Topics[0] = "0xedf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-            var matcher = new EventMatcher(_eventAbi, addressMatcher.Object, parameterMatcher.Object);
+            var matcher = new EventMatcher(_eventAbis, addressMatcher.Object, parameterMatcher.Object);
             Assert.False(matcher.IsMatch(_log));
         }
 
@@ -92,9 +107,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var addressMatcher = new Mock<IEventAddressMatcher>();
             addressMatcher.Setup(a => a.IsMatch(_log)).Returns(true);
             var parameterMatcher = new Mock<IEventParameterMatcher>();
-            parameterMatcher.Setup(p => p.IsMatch(_eventAbi, _log)).Returns(false);
+            parameterMatcher.Setup(p => p.IsMatch(_eventAbis, _log)).Returns(false);
 
-            var matcher = new EventMatcher(_eventAbi, addressMatcher.Object, parameterMatcher.Object);
+            var matcher = new EventMatcher(_eventAbis, addressMatcher.Object, parameterMatcher.Object);
             Assert.False(matcher.IsMatch(_log));
         }
 
@@ -104,9 +119,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var addressMatcher = new Mock<IEventAddressMatcher>();
             addressMatcher.Setup(a => a.IsMatch(_log)).Returns(false);
             var parameterMatcher = new Mock<IEventParameterMatcher>();
-            parameterMatcher.Setup(p => p.IsMatch(_eventAbi, _log)).Returns(true);
+            parameterMatcher.Setup(p => p.IsMatch(_eventAbis, _log)).Returns(true);
 
-            var matcher = new EventMatcher(_eventAbi, addressMatcher.Object, parameterMatcher.Object);
+            var matcher = new EventMatcher(_eventAbis, addressMatcher.Object, parameterMatcher.Object);
             Assert.False(matcher.IsMatch(_log));
         }
 

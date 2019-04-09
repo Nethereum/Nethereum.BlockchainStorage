@@ -16,17 +16,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
         }
 
         public IEnumerable<IParameterCondition> ParameterConditions { get; }
-        public bool IsMatch(EventABI abi, FilterLog log)
+        public bool IsMatch(EventABI[] abis, FilterLog log)
         {
             if(!ParameterConditions?.Any() ?? false) return true;
 
-            var topics = abi.DecodeEventDefaultTopics(log);
-            var matchingFilters = ParameterConditions.Where(f => f.IsTrue(topics)).ToArray();
-            if (matchingFilters.Length != ParameterConditions.Count())
-            {
-                return false;
+            foreach(var abi in abis)
+            {             
+                var topics = abi.DecodeEventDefaultTopics(log);
+                var matchingFilters = ParameterConditions.Where(f => f.IsTrue(topics)).ToArray();
+                if (matchingFilters.Length == ParameterConditions.Count())
+                {
+                    return true;
+                }
             }
-            return true;
+
+            return false;
         }
     }
 }

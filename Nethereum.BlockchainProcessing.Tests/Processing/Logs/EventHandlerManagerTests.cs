@@ -64,16 +64,54 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public async Task DecodesEventFromAbi()
         {
             var subscription = CreateMockSubscription(out List<DecodedEvent> eventsHandled);
-
-            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history);
+            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out _);
 
             var coordinator = new EventHandlerManager(
                 mockEventHandlerHistoryDb.Object);
 
             var logs = new[] { TestContract.SampleTransferLog() };
-            await coordinator.HandleAsync(subscription, TestContract.TransferEventAbi, logs);
+            await coordinator.HandleAsync(subscription, new[]{ TestContract.TransferEventAbi }, logs);
 
             Assert.Single(eventsHandled);
+        }
+
+        [Fact]
+        public async Task WhenAbisAreNotConfigured_DecodesToGenericEventLog()
+        {
+            var subscription = CreateMockSubscription(out List<DecodedEvent> eventsHandled);
+            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out _);
+
+            var coordinator = new EventHandlerManager(
+                mockEventHandlerHistoryDb.Object);
+
+            var logs = new[] { new FilterLog() };
+            await coordinator.HandleAsync(subscription, new ABI.Model.EventABI[0], logs);
+
+            Assert.Single(eventsHandled);
+            Assert.Empty(eventsHandled[0].Event);
+        }
+
+        [Fact]
+        public async Task WithMultipleAbis_DecodesToFirstMatchingAbi()
+        {
+            var subscription = CreateMockSubscription(out List<DecodedEvent> eventsHandled);
+            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out _);
+
+            var coordinator = new EventHandlerManager(
+                mockEventHandlerHistoryDb.Object);
+
+            var logs = new[] { TestContract.SampleTransferLog() };
+
+            var abis = new []{ 
+                TestContract.ApprovalEventAbi,
+                TestContract.TransferEventAbi };
+
+            await coordinator.HandleAsync(subscription, abis, logs);
+
+            Assert.Single(eventsHandled);
+            Assert.Equal(
+                TestContract.TransferEventAbi.InputParameters.Length, 
+                eventsHandled[0].Event.Count);
         }
 
         [Fact]
@@ -93,7 +131,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             var eventAbi = TestContract.TransferEventAbi;
 
-            await coordinator.HandleAsync(subscription, eventAbi, logs);
+            await coordinator.HandleAsync(subscription, new[]{ eventAbi }, logs);
 
             Assert.Empty(eventsHandled);
         }

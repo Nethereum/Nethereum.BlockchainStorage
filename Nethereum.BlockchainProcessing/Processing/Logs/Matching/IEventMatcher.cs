@@ -5,7 +5,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 {
     public interface IEventMatcher
     {
-        EventABI Abi {get;}
+        EventABI[] Abis {get;}
         bool IsMatch(FilterLog log);
     }
 }

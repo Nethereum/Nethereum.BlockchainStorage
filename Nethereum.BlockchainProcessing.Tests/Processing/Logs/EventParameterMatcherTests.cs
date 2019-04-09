@@ -13,14 +13,14 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {
     public class EventParameterMatcherTests
     {
-        EventABI _eventAbi = TestData.Contracts.StandardContract.TransferEventAbi;
+        EventABI[] _eventAbis = new []{ TestData.Contracts.StandardContract.TransferEventAbi };
         FilterLog _log = new FilterLog();
 
         [Fact]
         public void WhenThereAreNoConditionsReturnsTrue()
         {
             var matcher = new EventParameterMatcher(Array.Empty<IParameterCondition>());
-            Assert.True(matcher.IsMatch(_eventAbi, _log));
+            Assert.True(matcher.IsMatch(_eventAbis, _log));
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             mockCondition.Setup(c => c.IsTrue(It.IsAny<EventLog<List<ParameterOutput>>>())).Returns(false);
 
             var matcher = new EventParameterMatcher(new IParameterCondition[]{ mockCondition.Object});
-            Assert.False(matcher.IsMatch(_eventAbi, _log));
+            Assert.False(matcher.IsMatch(_eventAbis, _log));
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             match.Setup(c => c.IsTrue(It.IsAny<EventLog<List<ParameterOutput>>>())).Returns(true);
 
             var matcher = new EventParameterMatcher(new IParameterCondition[]{ doNotMatch.Object, match.Object});
-            Assert.False(matcher.IsMatch(_eventAbi, _log));
+            Assert.False(matcher.IsMatch(_eventAbis, _log));
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             mockCondition2.Setup(c => c.IsTrue(It.IsAny<EventLog<List<ParameterOutput>>>())).Returns(true);
 
             var matcher = new EventParameterMatcher(new IParameterCondition[]{ mockCondition1.Object, mockCondition2.Object});
-            Assert.True(matcher.IsMatch(_eventAbi, _log));
+            Assert.True(matcher.IsMatch(_eventAbis, _log));
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 });
 
             var matcher = new EventParameterMatcher(new IParameterCondition[]{ mockCondition1.Object});
-            matcher.IsMatch(_eventAbi, TestData.Contracts.StandardContract.SampleTransferLog());
+            matcher.IsMatch(_eventAbis, TestData.Contracts.StandardContract.SampleTransferLog());
 
             Assert.NotNull(actualDecodedParameters);
             Assert.Equal("0x19ce02e0b4fdf5cfee0ed21141b38c2d88113c58828c771e813ce2624af127cd", actualDecodedParameters.Log.TransactionHash);
