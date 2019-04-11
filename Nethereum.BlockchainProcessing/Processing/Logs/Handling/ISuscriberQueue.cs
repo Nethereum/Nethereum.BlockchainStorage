@@ -6,5 +6,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     {
         string Name {get;}
         Task AddMessageAsync(object content);
+
+        Task<int> GetApproxMessageCountAsync();
     }
 }

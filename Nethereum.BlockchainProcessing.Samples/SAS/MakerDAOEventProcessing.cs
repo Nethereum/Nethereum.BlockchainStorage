@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         [Fact]
         public async Task WriteAnyMakerEventToQueue()
         {
-            var config = LoadConfig();
+            var config = TestConfiguration.LoadConfig();
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
 
             var configurationContext = MakerDAOEventProcessingConfig.Create(PARTITION, out IdGenerator idGenerator);
@@ -50,7 +50,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // load service
             var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions, new NewFilterInput[]{ makerAddressFilter});
+            var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions, makerAddressFilter);
             var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute
@@ -91,18 +91,6 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }
 
             await cloudTableSetup.GetCountersTable().DeleteIfExistsAsync();
-        }
-
-        private static IConfigurationRoot LoadConfig()
-        {
-            ConfigurationUtils.SetEnvironment("development");
-
-            //use the command line to set your azure search api key
-            //e.g. dotnet user-secrets set "AzureStorageConnectionString" "<put key here>"
-            var appConfig = ConfigurationUtils
-                .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainProcessing.Samples");
-
-            return appConfig;
         }
     }
 }

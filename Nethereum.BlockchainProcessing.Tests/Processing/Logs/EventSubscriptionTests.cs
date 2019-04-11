@@ -86,5 +86,55 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             Assert.Equal(logs, logsHandled);
         }
+
+        [Fact]
+        public void FromEventAbis()
+        {
+            var eventsToMatch = TestData.Contracts.StandardContract.ContractAbi.Events;
+            var eventSubscription = new EventSubscription(eventsToMatch);
+
+            Assert.Equal(eventsToMatch, eventSubscription.Matcher.Abis);
+
+            var transferLog = TestData.Contracts.StandardContract.SampleTransferLog();
+            var genericLog = new FilterLog();
+
+            Assert.True(eventSubscription.IsLogForEvent(transferLog));
+            Assert.False(eventSubscription.IsLogForEvent(genericLog));
+        }
+
+        [Fact]
+        public void FromEventAbis_SetsDefaultDependencies()
+        {
+            var state = new EventSubscriptionStateDto();
+            var eventHandlerHistoryDb = new Mock<IEventHandlerHistoryDb>().Object;
+            var contractAddresses = new []{ "0x243e72b69141f6af525a9a5fd939668ee9f2b354"};
+            var parameterConditions = new[] {ParameterCondition.Create(1, ParameterConditionOperator.Equals, "x")};
+
+            var eventSubscription = new EventSubscription(
+                TestData.Contracts.StandardContract.ContractAbi.Events,
+                contractAddresses,
+                parameterConditions,
+                1,2, state, eventHandlerHistoryDb );
+
+            Assert.Equal(1, eventSubscription.Id);
+            Assert.Equal(2, eventSubscription.SubscriberId);
+
+            var eventHandlerManager = eventSubscription.HandlerManager as EventHandlerManager;
+            Assert.NotNull(eventHandlerManager);
+            Assert.Same(eventHandlerHistoryDb, eventHandlerManager.History);
+
+            Assert.IsType<EventHandlerManager>(eventSubscription.HandlerManager);
+            Assert.Same(state, eventSubscription.State);
+
+            var eventMatcher = eventSubscription.Matcher as EventMatcher;
+            Assert.NotNull(eventMatcher);
+            var eventAddressMatcher = eventMatcher.AddressMatcher as EventAddressMatcher;
+            Assert.NotNull(eventAddressMatcher);
+            Assert.Equal(contractAddresses, eventAddressMatcher.AddressesToMatch);
+
+            var parameterMatcher = eventMatcher.ParameterMatcher as EventParameterMatcher;
+            Assert.NotNull(eventMatcher.ParameterMatcher);
+            Assert.Equal(parameterConditions, parameterMatcher.ParameterConditions);
+        }
     }
 }

@@ -25,6 +25,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
     public static class QueueMessageExtensions 
     {
+        public static void AddQueueHandler(this EventSubscription subscription, IQueue queue, long id = 0)
+        {
+            subscription.AddHandler(new QueueHandler(subscription, id, queue));
+        }
+
         public static EventLogQueueMessage ToQueueMessage(this DecodedEvent decodedEvent)
         {
             var msg = new EventLogQueueMessage

@@ -9,10 +9,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 {
     public class EventParameterMatcher : IEventParameterMatcher
     {
-        public EventParameterMatcher(IEnumerable<IParameterCondition> parameterConditions)
+        public EventParameterMatcher(IEnumerable<IParameterCondition> parameterConditions = null)
         {
-            ParameterConditions = parameterConditions
-                ?? throw new ArgumentNullException(nameof(parameterConditions));
+            ParameterConditions = parameterConditions ?? Array.Empty<IParameterCondition>();
         }
 
         public IEnumerable<IParameterCondition> ParameterConditions { get; }

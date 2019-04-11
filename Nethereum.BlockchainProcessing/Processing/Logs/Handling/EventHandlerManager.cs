@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public class EventHandlerManager : IEventHandlerManager
     {
         public EventHandlerManager(
-            IEventHandlerHistoryDb eventHandlerHistory)
+            IEventHandlerHistoryDb eventHandlerHistory = null)
         {
             History = eventHandlerHistory;
         }
@@ -36,16 +36,22 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         {
             foreach (var handler in subscription.EventHandlers)
             {
-                if (await History.ContainsEventHandlerHistory(handler.Id, decodedEvent.Key))
-                {
-                    continue;
+                if(History != null)
+                { 
+                    if (await History.ContainsEventHandlerHistory(handler.Id, decodedEvent.Key))
+                    {
+                        continue;
+                    }
                 }
 
                 decodedEvent.State["HandlerInvocations"] = 1 + (int)decodedEvent.State["HandlerInvocations"];
 
                 var invokeNextHandler = await handler.HandleAsync(decodedEvent);
 
-                await History.AddEventHandlerHistory(handler.Id, decodedEvent.Key);
+                if(History != null)
+                { 
+                    await History.AddEventHandlerHistory(handler.Id, decodedEvent.Key);
+                }
 
                 if (!invokeNextHandler)
                 {

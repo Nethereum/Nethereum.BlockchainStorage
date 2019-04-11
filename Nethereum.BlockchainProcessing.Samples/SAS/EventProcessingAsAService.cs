@@ -27,7 +27,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         [Fact]
         public async Task WebJobExample()
         {
-            var config = LoadConfig();
+            var config = TestConfiguration.LoadConfig();
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
             string azureSearchKey = config["AzureSearchApiKey"];
 
@@ -122,16 +122,5 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             await azureTablesSubscriberRepositoryFactory.DeleteTablesAsync();
         }
 
-        private static IConfigurationRoot LoadConfig()
-        {
-            ConfigurationUtils.SetEnvironment("development");
-
-            //use the command line to set your azure search api key
-            //e.g. dotnet user-secrets set "AzureStorageConnectionString" "<put key here>"
-            var appConfig = ConfigurationUtils
-                .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainProcessing.Samples");
-
-            return appConfig;
-        }
     }
 }
