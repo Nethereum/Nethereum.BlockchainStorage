@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
     public class MakerDAOEventProcessing
     {
-        const long PARTITION = 1;
+        const long PARTITION = 2;
         const ulong MIN_BLOCK_NUMBER = 7540000;
         const uint MAX_BLOCKS_PER_BATCH = 100;
 
@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var config = LoadConfig();
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
 
-            var configurationContext = MakerDAOEventProcessingConfig.Create(out IdGenerator idGenerator);
+            var configurationContext = MakerDAOEventProcessingConfig.Create(PARTITION, out IdGenerator idGenerator);
             IEventProcessingConfigurationRepository configurationRepository = configurationContext.CreateMockRepository(idGenerator);
 
             var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);

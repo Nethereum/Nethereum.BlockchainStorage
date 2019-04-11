@@ -11,20 +11,19 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public static readonly string ApprovalEventSignature = "8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
 
 
-        public static EventProcessingConfigContext Create(out IdGenerator idGenerator)
+        public static EventProcessingConfigContext Create(long partitionId, out IdGenerator idGenerator)
         {
             EventProcessingConfigContext repo = new EventProcessingConfigContext();
 
-            const long PartitionId = 1;
             idGenerator = new IdGenerator();
 
-            AddHarry(PartitionId, idGenerator, repo);
-            AddGeorge(PartitionId, idGenerator, repo);
-            AddNosey(PartitionId, idGenerator, repo);
-            AddIan(PartitionId, idGenerator, repo);
-            AddEric(PartitionId, idGenerator, repo);
-            AddCharlie(PartitionId, idGenerator, repo);
-            AddMary(PartitionId, idGenerator, repo);
+            AddHarry(partitionId, idGenerator, repo);
+            AddGeorge(partitionId, idGenerator, repo);
+            AddNosey(partitionId, idGenerator, repo);
+            AddIan(partitionId, idGenerator, repo);
+            AddEric(partitionId, idGenerator, repo);
+            AddCharlie(partitionId, idGenerator, repo);
+            AddMary(partitionId, idGenerator, repo);
 
             return repo;
         }

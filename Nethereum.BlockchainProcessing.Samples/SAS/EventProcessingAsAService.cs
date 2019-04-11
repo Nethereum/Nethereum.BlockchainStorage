@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
             string azureSearchKey = config["AzureSearchApiKey"];
 
-            var configurationContext = EventProcessingConfigMock.Create(out IdGenerator idGenerator);
+            var configurationContext = EventProcessingConfigMock.Create(PARTITION, out IdGenerator idGenerator);
             IEventProcessingConfigurationRepository configurationRepository = configurationContext.CreateMockRepository(idGenerator);
 
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
