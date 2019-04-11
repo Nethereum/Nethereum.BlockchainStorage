@@ -31,8 +31,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
             string azureSearchKey = config["AzureSearchApiKey"];
 
-            var configurationContext = new MockEventProcessingContext();
-            IEventProcessingConfigurationRepository configurationRepository = MockEventProcessingDb.Create(configurationContext);
+            var configurationContext = EventProcessingConfigMock.Create(out IdGenerator idGenerator);
+            IEventProcessingConfigurationRepository configurationRepository = configurationContext.CreateMockRepository(idGenerator);
 
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var blockchainProxy = new BlockchainProxyService(web3);
@@ -100,7 +100,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         }
 
         private async Task ClearDown(
-            MockEventProcessingContext repo, 
+            EventProcessingConfigContext repo, 
             CloudTableSetup cloudTableSetup, 
             IAzureSearchService searchService, 
             AzureSubscriberQueueFactory subscriberQueueFactory,

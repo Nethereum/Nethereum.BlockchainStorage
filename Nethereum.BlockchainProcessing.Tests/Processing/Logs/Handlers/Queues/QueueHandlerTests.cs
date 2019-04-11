@@ -2,10 +2,7 @@
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -34,7 +31,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Queues
         }
 
         [Fact]
-        public void DecodedEventToQueueMessage()
+        public void TransformDecodedEventToQueueMessage()
         {
             var log = TestData.Contracts.StandardContract.SampleTransferLog();
             var decodedLog = log.ToDecodedEvent(TestData.Contracts.StandardContract.TransferEventAbi);

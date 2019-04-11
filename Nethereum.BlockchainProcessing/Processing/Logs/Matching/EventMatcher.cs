@@ -1,5 +1,5 @@
 ﻿using Nethereum.ABI.Model;
-using Nethereum.Contracts.Extensions;
+using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching

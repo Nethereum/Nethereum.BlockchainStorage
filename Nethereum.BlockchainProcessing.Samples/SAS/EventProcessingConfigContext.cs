@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
-    public class MockEventProcessingContext
+    public class EventProcessingConfigContext
     {
         public List<SubscriberDto> Subscribers = new List<SubscriberDto>();
         public List<SubscriberContractDto> Contracts = new List<SubscriberContractDto>();
