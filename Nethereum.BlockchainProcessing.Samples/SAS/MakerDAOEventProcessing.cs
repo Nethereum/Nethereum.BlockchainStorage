@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Samples.SAS
 {
-    public class MonitorMakerDAO
+    public class MakerDAOEventProcessing
     {
         const long PARTITION = 1;
         const ulong MIN_BLOCK_NUMBER = 7540000;
@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var config = LoadConfig();
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
 
-            var configurationContext = MonitorMakerDAOConfig.Create(out IdGenerator idGenerator);
+            var configurationContext = MakerDAOEventProcessingConfig.Create(out IdGenerator idGenerator);
             IEventProcessingConfigurationRepository configurationRepository = configurationContext.CreateMockRepository(idGenerator);
 
             var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);
@@ -46,7 +46,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
 
             //this ensures we only query the chain for events relating to this contract
-            var makerAddressFilter = new NewFilterInput() { Address = new[] { MonitorMakerDAOConfig .MAKER_CONTRACT_ADDRESS} };
+            var makerAddressFilter = new NewFilterInput() { Address = new[] { MakerDAOEventProcessingConfig.MAKER_CONTRACT_ADDRESS} };
 
             // load service
             var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
@@ -57,7 +57,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var blockRangesProcessed = new List<BlockRange?>();
             try
             {
-                for(var i = 0 ; i < 10; i ++) // 10 batch iterations
+                for(var i = 0 ; i < 2; i ++) // 2 batch iterations
                 { 
                     var ctx = new System.Threading.CancellationTokenSource();
                     var rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
@@ -73,8 +73,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }            
 
             var subscriptionState = await configurationRepository.GetOrCreateEventSubscriptionStateAsync(eventSubscriptions[0].Id);
-            Assert.Equal(10, (int)subscriptionState.Values["HandlerInvocations"]);
-            Assert.Equal(323, (int)subscriptionState.Values["EventsHandled"]);
+            Assert.Equal(2, (int)subscriptionState.Values["HandlerInvocations"]);
+            Assert.Equal(28, (int)subscriptionState.Values["EventsHandled"]);
 
         }
 
