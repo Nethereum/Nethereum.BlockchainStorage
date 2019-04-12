@@ -31,6 +31,28 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Queues
         }
 
         [Fact]
+        public async Task CanUseCustomMessageMapper()
+        {
+            var subscription = new Mock<IEventSubscription>();
+            var queue = new Mock<IQueue>();
+            var messageToQueue = new object();
+            var customMapper = new QueueMessageMapper(decodedEvent => messageToQueue);
+            var handler = new QueueHandler(subscription.Object, 99, queue.Object, customMapper);
+            var decodedLog = DecodedEvent.Empty();
+
+            object actualQueueMessage = null;
+            queue
+                .Setup(q => q.AddMessageAsync(It.IsAny<object>()))
+                .Callback<object>((msg) => actualQueueMessage = msg )
+                .Returns(Task.CompletedTask);
+
+            var result = await handler.HandleAsync(decodedLog);
+
+            Assert.True(result);
+            Assert.Same(messageToQueue, actualQueueMessage);
+        }
+
+        [Fact]
         public void TransformDecodedEventToQueueMessage()
         {
             var log = TestData.Contracts.StandardContract.SampleTransferLog();
@@ -57,6 +79,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Queues
                 Assert.Equal(parameter.Parameter.ABIType.Name, copy.AbiType);
             }
         }
-        
+
+
     }
 }

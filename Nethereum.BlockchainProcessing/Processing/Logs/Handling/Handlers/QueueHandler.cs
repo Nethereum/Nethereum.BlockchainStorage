@@ -1,23 +1,45 @@
 ﻿using Nethereum.RPC.Eth.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
+    public interface IQueueMessageMapper
+    {
+        object Map(DecodedEvent decodedEvent);
+    }
+
+    public class QueueMessageMapper : IQueueMessageMapper
+    {
+        public static readonly IQueueMessageMapper Default = new QueueMessageMapper();
+
+        public Func<DecodedEvent, object> MappingFunction { get; }
+        public QueueMessageMapper(Func<DecodedEvent, object> mappingFunction = null)
+        {
+            MappingFunction = mappingFunction ?? new Func<DecodedEvent, object>((decodedEvent) => decodedEvent.ToQueueMessage()); 
+        }
+
+        public object Map(DecodedEvent decodedEvent) => MappingFunction(decodedEvent);
+    }
+
     public class QueueHandler : EventHandlerBase, IEventHandler
     {
-        public QueueHandler(IEventSubscription subscription, long id, IQueue queue)
+        public QueueHandler(IEventSubscription subscription, long id, IQueue queue, IQueueMessageMapper mapper = null)
             :base(subscription, id)
         {
+
             Queue = queue;
+            Mapper = mapper ?? QueueMessageMapper.Default;
         }
 
         public IQueue Queue { get; }
+        public IQueueMessageMapper Mapper { get; }
 
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            var msgToQueue = decodedEvent.ToQueueMessage();
+            var msgToQueue = Mapper.Map(decodedEvent);
             await Queue.AddMessageAsync(msgToQueue);
             return true;
         }
@@ -25,9 +47,16 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
     public static class QueueMessageExtensions 
     {
-        public static void AddQueueHandler(this EventSubscription subscription, IQueue queue, long id = 0)
+        public static void AddQueueHandler(
+            this EventSubscription subscription, IQueue queue, IQueueMessageMapper mapper = null, long id = 0)
         {
-            subscription.AddHandler(new QueueHandler(subscription, id, queue));
+            subscription.AddHandler(new QueueHandler(subscription, id, queue, mapper));
+        }
+
+        public static void AddQueueHandler(
+            this EventSubscription subscription, IQueue queue, Func<DecodedEvent, object> mappingFunc, long id = 0)
+        {
+            AddQueueHandler(subscription, queue, new QueueMessageMapper(mappingFunc), id);
         }
 
         public static EventLogQueueMessage ToQueueMessage(this DecodedEvent decodedEvent)
