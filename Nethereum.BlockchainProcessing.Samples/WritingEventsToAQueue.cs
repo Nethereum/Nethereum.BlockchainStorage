@@ -85,7 +85,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             //  - The filter is invoked before any event subscriptions evaluate the logs
             //  - The subscriptions are free to implement their own matching logic
             //  - In this sample we're only interested in MakerDAO logs
-            //  - Therefore it makes sense to restict the number of logs to retrieve from the chain
+            //  - Therefore it makes sense to restrict the number of logs to retrieve from the chain
             var makerAddressFilter = new NewFilterInput() { Address = new[] { MAKER_CONTRACT_ADDRESS } };
 
             // Create a log processor

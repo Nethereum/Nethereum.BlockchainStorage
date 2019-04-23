@@ -15,6 +15,13 @@ namespace Nethereum.BlockchainProcessing.Tests.DtoWrappers
         [Function("doSomething")]
         public class DoSomethingFunction: FunctionMessage{}
         
+        [Fact]
+        public void WhenTxIsNullBlockNumberIsZero()
+        {
+            var txWithReceipt = new TransactionWithReceipt();
+            Assert.Equal(BigInteger.Zero, txWithReceipt.BlockNumber.Value);
+        }
+
         /// <summary>
         /// Ensuring that the various convenience properties and methods on this wrapper object
         /// are present and return expected values

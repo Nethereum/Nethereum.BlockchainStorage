@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         Task<EventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId);
         Task<EventSubscriptionDto[]> GetEventSubscriptionsAsync(long subscriberId);
         Task<ParameterConditionDto[]> GetParameterConditionsAsync(long eventSubscriptionId);
-        Task<SubscriberDto[]> GetSubscribersAsync(long partitionId);
+        Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId);
         Task<EventHandlerDto[]> GetEventHandlers(long eventSubscriptionId);
 
     }

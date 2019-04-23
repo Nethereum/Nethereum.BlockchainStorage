@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Handlers
 {
     public class TransactionWithReceipt
     {
-        static readonly HexBigInteger UndefinedBlockNumber = new HexBigInteger(BigInteger.MinusOne);
+        static readonly HexBigInteger UndefinedBlockNumber = new HexBigInteger(BigInteger.Zero);
         
         public TransactionWithReceipt()
         {

@@ -4,26 +4,38 @@ using System.Collections.Generic;
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
 
-    public abstract class DbRow
+    public interface IDbRow
+    {
+        long Id { get; set; }
+    }
+
+    public interface ISubscriberDto : IDbRow
+    {
+         bool Disabled { get; set; }
+         long PartitionId { get; set; }
+         string Name { get; set; }
+    }
+
+    public abstract class DbRow: IDbRow
     {
         public long Id {get;set;}
     }
 
-    public class SubscriberDto: DbRow
+    public class SubscriberDto: DbRow, ISubscriberDto
     {
         public bool Disabled {get;set;}
         public long PartitionId {get;set;}
         public string Name {get;set;}
     }
 
-    public class EventSubscriptionDto: DbRow
+    public class EventSubscriptionDto : DbRow, IEventSubscriptionDto
     {
-        public bool Disabled {get;set;}
-        public long SubscriberId {get;set;}
-        public long? ContractId {get;set;}
+        public bool Disabled { get; set; }
+        public long SubscriberId { get; set; }
+        public long? ContractId { get; set; }
 
-        public bool CatchAllContractEvents { get;set;}
-        public List<string> EventSignatures {get;set;} = new List<string>();
+        public bool CatchAllContractEvents { get; set; }
+        public List<string> EventSignatures { get; set; } = new List<string>();
 
     }
 

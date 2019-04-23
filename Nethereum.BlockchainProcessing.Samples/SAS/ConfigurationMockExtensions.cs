@@ -53,7 +53,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             configDb
                 .Setup(d => d.GetSubscribersAsync(It.IsAny<long>()))
-                .Returns<long>((partitionId) => Task.FromResult(repo.Subscribers.Where(s => s.PartitionId == partitionId).ToArray()));
+                .Returns<long>((partitionId) => Task.FromResult(repo.Subscribers.Where(s => s.PartitionId == partitionId).Cast<ISubscriberDto>().ToArray()));
 
             configDb
                 .Setup(d => d.GetEventSubscriptionsAsync(It.IsAny<long>()))
