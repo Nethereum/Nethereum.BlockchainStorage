@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
         [Fact]
         public async Task IsEmpty()
         {
-            var config = new EventRuleConfiguration
+            var config = new EventRuleDto
             {
                 Type = EventRuleType.Empty,
                 Source = EventRuleSource.EventParameter,
@@ -83,7 +83,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
 
         private async Task IsEqual(object val, string valAsString, object differentValue)
         {
-            var config = new EventRuleConfiguration
+            var config = new EventRuleDto
             {
                 Type = EventRuleType.Equals,
                 Source = EventRuleSource.EventParameter,
@@ -155,7 +155,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
         private async Task IsGreaterOrEqual(object minValue, string minValueAsString, object higherVal, object lowerVal)
         {
 
-            var config = new EventRuleConfiguration
+            var config = new EventRuleDto
             {
                 Type = EventRuleType.GreaterOrEqualTo,
                 Source = EventRuleSource.EventParameter,
@@ -229,7 +229,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
 
         private async Task IsLessOrEqual(object maxValue, string maxValueAsString, object higherValue, object lesserValue)
         {
-            var config = new EventRuleConfiguration
+            var config = new EventRuleDto
             {
                 Type = EventRuleType.LessThanOrEqualTo,
                 Source = EventRuleSource.EventParameter,
@@ -284,7 +284,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Rules
         private async Task IsModulus(object modulusOf, string modulusAsString, object isAModulus, object notAModulus)
         {
 
-            var config = new EventRuleConfiguration
+            var config = new EventRuleDto
             {
                 Type = EventRuleType.Modulus,
                 Source = EventRuleSource.EventParameter,

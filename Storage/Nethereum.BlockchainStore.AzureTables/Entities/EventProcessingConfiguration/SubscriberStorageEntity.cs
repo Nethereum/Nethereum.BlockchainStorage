@@ -2,10 +2,10 @@
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguration
 {
-    public class SubscriberContractEntity : SubscriberOwnedBase, ISubscriberContractDto
+    public class SubscriberStorageEntity : SubscriberOwnedBase, ISubscriberStorageDto
     {
-        public string Abi { get;set;}
-        public string Name { get; set; }
+        public bool Disabled { get; set; }
 
+        public string Name { get; set; }
     }
 }

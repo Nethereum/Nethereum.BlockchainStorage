@@ -5,6 +5,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public interface ISubscriberQueueConfigurationRepository
     { 
-         Task<SubscriberQueueConfigurationDto> GetSubscriberQueueAsync(long subscriberQueueId);
+         Task<ISubscriberQueueDto> GetSubscriberQueueAsync(long subscriberId, long subscriberQueueId);
     }
 }

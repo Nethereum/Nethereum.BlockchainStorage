@@ -7,27 +7,15 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
-    public class EventRuleConfiguration
-    {
-        public EventRuleSource Source { get;set;}
-        public EventRuleType Type { get;set;}
-
-        public string InputName { get;set;}
-
-        public int EventParameterNumber { get;set;}
-
-        public string Value { get;set;}
-    }
-
 
     public class EventRule : EventHandlerBase, IEventHandler
     {
-        public EventRule(IEventSubscription subscription, long id, EventRuleConfiguration configuration) :base(subscription, id)
+        public EventRule(IEventSubscription subscription, long id, IEventRuleDto configuration) :base(subscription, id)
         {
             Configuration = configuration;
         }
 
-        public EventRuleConfiguration Configuration { get; }
+        public IEventRuleDto Configuration { get; }
 
         public Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {

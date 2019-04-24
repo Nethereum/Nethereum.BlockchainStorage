@@ -39,9 +39,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var searchIndex = repo.Add(new SubscriberSearchIndexConfigurationDto
+            var searchIndex = repo.Add(new SubscriberSearchIndexDto
             {
-                Id = id.Next<SubscriberSearchIndexConfigurationDto>(),
+                Id = id.Next<SubscriberSearchIndexDto>(),
                 SubscriberId = indexer.Id,
                 Name = "subscriber-transfer-ian"
             });
@@ -83,9 +83,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var repository = repo.Add(new SubscriberRepositoryConfigurationDto
+            var repository = repo.Add(new SubscriberStorageDto
             {
-                Id = id.Next<SubscriberRepositoryConfigurationDto>(),
+                Id = id.Next<SubscriberStorageDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "charlielogs"
             });
@@ -162,9 +162,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Value = "10"
             });
 
-            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            var queue = repo.Add(new SubscriberQueueDto
             {
-                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                Id = id.Next<SubscriberQueueDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "subscriber-transfer-eric"
             });
@@ -189,9 +189,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            var queue = repo.Add(new SubscriberQueueDto
             {
-                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                Id = id.Next<SubscriberQueueDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "subscriber-nosey"
             });
@@ -262,9 +262,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            var queue = repo.Add(new SubscriberQueueDto
             {
-                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                Id = id.Next<SubscriberQueueDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "subscriber-george"
             });
@@ -324,9 +324,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            var queue = repo.Add(new SubscriberQueueDto
             {
-                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                Id = id.Next<SubscriberQueueDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "subscriber-mary"
             });
@@ -369,9 +369,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            var queue = repo.Add(new SubscriberQueueDto
             {
-                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                Id = id.Next<SubscriberQueueDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "subscriber-harry"
             });

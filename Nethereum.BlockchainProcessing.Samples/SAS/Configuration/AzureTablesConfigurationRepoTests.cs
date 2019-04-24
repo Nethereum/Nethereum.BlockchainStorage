@@ -11,18 +11,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
 {
     public class AzureTablesConfigurationRepoFixture: IDisposable
     {
-        public readonly EventProcessingCloudTableSetup CloudTableSetup;
-        public ISubscriberRepository SubscriberRepo;
-        public ISubscriberContractsRepository SubscriberContractsRepo;
-        public IEventSubscriptionRepository EventSubscriptionRepo;
-        public IEventSubscriptionAddressRepository EventSubscriptionAddressRepository;
-        public IEventHandlerRepository EventHandlerRepository;
-        public IParameterConditionRepository ParameterConditionRepository;
-        public AzureEventProcessingConfigurationRepository ConfigRepo;
-        public IEventSubscriptionStateRepository EventSubscriptionStateRepository;
-        public IContractQueryRepository ContractQueryRepository;
-        public IContractQueryParameterRepository ContractQueryParameterRepository;
-        public IEventAggregatorRepository EventAggregatorRepository;
+        private readonly EventProcessingCloudTableSetup CloudTableSetup;
+        public readonly AzureEventProcessingConfigurationRepository ConfigRepo;
 
         public AzureTablesConfigurationRepoFixture()
         {
@@ -30,29 +20,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
 
             CloudTableSetup = new EventProcessingCloudTableSetup(azureStorageConnectionString, "test");
-
-            SubscriberRepo = CloudTableSetup.GetSubscriberRepository();
-            SubscriberContractsRepo = CloudTableSetup.GetSubscriberContractsRepository();
-            EventSubscriptionRepo = CloudTableSetup.GetEventSubscriptionsRepository();
-            EventSubscriptionAddressRepository = CloudTableSetup.GetEventSubscriptionAddressesRepository();
-            EventHandlerRepository = CloudTableSetup.GetEventHandlerRepository();
-            ParameterConditionRepository = CloudTableSetup.GetParameterConditionRepository();
-            EventSubscriptionStateRepository = CloudTableSetup.GetEventSubscriptionStateRepository();
-            ContractQueryRepository = CloudTableSetup.GetContractQueryRepository();
-            ContractQueryParameterRepository = CloudTableSetup.GetContractQueryParameterRepository();
-            EventAggregatorRepository = CloudTableSetup.GetEventAggregatorRepository();
-
-            ConfigRepo = new AzureEventProcessingConfigurationRepository(
-                SubscriberRepo, 
-                SubscriberContractsRepo, 
-                EventSubscriptionRepo, 
-                EventSubscriptionAddressRepository,
-                EventHandlerRepository,
-                ParameterConditionRepository,
-                EventSubscriptionStateRepository,
-                ContractQueryRepository,
-                ContractQueryParameterRepository,
-                EventAggregatorRepository);
+            ConfigRepo = new AzureEventProcessingConfigurationRepository(CloudTableSetup);
         }
 
         public void Dispose()
@@ -111,9 +79,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             };
 
 
-            await Fixture.SubscriberRepo.UpsertAsync(subscriber1);
-            await Fixture.SubscriberRepo.UpsertAsync(subscriber2);
-            await Fixture.SubscriberRepo.UpsertAsync(subscriber3);
+            await Fixture.ConfigRepo.SubscriberRepository.UpsertAsync(subscriber1);
+            await Fixture.ConfigRepo.SubscriberRepository.UpsertAsync(subscriber2);
+            await Fixture.ConfigRepo.SubscriberRepository.UpsertAsync(subscriber3);
 
             var partition1Subscribers = await Fixture.ConfigRepo.GetSubscribersAsync(partitionId: 1);
             var partition2Subscribers = await Fixture.ConfigRepo.GetSubscribersAsync(partitionId: 2);
@@ -147,9 +115,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             };
 
 
-            await Fixture.SubscriberContractsRepo.UpsertAsync(contract1);
-            await Fixture.SubscriberContractsRepo.UpsertAsync(contract2);
-            await Fixture.SubscriberContractsRepo.UpsertAsync(contract3);
+            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contract1);
+            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contract2);
+            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contract3);
 
             var contract1FromRepo = await Fixture.ConfigRepo.GetSubscriberContractAsync(subscriberId:99, contractId: 1);
             var contract2FromRepo = await Fixture.ConfigRepo.GetSubscriberContractAsync(subscriberId: 99, contractId: 2);
@@ -197,9 +165,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 EventSignatures = new System.Collections.Generic.List<string>(new[] { "", "" })
             };
 
-            await Fixture.EventSubscriptionRepo.UpsertAsync(sub1);
-            await Fixture.EventSubscriptionRepo.UpsertAsync(sub2);
-            await Fixture.EventSubscriptionRepo.UpsertAsync(sub3);
+            await Fixture.ConfigRepo.EventSubscriptionRepository.UpsertAsync(sub1);
+            await Fixture.ConfigRepo.EventSubscriptionRepository.UpsertAsync(sub2);
+            await Fixture.ConfigRepo.EventSubscriptionRepository.UpsertAsync(sub3);
 
             var sub1Subscriptions = await Fixture.ConfigRepo.GetEventSubscriptionsAsync(99);
             var sub2Subscriptions = await Fixture.ConfigRepo.GetEventSubscriptionsAsync(100);
@@ -221,9 +189,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var addr2 = new EventSubscriptionAddressDto { Id = 2, EventSubscriptionId = 99, Address = "abc" };
             var addr3 = new EventSubscriptionAddressDto { Id = 3, EventSubscriptionId = 100, Address = "qer" };
 
-            await Fixture.EventSubscriptionAddressRepository.UpsertAsync(addr1);
-            await Fixture.EventSubscriptionAddressRepository.UpsertAsync(addr2);
-            await Fixture.EventSubscriptionAddressRepository.UpsertAsync(addr3);
+            await Fixture.ConfigRepo.EventSubscriptionAddressRepository.UpsertAsync(addr1);
+            await Fixture.ConfigRepo.EventSubscriptionAddressRepository.UpsertAsync(addr2);
+            await Fixture.ConfigRepo.EventSubscriptionAddressRepository.UpsertAsync(addr3);
 
             var sub1Addresses = await Fixture.ConfigRepo.GetEventSubscriptionAddressesAsync(99);
             var sub2Addresses = await Fixture.ConfigRepo.GetEventSubscriptionAddressesAsync(100);
@@ -270,9 +238,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 SubscriberRepositoryId = 7
             };
 
-            await Fixture.EventHandlerRepository.UpsertAsync(handler1);
-            await Fixture.EventHandlerRepository.UpsertAsync(handler2);
-            await Fixture.EventHandlerRepository.UpsertAsync(handler3);
+            await Fixture.ConfigRepo.EventHandlerRepository.UpsertAsync(handler1);
+            await Fixture.ConfigRepo.EventHandlerRepository.UpsertAsync(handler2);
+            await Fixture.ConfigRepo.EventHandlerRepository.UpsertAsync(handler3);
 
             var sub1Handlers = await Fixture.ConfigRepo.GetEventHandlersAsync(99);
             var sub2Handlers = await Fixture.ConfigRepo.GetEventHandlersAsync(100);
@@ -300,9 +268,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var condition2 = new ParameterConditionDto { Id = 2, EventSubscriptionId = 99, Operator = ParameterConditionOperator.LessOrEqual, ParameterOrder = 2, Value = "5" };
             var condition3 = new ParameterConditionDto { Id = 3, EventSubscriptionId = 100, Operator = ParameterConditionOperator.Equals, ParameterOrder = 1, Value = "11" };
 
-            await Fixture.ParameterConditionRepository.UpsertAsync(condition1);
-            await Fixture.ParameterConditionRepository.UpsertAsync(condition2);
-            await Fixture.ParameterConditionRepository.UpsertAsync(condition3);
+            await Fixture.ConfigRepo.ParameterConditionRepository.UpsertAsync(condition1);
+            await Fixture.ConfigRepo.ParameterConditionRepository.UpsertAsync(condition2);
+            await Fixture.ConfigRepo.ParameterConditionRepository.UpsertAsync(condition3);
 
             var sub1Conditions = await Fixture.ConfigRepo.GetParameterConditionsAsync(99);
             var sub2Conditions = await Fixture.ConfigRepo.GetParameterConditionsAsync(100);
@@ -396,10 +364,10 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
 
             var queryParameterDtos = new[] { queryParam1, queryParam2 };
 
-            await Fixture.SubscriberContractsRepo.UpsertAsync(contractDto);
-            await Fixture.ContractQueryRepository.UpsertAsync(contractQuery);
-            await Fixture.ContractQueryParameterRepository.UpsertAsync(queryParam1);
-            await Fixture.ContractQueryParameterRepository.UpsertAsync(queryParam2);
+            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contractDto);
+            await Fixture.ConfigRepo.ContractQueryRepository.UpsertAsync(contractQuery);
+            await Fixture.ConfigRepo.ContractQueryParameterRepository.UpsertAsync(queryParam1);
+            await Fixture.ConfigRepo.ContractQueryParameterRepository.UpsertAsync(queryParam2);
 
             var configFromRepo = await Fixture.ConfigRepo.GetContractQueryConfigurationAsync(contractDto.SubscriberId, contractQuery.EventHandlerId);
 
@@ -439,7 +407,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 Source = AggregatorSource.EventParameter,
                 SourceKey = "Value"};
 
-            await Fixture.EventAggregatorRepository.UpsertAsync(aggregatorDto);
+            await Fixture.ConfigRepo.EventAggregatorRepository.UpsertAsync(aggregatorDto);
 
             var fromRepo = await Fixture.ConfigRepo.GetEventAggregationConfigurationAsync(aggregatorDto.EventHandlerId);
 
@@ -449,6 +417,137 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             Assert.Equal(aggregatorDto.OutputKey, fromRepo.OutputKey);
             Assert.Equal(aggregatorDto.Source, fromRepo.Source);
             Assert.Equal(aggregatorDto.SourceKey, fromRepo.SourceKey);
+        }
+
+        [Fact]
+        public async Task EventRules()
+        {
+            var dto1 = new EventRuleDto {
+                EventHandlerId = 900,
+                EventParameterNumber = 1,
+                InputName = "From",
+                Source = EventRuleSource.EventParameter,
+                Type = EventRuleType.GreaterOrEqualTo,
+                Value = "10"
+                };
+
+            var dto2 = new EventRuleDto
+            {
+                EventHandlerId = 901,
+                InputName = "RunningTotal",
+                Source = EventRuleSource.EventState,
+                Type = EventRuleType.LessThanOrEqualTo,
+                Value = "10"
+            };
+
+            await Fixture.ConfigRepo.EventRuleRepository.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.EventRuleRepository.UpsertAsync(dto2);
+
+            var fromRepo1 = await Fixture.ConfigRepo.GetEventRuleConfigurationAsync(dto1.EventHandlerId);
+            var fromRepo2 = await Fixture.ConfigRepo.GetEventRuleConfigurationAsync(dto2.EventHandlerId);
+
+            Assert.Equal(dto1.EventHandlerId, fromRepo1.EventHandlerId);
+            Assert.Equal(dto1.EventParameterNumber, fromRepo1.EventParameterNumber);
+            Assert.Equal(dto1.InputName, fromRepo1.InputName);
+            Assert.Equal(dto1.Source, fromRepo1.Source);
+            Assert.Equal(dto1.Type, fromRepo1.Type);
+            Assert.Equal(dto1.Value, fromRepo1.Value);
+
+            Assert.Equal(dto2.EventHandlerId, fromRepo2.EventHandlerId);
+        }
+
+
+        [Fact]
+        public async Task SubscriberQueues()
+        {
+            var queueDto1 = new SubscriberQueueDto {SubscriberId = 99, Id = 1099, Disabled = false, Name = "transfers" };
+            var queueDto2 = new SubscriberQueueDto { SubscriberId = 100, Id = 1100, Disabled = false, Name = "approvals" };
+
+            await Fixture.ConfigRepo.SubscriberQueueRepository.UpsertAsync(queueDto1);
+            await Fixture.ConfigRepo.SubscriberQueueRepository.UpsertAsync(queueDto2);
+
+            var fromRepo1 = await Fixture.ConfigRepo.GetSubscriberQueueAsync(queueDto1.SubscriberId, queueDto1.Id);
+
+            Assert.Equal(queueDto1.Id, fromRepo1.Id);
+            Assert.Equal(queueDto1.SubscriberId, fromRepo1.SubscriberId);
+            Assert.Equal(queueDto1.Disabled, fromRepo1.Disabled);
+            Assert.Equal(queueDto1.Name, fromRepo1.Name);
+
+            var fromRepo2 = await Fixture.ConfigRepo.GetSubscriberQueueAsync(queueDto2.SubscriberId, queueDto2.Id);
+
+            Assert.Equal(queueDto2.Id, fromRepo2.Id);
+        }
+
+        [Fact]
+        public async Task SubscriberSearchIndexes()
+        {
+            var dto1 = new SubscriberSearchIndexDto { SubscriberId = 99, Id = 1099, Disabled = false, Name = "transfers" };
+            var dto2 = new SubscriberSearchIndexDto { SubscriberId = 100, Id = 1100, Disabled = false, Name = "approvals" };
+
+            await Fixture.ConfigRepo.SubscriberSearchIndexRepository.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.SubscriberSearchIndexRepository.UpsertAsync(dto2);
+
+            var fromRepo1 = await Fixture.ConfigRepo.GetSubscriberSearchIndexAsync(dto1.SubscriberId, dto1.Id);
+
+            Assert.Equal(dto1.Id, fromRepo1.Id);
+            Assert.Equal(dto1.SubscriberId, fromRepo1.SubscriberId);
+            Assert.Equal(dto1.Disabled, fromRepo1.Disabled);
+            Assert.Equal(dto1.Name, fromRepo1.Name);
+
+            var fromRepo2 = await Fixture.ConfigRepo.GetSubscriberSearchIndexAsync(dto2.SubscriberId, dto2.Id);
+
+            Assert.Equal(dto2.Id, fromRepo2.Id);
+        }
+
+        [Fact]
+        public async Task SubscriberStorage()
+        {
+            var dto1 = new SubscriberStorageDto { SubscriberId = 99, Id = 1099, Disabled = false, Name = "transfers" };
+            var dto2 = new SubscriberStorageDto { SubscriberId = 100, Id = 1100, Disabled = false, Name = "approvals" };
+
+            await Fixture.ConfigRepo.SubscriberStorageRepository.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.SubscriberStorageRepository.UpsertAsync(dto2);
+
+            var fromRepo1 = await Fixture.ConfigRepo.GetSubscriberStorageAsync(dto1.SubscriberId, dto1.Id);
+
+            Assert.Equal(dto1.Id, fromRepo1.Id);
+            Assert.Equal(dto1.SubscriberId, fromRepo1.SubscriberId);
+            Assert.Equal(dto1.Disabled, fromRepo1.Disabled);
+            Assert.Equal(dto1.Name, fromRepo1.Name);
+
+            var fromRepo2 = await Fixture.ConfigRepo.GetSubscriberStorageAsync(dto2.SubscriberId, dto2.Id);
+
+            Assert.Equal(dto2.Id, fromRepo2.Id);
+        }
+
+        [Fact]
+        public async Task EventHandlerHistory()
+        {
+            var dto1 = new EventHandlerHistoryDto {SubscriberId = 99, EventSubscriptionId = 101, EventHandlerId = 987, EventKey = "xyz1" };
+            var dto2 = new EventHandlerHistoryDto { SubscriberId = 99, EventSubscriptionId = 101, EventHandlerId = 987, EventKey = "xyz2" };
+            var dto3 = new EventHandlerHistoryDto { SubscriberId = 100, EventSubscriptionId = 102, EventHandlerId = 988, EventKey = "xyz1" };
+
+            await Fixture.ConfigRepo.AddAsync(dto1);
+            await Fixture.ConfigRepo.AddAsync(dto2);
+            await Fixture.ConfigRepo.AddAsync(dto3);
+
+            Assert.True(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(dto1.EventHandlerId, dto1.EventKey));
+            Assert.True(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(dto2.EventHandlerId, dto2.EventKey));
+            Assert.True(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(dto2.EventHandlerId, dto2.EventKey));
+
+            Assert.False(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(1232345346, "blahblah"));
+
+            var fromRep = await Fixture.ConfigRepo.EventHandlerHistoryRepository.GetAsync(dto1.EventHandlerId, dto1.EventKey);
+
+            Assert.Equal(dto1.EventHandlerId, fromRep.EventHandlerId);
+            Assert.Equal(dto1.EventKey, fromRep.EventKey);
+            Assert.Equal(dto1.EventSubscriptionId, fromRep.EventSubscriptionId);
+            Assert.Equal(dto1.SubscriberId, fromRep.SubscriberId);
+
+            var fromRepoForHandler = await Fixture.ConfigRepo.EventHandlerHistoryRepository.GetAsync(dto1.EventHandlerId);
+            Assert.Equal(dto1.EventKey, fromRepoForHandler[0].EventKey);
+            Assert.Equal(dto2.EventKey, fromRepoForHandler[1].EventKey);
+
         }
 
     }

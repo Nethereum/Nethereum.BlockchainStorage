@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface IEventHandlerHistoryRepository
+    public interface IEventHandlerHistory
     {
-        Task AddEventHandlerHistory(long eventHandlerId, string eventKey);
-        Task<bool> ContainsEventHandlerHistory(long id, string eventKey);
+        Task AddAsync(IEventHandlerHistoryDto dto);
+        Task<bool> ContainsEventHandlerHistoryAsync(long eventHandlerId, string eventKey);
     }
 }

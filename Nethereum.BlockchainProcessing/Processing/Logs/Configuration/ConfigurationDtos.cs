@@ -260,33 +260,64 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         EventParameter, EventState, TransactionHash, BlockNumber
     }
 
-    public class SubscriberQueueConfigurationDto: DbRow
+    public interface ISubscriberQueueDto : IDbRow
+    {
+        bool Disabled { get; set; }
+        long SubscriberId { get; set; }
+        string Name { get; set; }
+    }
+
+    public class SubscriberQueueDto: DbRow, ISubscriberQueueDto
     {
         public bool Disabled {get;set;}
         public long SubscriberId {get;set;}
         public string Name {get;set;}
     }
 
-    public class SubscriberSearchIndexConfigurationDto: DbRow
+    public interface ISubscriberSearchIndexDto : IDbRow
+    {
+        bool Disabled { get; set; }
+        long SubscriberId { get; set; }
+        string Name { get; set; }
+    }
+
+    public class SubscriberSearchIndexDto: DbRow, ISubscriberSearchIndexDto
     {
         public bool Disabled {get;set;}
         public long SubscriberId {get;set;}
         public string Name {get;set;}
     }
 
-    public class SubscriberRepositoryConfigurationDto : DbRow
+    public interface IEventHandlerHistoryDto : IDbRow
+    {
+        long EventHandlerId { get; set; }
+        string EventKey { get; set; }
+
+        long SubscriberId { get; set; }
+        long EventSubscriptionId { get; set; }
+    }
+
+    public class EventHandlerHistoryDto: DbRow, IEventHandlerHistoryDto
+    {
+        public long SubscriberId { get; set; }
+
+        public long EventSubscriptionId { get; set; }
+        public long EventHandlerId {get;set;}
+        public string EventKey { get;set;} 
+    }
+
+    public interface ISubscriberStorageDto : IDbRow
+    {
+        bool Disabled { get; set; }
+        long SubscriberId { get; set; }
+        string Name { get; set; }
+    }
+
+    public class SubscriberStorageDto : DbRow, ISubscriberStorageDto
     {
         public bool Disabled { get; set; }
         public long SubscriberId { get; set; }
         public string Name { get; set; }
-    }
-
-    public class EventHandlerHistoryDto: DbRow
-    {
-        public long SubscriberId {get;set; }
-        public long EventSubscriptionId {get;set; }
-        public long EventHandlerId {get;set; }
-        public string EventKey { get;set;}
     }
 
     public class EventRuleConfigurationDto: DbRow
@@ -311,6 +342,33 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
     public enum EventRuleType
     {
         Equals, GreaterOrEqualTo, LessThanOrEqualTo, Modulus, Empty
+    }
+
+    public interface IEventRuleDto : IDbRow
+    {
+        EventRuleSource Source { get; set; }
+        EventRuleType Type { get; set; }
+
+        string InputName { get; set; }
+
+        int EventParameterNumber { get; set; }
+
+        string Value { get; set; }
+
+        long EventHandlerId { get;set;}
+    }
+
+    public class EventRuleDto: DbRow, IEventRuleDto
+    {
+        public long EventHandlerId { get;set;}
+        public EventRuleSource Source { get; set; }
+        public EventRuleType Type { get; set; }
+
+        public string InputName { get; set; }
+
+        public int EventParameterNumber { get; set; }
+
+        public string Value { get; set; }
     }
 
 }

@@ -47,7 +47,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         {
             var subscription = CreateMockSubscription(out List<DecodedEvent> eventsHandled);
 
-            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history);
+            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<IEventHandlerHistoryDto> history);
 
             var coordinator = new EventHandlerManager(
                 mockEventHandlerHistoryDb.Object);
@@ -57,8 +57,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             Assert.Single(eventsHandled);
             Assert.Single(history);
-            Assert.Equal(subscription.EventHandlers.First().Id, history[0].eventHandlerId);
-            Assert.Equal(eventsHandled[0].Key, history[0].eventKey);  
+            Assert.Equal(subscription.EventHandlers.First().Id, history[0].EventHandlerId);
+            Assert.Equal(eventsHandled[0].Key, history[0].EventKey);  
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         {
             var subscription = CreateMockSubscription(out List<DecodedEvent> eventsHandled);
 
-            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history);
+            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<IEventHandlerHistoryDto> history);
 
             var coordinator = new EventHandlerManager(
                 mockEventHandlerHistoryDb.Object);
@@ -142,14 +142,18 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         {
             var subscription = CreateMockSubscription(out List<DecodedEvent> eventsHandled);
 
-            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history);
+            var mockEventHandlerHistoryDb = CreateMockHistoryDb(out List<IEventHandlerHistoryDto> history);
 
             var coordinator = new EventHandlerManager(mockEventHandlerHistoryDb.Object);
 
             var logs = new[] { new FilterLog { } };
 
             //fake an entry in the history
-            history.Add((subscription.EventHandlers.First().Id, new DecodedEvent(null, logs[0]).Key));
+            history.Add(
+                new EventHandlerHistoryDto{
+                    EventHandlerId = subscription.EventHandlers.First().Id, 
+                    EventKey = new DecodedEvent(null, logs[0]).Key
+                    });
 
             await coordinator.HandleAsync(subscription, null, logs);
 
@@ -179,35 +183,35 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         }
 
 
-        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(List<(long eventHandlerId, string eventKey)> history = null)
+        private static Mock<IEventHandlerHistory> CreateMockHistoryDb(List<IEventHandlerHistoryDto> history = null)
         {
-            return CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> h);
+            return CreateMockHistoryDb(out List<IEventHandlerHistoryDto> h);
         }
 
-        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history)
+        private static Mock<IEventHandlerHistory> CreateMockHistoryDb(out List<IEventHandlerHistoryDto> history)
         {
-            history = new List<(long eventHandlerId, string eventKey)>();
-            return CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> h, history);
+            history = new List<IEventHandlerHistoryDto>();
+            return CreateMockHistoryDb(out List<IEventHandlerHistoryDto> h, history);
         }
 
-        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> historyList, List<(long eventHandlerId, string eventKey)> history = null)
+        private static Mock<IEventHandlerHistory> CreateMockHistoryDb(out List<IEventHandlerHistoryDto> historyList, List<IEventHandlerHistoryDto> history = null)
         {
-            history = history ?? new List<(long eventHandlerId, string eventKey)>();
+            history = history ?? new List<IEventHandlerHistoryDto>();
             historyList = history;
 
-            var mock = new Mock<IEventHandlerHistoryRepository>();
+            var mock = new Mock<IEventHandlerHistory>();
             mock
-                .Setup(m => m.AddEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
-                .Returns<long, string>((handlerId, eventKey) =>
+                .Setup(m => m.AddAsync(It.IsAny<IEventHandlerHistoryDto>()))
+                .Returns<IEventHandlerHistoryDto>((item) =>
                 {
-                    history.Add((handlerId, eventKey));
+                    history.Add(item);
                     return Task.CompletedTask;
                 });
             mock
-                .Setup(m => m.ContainsEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
+                .Setup(m => m.ContainsEventHandlerHistoryAsync(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns<long, string>((handlerId, eventKey) =>
                 {
-                    var exists = history.Any(h => h.eventHandlerId == handlerId && h.eventKey == eventKey);
+                    var exists = history.Any(h => h.EventHandlerId == handlerId && h.EventKey == eventKey);
                     return Task.FromResult(exists);
                 });
             return mock;

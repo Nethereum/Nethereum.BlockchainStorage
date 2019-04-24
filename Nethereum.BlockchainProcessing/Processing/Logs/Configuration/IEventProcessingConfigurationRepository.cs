@@ -10,9 +10,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         IEventAggregatorConfigurationRepository,
         ISubscriberQueueConfigurationRepository,
         ISubscriberSearchIndexConfigurationRepository,
-        IEventHandlerHistoryRepository,
+        IEventHandlerHistory,
         IEventRuleConfigurationRepository,
-        ISubscriberRepositoryConfigurationRepository
+        ISubscriberStorageConfigurationRepository
     {
         Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId);
         Task<ISubscriberContractDto> GetSubscriberContractAsync(long subscriberId, long contractId);

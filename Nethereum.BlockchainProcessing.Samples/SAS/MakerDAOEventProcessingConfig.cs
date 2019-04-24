@@ -30,9 +30,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 PartitionId = partitionId
             });
 
-            var queue = repo.Add(new SubscriberQueueConfigurationDto
+            var queue = repo.Add(new SubscriberQueueDto
             {
-                Id = id.Next<SubscriberQueueConfigurationDto>(),
+                Id = id.Next<SubscriberQueueDto>(),
                 SubscriberId = subscriber.Id,
                 Name = "subscriber-maker-dao"
             });

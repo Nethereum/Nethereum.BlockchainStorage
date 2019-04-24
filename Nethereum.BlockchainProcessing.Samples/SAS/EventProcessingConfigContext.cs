@@ -16,19 +16,19 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public List<ContractQueryParameterDto> ContractQueryParameters = new List<ContractQueryParameterDto>();
         public List<ParameterConditionDto> ParameterConditions = new List<ParameterConditionDto>();
         public List<EventAggregatorDto> EventAggregators = new List<EventAggregatorDto>();
-        public List<EventSubscriptionStateDto> EventSubscriptionStates = new List<EventSubscriptionStateDto>();
-        public List<SubscriberQueueConfigurationDto> SubscriberQueues = new List<SubscriberQueueConfigurationDto>();
-        public List<SubscriberSearchIndexConfigurationDto> SubscriberSearchIndexes = new List<SubscriberSearchIndexConfigurationDto>();
-        public List<EventHandlerHistoryDto> EventHandlerHistories = new List<EventHandlerHistoryDto>();
+        public List<IEventSubscriptionStateDto> EventSubscriptionStates = new List<IEventSubscriptionStateDto>();
+        public List<SubscriberQueueDto> SubscriberQueues = new List<SubscriberQueueDto>();
+        public List<SubscriberSearchIndexDto> SubscriberSearchIndexes = new List<SubscriberSearchIndexDto>();
+        public List<IEventHandlerHistoryDto> EventHandlerHistories = new List<IEventHandlerHistoryDto>();
         public List<EventRuleConfigurationDto> EventRuleConfigurations = new List<EventRuleConfigurationDto>();
-        public List<SubscriberRepositoryConfigurationDto> SubscriberRepositories = new List<SubscriberRepositoryConfigurationDto>();
+        public List<SubscriberStorageDto> SubscriberRepositories = new List<SubscriberStorageDto>();
 
-        public EventSubscriptionStateDto GetEventSubscriptionState(long eventSubscriptionId)
+        public IEventSubscriptionStateDto GetEventSubscriptionState(long eventSubscriptionId)
         {
             return EventSubscriptionStates.FirstOrDefault(s => s.EventSubscriptionId == eventSubscriptionId);
         }
 
-        public SubscriberRepositoryConfigurationDto Add(SubscriberRepositoryConfigurationDto dto)
+        public SubscriberStorageDto Add(SubscriberStorageDto dto)
         {
             SubscriberRepositories.Add(dto);
             return dto;
@@ -46,19 +46,19 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             return dto;
         }
 
-        public EventHandlerHistoryDto Add(EventHandlerHistoryDto dto)
+        public IEventHandlerHistoryDto Add(IEventHandlerHistoryDto dto)
         {
             EventHandlerHistories.Add(dto);
             return dto;
         }
 
-        public SubscriberSearchIndexConfigurationDto Add(SubscriberSearchIndexConfigurationDto dto)
+        public SubscriberSearchIndexDto Add(SubscriberSearchIndexDto dto)
         {
             SubscriberSearchIndexes.Add(dto);
             return dto;
         }
 
-        public SubscriberQueueConfigurationDto Add(SubscriberQueueConfigurationDto dto)
+        public SubscriberQueueDto Add(SubscriberQueueDto dto)
         {
             SubscriberQueues.Add(dto);
             return dto;

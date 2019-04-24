@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Factories
 {
-    public class AzureTablesSubscriberRepositoryFactory : ISubscriberRepositoryFactory
+    public class AzureTablesSubscriberRepositoryFactory : ISubscriberStorageFactory
     {
         Dictionary<string, CloudTableSetup> _cloudTableSetups = new Dictionary<string, CloudTableSetup>();
         public AzureTablesSubscriberRepositoryFactory( 
             string azureStorageConnectionString,
-            ISubscriberRepositoryConfigurationRepository configurationFactory)
+            ISubscriberStorageConfigurationRepository configurationFactory)
         {
             ConfigurationFactory = configurationFactory;
             AzureStorageConnectionString = azureStorageConnectionString;
         }
 
-        public ISubscriberRepositoryConfigurationRepository ConfigurationFactory { get; }
+        public ISubscriberStorageConfigurationRepository ConfigurationFactory { get; }
         public string AzureStorageConnectionString { get; }
 
-        public async Task<ILogHandler> GetLogRepositoryAsync(long subscriberReposistoryId)
+        public async Task<ILogHandler> GetLogRepositoryAsync(long subscriberId, long subscriberReposistoryId)
         {
-           var config = await ConfigurationFactory.GetSubscriberRepositoryAsync(subscriberReposistoryId);
+           var config = await ConfigurationFactory.GetSubscriberStorageAsync(subscriberId, subscriberReposistoryId);
            CloudTableSetup cloudTableSetup = GetCloudTableSetup(config.Name);
            var repo = cloudTableSetup.CreateTransactionLogRepository();
            var handler = new TransactionLogRepositoryHandler(repo);

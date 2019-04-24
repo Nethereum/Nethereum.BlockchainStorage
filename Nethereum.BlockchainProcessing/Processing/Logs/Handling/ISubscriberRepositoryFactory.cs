@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface ISubscriberRepositoryFactory
+    public interface ISubscriberStorageFactory
     {
-        Task<ILogHandler> GetLogRepositoryAsync(long subscriberReposistoryId);
+        Task<ILogHandler> GetLogRepositoryAsync(long subscriberId, long subscriberReposistoryId);
     }
 }

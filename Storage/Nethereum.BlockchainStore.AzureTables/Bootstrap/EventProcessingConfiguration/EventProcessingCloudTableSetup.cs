@@ -30,6 +30,16 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfigu
 
         public CloudTable GetEventAggregatorTable() => GetPrefixedTable("EventAggregators");
 
+        public CloudTable GetSubscriberQueuesTable() => GetPrefixedTable("SubscriberQueues");
+
+        public CloudTable GetSubscriberSearchIndexesTable() => GetPrefixedTable("SubscriberSearchIndexes");
+
+        public CloudTable GetEventHandlerHistoriesTable() => GetPrefixedTable("EventHandlerHistories");
+
+        public CloudTable GetEventRulesTable() => GetPrefixedTable("EventRules");
+
+        public CloudTable GetSusbscriberStorageTable() => GetPrefixedTable("SubscriberStorageRepos");
+
         public ISubscriberRepository GetSubscriberRepository() => new SubscriberRepository(GetSubscribersTable());
 
         public ISubscriberContractsRepository GetSubscriberContractsRepository() => new SubscriberContractsRepository(GetSubscriberContractsTable());
@@ -49,5 +59,15 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfigu
         public IContractQueryParameterRepository GetContractQueryParameterRepository() => new ContractQueryParameterRepository(GetContractQueryParameterTable());
 
         public IEventAggregatorRepository GetEventAggregatorRepository() => new EventAggregatorRepository(GetEventAggregatorTable());
+
+        public ISubscriberQueueRepository GetSubscriberQueueRepository() => new SubscriberQueueRepository(GetSubscriberQueuesTable());
+
+        public ISubscriberSearchIndexRepository GetSubscriberSearchIndexRepository() => new SubscriberSearchIndexRepository(GetSubscriberSearchIndexesTable());
+
+        public IEventHandlerHistoryRepository GetEventHandlerHistoryRepository() => new EventHandlerHistoryRepository(GetEventHandlerHistoriesTable());
+
+        public IEventRuleRepository GetEventRuleRepository() => new EventRuleRepository(GetEventRulesTable());
+
+        public ISubscriberStorageRepository GetSubscriberStorageRepository() => new SubscriberStorageRepository(GetSusbscriberStorageTable());
     }
 }

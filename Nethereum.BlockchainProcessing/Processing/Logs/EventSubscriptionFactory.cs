@@ -19,8 +19,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             IBlockchainProxyService blockchainProxy,
             IEventProcessingConfigurationRepository configurationRepository,
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            ISubscriberSearchIndexRepository subscriberSearchIndexFactory = null,
-            ISubscriberRepositoryFactory subscriberRepositoryFactory = null):this(
+            Handling.ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
+            ISubscriberStorageFactory subscriberRepositoryFactory = null):this(
                 configurationRepository, 
                 new EventMatcherFactory(configurationRepository), 
                 new EventHandlerFactory(

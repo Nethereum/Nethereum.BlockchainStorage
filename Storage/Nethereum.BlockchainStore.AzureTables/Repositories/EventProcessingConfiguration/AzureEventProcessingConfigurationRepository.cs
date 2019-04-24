@@ -1,6 +1,7 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
+using Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfiguration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,27 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
 {
     public class AzureEventProcessingConfigurationRepository : IEventProcessingConfigurationRepository
     {
+        public AzureEventProcessingConfigurationRepository(EventProcessingCloudTableSetup cloudTableSetup)
+            :this(
+                 cloudTableSetup.GetSubscriberRepository(),
+                cloudTableSetup.GetSubscriberContractsRepository(),
+                cloudTableSetup.GetEventSubscriptionsRepository(),
+                cloudTableSetup.GetEventSubscriptionAddressesRepository(),
+                cloudTableSetup.GetEventHandlerRepository(),
+                cloudTableSetup.GetParameterConditionRepository(),
+                cloudTableSetup.GetEventSubscriptionStateRepository(),
+                cloudTableSetup.GetContractQueryRepository(),
+                cloudTableSetup.GetContractQueryParameterRepository(),
+                cloudTableSetup.GetEventAggregatorRepository(),
+                cloudTableSetup.GetSubscriberQueueRepository(),
+                cloudTableSetup.GetSubscriberSearchIndexRepository(),
+                cloudTableSetup.GetEventHandlerHistoryRepository(),
+                cloudTableSetup.GetEventRuleRepository(),
+                cloudTableSetup.GetSubscriberStorageRepository())
+        {
+
+        }
+
         public AzureEventProcessingConfigurationRepository(
             ISubscriberRepository subscriberRepository,
             ISubscriberContractsRepository subscriberContractRepository,
@@ -20,7 +42,12 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             IEventSubscriptionStateRepository eventSubscriptionStateRepository,
             IContractQueryRepository contractQueryRepository,
             IContractQueryParameterRepository contractQueryParameterRepository,
-            IEventAggregatorRepository eventAggregatorRepository
+            IEventAggregatorRepository eventAggregatorRepository,
+            ISubscriberQueueRepository subscriberQueueRepository,
+            ISubscriberSearchIndexRepository subscriberSearchIndexRepository,
+            IEventHandlerHistoryRepository eventHandlerHistoryRepository,
+            IEventRuleRepository eventRuleRepository,
+            ISubscriberStorageRepository subscriberStorageRepository
             )
         {
             SubscriberRepository = subscriberRepository;
@@ -33,6 +60,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             ContractQueryRepository = contractQueryRepository;
             ContractQueryParameterRepository = contractQueryParameterRepository;
             EventAggregatorRepository = eventAggregatorRepository;
+            SubscriberQueueRepository = subscriberQueueRepository;
+            SubscriberSearchIndexRepository = subscriberSearchIndexRepository;
+            EventHandlerHistoryRepository = eventHandlerHistoryRepository;
+            EventRuleRepository = eventRuleRepository;
+            SubscriberStorageRepository = subscriberStorageRepository;
         }
 
         public ISubscriberRepository SubscriberRepository { get; }
@@ -45,6 +77,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
         public IContractQueryRepository ContractQueryRepository { get; }
         public IContractQueryParameterRepository ContractQueryParameterRepository { get; }
         public IEventAggregatorRepository EventAggregatorRepository { get; }
+        public ISubscriberQueueRepository SubscriberQueueRepository { get; }
+        public ISubscriberSearchIndexRepository SubscriberSearchIndexRepository { get; }
+        public IEventHandlerHistoryRepository EventHandlerHistoryRepository { get; }
+        public IEventRuleRepository EventRuleRepository { get; }
+        public ISubscriberStorageRepository SubscriberStorageRepository { get; }
 
         public Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId) => SubscriberRepository.GetSubscribersAsync(partitionId);
 
@@ -62,6 +99,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
 
         public Task UpsertAsync(IEnumerable<IEventSubscriptionStateDto> state) => EventSubscriptionStateRepository.UpsertAsync(state);
 
+        public Task<ISubscriberQueueDto> GetSubscriberQueueAsync(long subscriberId, long subscriberQueueId) => SubscriberQueueRepository.GetAsync(subscriberId, subscriberQueueId);
+
         public async Task<ContractQueryConfiguration> GetContractQueryConfigurationAsync(long subscriberId, long eventHandlerId)
         {
             return await ContractQueryRepository.LoadContractQueryConfiguration(
@@ -74,38 +113,15 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             return config.ToEventAggregatorConfiguration();
         }
 
-        public Task AddEventHandlerHistory(long eventHandlerId, string eventKey)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<ISubscriberSearchIndexDto> GetSubscriberSearchIndexAsync(long subscriberId, long subscriberSearchIndexId) => SubscriberSearchIndexRepository.GetAsync(subscriberId, subscriberSearchIndexId);
 
-        public Task<bool> ContainsEventHandlerHistory(long id, string eventKey)
-        {
-            throw new NotImplementedException();
-        }
+        public Task AddAsync(IEventHandlerHistoryDto dto) => EventHandlerHistoryRepository.AddAsync(dto);
 
-        public Task<EventRuleConfiguration> GetEventRuleConfigurationAsync(long eventHandlerId)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<bool> ContainsEventHandlerHistoryAsync(long eventHandlerId, string eventKey) => EventHandlerHistoryRepository.ContainsAsync(eventHandlerId, eventKey);
 
+        public Task<IEventRuleDto> GetEventRuleConfigurationAsync(long eventHandlerId) => EventRuleRepository.GetAsync(eventHandlerId);
 
-
-        public Task<SubscriberQueueConfigurationDto> GetSubscriberQueueAsync(long subscriberQueueId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<SubscriberRepositoryConfigurationDto> GetSubscriberRepositoryAsync(long subscriberRepositoryId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<SubscriberSearchIndexConfigurationDto> GetSubscriberSearchIndexAsync(long subscriberSearchIndexId)
-        {
-            throw new NotImplementedException();
-        }
-
+        public Task<ISubscriberStorageDto> GetSubscriberStorageAsync(long subscriberId, long subscriberRepositoryId) => SubscriberStorageRepository.GetAsync(subscriberId, subscriberRepositoryId);
 
     }
 }

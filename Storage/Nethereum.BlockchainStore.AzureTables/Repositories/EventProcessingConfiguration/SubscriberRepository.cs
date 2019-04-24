@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
+
     public class SubscriberRepository : AzureTableRepository<SubscriberEntity>, ISubscriberRepository
     {
         public SubscriberRepository(CloudTable table) : base(table)

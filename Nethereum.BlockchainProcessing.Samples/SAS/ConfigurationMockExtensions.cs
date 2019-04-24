@@ -30,19 +30,14 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         {
             Mock<IEventProcessingConfigurationRepository> configDb = new Mock<IEventProcessingConfigurationRepository>();
 
-            configDb.Setup(h => h.AddEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
-                .Returns<long, string>((eventHandlerId, eventKey) =>
+            configDb.Setup(h => h.AddAsync(It.IsAny<IEventHandlerHistoryDto>()))
+                .Returns<IEventHandlerHistoryDto>((history) =>
                 {
-                    repo.Add(new EventHandlerHistoryDto
-                    {
-                        Id = id.Next<EventHandlerHistoryDto>(),
-                        EventHandlerId = eventHandlerId,
-                        EventKey = eventKey
-                    });
+                    repo.Add(history);
                     return Task.CompletedTask;
                 });
 
-            configDb.Setup(h => h.ContainsEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
+            configDb.Setup(h => h.ContainsEventHandlerHistoryAsync(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns<long, string>((eventHandlerId, eventKey) =>
                 {
                     var exists = repo.EventHandlerHistories.Any(h => 
@@ -89,8 +84,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 });
 
             configDb
-                .Setup(d => d.UpsertAsync(It.IsAny<IEnumerable<EventSubscriptionStateDto>>()))
-                .Callback<IEnumerable<EventSubscriptionStateDto>>((states) =>
+                .Setup(d => d.UpsertAsync(It.IsAny<IEnumerable<IEventSubscriptionStateDto>>()))
+                .Callback<IEnumerable<IEventSubscriptionStateDto>>((states) =>
                 { 
                     foreach(var state in states)
                     { 
@@ -131,28 +126,28 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 });
 
             configDb
-                .Setup(d => d.GetSubscriberQueueAsync(It.IsAny<long>()))
-                .Returns<long>((subscriberQueueId) =>
+                .Setup(d => d.GetSubscriberQueueAsync(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns<long, long>((subscriberId, subscriberQueueId) =>
                 {
-                    var dto = repo.SubscriberQueues.FirstOrDefault(q => q.Id == subscriberQueueId);
+                    var dto = repo.SubscriberQueues.FirstOrDefault(q => q.SubscriberId == subscriberId && q.Id == subscriberQueueId);
                     if (dto == null) throw new ArgumentException($"Could not find Subscriber Queue Id: {subscriberQueueId}");
-                    return Task.FromResult(dto);
+                    return Task.FromResult(dto as ISubscriberQueueDto);
                 });
 
             configDb
-                .Setup(d => d.GetSubscriberSearchIndexAsync(It.IsAny<long>()))
-                .Returns<long>((subscriberSearchIndexId) => {
-                    var dto = repo.SubscriberSearchIndexes.FirstOrDefault(q => q.Id == subscriberSearchIndexId);
+                .Setup(d => d.GetSubscriberSearchIndexAsync(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns<long, long>((subscriberId, subscriberSearchIndexId) => {
+                    var dto = repo.SubscriberSearchIndexes.FirstOrDefault(q => q.SubscriberId == subscriberId && q.Id == subscriberSearchIndexId);
                     if (dto == null) throw new ArgumentException($"Could not find Subscriber Search Index Id: {subscriberSearchIndexId}");
-                    return Task.FromResult(dto);
+                    return Task.FromResult(dto as ISubscriberSearchIndexDto);
                 });
 
             configDb
-                .Setup(d => d.GetSubscriberRepositoryAsync(It.IsAny<long>()))
-                .Returns<long>((subscriberRepositoryId) => {
-                    var dto = repo.SubscriberRepositories.FirstOrDefault(q => q.Id == subscriberRepositoryId);
+                .Setup(d => d.GetSubscriberStorageAsync(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns<long, long>((subscriberId, subscriberRepositoryId) => {
+                    var dto = repo.SubscriberRepositories.FirstOrDefault(q => q.SubscriberId == subscriberId && q.Id == subscriberRepositoryId);
                     if (dto == null) throw new ArgumentException($"Could not find Subscriber Repository Id: {subscriberRepositoryId}");
-                    return Task.FromResult(dto);
+                    return Task.FromResult(dto as ISubscriberStorageDto);
                 });
 
             configDb
@@ -168,9 +163,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             return configDb.Object;
         }
 
-        private static EventRuleConfiguration Map(EventRuleConfigurationDto dto)
+        private static IEventRuleDto Map(EventRuleConfigurationDto dto)
         {
-            return new EventRuleConfiguration
+            return new EventRuleDto
             {
                 EventParameterNumber = dto.EventParameterNumber,
                 InputName = dto.SourceKey,

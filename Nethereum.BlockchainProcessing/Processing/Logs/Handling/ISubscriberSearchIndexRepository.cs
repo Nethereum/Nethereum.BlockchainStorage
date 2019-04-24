@@ -2,8 +2,8 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
-    public interface ISubscriberSearchIndexRepository
+    public interface ISubscriberSearchIndexFactory
     {
-        Task<ISubscriberSearchIndex> GetSubscriberSearchIndexAsync(long subscriberSearchIndexId);
+        Task<ISubscriberSearchIndex> GetSubscriberSearchIndexAsync(long subscriberId, long subscriberSearchIndexId);
     }
 }

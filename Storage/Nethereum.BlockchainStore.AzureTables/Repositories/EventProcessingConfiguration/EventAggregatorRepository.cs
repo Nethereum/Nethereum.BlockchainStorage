@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
+
     public class EventAggregatorRepository : AzureTableRepository<EventAggregatorEntity>, IEventAggregatorRepository
     {
         public EventAggregatorRepository(CloudTable table) : base(table)
@@ -37,6 +38,40 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
         {
             var entity = Map(dto);
             return await base.UpsertAsync(entity) as IEventAggregatorDto;
+        }
+    }
+
+    public class EventRuleRepository : AzureTableRepository<EventRuleEntity>, IEventRuleRepository
+    {
+        public EventRuleRepository(CloudTable table) : base(table)
+        {
+        }
+
+        public async Task<IEventRuleDto> GetAsync(long eventHandlerId)
+        {
+            return await GetAsync(eventHandlerId.ToString(), eventHandlerId.ToString());
+        }
+
+        public static EventRuleEntity Map(IEventRuleDto dto)
+        {
+            if (dto is EventRuleEntity e) return e;
+
+            return new EventRuleEntity
+            {
+                Id = dto.EventHandlerId,
+                EventHandlerId = dto.EventHandlerId,
+                EventParameterNumber = dto.EventParameterNumber,
+                Source = dto.Source,
+                InputName = dto.InputName,
+                Type = dto.Type,
+                Value = dto.Value
+            };
+        }
+
+        public async Task<IEventRuleDto> UpsertAsync(IEventRuleDto dto)
+        {
+            var entity = Map(dto);
+            return await base.UpsertAsync(entity) as IEventRuleDto;
         }
     }
 }

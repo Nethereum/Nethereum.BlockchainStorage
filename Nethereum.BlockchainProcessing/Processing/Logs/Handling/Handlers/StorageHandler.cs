@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers
 {
-    public class RepositoryHandler: EventHandlerBase, IEventHandler
+    public class StorageHandler: EventHandlerBase, IEventHandler
     {
-        public RepositoryHandler(
+        public StorageHandler(
             IEventSubscription subscription, 
             long id, 
             ILogHandler logHandler) :base(subscription, id)

@@ -14,8 +14,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IBlockchainProxyService blockchainProxy, 
             IEventProcessingConfigurationRepository configRepo, 
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            ISubscriberSearchIndexRepository subscriberSearchIndexFactory = null,
-            ISubscriberRepositoryFactory subscriberRepositoryFactory = null)
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
+            ISubscriberStorageFactory subscriberRepositoryFactory = null)
             :this(
                  configRepo, 
                  configRepo, 
@@ -36,9 +36,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IEventAggregatorConfigurationRepository eventAggregatorConfigurationFactory = null,
             IGetTransactionByHash getTransactionProxy = null,
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            ISubscriberSearchIndexRepository subscriberSearchIndexFactory = null,
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
             IEventRuleConfigurationRepository eventRuleConfigurationFactory = null,
-            ISubscriberRepositoryFactory subscriberRepositoryFactory = null)
+            ISubscriberStorageFactory subscriberRepositoryFactory = null)
         {
             StateFactory = stateFactory;
             ContractQueryFactory = contractQueryFactory;
@@ -57,9 +57,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public IEventAggregatorConfigurationRepository EventAggregatorConfigurationFactory { get; }
         public IGetTransactionByHash GetTransactionProxy { get; }
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
-        public ISubscriberSearchIndexRepository SubscriberSearchIndexFactory { get; }
+        public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
         public IEventRuleConfigurationRepository EventRuleConfigurationFactory { get; }
-        public ISubscriberRepositoryFactory SubscriberRepositoryFactory { get; }
+        public ISubscriberStorageFactory SubscriberRepositoryFactory { get; }
 
         public async Task<IEventHandler> LoadAsync(IEventSubscription subscription, IEventHandlerDto config)
         { 
@@ -83,7 +83,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
                 case EventHandlerType.Queue:
                     CheckDependency(SubscriberQueueFactory);
-                    var queue = await SubscriberQueueFactory.GetSubscriberQueueAsync(config.SubscriberQueueId);
+                    var queue = await SubscriberQueueFactory.GetSubscriberQueueAsync(subscription.SubscriberId, config.SubscriberQueueId);
                     return new QueueHandler(subscription, config.Id, queue);
 
                 case EventHandlerType.GetTransaction:
@@ -92,13 +92,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
                 case EventHandlerType.Index:
                     CheckDependency(SubscriberSearchIndexFactory);
-                    var searchIndex = await SubscriberSearchIndexFactory.GetSubscriberSearchIndexAsync(config.SubscriberSearchIndexId);
+                    var searchIndex = await SubscriberSearchIndexFactory.GetSubscriberSearchIndexAsync(subscription.SubscriberId, config.SubscriberSearchIndexId);
                     return new SearchIndexHandler(subscription, config.Id, searchIndex);
 
                 case EventHandlerType.Store:
                     CheckDependency(SubscriberRepositoryFactory);
-                    var logRepository = await SubscriberRepositoryFactory.GetLogRepositoryAsync(config.SubscriberRepositoryId);
-                    return new RepositoryHandler(subscription, config.Id, logRepository);
+                    var logRepository = await SubscriberRepositoryFactory.GetLogRepositoryAsync(subscription.SubscriberId, config.SubscriberRepositoryId);
+                    return new StorageHandler(subscription, config.Id, logRepository);
 
                 default:
                     throw new ArgumentException("unsupported handler type");

@@ -1,4 +1,5 @@
 ﻿using Nethereum.ABI.Model;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
@@ -10,12 +11,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public class EventHandlerManager : IEventHandlerManager
     {
         public EventHandlerManager(
-            IEventHandlerHistoryRepository eventHandlerHistory = null)
+            IEventHandlerHistory eventHandlerHistory = null)
         {
             History = eventHandlerHistory;
         }
 
-        public IEventHandlerHistoryRepository History { get; }
+        public IEventHandlerHistory History { get; }
 
         public async Task HandleAsync(IEventSubscription subscription, EventABI[] abis, params FilterLog[] eventLogs)
         {
@@ -38,7 +39,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             {
                 if(History != null)
                 { 
-                    if (await History.ContainsEventHandlerHistory(handler.Id, decodedEvent.Key))
+                    if (await History.ContainsEventHandlerHistoryAsync(handler.Id, decodedEvent.Key))
                     {
                         continue;
                     }
@@ -49,8 +50,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 var invokeNextHandler = await handler.HandleAsync(decodedEvent);
 
                 if(History != null)
-                { 
-                    await History.AddEventHandlerHistory(handler.Id, decodedEvent.Key);
+                {
+                    await WriteToHistoryAsync(decodedEvent, handler);
                 }
 
                 if (!invokeNextHandler)
@@ -58,6 +59,19 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                     break;
                 }
             }
+        }
+
+        private async Task WriteToHistoryAsync(DecodedEvent decodedEvent, IEventHandler handler)
+        {
+            var history = new EventHandlerHistoryDto
+            {
+                EventHandlerId = handler.Id,
+                EventSubscriptionId = handler.Subscription?.Id ?? 0,
+                EventKey = decodedEvent.Key,
+                SubscriberId = handler.Subscription?.SubscriberId ?? 0
+            };
+
+            await History.AddAsync(history);
         }
 
         private void SetStateValues(IEventSubscription subscription, DecodedEvent decodedEvent)
