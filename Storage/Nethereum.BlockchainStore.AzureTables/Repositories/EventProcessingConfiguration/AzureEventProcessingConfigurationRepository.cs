@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using System;
 using System.Collections.Generic;
@@ -8,15 +9,40 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
 {
     public class AzureEventProcessingConfigurationRepository : IEventProcessingConfigurationRepository
     {
-        public AzureEventProcessingConfigurationRepository(ISubscriberRepository subscriberRepository)
+        public AzureEventProcessingConfigurationRepository(
+            ISubscriberRepository subscriberRepository,
+            ISubscriberContractsRepository subscriberContractRepository,
+            IEventSubscriptionRepository eventSubscriptionRepository,
+            IEventSubscriptionAddressRepository eventSubscriptionAddressRepository,
+            IEventHandlerRepository eventHandlerRepository,
+            IParameterConditionRepository parameterConditionRepository)
         {
             SubscriberRepository = subscriberRepository;
+            SubscriberContractRepository = subscriberContractRepository;
+            EventSubscriptionRepository = eventSubscriptionRepository;
+            EventSubscriptionAddressRepository = eventSubscriptionAddressRepository;
+            EventHandlerRepository = eventHandlerRepository;
+            ParameterConditionRepository = parameterConditionRepository;
         }
 
         public ISubscriberRepository SubscriberRepository { get; }
+        public ISubscriberContractsRepository SubscriberContractRepository { get; }
+        public IEventSubscriptionRepository EventSubscriptionRepository { get; }
+        public IEventSubscriptionAddressRepository EventSubscriptionAddressRepository { get; }
+        public IEventHandlerRepository EventHandlerRepository { get; }
+        public IParameterConditionRepository ParameterConditionRepository { get; }
 
         public Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId) => SubscriberRepository.GetSubscribersAsync(partitionId);
 
+        public Task<ISubscriberContractDto> GetSubscriberContractAsync(long subscriberId, long contractId) => SubscriberContractRepository.GetContractAsync(subscriberId, contractId);
+
+        public Task<IEventSubscriptionDto[]> GetEventSubscriptionsAsync(long subscriberId) => EventSubscriptionRepository.GetEventSubscriptionsAsync(subscriberId);
+
+        public Task<IEventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId) => EventSubscriptionAddressRepository.GetEventSubscriptionAddressesAsync(eventSubscriptionId);
+
+        public Task<IEventHandlerDto[]> GetEventHandlersAsync(long eventSubscriptionId) => EventHandlerRepository.GetEventHandlersAsync(eventSubscriptionId);
+
+        public Task<IParameterConditionDto[]> GetParameterConditionsAsync(long eventSubscriptionId) => ParameterConditionRepository.GetParameterConditionsAsync(eventSubscriptionId);
 
         public Task AddEventHandlerHistory(long eventHandlerId, string eventKey)
         {
@@ -24,11 +50,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
         }
 
         public Task<bool> ContainsEventHandlerHistory(long id, string eventKey)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<SubscriberContractDto> GetContractAsync(long contractId)
         {
             throw new NotImplementedException();
         }
@@ -43,32 +64,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             throw new NotImplementedException();
         }
 
-        public Task<EventHandlerDto[]> GetEventHandlers(long eventSubscriptionId)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<EventRuleConfiguration> GetEventRuleConfigurationAsync(long eventHandlerId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<EventSubscriptionDto[]> GetEventSubscriptionsAsync(long subscriberId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<EventSubscriptionStateDto> GetOrCreateEventSubscriptionStateAsync(long eventSubscriptionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ParameterConditionDto[]> GetParameterConditionsAsync(long eventSubscriptionId)
+        public Task<IEventSubscriptionStateDto> GetOrCreateEventSubscriptionStateAsync(long eventSubscriptionId)
         {
             throw new NotImplementedException();
         }
@@ -88,7 +90,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             throw new NotImplementedException();
         }
 
-        public Task UpsertAsync(IEnumerable<EventSubscriptionStateDto> state)
+        public Task UpsertAsync(IEnumerable<IEventSubscriptionStateDto> state)
         {
             throw new NotImplementedException();
         }

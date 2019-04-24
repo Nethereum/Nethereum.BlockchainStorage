@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
 using System;
@@ -13,7 +14,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IBlockchainProxyService blockchainProxy, 
             IEventProcessingConfigurationRepository configRepo, 
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
+            ISubscriberSearchIndexRepository subscriberSearchIndexFactory = null,
             ISubscriberRepositoryFactory subscriberRepositoryFactory = null)
             :this(
                  configRepo, 
@@ -29,14 +30,14 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         }
 
         public EventHandlerFactory(
-            IEventSubscriptionStateFactory stateFactory, 
-            IEventContractQueryConfigurationFactory contractQueryFactory = null,
+            IEventSubscriptionStateRepository stateFactory, 
+            IEventContractQueryConfigurationRepository contractQueryFactory = null,
             IContractQuery contractQueryHandler = null,
-            IEventAggregatorConfigurationFactory eventAggregatorConfigurationFactory = null,
+            IEventAggregatorConfigurationRepository eventAggregatorConfigurationFactory = null,
             IGetTransactionByHash getTransactionProxy = null,
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
-            IEventRuleConfigurationFactory eventRuleConfigurationFactory = null,
+            ISubscriberSearchIndexRepository subscriberSearchIndexFactory = null,
+            IEventRuleConfigurationRepository eventRuleConfigurationFactory = null,
             ISubscriberRepositoryFactory subscriberRepositoryFactory = null)
         {
             StateFactory = stateFactory;
@@ -50,17 +51,17 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             SubscriberRepositoryFactory = subscriberRepositoryFactory;
         }
 
-        public IEventSubscriptionStateFactory StateFactory { get; }
-        public IEventContractQueryConfigurationFactory ContractQueryFactory { get; }
+        public IEventSubscriptionStateRepository StateFactory { get; }
+        public IEventContractQueryConfigurationRepository ContractQueryFactory { get; }
         public IContractQuery ContractQueryHandler { get; }
-        public IEventAggregatorConfigurationFactory EventAggregatorConfigurationFactory { get; }
+        public IEventAggregatorConfigurationRepository EventAggregatorConfigurationFactory { get; }
         public IGetTransactionByHash GetTransactionProxy { get; }
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
-        public ISubscriberSearchIndexFactory SubscriberSearchIndexFactory { get; }
-        public IEventRuleConfigurationFactory EventRuleConfigurationFactory { get; }
+        public ISubscriberSearchIndexRepository SubscriberSearchIndexFactory { get; }
+        public IEventRuleConfigurationRepository EventRuleConfigurationFactory { get; }
         public ISubscriberRepositoryFactory SubscriberRepositoryFactory { get; }
 
-        public async Task<IEventHandler> LoadAsync(IEventSubscription subscription, EventHandlerDto config)
+        public async Task<IEventHandler> LoadAsync(IEventSubscription subscription, IEventHandlerDto config)
         { 
             switch (config.HandlerType)
             {

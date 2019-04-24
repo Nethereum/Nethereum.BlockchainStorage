@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using System;
 using System.Collections.Generic;
@@ -57,23 +58,23 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             configDb
                 .Setup(d => d.GetEventSubscriptionsAsync(It.IsAny<long>()))
-                .Returns<long>((subscriberId) => Task.FromResult(repo.EventSubscriptions.Where(s => s.SubscriberId == subscriberId).ToArray()));
+                .Returns<long>((subscriberId) => Task.FromResult(repo.EventSubscriptions.Where(s => s.SubscriberId == subscriberId).Cast<IEventSubscriptionDto>().ToArray()));
 
             configDb
-                .Setup(d => d.GetContractAsync(It.IsAny<long>()))
-                .Returns<long>((contractId) => Task.FromResult(repo.Contracts.Where(s => s.Id == contractId).FirstOrDefault()));
+                .Setup(d => d.GetSubscriberContractAsync(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns<long, long>((subscriberId, contractId) => Task.FromResult(repo.Contracts.Where(s => s.SubscriberId == subscriberId && s.Id == contractId).Cast<ISubscriberContractDto>().FirstOrDefault()));
 
             configDb
                 .Setup(d => d.GetEventSubscriptionAddressesAsync(It.IsAny<long>()))
-                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.EventSubscriptionAddresses.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
+                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.EventSubscriptionAddresses.Where(s => s.EventSubscriptionId == eventSubscriptionId).Cast<IEventSubscriptionAddressDto>().ToArray()));
 
             configDb
                 .Setup(d => d.GetParameterConditionsAsync(It.IsAny<long>()))
-                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.ParameterConditions.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
+                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.ParameterConditions.Where(s => s.EventSubscriptionId == eventSubscriptionId).Cast<IParameterConditionDto>().ToArray()));
 
             configDb
-                .Setup(d => d.GetEventHandlers(It.IsAny<long>()))
-                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.DecodedEventHandlers.Where(s => s.EventSubscriptionId == eventSubscriptionId).ToArray()));
+                .Setup(d => d.GetEventHandlersAsync(It.IsAny<long>()))
+                .Returns<long>((eventSubscriptionId) => Task.FromResult(repo.DecodedEventHandlers.Where(s => s.EventSubscriptionId == eventSubscriptionId).Cast<IEventHandlerDto>().ToArray()));
 
             configDb
                 .Setup(d => d.GetOrCreateEventSubscriptionStateAsync(It.IsAny<long>()))
@@ -84,7 +85,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     {
                         state = repo.Add(new EventSubscriptionStateDto(eventSubscriptionId));
                     }
-                    return Task.FromResult(state);
+                    return Task.FromResult(state as IEventSubscriptionStateDto);
                 });
 
             configDb

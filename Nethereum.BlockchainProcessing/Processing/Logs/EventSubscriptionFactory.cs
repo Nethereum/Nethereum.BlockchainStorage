@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             IBlockchainProxyService blockchainProxy,
             IEventProcessingConfigurationRepository configurationRepository,
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
+            ISubscriberSearchIndexRepository subscriberSearchIndexFactory = null,
             ISubscriberRepositoryFactory subscriberRepositoryFactory = null):this(
                 configurationRepository, 
                 new EventMatcherFactory(configurationRepository), 
@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return eventSubscriptions;
         }
 
-        private async Task<EventSubscription> LoadEventSubscriptionsAsync(EventSubscriptionDto subscriptionConfig)
+        private async Task<EventSubscription> LoadEventSubscriptionsAsync(IEventSubscriptionDto subscriptionConfig)
         {
             var matcher = await EventMatcherFactory.LoadAsync(subscriptionConfig);
             var state = await ConfigurationRepository.GetOrCreateEventSubscriptionStateAsync(subscriptionConfig.Id);
@@ -77,7 +77,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         private async Task AddEventHandlers(EventSubscription eventSubscription)
         {
-            var handlerConfiguration = await ConfigurationRepository.GetEventHandlers(eventSubscription.Id);
+            var handlerConfiguration = await ConfigurationRepository.GetEventHandlersAsync(eventSubscription.Id);
 
             foreach(var configItem in handlerConfiguration.Where(c => !c.Disabled).OrderBy(h => h.Order))
             {

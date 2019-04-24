@@ -9,6 +9,7 @@ using Xunit;
 using System.Linq;
 using System.Collections.Generic;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregators.AddToList
 {

@@ -1,4 +1,5 @@
 ﻿using Nethereum.ABI.Model;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.RPC.Eth.DTOs;
@@ -14,7 +15,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             long subscriberId = 0, 
             EventSubscriptionStateDto state = null,
             string[] contractAddressesToMatch = null,
-            IEventHandlerHistoryDb eventHandlerHistoryDb = null,
+            IEventHandlerHistoryRepository eventHandlerHistoryDb = null,
             IEnumerable<IParameterCondition> parameterConditions = null)
             :base(
                  id, 
@@ -42,8 +43,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             IEnumerable<IParameterCondition> parameterConditions = null,
             long id = 0, 
             long subscriberId = 0,
-            EventSubscriptionStateDto state = null,
-            IEventHandlerHistoryDb eventHandlerHistoryDb = null):
+            IEventSubscriptionStateDto state = null,
+            IEventHandlerHistoryRepository eventHandlerHistoryDb = null):
             this(
                  id,
                  subscriberId,
@@ -62,7 +63,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             long subscriberId, 
             IEventMatcher matcher, 
             IEventHandlerManager handlerManager, 
-            EventSubscriptionStateDto state)
+            IEventSubscriptionStateDto state)
         {
             Id = id;
             SubscriberId = subscriberId;
@@ -91,7 +92,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public long Id {get; }
 
         public IEventHandlerManager HandlerManager { get; }
-        public EventSubscriptionStateDto State { get; }
+        public IEventSubscriptionStateDto State { get; }
         public IEventMatcher Matcher { get; }
 
         public bool IsLogForEvent(FilterLog log)

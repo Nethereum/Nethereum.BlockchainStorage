@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureSubscriberSearchIndexFactory : ISubscriberSearchIndexFactory
+    public class AzureSubscriberSearchIndexFactory : ISubscriberSearchIndexRepository
     {
         EventToGenericSearchDocMapper eventToGenericSearchDocMapper = new EventToGenericSearchDocMapper();
         public AzureSubscriberSearchIndexFactory(

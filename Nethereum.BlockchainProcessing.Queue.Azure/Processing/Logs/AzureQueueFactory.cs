@@ -8,14 +8,14 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 {
     public class AzureSubscriberQueueFactory : ISubscriberQueueFactory
     {
-        public AzureSubscriberQueueFactory(string connectionString, ISubscriberQueueConfigurationFactory queueConfigurationFactory = null)
+        public AzureSubscriberQueueFactory(string connectionString, ISubscriberQueueConfigurationRepository queueConfigurationFactory = null)
         {
             CloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             CloudQueueClient = CloudStorageAccount.CreateCloudQueueClient();
             QueueConfigurationFactory = queueConfigurationFactory;
         }
 
-        public ISubscriberQueueConfigurationFactory QueueConfigurationFactory { get; }
+        public ISubscriberQueueConfigurationRepository QueueConfigurationFactory { get; }
         public CloudStorageAccount CloudStorageAccount { get; }
         public CloudQueueClient CloudQueueClient { get; }
 

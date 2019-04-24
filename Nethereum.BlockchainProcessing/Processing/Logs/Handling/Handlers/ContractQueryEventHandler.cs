@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 

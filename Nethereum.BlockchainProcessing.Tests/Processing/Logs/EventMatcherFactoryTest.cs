@@ -1,6 +1,6 @@
 ﻿using Moq;
-using Nethereum.ABI.Model;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,7 +54,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 Value = "xyz"
             };
 
-            _mockDb.Setup(d => d.GetContractAsync(_contractDto.Id)).ReturnsAsync(_contractDto);
+            _mockDb.Setup(d => d.GetSubscriberContractAsync(_subscriberOneConfig.Id, _contractDto.Id)).ReturnsAsync(_contractDto);
             _mockDb.Setup(d => d.GetEventSubscriptionsAsync(_subscriberOneConfig.Id)).ReturnsAsync(new []{_eventSubscriptionConfig});
             _mockDb.Setup(d => d.GetEventSubscriptionAddressesAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_addressesConfig});
             _mockDb.Setup(d => d.GetParameterConditionsAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_parameterConditionConfig});

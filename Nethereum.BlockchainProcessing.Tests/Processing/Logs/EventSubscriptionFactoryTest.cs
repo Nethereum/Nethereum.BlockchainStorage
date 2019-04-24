@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             _mockDb.Setup(d => d.GetSubscribersAsync(PARTITION_ID)).ReturnsAsync(new []{_subscriberOneConfig});
             _mockDb.Setup(d => d.GetEventSubscriptionsAsync(_subscriberOneConfig.Id)).ReturnsAsync(new []{_eventSubscriptionConfig});
-            _mockDb.Setup(d => d.GetEventHandlers(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_eventHandlerConfig });
+            _mockDb.Setup(d => d.GetEventHandlersAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_eventHandlerConfig });
             _mockDb.Setup(d => d.GetOrCreateEventSubscriptionStateAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(_eventSubscriptionStateConfig);
 
             _mockEventHandlerFactory.Setup(f => f.LoadAsync(It.IsAny<IEventSubscription>(), _eventHandlerConfig)).ReturnsAsync(_mockEventHandler.Object);

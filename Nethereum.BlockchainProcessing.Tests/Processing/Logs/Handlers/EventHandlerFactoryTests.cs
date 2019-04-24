@@ -2,6 +2,7 @@
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
@@ -14,14 +15,14 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
     {
         EventHandlerFactory _eventHandlerFactory;
 
-        Mock<IEventSubscriptionStateFactory> _stateFactory = new Mock<IEventSubscriptionStateFactory>();
-        Mock<IEventContractQueryConfigurationFactory> _contractQueryFactory = new Mock<IEventContractQueryConfigurationFactory>();
+        Mock<IEventSubscriptionStateRepository> _stateFactory = new Mock<IEventSubscriptionStateRepository>();
+        Mock<IEventContractQueryConfigurationRepository> _contractQueryFactory = new Mock<IEventContractQueryConfigurationRepository>();
         Mock<IContractQuery> _contractQueryHandler = new Mock<IContractQuery>();
-        Mock<IEventAggregatorConfigurationFactory> _eventAggregatorConfigurationFactory = new Mock<IEventAggregatorConfigurationFactory>();
+        Mock<IEventAggregatorConfigurationRepository> _eventAggregatorConfigurationFactory = new Mock<IEventAggregatorConfigurationRepository>();
         Mock<IGetTransactionByHash> _getTransactionProxy = new Mock<IGetTransactionByHash>();
         Mock<ISubscriberQueueFactory> _subscriberQueueFactory = new Mock<ISubscriberQueueFactory>();
-        Mock<ISubscriberSearchIndexFactory> _subscriberSearchIndexFactory = new Mock<ISubscriberSearchIndexFactory>();
-        Mock<IEventRuleConfigurationFactory> _eventRuleConfigurationFactory = new Mock<IEventRuleConfigurationFactory>();
+        Mock<ISubscriberSearchIndexRepository> _subscriberSearchIndexFactory = new Mock<ISubscriberSearchIndexRepository>();
+        Mock<IEventRuleConfigurationRepository> _eventRuleConfigurationFactory = new Mock<IEventRuleConfigurationRepository>();
         Mock<ISubscriberRepositoryFactory> _subscriberRepositoryFactory = new Mock<ISubscriberRepositoryFactory>();
 
         EventSubscriptionStateDto _eventSubscriptionStateDto = new EventSubscriptionStateDto();

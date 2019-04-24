@@ -1,7 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguration;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
@@ -14,26 +14,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
 
         public async Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId)
         {
-            string filter = TableQuery.GenerateFilterCondition(
-                    "PartitionKey", QueryComparisons.Equal, partitionId.ToString());
-
-            var subscriberQuery = new TableQuery<SubscriberEntity>().Where(filter);
-
-            var subscriberDtos = new List<ISubscriberDto>();
-
-            TableContinuationToken continuationToken = null;
-
-            do
-            {
-                var result = await Table.ExecuteQuerySegmentedAsync(subscriberQuery, continuationToken);
-                subscriberDtos.AddRange(result);
-            }
-            while (continuationToken != null);
-
-            return subscriberDtos.ToArray();
+            var entities = await GetManyAsync(partitionId.ToString());
+            return entities;
         }
 
-        public SubscriberEntity Map(ISubscriberDto dto)
+        public static SubscriberEntity Map(ISubscriberDto dto)
         {
             if(dto is SubscriberEntity entity) return entity;
 

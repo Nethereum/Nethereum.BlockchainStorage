@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         long Id {get;}
         long SubscriberId {get;}
 
-        EventSubscriptionStateDto State { get; }
+        IEventSubscriptionStateDto State { get; }
 
         IEnumerable<IEventHandler> EventHandlers { get;}
     }

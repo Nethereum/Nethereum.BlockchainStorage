@@ -1,24 +1,26 @@
-﻿using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public interface IEventProcessingConfigurationRepository: 
-        IEventSubscriptionStateFactory, 
-        IEventContractQueryConfigurationFactory, 
-        IEventAggregatorConfigurationFactory,
-        ISubscriberQueueConfigurationFactory,
-        ISubscriberSearchIndexConfigurationFactory,
-        IEventHandlerHistoryDb,
-        IEventRuleConfigurationFactory,
-        ISubscriberRepositoryConfigurationFactory
+        IEventSubscriptionStateRepository, 
+        IEventContractQueryConfigurationRepository, 
+        IEventAggregatorConfigurationRepository,
+        ISubscriberQueueConfigurationRepository,
+        ISubscriberSearchIndexConfigurationRepository,
+        IEventHandlerHistoryRepository,
+        IEventRuleConfigurationRepository,
+        ISubscriberRepositoryConfigurationRepository
     {
-        Task<SubscriberContractDto> GetContractAsync(long contractId);
-        Task<EventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId);
-        Task<EventSubscriptionDto[]> GetEventSubscriptionsAsync(long subscriberId);
-        Task<ParameterConditionDto[]> GetParameterConditionsAsync(long eventSubscriptionId);
         Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId);
-        Task<EventHandlerDto[]> GetEventHandlers(long eventSubscriptionId);
+        Task<ISubscriberContractDto> GetSubscriberContractAsync(long subscriberId, long contractId);
+        Task<IEventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId);
+        Task<IEventSubscriptionDto[]> GetEventSubscriptionsAsync(long subscriberId);
 
+        Task<IEventHandlerDto[]> GetEventHandlersAsync(long eventSubscriptionId);
+        Task<IParameterConditionDto[]> GetParameterConditionsAsync(long eventSubscriptionId);
+        
     }
 }

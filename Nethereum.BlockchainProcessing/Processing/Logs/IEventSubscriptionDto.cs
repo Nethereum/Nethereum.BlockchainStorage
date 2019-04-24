@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+using System.Collections.Generic;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {

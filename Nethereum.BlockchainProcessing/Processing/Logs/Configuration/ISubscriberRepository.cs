@@ -1,7 +1,7 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface ISubscriberRepository
     {

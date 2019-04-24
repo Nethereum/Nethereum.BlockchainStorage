@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+using System;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 {

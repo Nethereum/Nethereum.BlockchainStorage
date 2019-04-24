@@ -12,13 +12,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Factories
         Dictionary<string, CloudTableSetup> _cloudTableSetups = new Dictionary<string, CloudTableSetup>();
         public AzureTablesSubscriberRepositoryFactory( 
             string azureStorageConnectionString,
-            ISubscriberRepositoryConfigurationFactory configurationFactory)
+            ISubscriberRepositoryConfigurationRepository configurationFactory)
         {
             ConfigurationFactory = configurationFactory;
             AzureStorageConnectionString = azureStorageConnectionString;
         }
 
-        public ISubscriberRepositoryConfigurationFactory ConfigurationFactory { get; }
+        public ISubscriberRepositoryConfigurationRepository ConfigurationFactory { get; }
         public string AzureStorageConnectionString { get; }
 
         public async Task<ILogHandler> GetLogRepositoryAsync(long subscriberReposistoryId)

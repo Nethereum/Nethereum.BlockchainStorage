@@ -10,12 +10,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public class EventHandlerManager : IEventHandlerManager
     {
         public EventHandlerManager(
-            IEventHandlerHistoryDb eventHandlerHistory = null)
+            IEventHandlerHistoryRepository eventHandlerHistory = null)
         {
             History = eventHandlerHistory;
         }
 
-        public IEventHandlerHistoryDb History { get; }
+        public IEventHandlerHistoryRepository History { get; }
 
         public async Task HandleAsync(IEventSubscription subscription, EventABI[] abis, params FilterLog[] eventLogs)
         {

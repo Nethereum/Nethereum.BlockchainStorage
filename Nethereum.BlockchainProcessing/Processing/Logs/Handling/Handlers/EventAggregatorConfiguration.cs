@@ -1,4 +1,6 @@
-﻿namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
     public class EventAggregatorConfiguration
     {

@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
@@ -178,23 +179,23 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         }
 
 
-        private static Mock<IEventHandlerHistoryDb> CreateMockHistoryDb(List<(long eventHandlerId, string eventKey)> history = null)
+        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(List<(long eventHandlerId, string eventKey)> history = null)
         {
             return CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> h);
         }
 
-        private static Mock<IEventHandlerHistoryDb> CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history)
+        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> history)
         {
             history = new List<(long eventHandlerId, string eventKey)>();
             return CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> h, history);
         }
 
-        private static Mock<IEventHandlerHistoryDb> CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> historyList, List<(long eventHandlerId, string eventKey)> history = null)
+        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(out List<(long eventHandlerId, string eventKey)> historyList, List<(long eventHandlerId, string eventKey)> history = null)
         {
             history = history ?? new List<(long eventHandlerId, string eventKey)>();
             historyList = history;
 
-            var mock = new Mock<IEventHandlerHistoryDb>();
+            var mock = new Mock<IEventHandlerHistoryRepository>();
             mock
                 .Setup(m => m.AddEventHandlerHistory(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns<long, string>((handlerId, eventKey) =>

@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 
         private IEventProcessingConfigurationRepository _repo { get; }
 
-        public async Task<IEventMatcher> LoadAsync(EventSubscriptionDto eventSubscription)
+        public async Task<IEventMatcher> LoadAsync(IEventSubscriptionDto eventSubscription)
         {
             var eventAbis = await GetEventAbisAsync(eventSubscription);
             var addressMatcher = await CreateEventAddressMatcherAsync(eventSubscription);
@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
             return matcher;
         }
 
-        private async Task<EventParameterMatcher> CreateParameterMatcherAsync(EventSubscriptionDto eventSubscription)
+        private async Task<EventParameterMatcher> CreateParameterMatcherAsync(IEventSubscriptionDto eventSubscription)
         {
             var parameterConditionDtos = await _repo.GetParameterConditionsAsync(eventSubscription.Id);
             var parameterConditions = parameterConditionDtos.Select(c => ParameterCondition.Create(c.ParameterOrder, c.Operator, c.Value));
@@ -33,14 +33,14 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
             return parameterMatcher;
         }
 
-        private async Task<EventAddressMatcher> CreateEventAddressMatcherAsync(EventSubscriptionDto eventSubscription)
+        private async Task<EventAddressMatcher> CreateEventAddressMatcherAsync(IEventSubscriptionDto eventSubscription)
         {
             var addressDtos = await _repo.GetEventSubscriptionAddressesAsync(eventSubscription.Id);
             var addressMatcher = new EventAddressMatcher(addressDtos.Select(a => a.Address));
             return addressMatcher;
         }
 
-        private async Task<EventABI[]> GetEventAbisAsync(EventSubscriptionDto eventSubscription)
+        private async Task<EventABI[]> GetEventAbisAsync(IEventSubscriptionDto eventSubscription)
         {
             if(eventSubscription.ContractId == null) return null;
 
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
                 return null;
             }
 
-            var contractDto = await _repo.GetContractAsync(eventSubscription.ContractId.Value);
+            var contractDto = await _repo.GetSubscriberContractAsync(eventSubscription.SubscriberId, eventSubscription.ContractId.Value);
             ContractABI contractAbi = contractDto.Abi == null ? null : _abiDeserializer.DeserialiseContract(contractDto.Abi);
 
             if(contractAbi == null) return null;

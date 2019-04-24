@@ -1,4 +1,5 @@
-﻿using Nethereum.Hex.HexTypes;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+using Nethereum.Hex.HexTypes;
 using System;
 using System.Linq;
 using System.Numerics;
