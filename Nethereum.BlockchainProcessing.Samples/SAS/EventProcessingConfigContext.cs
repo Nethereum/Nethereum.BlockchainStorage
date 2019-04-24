@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
         public List<ContractQueryDto> ContractQueries = new List<ContractQueryDto>();
         public List<ContractQueryParameterDto> ContractQueryParameters = new List<ContractQueryParameterDto>();
         public List<ParameterConditionDto> ParameterConditions = new List<ParameterConditionDto>();
-        public List<EventAggregatorConfigurationDto> EventAggregators = new List<EventAggregatorConfigurationDto>();
+        public List<EventAggregatorDto> EventAggregators = new List<EventAggregatorDto>();
         public List<EventSubscriptionStateDto> EventSubscriptionStates = new List<EventSubscriptionStateDto>();
         public List<SubscriberQueueConfigurationDto> SubscriberQueues = new List<SubscriberQueueConfigurationDto>();
         public List<SubscriberSearchIndexConfigurationDto> SubscriberSearchIndexes = new List<SubscriberSearchIndexConfigurationDto>();
@@ -64,7 +64,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             return dto;
         }
 
-        public EventAggregatorConfigurationDto Add(EventAggregatorConfigurationDto dto)
+        public EventAggregatorDto Add(EventAggregatorDto dto)
         {
             EventAggregators.Add(dto);
             return dto;

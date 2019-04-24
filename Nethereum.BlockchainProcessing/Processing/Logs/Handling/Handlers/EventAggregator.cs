@@ -67,10 +67,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
             switch(Configuration.Destination)
             {
                 case AggregatorDestination.EventSubscriptionState:
-                    existingValue = GetValueFromSubscriptionState(Configuration.OutputName, Zero);
+                    existingValue = GetValueFromSubscriptionState(Configuration.OutputKey, Zero);
                     break;
                 case AggregatorDestination.EventState:
-                    existingValue = GetValueFromEventState(decodedEvent, Configuration.OutputName, Zero);
+                    existingValue = GetValueFromEventState(decodedEvent, Configuration.OutputKey, Zero);
                     break;
             }   
 
@@ -101,9 +101,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
             switch (Configuration.Destination)
             {
                 case AggregatorDestination.EventState:
-                    return GetValueFromEventState(decodedEvent, Configuration.OutputName, null);
+                    return GetValueFromEventState(decodedEvent, Configuration.OutputKey, null);
                 case AggregatorDestination.EventSubscriptionState:
-                    return GetValueFromSubscriptionState(Configuration.OutputName, null);
+                    return GetValueFromSubscriptionState(Configuration.OutputKey, null);
                 default:
                     return null;
             }
@@ -116,7 +116,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
                 case AggregatorSource.EventParameter:
                     return GetInputValueFromEventParameter(decodedEvent);
                 case AggregatorSource.EventState:
-                    return GetValueFromEventState(decodedEvent, Configuration.InputName, null);
+                    return GetValueFromEventState(decodedEvent, Configuration.SourceKey, null);
                 case AggregatorSource.TransactionHash:
                     return decodedEvent.Log.TransactionHash;
                 case AggregatorSource.BlockNumber:
@@ -131,10 +131,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
             switch (Configuration.Destination)
             {
                 case AggregatorDestination.EventState:
-                    decodedEvent.State[Configuration.OutputName] = outputValue;
+                    decodedEvent.State[Configuration.OutputKey] = outputValue;
                     break;
                 case AggregatorDestination.EventSubscriptionState:
-                    Subscription.State.Values[Configuration.OutputName] = outputValue;
+                    Subscription.State.Values[Configuration.OutputKey] = outputValue;
                     break;
             }
         }

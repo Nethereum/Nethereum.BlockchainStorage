@@ -19,6 +19,10 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         public IEventHandlerRepository EventHandlerRepository;
         public IParameterConditionRepository ParameterConditionRepository;
         public AzureEventProcessingConfigurationRepository ConfigRepo;
+        public IEventSubscriptionStateRepository EventSubscriptionStateRepository;
+        public IContractQueryRepository ContractQueryRepository;
+        public IContractQueryParameterRepository ContractQueryParameterRepository;
+        public IEventAggregatorRepository EventAggregatorRepository;
 
         public AzureTablesConfigurationRepoFixture()
         {
@@ -33,6 +37,10 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             EventSubscriptionAddressRepository = CloudTableSetup.GetEventSubscriptionAddressesRepository();
             EventHandlerRepository = CloudTableSetup.GetEventHandlerRepository();
             ParameterConditionRepository = CloudTableSetup.GetParameterConditionRepository();
+            EventSubscriptionStateRepository = CloudTableSetup.GetEventSubscriptionStateRepository();
+            ContractQueryRepository = CloudTableSetup.GetContractQueryRepository();
+            ContractQueryParameterRepository = CloudTableSetup.GetContractQueryParameterRepository();
+            EventAggregatorRepository = CloudTableSetup.GetEventAggregatorRepository();
 
             ConfigRepo = new AzureEventProcessingConfigurationRepository(
                 SubscriberRepo, 
@@ -40,17 +48,19 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 EventSubscriptionRepo, 
                 EventSubscriptionAddressRepository,
                 EventHandlerRepository,
-                ParameterConditionRepository);
+                ParameterConditionRepository,
+                EventSubscriptionStateRepository,
+                ContractQueryRepository,
+                ContractQueryParameterRepository,
+                EventAggregatorRepository);
         }
 
         public void Dispose()
         {
-            CloudTableSetup?.GetSubscribersTable().DeleteIfExistsAsync().Wait();
-            CloudTableSetup?.GetEventSubscriptionsTable().DeleteIfExistsAsync().Wait();
-            CloudTableSetup?.GetSubscriberContractsTable().DeleteIfExistsAsync().Wait();
-            CloudTableSetup?.GetEventSubscriptionAddressesTable().DeleteIfExistsAsync().Wait();
-            CloudTableSetup?.GetEventHandlerTable().DeleteIfExistsAsync().Wait();
-            CloudTableSetup?.GetParameterConditionTable().DeleteIfExistsAsync().Wait();
+            foreach(var table in CloudTableSetup.GetCachedTables())
+            {
+                table.DeleteIfExistsAsync().Wait();
+            }
         }
 
     }
@@ -74,7 +84,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         }
 
         [Fact]
-        public async Task UpsertAndRetrieveSubscribers()
+        public async Task Subscribers()
         {
             var subscriber1 = new SubscriberDto
             {
@@ -113,7 +123,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         }
 
         [Fact]
-        public async Task UpsertAndRetrieveSubscriberContracts()
+        public async Task SubscriberContracts()
         {
             var contract1 = new SubscriberContractDto
             {
@@ -155,7 +165,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         }
 
         [Fact]
-        public async Task UpsertAndRetrieveEventSubscriptions()
+        public async Task EventSubscriptions()
         {
             var sub1 = new EventSubscriptionDto
             {
@@ -205,7 +215,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         }
 
         [Fact]
-        public async Task UpsertAndRetrieveEventSubscriptionAddresses()
+        public async Task EventSubscriptionAddresses()
         {
             var addr1 = new EventSubscriptionAddressDto {Id = 1, EventSubscriptionId = 99, Address = "xyz" };
             var addr2 = new EventSubscriptionAddressDto { Id = 2, EventSubscriptionId = 99, Address = "abc" };
@@ -226,7 +236,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         }
 
         [Fact]
-        public async Task UpsertAndRetrieveEventHandlers()
+        public async Task EventHandlers()
         {
             var handler1 = new EventHandlerDto { 
                 Id = 1, 
@@ -284,7 +294,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         }
 
         [Fact]
-        public async Task UpsertAndRetrieveParameterConditions()
+        public async Task ParameterConditions()
         {
             var condition1 = new ParameterConditionDto { Id = 1, EventSubscriptionId = 99, Operator = ParameterConditionOperator.GreaterOrEqual, ParameterOrder = 1, Value = "10"};
             var condition2 = new ParameterConditionDto { Id = 2, EventSubscriptionId = 99, Operator = ParameterConditionOperator.LessOrEqual, ParameterOrder = 2, Value = "5" };
@@ -306,6 +316,140 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             Assert.Equal(condition1.Value, c1.Value);
 
            }
+
+        [Fact]
+        public async Task EventSubscriptionState()
+        {
+            //initialising state for a new sub
+            var newState = await Fixture.ConfigRepo.GetOrCreateEventSubscriptionStateAsync(100);
+            Assert.Equal((long)100, newState.Id);
+            Assert.Equal((long)100, newState.EventSubscriptionId);
+            Assert.NotNull(newState.Values);
+
+            //getting state for existing sub
+            var stateDto = new EventSubscriptionStateDto
+            {
+                EventSubscriptionId = 99, Values = new System.Collections.Generic.Dictionary<string, object>()
+                {
+                    { "key1", (object)"val1" },
+                    { "key2", (object)1 }
+                }
+            };
+
+            await Fixture.ConfigRepo.UpsertAsync(new[] { stateDto});
+
+            var fromRepo = await Fixture.ConfigRepo.GetOrCreateEventSubscriptionStateAsync(99);
+
+            Assert.Equal(99, fromRepo.EventSubscriptionId);
+            Assert.Equal(99, fromRepo.Id);
+            Assert.Equal("val1", fromRepo.Values["key1"].ToString());
+            Assert.Equal((long)1, fromRepo.Values["key2"]);
+        }
+
+        [Fact]
+        public async Task ContractQueries()
+        {
+            var contractDto = new SubscriberContractDto
+            {
+                SubscriberId = 999,
+                Id = 1001,
+                Abi = "{}",
+                Name = "StandardContract"
+            };
+
+            //dummy values - purely to ensure the repo returns all expected values
+            //not meant to be actually consistent with a typical record 
+            var contractQuery = new ContractQueryDto
+            {
+                ContractId = contractDto.Id,
+                ContractAddress = "ContractAddress",
+                ContractAddressParameterNumber = 2,
+                ContractAddressSource = ContractAddressSource.EventParameter,
+                ContractAddressStateVariableName = "ContractAddressStateVariableName",
+                EventHandlerId = 200,
+                EventStateOutputName = "EventStateOutputName",
+                FunctionSignature = "FunctionSignature",
+                SubscriptionStateOutputName = "SubscriptionStateOutputName"
+            };
+
+            var queryParam1 = new ContractQueryParameterDto
+            {
+                ContractQueryId = contractQuery.EventHandlerId,
+                EventParameterNumber = 1,
+                Order = 1,
+                EventStateName = "EventStateName",
+                Id = 567,
+                Source = EventValueSource.EventParameters,
+                Value = "Value"
+            };
+
+            var queryParam2 = new ContractQueryParameterDto
+            {
+                ContractQueryId = contractQuery.EventHandlerId,
+                EventParameterNumber = 2,
+                Order = 2,
+                EventStateName = "EventStateName",
+                Id = 568,
+                Source = EventValueSource.EventParameters,
+                Value = "Value"
+            };
+
+            var queryParameterDtos = new[] { queryParam1, queryParam2 };
+
+            await Fixture.SubscriberContractsRepo.UpsertAsync(contractDto);
+            await Fixture.ContractQueryRepository.UpsertAsync(contractQuery);
+            await Fixture.ContractQueryParameterRepository.UpsertAsync(queryParam1);
+            await Fixture.ContractQueryParameterRepository.UpsertAsync(queryParam2);
+
+            var configFromRepo = await Fixture.ConfigRepo.GetContractQueryConfigurationAsync(contractDto.SubscriberId, contractQuery.EventHandlerId);
+
+            Assert.Equal(contractDto.Abi, configFromRepo.ContractABI);
+            Assert.Equal(contractQuery.ContractAddress, configFromRepo.ContractAddress);
+            Assert.Equal(contractQuery.ContractAddressParameterNumber, configFromRepo.ContractAddressParameterNumber);
+            Assert.Equal(contractQuery.ContractAddressSource, configFromRepo.ContractAddressSource);
+            Assert.Equal(contractQuery.ContractAddressStateVariableName, configFromRepo.ContractAddressStateVariableName);
+            Assert.Equal(contractQuery.EventStateOutputName, configFromRepo.EventStateOutputName);
+            Assert.Equal(contractQuery.FunctionSignature, configFromRepo.FunctionSignature);
+            Assert.Equal(contractQuery.SubscriptionStateOutputName, configFromRepo.SubscriptionStateOutputName);
+
+            Assert.Equal(queryParameterDtos.Length, configFromRepo.Parameters.Length);
+
+            for(var i = 0; i < queryParameterDtos.Length; i++)
+            {
+                var dto = queryParameterDtos[i];
+                var actual = configFromRepo.Parameters[i];
+
+                Assert.Equal(dto.EventParameterNumber, actual.EventParameterNumber);
+                Assert.Equal(dto.EventStateName, actual.EventStateName);
+                Assert.Equal(dto.Order, actual.Order);
+                Assert.Equal(dto.Source, actual.Source);
+                Assert.Equal(dto.Value, actual.Value);
+            }
+        }
+
+        [Fact]
+        public async Task EventAggregators()
+        {
+            var aggregatorDto = new EventAggregatorDto { 
+                EventHandlerId = 800, 
+                Destination = AggregatorDestination.EventSubscriptionState,
+                EventParameterNumber = 2,
+                Operation = AggregatorOperation.Sum,
+                OutputKey = "SumOfSomething",
+                Source = AggregatorSource.EventParameter,
+                SourceKey = "Value"};
+
+            await Fixture.EventAggregatorRepository.UpsertAsync(aggregatorDto);
+
+            var fromRepo = await Fixture.ConfigRepo.GetEventAggregationConfigurationAsync(aggregatorDto.EventHandlerId);
+
+            Assert.Equal(aggregatorDto.Destination, fromRepo.Destination);
+            Assert.Equal(aggregatorDto.EventParameterNumber, fromRepo.EventParameterNumber);
+            Assert.Equal(aggregatorDto.Operation, fromRepo.Operation);
+            Assert.Equal(aggregatorDto.OutputKey, fromRepo.OutputKey);
+            Assert.Equal(aggregatorDto.Source, fromRepo.Source);
+            Assert.Equal(aggregatorDto.SourceKey, fromRepo.SourceKey);
+        }
 
     }
 }

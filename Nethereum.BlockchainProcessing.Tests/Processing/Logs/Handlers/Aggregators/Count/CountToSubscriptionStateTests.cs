@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
             {
                 Operation = AggregatorOperation.Count,
                 Destination = AggregatorDestination.EventSubscriptionState,
-                OutputName = OUTPUT_NAME
+                OutputKey = OUTPUT_NAME
             };
         }
 

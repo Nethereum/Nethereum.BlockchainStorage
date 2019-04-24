@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -31,21 +33,33 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
             return cloudStorageAccount;
         }
 
-        protected string PrefixTable(string table)
+        protected string PrefixTableName(string table)
         {
             return prefix + table;
         }
 
-        protected virtual CloudTable GetPrefixedTable(string name)
+        private Dictionary<string, CloudTable> TableCache = new Dictionary<string, CloudTable>();
+
+        public CloudTable[] GetCachedTables()
         {
-            return GetTable(PrefixTable(name));
+            return TableCache.Values.ToArray();
         }
 
-        public virtual CloudTable GetTable(string name)
+        protected virtual CloudTable GetPrefixedTable(string nameWithoutPrefix)
+        {
+            var prefixedName = PrefixTableName(nameWithoutPrefix);
+            if (!TableCache.ContainsKey(prefixedName))
+            {
+                TableCache.Add(prefixedName, GetTable(prefixedName));
+            }
+            return TableCache[prefixedName];
+        }
+
+        private CloudTable GetTable(string prefixedName)
         {
             var storageAccount = GetStorageAccount();
             var tableClient = storageAccount.CreateCloudTableClient();
-            var table = tableClient.GetTableReference(name);
+            var table = tableClient.GetTableReference(prefixedName);
             table.CreateIfNotExistsAsync().Wait();
             return table;
         }

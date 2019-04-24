@@ -1,5 +1,6 @@
 ﻿using Nethereum.ABI.JsonDeserialisation;
 using Nethereum.ABI.Model;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 

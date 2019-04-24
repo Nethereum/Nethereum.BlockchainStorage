@@ -1,9 +1,7 @@
-﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface IEventSubscriptionStateRepository
     {

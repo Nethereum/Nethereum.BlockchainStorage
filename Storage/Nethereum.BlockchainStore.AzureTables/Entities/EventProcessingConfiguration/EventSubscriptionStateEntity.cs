@@ -1,8 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguration

@@ -216,7 +216,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Order = 1
             });
 
-            repo.Add(new EventAggregatorConfigurationDto
+            repo.Add(new EventAggregatorDto
             {
                 EventHandlerId = txHashTracker.Id,
                 Source = AggregatorSource.TransactionHash,
@@ -233,7 +233,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Order = 2
             });
 
-            repo.Add(new EventAggregatorConfigurationDto
+            repo.Add(new EventAggregatorDto
             {
                 EventHandlerId = blockTracker.Id,
                 Source = AggregatorSource.BlockNumber,
@@ -295,9 +295,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Order = 1
             });
 
-            repo.Add(new EventAggregatorConfigurationDto
+            repo.Add(new EventAggregatorDto
             {
-                Id = id.Next<EventAggregatorConfigurationDto>(),
+                Id = id.Next<EventAggregatorDto>(),
                 EventHandlerId = transferCountHandler.Id,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 Operation = AggregatorOperation.Count,
@@ -410,9 +410,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 Order = 1
             });
 
-            repo.Add(new EventAggregatorConfigurationDto
+            repo.Add(new EventAggregatorDto
             {
-                Id = id.Next<EventAggregatorConfigurationDto>(),
+                Id = id.Next<EventAggregatorDto>(),
                 EventHandlerId = transferValueRunningTotalHandler.Id,
                 Destination = AggregatorDestination.EventSubscriptionState,
                 Operation = AggregatorOperation.Sum,

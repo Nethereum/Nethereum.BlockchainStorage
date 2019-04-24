@@ -19,9 +19,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
             {
                 Operation = AggregatorOperation.Sum,
                 Source = AggregatorSource.EventState,
-                InputName = INPUT_NAME,
+                SourceKey = INPUT_NAME,
                 Destination = AggregatorDestination.EventSubscriptionState,
-                OutputName = OUTPUT_NAME
+                OutputKey = OUTPUT_NAME
             };
         }
 

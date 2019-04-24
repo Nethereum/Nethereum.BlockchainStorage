@@ -14,37 +14,37 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 
         public CloudTable GetTransactionsVmStackTable()
         {
-            return GetTable(prefix + "TransactionsVmStack");
+            return GetPrefixedTable("TransactionsVmStack");
         }
 
         public CloudTable GetTransactionsLogTable()
         {
-            return GetTable(prefix + "TransactionsLog");
+            return GetPrefixedTable("TransactionsLog");
         }
 
         public CloudTable GetTransactionsTable()
         {
-            return GetTable(prefix + "Transactions");
+            return GetPrefixedTable("Transactions");
         }
 
         public CloudTable GetAddressTransactionsTable()
         {
-            return GetTable(prefix + "AddressTransactions");
+            return GetPrefixedTable("AddressTransactions");
         }
 
         public CloudTable GetBlocksTable()
         {
-            return GetTable(prefix + "Blocks");
+            return GetPrefixedTable("Blocks");
         }
 
         public CloudTable GetContractsTable()
         {
-            return GetTable(prefix + "Contracts");
+            return GetPrefixedTable("Contracts");
         }
 
         public CloudTable GetCountersTable()
         {
-            return GetTable(prefix + "Counters");
+            return GetPrefixedTable("Counters");
         }
 
         public IAddressTransactionRepository CreateAddressTransactionRepository() => new AddressTransactionRepository(GetTransactionsLogTable());

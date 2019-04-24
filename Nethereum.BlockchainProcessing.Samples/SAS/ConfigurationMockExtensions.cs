@@ -104,12 +104,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns(Task.CompletedTask);
 
             configDb
-                .Setup(d => d.GetContractQueryConfigurationAsync(It.IsAny<long>()))
-                .Returns<long>((eventHandlerId) =>
+                .Setup(d => d.GetContractQueryConfigurationAsync(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns<long, long>((subscriberId, eventHandlerId) =>
                 {
                     var contractQuery = repo.ContractQueries.FirstOrDefault(c => c.EventHandlerId == eventHandlerId);
                     if (contractQuery == null) throw new ArgumentException($"Could not find Contract Query Configuration for Event Handler Id: {eventHandlerId}");
-                    var contract = repo.Contracts.FirstOrDefault(c => c.Id == contractQuery.ContractId);
+                    var contract = repo.Contracts.FirstOrDefault(c => c.SubscriberId == subscriberId && c.Id == contractQuery.ContractId);
                     if (contract == null) throw new ArgumentException($"Could not find Contract Query Id: {contractQuery.Id}, Contract Id: {contractQuery.ContractId}");
                     var parameters = repo.ContractQueryParameters.Where(p => p.ContractQueryId == contractQuery.Id);
 
@@ -180,15 +180,15 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             };
         }
 
-        private static EventAggregatorConfiguration Map(EventAggregatorConfigurationDto dto)
+        private static EventAggregatorConfiguration Map(EventAggregatorDto dto)
         {
             return new EventAggregatorConfiguration
             {
                 Destination = dto.Destination,
                 EventParameterNumber = dto.EventParameterNumber,
-                InputName = dto.SourceKey,
+                SourceKey = dto.SourceKey,
                 Operation = dto.Operation,
-                OutputName = dto.OutputKey,
+                OutputKey = dto.OutputKey,
                 Source = dto.Source
             };
         }

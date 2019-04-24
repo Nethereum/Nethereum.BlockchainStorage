@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;

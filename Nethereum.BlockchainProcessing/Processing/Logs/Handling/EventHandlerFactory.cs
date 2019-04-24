@@ -78,7 +78,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventHandlerType.ContractQuery:
                     CheckDependency(ContractQueryFactory);
                     CheckDependency(ContractQueryHandler);
-                    var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(config.Id);
+                    var queryConfig = await ContractQueryFactory.GetContractQueryConfigurationAsync(subscription.SubscriberId, config.Id);
                     return new ContractQueryEventHandler(subscription, config.Id, ContractQueryHandler, queryConfig);
 
                 case EventHandlerType.Queue:

@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
                 Source = AggregatorSource.EventParameter,
                 EventParameterNumber = EVENT_PARAMETER_NUMBER,
                 Destination = AggregatorDestination.EventSubscriptionState,
-                OutputName = OUTPUT_NAME
+                OutputKey = OUTPUT_NAME
             };
         }
 

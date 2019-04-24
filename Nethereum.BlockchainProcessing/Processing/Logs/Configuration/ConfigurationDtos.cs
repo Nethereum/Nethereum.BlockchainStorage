@@ -144,7 +144,29 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 
     }
 
-    public class ContractQueryDto: DbRow
+    public interface IContractQueryDto : IDbRow
+    {
+        long EventHandlerId { get; set; }
+
+        ContractAddressSource ContractAddressSource { get; set; }
+
+        long ContractId { get; set; }
+
+        string FunctionSignature { get; set; }
+
+        string ContractAddress { get; set; }
+
+        int? ContractAddressParameterNumber { get; set; }
+
+        string ContractAddressStateVariableName { get; set; }
+
+        string EventStateOutputName { get; set; }
+        string SubscriptionStateOutputName { get; set; }
+
+    }
+
+
+    public class ContractQueryDto: DbRow, IContractQueryDto
     {
         public long EventHandlerId {get;set;}
 
@@ -164,8 +186,23 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         public string SubscriptionStateOutputName {get;set;}
 
     }
+    public interface IContractQueryParameterDto : IDbRow
+    {
+        
+        long ContractQueryId { get; set; }
+        
+        int Order { get; set; }
+        
+        EventValueSource Source { get; set; }
+        
+        object Value { get; set; }
+        
+        int EventParameterNumber { get; set; }
+        
+        string EventStateName { get; set; }
+    }
 
-    public class ContractQueryParameterDto: DbRow
+    public class ContractQueryParameterDto: DbRow, IContractQueryParameterDto
     {
         public long ContractQueryId {get;set;}
         public int Order {get;set;}
@@ -175,7 +212,18 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         public string EventStateName {get;set;}
     }
 
-    public class EventAggregatorConfigurationDto: DbRow
+    public interface IEventAggregatorDto : IDbRow
+    {
+        long EventHandlerId { get; set; }
+        AggregatorSource Source { get; set; }
+        AggregatorOperation Operation { get; set; }
+        AggregatorDestination Destination { get; set; }
+        int EventParameterNumber { get; set; }
+        string SourceKey { get; set; }
+        string OutputKey { get; set; }
+    }
+
+    public class EventAggregatorDto: DbRow, IEventAggregatorDto
     {
         public long EventHandlerId {get;set;}
         public AggregatorSource Source {get;set;}

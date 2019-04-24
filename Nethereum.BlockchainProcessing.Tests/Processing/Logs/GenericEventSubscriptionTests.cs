@@ -2,10 +2,6 @@
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.RPC.Eth.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs

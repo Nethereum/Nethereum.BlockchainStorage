@@ -22,6 +22,14 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfigu
 
         public CloudTable GetParameterConditionTable() => GetPrefixedTable("ParameterConditions");
 
+        public CloudTable GetEventSubscriptionStateTable() => GetPrefixedTable("EventSubscriptionStates");
+
+        public CloudTable GetContractQueryTable() => GetPrefixedTable("ContractQueries");
+
+        public CloudTable GetContractQueryParameterTable() => GetPrefixedTable("ContractQueryParameters");
+
+        public CloudTable GetEventAggregatorTable() => GetPrefixedTable("EventAggregators");
+
         public ISubscriberRepository GetSubscriberRepository() => new SubscriberRepository(GetSubscribersTable());
 
         public ISubscriberContractsRepository GetSubscriberContractsRepository() => new SubscriberContractsRepository(GetSubscriberContractsTable());
@@ -33,5 +41,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfigu
         public IEventHandlerRepository GetEventHandlerRepository() => new EventHandlerRepository(GetEventHandlerTable());
 
         public IParameterConditionRepository GetParameterConditionRepository() => new ParameterConditionRepository(GetParameterConditionTable());
+
+        public IEventSubscriptionStateRepository GetEventSubscriptionStateRepository() => new EventSubscriptionStateRepository(GetEventSubscriptionStateTable());
+
+        public IContractQueryRepository GetContractQueryRepository() => new ContractQueryRepository(GetContractQueryTable());
+
+        public IContractQueryParameterRepository GetContractQueryParameterRepository() => new ContractQueryParameterRepository(GetContractQueryParameterTable());
+
+        public IEventAggregatorRepository GetEventAggregatorRepository() => new EventAggregatorRepository(GetEventAggregatorTable());
     }
 }

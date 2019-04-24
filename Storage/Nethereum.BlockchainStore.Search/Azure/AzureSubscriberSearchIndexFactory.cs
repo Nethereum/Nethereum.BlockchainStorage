@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Search.Models;
 using Nethereum.ABI.FunctionEncoding;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Contracts;
 using System.Collections.Generic;

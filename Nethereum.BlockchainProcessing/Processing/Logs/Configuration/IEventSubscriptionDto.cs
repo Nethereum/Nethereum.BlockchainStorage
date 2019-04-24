@@ -1,7 +1,7 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using System.Collections.Generic;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface IEventSubscriptionDto: IDbRow
     {

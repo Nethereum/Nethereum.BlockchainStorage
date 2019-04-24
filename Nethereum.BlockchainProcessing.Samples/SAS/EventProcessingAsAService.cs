@@ -2,6 +2,7 @@
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.AzureTables.Factories;
