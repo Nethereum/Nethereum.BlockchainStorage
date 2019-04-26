@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using System;
 using System.Threading.Tasks;
@@ -8,30 +9,27 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 {
     public class AzureSubscriberQueueFactory : ISubscriberQueueFactory
     {
-        public AzureSubscriberQueueFactory(string connectionString, ISubscriberQueueConfigurationRepository queueConfigurationFactory = null)
+        public AzureSubscriberQueueFactory(string connectionString)
         {
             CloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             CloudQueueClient = CloudStorageAccount.CreateCloudQueueClient();
-            QueueConfigurationFactory = queueConfigurationFactory;
         }
 
-        public ISubscriberQueueConfigurationRepository QueueConfigurationFactory { get; }
         public CloudStorageAccount CloudStorageAccount { get; }
         public CloudQueueClient CloudQueueClient { get; }
 
-        public async Task<IQueue> GetSubscriberQueueAsync(long subscriberId, long subscriberQueueId)
+        public async Task<IQueue> GetSubscriberQueueAsync(ISubscriberQueueDto queueConfig)
         {
-            var queueConfig = await QueueConfigurationFactory.GetSubscriberQueueAsync(subscriberId, subscriberQueueId);
-            if(queueConfig.Disabled) throw new Exception($"Subscriber Queue ({subscriberQueueId}) is disabled");
+            if(queueConfig.Disabled) throw new Exception($"Subscriber Queue ({queueConfig.Id}) is disabled");
 
-            return await GetOrCreateQueueAsync(queueConfig.Name);
+            return await GetOrCreateQueueAsync(queueConfig.Name).ConfigureAwait(false);
         }
 
         public async Task<IQueue> GetOrCreateQueueAsync(string queueName)
         {
             var queueReference = CloudQueueClient.GetQueueReference(queueName);
 
-            await queueReference.CreateIfNotExistsAsync();
+            await queueReference.CreateIfNotExistsAsync().ConfigureAwait(false);
 
             return new AzureQueue(queueReference);
         }

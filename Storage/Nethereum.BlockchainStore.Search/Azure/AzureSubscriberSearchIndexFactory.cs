@@ -10,27 +10,22 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureSubscriberSearchIndexFactory : BlockchainProcessing.Processing.Logs.Handling.ISubscriberSearchIndexFactory
+    public class AzureSubscriberSearchIndexFactory : ISubscriberSearchIndexFactory
     {
         EventToGenericSearchDocMapper eventToGenericSearchDocMapper = new EventToGenericSearchDocMapper();
         public AzureSubscriberSearchIndexFactory(
-            IEventProcessingConfigurationRepository eventProcessingConfigurationDb,
             IAzureSearchService searchService)
         {
-            EventProcessingConfigurationDb = eventProcessingConfigurationDb;
             SearchService = searchService;
         }
 
         public IEventProcessingConfigurationRepository EventProcessingConfigurationDb { get; }
         public IAzureSearchService SearchService { get; }
 
-        public async Task<ISubscriberSearchIndex> GetSubscriberSearchIndexAsync(long subscriberId, long subscriberSearchIndexId)
+        public async Task<ISubscriberSearchIndex> GetSubscriberSearchIndexAsync(ISubscriberSearchIndexDto config)
         {
-            var config = await EventProcessingConfigurationDb.GetSubscriberSearchIndexAsync(subscriberId, subscriberSearchIndexId);
-
             var index = eventToGenericSearchDocMapper.CreateAzureIndexDefinition(config.Name);
-
-            var azureIndex = await SearchService.CreateEventIndexer(index, eventToGenericSearchDocMapper);
+            var azureIndex = await SearchService.CreateEventIndexer(index, eventToGenericSearchDocMapper).ConfigureAwait(false);
             return new AzureSubscriberSearchIndex(config.Name, azureIndex);
         }
     }

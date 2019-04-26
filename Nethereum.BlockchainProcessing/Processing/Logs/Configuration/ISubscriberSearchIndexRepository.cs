@@ -2,9 +2,7 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
-    public interface ISubscriberSearchIndexRepository
+    public interface ISubscriberSearchIndexRepository: ISubscriberOwnedRepository<ISubscriberSearchIndexDto>
     {
-        Task<ISubscriberSearchIndexDto> GetAsync(long subscriberId, long searchIndexId);
-        Task<ISubscriberSearchIndexDto> UpsertAsync(ISubscriberSearchIndexDto dto);
     }
 }

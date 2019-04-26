@@ -13,12 +13,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
             this IContractQueryRepository contractQueryRepository,
             long subscriberId,
             long eventHandlerId,
-            ISubscriberContractsRepository subscriberContractsRepository,
+            ISubscriberOwnedRepository<ISubscriberContractDto> subscriberContractsRepository,
             IContractQueryParameterRepository contractQueryParameterRepository)
         {
-            var queryConfig = await contractQueryRepository.GetContractQueryAsync(eventHandlerId);
-            var contractConfig = await subscriberContractsRepository.GetContractAsync(subscriberId, queryConfig.ContractId);
-            var queryParameters = await contractQueryParameterRepository.GetAsync(queryConfig.Id);
+            var queryConfig = await contractQueryRepository.GetAsync(eventHandlerId);
+            var contractConfig = await subscriberContractsRepository.GetAsync(subscriberId, queryConfig.ContractId);
+            var queryParameters = await contractQueryParameterRepository.GetManyAsync(queryConfig.Id);
 
             return queryConfig.ToContractQueryConfiguration(contractConfig, queryParameters);
         }
@@ -46,19 +46,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
                     Source = p.Source,
                     Value = p.Value
                 }).ToArray()
-            };
-        }
-
-        public static EventAggregatorConfiguration ToEventAggregatorConfiguration(this IEventAggregatorDto dto)
-        {
-            return new EventAggregatorConfiguration
-            {
-                Destination = dto.Destination,
-                EventParameterNumber = dto.EventParameterNumber,
-                SourceKey = dto.SourceKey,
-                Operation = dto.Operation,
-                OutputKey = dto.OutputKey,
-                Source = dto.Source
             };
         }
     }

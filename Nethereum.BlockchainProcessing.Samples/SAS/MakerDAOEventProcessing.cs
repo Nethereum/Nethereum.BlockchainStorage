@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);
 
             // queue components
-            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configurationRepository);
+            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString);
 
             // load subscribers and event subscriptions
             var eventSubscriptionFactory = new EventSubscriptionFactory(
@@ -65,7 +65,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                     blockRangesProcessed.Add(rangeProcessed);
 
                     // save event subscription state after each batch
-                    await configurationRepository.UpsertAsync(eventSubscriptions.Select(s => s.State));
+                    await configurationRepository.EventSubscriptionStates.UpsertAsync(eventSubscriptions.Select(s => s.State));
                 }
             }
             finally
@@ -73,7 +73,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 await ClearDown(configurationContext, storageCloudSetup, queueFactory);
             }            
 
-            var subscriptionState = await configurationRepository.GetOrCreateEventSubscriptionStateAsync(eventSubscriptions[0].Id);
+            var subscriptionState = await configurationRepository.EventSubscriptionStates.GetAsync(eventSubscriptions[0].Id);
             Assert.Equal(2, (int)subscriptionState.Values["HandlerInvocations"]);
             Assert.Equal(28, (int)subscriptionState.Values["EventsHandled"]);
 

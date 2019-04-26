@@ -18,12 +18,16 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
         Mock<IEventSubscriptionStateRepository> _stateFactory = new Mock<IEventSubscriptionStateRepository>();
         Mock<IEventContractQueryConfigurationRepository> _contractQueryFactory = new Mock<IEventContractQueryConfigurationRepository>();
         Mock<IContractQuery> _contractQueryHandler = new Mock<IContractQuery>();
-        Mock<IEventAggregatorConfigurationRepository> _eventAggregatorConfigurationFactory = new Mock<IEventAggregatorConfigurationRepository>();
+        Mock<IEventAggregatorRepository> _eventAggregatorConfigurationFactory = new Mock<IEventAggregatorRepository>();
         Mock<IGetTransactionByHash> _getTransactionProxy = new Mock<IGetTransactionByHash>();
         Mock<ISubscriberQueueFactory> _subscriberQueueFactory = new Mock<ISubscriberQueueFactory>();
-        Mock<BlockchainProcessing.Processing.Logs.Handling.ISubscriberSearchIndexFactory> _subscriberSearchIndexFactory = new Mock<BlockchainProcessing.Processing.Logs.Handling.ISubscriberSearchIndexFactory>();
-        Mock<IEventRuleConfigurationRepository> _eventRuleConfigurationFactory = new Mock<IEventRuleConfigurationRepository>();
-        Mock<ISubscriberStorageFactory> _subscriberRepositoryFactory = new Mock<ISubscriberStorageFactory>();
+        Mock<ISubscriberSearchIndexFactory> _subscriberSearchIndexFactory = new Mock<BlockchainProcessing.Processing.Logs.Handling.ISubscriberSearchIndexFactory>();
+        Mock<IEventRuleRepository> _eventRuleRepository = new Mock<IEventRuleRepository>();
+        Mock<ISubscriberStorageFactory> _subscriberStorageFactory = new Mock<ISubscriberStorageFactory>();
+
+        Mock<ISubscriberQueueRepository> _subscriberQueueRepository = new Mock<ISubscriberQueueRepository>();
+        Mock<ISubscriberSearchIndexRepository> _subscriberSearchIndexRepository = new Mock<ISubscriberSearchIndexRepository>();
+        Mock<ISubscriberStorageRepository> _subscriberStorageRepository = new Mock<ISubscriberStorageRepository>();
 
         EventSubscriptionStateDto _eventSubscriptionStateDto = new EventSubscriptionStateDto();
         Mock<IEventSubscription> _mockEventSubscription;
@@ -35,11 +39,14 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 _contractQueryFactory.Object, 
                 _contractQueryHandler.Object, 
                 _eventAggregatorConfigurationFactory.Object, 
-                _getTransactionProxy.Object, 
-                _subscriberQueueFactory.Object, 
+                _getTransactionProxy.Object,
+                _subscriberQueueRepository.Object,
+                _subscriberQueueFactory.Object,
+                _subscriberSearchIndexRepository.Object,
                 _subscriberSearchIndexFactory.Object,
-                _eventRuleConfigurationFactory.Object,
-                _subscriberRepositoryFactory.Object);
+                _eventRuleRepository.Object,
+                _subscriberStorageRepository.Object,
+                _subscriberStorageFactory.Object);
 
             _mockEventSubscription = new Mock<IEventSubscription>();
             _mockEventSubscription.Setup(s => s.State).Returns(_eventSubscriptionStateDto);
@@ -73,10 +80,10 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 HandlerType = EventHandlerType.Aggregate
             };
 
-            var aggregateConfig = new EventAggregatorConfiguration();                
+            var aggregateConfig = new EventAggregatorDto();                
 
             _eventAggregatorConfigurationFactory
-                .Setup(f => f.GetEventAggregationConfigurationAsync(config.Id))
+                .Setup(f => f.GetAsync(config.Id))
                 .ReturnsAsync(aggregateConfig);
 
             var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);
@@ -124,10 +131,15 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 SubscriberQueueId = 33
             };
 
+            var queueConfig = new SubscriberQueueDto();
             var queue = new Mock<IQueue>();
 
+            _subscriberQueueRepository
+                .Setup(r => r.GetAsync(_mockEventSubscription.Object.Id, config.SubscriberQueueId))
+                .ReturnsAsync(queueConfig);
+
             _subscriberQueueFactory
-                .Setup(f => f.GetSubscriberQueueAsync(_mockEventSubscription.Object.Id, config.SubscriberQueueId))
+                .Setup(f => f.GetSubscriberQueueAsync(queueConfig))
                 .ReturnsAsync(queue.Object);
 
             var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);
@@ -150,10 +162,15 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 SubscriberQueueId = 33
             };
 
+            var storageConfig = new SubscriberStorageDto();
             var repo = new Mock<ILogHandler>();
 
-            _subscriberRepositoryFactory
-                .Setup(f => f.GetLogRepositoryAsync(_mockEventSubscription.Object.SubscriberId, config.SubscriberRepositoryId))
+            _subscriberStorageRepository
+                .Setup(r => r.GetAsync(_mockEventSubscription.Object.SubscriberId, config.SubscriberRepositoryId))
+                .ReturnsAsync(storageConfig);
+
+            _subscriberStorageFactory
+                .Setup(f => f.GetLogRepositoryAsync(storageConfig))
                 .ReturnsAsync(repo.Object);
 
             var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);
@@ -194,10 +211,16 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 HandlerType = EventHandlerType.Index
             };
 
+            var searchIndexConfig = new SubscriberSearchIndexDto();
             var searchIndex = new Mock<ISubscriberSearchIndex>();
 
+            _subscriberSearchIndexRepository
+                .Setup(r => r.GetAsync(_mockEventSubscription.Object.SubscriberId, config.SubscriberSearchIndexId))
+                .ReturnsAsync(searchIndexConfig);
+                
+
             _subscriberSearchIndexFactory
-                .Setup(f => f.GetSubscriberSearchIndexAsync(_mockEventSubscription.Object.SubscriberId, config.SubscriberSearchIndexId))
+                .Setup(f => f.GetSubscriberSearchIndexAsync(searchIndexConfig))
                 .ReturnsAsync(searchIndex.Object);
 
             var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);

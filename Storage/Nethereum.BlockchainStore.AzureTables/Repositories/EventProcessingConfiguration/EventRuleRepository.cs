@@ -4,26 +4,23 @@ using Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguratio
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
-
-    public class EventAggregatorRepository : 
-        OneToOneRepository<IEventAggregatorDto, EventAggregatorEntity>, IEventAggregatorRepository
+    public class EventRuleRepository : OneToOneRepository<IEventRuleDto, EventRuleEntity>, IEventRuleRepository
     {
-        public EventAggregatorRepository(CloudTable table) : base(table)
+        public EventRuleRepository(CloudTable table) : base(table)
         {
         }
 
-        protected override EventAggregatorEntity Map(IEventAggregatorDto dto)
+        protected override EventRuleEntity Map(IEventRuleDto dto)
         {
-            return new EventAggregatorEntity
+            return new EventRuleEntity
             {
                 Id = dto.EventHandlerId,
                 EventHandlerId = dto.EventHandlerId,
-                Destination = dto.Destination,
                 EventParameterNumber = dto.EventParameterNumber,
-                Operation = dto.Operation,
-                OutputKey = dto.OutputKey,
                 Source = dto.Source,
-                SourceKey = dto.SourceKey
+                InputName = dto.InputName,
+                Type = dto.Type,
+                Value = dto.Value
             };
         }
     }

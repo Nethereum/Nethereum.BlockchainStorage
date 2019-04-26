@@ -1,7 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
-using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
-using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,9 +11,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         private const string OUTPUT_NAME = "RunningTotal";
         private const string INPUT_NAME = "Val";
 
-        protected override EventAggregatorConfiguration CreateConfiguration()
+        protected override IEventAggregatorDto CreateConfiguration()
         {
-            return new EventAggregatorConfiguration
+            return new EventAggregatorDto
             {
                 Operation = AggregatorOperation.Sum,
                 Source = AggregatorSource.EventState,

@@ -4,7 +4,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface IContractQueryRepository
     {
-        Task<IContractQueryDto> GetContractQueryAsync(long eventHandlerId);
+        Task<IContractQueryDto> GetAsync(long eventHandlerId);
         Task<IContractQueryDto> UpsertAsync(IContractQueryDto dto);
     }
 

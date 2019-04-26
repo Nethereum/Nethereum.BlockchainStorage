@@ -12,7 +12,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
     public class AzureTablesConfigurationRepoFixture: IDisposable
     {
         private readonly EventProcessingCloudTableSetup CloudTableSetup;
-        public readonly AzureEventProcessingConfigurationRepository ConfigRepo;
+        public readonly IEventProcessingConfigurationRepository ConfigRepo;
 
         public AzureTablesConfigurationRepoFixture()
         {
@@ -79,12 +79,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             };
 
 
-            await Fixture.ConfigRepo.SubscriberRepository.UpsertAsync(subscriber1);
-            await Fixture.ConfigRepo.SubscriberRepository.UpsertAsync(subscriber2);
-            await Fixture.ConfigRepo.SubscriberRepository.UpsertAsync(subscriber3);
+            await Fixture.ConfigRepo.Subscribers.UpsertAsync(subscriber1);
+            await Fixture.ConfigRepo.Subscribers.UpsertAsync(subscriber2);
+            await Fixture.ConfigRepo.Subscribers.UpsertAsync(subscriber3);
 
-            var partition1Subscribers = await Fixture.ConfigRepo.GetSubscribersAsync(partitionId: 1);
-            var partition2Subscribers = await Fixture.ConfigRepo.GetSubscribersAsync(partitionId: 2);
+            var partition1Subscribers = await Fixture.ConfigRepo.Subscribers.GetManyAsync(partitionId: 1);
+            var partition2Subscribers = await Fixture.ConfigRepo.Subscribers.GetManyAsync(partitionId: 2);
 
             Assert.Equal(2, partition1Subscribers.Length);
             Assert.Single(partition2Subscribers);
@@ -115,13 +115,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             };
 
 
-            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contract1);
-            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contract2);
-            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contract3);
+            await Fixture.ConfigRepo.SubscriberContracts.UpsertAsync(contract1);
+            await Fixture.ConfigRepo.SubscriberContracts.UpsertAsync(contract2);
+            await Fixture.ConfigRepo.SubscriberContracts.UpsertAsync(contract3);
 
-            var contract1FromRepo = await Fixture.ConfigRepo.GetSubscriberContractAsync(subscriberId:99, contractId: 1);
-            var contract2FromRepo = await Fixture.ConfigRepo.GetSubscriberContractAsync(subscriberId: 99, contractId: 2);
-            var contract3FromRepo = await Fixture.ConfigRepo.GetSubscriberContractAsync(subscriberId: 100, contractId: 3);
+            var contract1FromRepo = await Fixture.ConfigRepo.SubscriberContracts.GetAsync(subscriberId:99, id: 1);
+            var contract2FromRepo = await Fixture.ConfigRepo.SubscriberContracts.GetAsync(subscriberId: 99, id: 2);
+            var contract3FromRepo = await Fixture.ConfigRepo.SubscriberContracts.GetAsync(subscriberId: 100, id: 3);
 
 
             Assert.NotNull(contract1FromRepo);
@@ -165,12 +165,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 EventSignatures = new System.Collections.Generic.List<string>(new[] { "", "" })
             };
 
-            await Fixture.ConfigRepo.EventSubscriptionRepository.UpsertAsync(sub1);
-            await Fixture.ConfigRepo.EventSubscriptionRepository.UpsertAsync(sub2);
-            await Fixture.ConfigRepo.EventSubscriptionRepository.UpsertAsync(sub3);
+            await Fixture.ConfigRepo.EventSubscriptions.UpsertAsync(sub1);
+            await Fixture.ConfigRepo.EventSubscriptions.UpsertAsync(sub2);
+            await Fixture.ConfigRepo.EventSubscriptions.UpsertAsync(sub3);
 
-            var sub1Subscriptions = await Fixture.ConfigRepo.GetEventSubscriptionsAsync(99);
-            var sub2Subscriptions = await Fixture.ConfigRepo.GetEventSubscriptionsAsync(100);
+            var sub1Subscriptions = await Fixture.ConfigRepo.EventSubscriptions.GetManyAsync(99);
+            var sub2Subscriptions = await Fixture.ConfigRepo.EventSubscriptions.GetManyAsync(100);
 
             Assert.Equal(2, sub1Subscriptions.Length);
             Assert.Single(sub2Subscriptions);
@@ -189,12 +189,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var addr2 = new EventSubscriptionAddressDto { Id = 2, EventSubscriptionId = 99, Address = "abc" };
             var addr3 = new EventSubscriptionAddressDto { Id = 3, EventSubscriptionId = 100, Address = "qer" };
 
-            await Fixture.ConfigRepo.EventSubscriptionAddressRepository.UpsertAsync(addr1);
-            await Fixture.ConfigRepo.EventSubscriptionAddressRepository.UpsertAsync(addr2);
-            await Fixture.ConfigRepo.EventSubscriptionAddressRepository.UpsertAsync(addr3);
+            await Fixture.ConfigRepo.EventSubscriptionAddresses.UpsertAsync(addr1);
+            await Fixture.ConfigRepo.EventSubscriptionAddresses.UpsertAsync(addr2);
+            await Fixture.ConfigRepo.EventSubscriptionAddresses.UpsertAsync(addr3);
 
-            var sub1Addresses = await Fixture.ConfigRepo.GetEventSubscriptionAddressesAsync(99);
-            var sub2Addresses = await Fixture.ConfigRepo.GetEventSubscriptionAddressesAsync(100);
+            var sub1Addresses = await Fixture.ConfigRepo.EventSubscriptionAddresses.GetManyAsync(99);
+            var sub2Addresses = await Fixture.ConfigRepo.EventSubscriptionAddresses.GetManyAsync(100);
 
             Assert.Equal(2, sub1Addresses.Length);
             Assert.Single(sub2Addresses);
@@ -238,12 +238,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 SubscriberRepositoryId = 7
             };
 
-            await Fixture.ConfigRepo.EventHandlerRepository.UpsertAsync(handler1);
-            await Fixture.ConfigRepo.EventHandlerRepository.UpsertAsync(handler2);
-            await Fixture.ConfigRepo.EventHandlerRepository.UpsertAsync(handler3);
+            await Fixture.ConfigRepo.EventHandlers.UpsertAsync(handler1);
+            await Fixture.ConfigRepo.EventHandlers.UpsertAsync(handler2);
+            await Fixture.ConfigRepo.EventHandlers.UpsertAsync(handler3);
 
-            var sub1Handlers = await Fixture.ConfigRepo.GetEventHandlersAsync(99);
-            var sub2Handlers = await Fixture.ConfigRepo.GetEventHandlersAsync(100);
+            var sub1Handlers = await Fixture.ConfigRepo.EventHandlers.GetManyAsync(99);
+            var sub2Handlers = await Fixture.ConfigRepo.EventHandlers.GetManyAsync(100);
 
             Assert.Equal(2, sub1Handlers.Length);
             Assert.Single(sub2Handlers);
@@ -268,12 +268,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var condition2 = new ParameterConditionDto { Id = 2, EventSubscriptionId = 99, Operator = ParameterConditionOperator.LessOrEqual, ParameterOrder = 2, Value = "5" };
             var condition3 = new ParameterConditionDto { Id = 3, EventSubscriptionId = 100, Operator = ParameterConditionOperator.Equals, ParameterOrder = 1, Value = "11" };
 
-            await Fixture.ConfigRepo.ParameterConditionRepository.UpsertAsync(condition1);
-            await Fixture.ConfigRepo.ParameterConditionRepository.UpsertAsync(condition2);
-            await Fixture.ConfigRepo.ParameterConditionRepository.UpsertAsync(condition3);
+            await Fixture.ConfigRepo.ParameterConditions.UpsertAsync(condition1);
+            await Fixture.ConfigRepo.ParameterConditions.UpsertAsync(condition2);
+            await Fixture.ConfigRepo.ParameterConditions.UpsertAsync(condition3);
 
-            var sub1Conditions = await Fixture.ConfigRepo.GetParameterConditionsAsync(99);
-            var sub2Conditions = await Fixture.ConfigRepo.GetParameterConditionsAsync(100);
+            var sub1Conditions = await Fixture.ConfigRepo.ParameterConditions.GetManyAsync(99);
+            var sub2Conditions = await Fixture.ConfigRepo.ParameterConditions.GetManyAsync(100);
 
             Assert.Equal(2, sub1Conditions.Length);
             Assert.Single(sub2Conditions);
@@ -289,7 +289,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
         public async Task EventSubscriptionState()
         {
             //initialising state for a new sub
-            var newState = await Fixture.ConfigRepo.GetOrCreateEventSubscriptionStateAsync(100);
+            var newState = await Fixture.ConfigRepo.EventSubscriptionStates.GetAsync(100);
             Assert.Equal((long)100, newState.Id);
             Assert.Equal((long)100, newState.EventSubscriptionId);
             Assert.NotNull(newState.Values);
@@ -304,9 +304,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 }
             };
 
-            await Fixture.ConfigRepo.UpsertAsync(new[] { stateDto});
+            await Fixture.ConfigRepo.EventSubscriptionStates.UpsertAsync(new[] { stateDto});
 
-            var fromRepo = await Fixture.ConfigRepo.GetOrCreateEventSubscriptionStateAsync(99);
+            var fromRepo = await Fixture.ConfigRepo.EventSubscriptionStates.GetAsync(99);
 
             Assert.Equal(99, fromRepo.EventSubscriptionId);
             Assert.Equal(99, fromRepo.Id);
@@ -364,12 +364,12 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
 
             var queryParameterDtos = new[] { queryParam1, queryParam2 };
 
-            await Fixture.ConfigRepo.SubscriberContractRepository.UpsertAsync(contractDto);
-            await Fixture.ConfigRepo.ContractQueryRepository.UpsertAsync(contractQuery);
-            await Fixture.ConfigRepo.ContractQueryParameterRepository.UpsertAsync(queryParam1);
-            await Fixture.ConfigRepo.ContractQueryParameterRepository.UpsertAsync(queryParam2);
+            await Fixture.ConfigRepo.SubscriberContracts.UpsertAsync(contractDto);
+            await Fixture.ConfigRepo.ContractQueries.UpsertAsync(contractQuery);
+            await Fixture.ConfigRepo.ContractQueryParameters.UpsertAsync(queryParam1);
+            await Fixture.ConfigRepo.ContractQueryParameters.UpsertAsync(queryParam2);
 
-            var configFromRepo = await Fixture.ConfigRepo.GetContractQueryConfigurationAsync(contractDto.SubscriberId, contractQuery.EventHandlerId);
+            var configFromRepo = await Fixture.ConfigRepo.EventContractQueries.GetContractQueryConfigurationAsync(contractDto.SubscriberId, contractQuery.EventHandlerId);
 
             Assert.Equal(contractDto.Abi, configFromRepo.ContractABI);
             Assert.Equal(contractQuery.ContractAddress, configFromRepo.ContractAddress);
@@ -407,9 +407,9 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 Source = AggregatorSource.EventParameter,
                 SourceKey = "Value"};
 
-            await Fixture.ConfigRepo.EventAggregatorRepository.UpsertAsync(aggregatorDto);
+            await Fixture.ConfigRepo.EventAggregators.UpsertAsync(aggregatorDto);
 
-            var fromRepo = await Fixture.ConfigRepo.GetEventAggregationConfigurationAsync(aggregatorDto.EventHandlerId);
+            var fromRepo = await Fixture.ConfigRepo.EventAggregators.GetAsync(aggregatorDto.EventHandlerId);
 
             Assert.Equal(aggregatorDto.Destination, fromRepo.Destination);
             Assert.Equal(aggregatorDto.EventParameterNumber, fromRepo.EventParameterNumber);
@@ -440,11 +440,11 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
                 Value = "10"
             };
 
-            await Fixture.ConfigRepo.EventRuleRepository.UpsertAsync(dto1);
-            await Fixture.ConfigRepo.EventRuleRepository.UpsertAsync(dto2);
+            await Fixture.ConfigRepo.EventRules.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.EventRules.UpsertAsync(dto2);
 
-            var fromRepo1 = await Fixture.ConfigRepo.GetEventRuleConfigurationAsync(dto1.EventHandlerId);
-            var fromRepo2 = await Fixture.ConfigRepo.GetEventRuleConfigurationAsync(dto2.EventHandlerId);
+            var fromRepo1 = await Fixture.ConfigRepo.EventRules.GetAsync(dto1.EventHandlerId);
+            var fromRepo2 = await Fixture.ConfigRepo.EventRules.GetAsync(dto2.EventHandlerId);
 
             Assert.Equal(dto1.EventHandlerId, fromRepo1.EventHandlerId);
             Assert.Equal(dto1.EventParameterNumber, fromRepo1.EventParameterNumber);
@@ -463,17 +463,17 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var queueDto1 = new SubscriberQueueDto {SubscriberId = 99, Id = 1099, Disabled = false, Name = "transfers" };
             var queueDto2 = new SubscriberQueueDto { SubscriberId = 100, Id = 1100, Disabled = false, Name = "approvals" };
 
-            await Fixture.ConfigRepo.SubscriberQueueRepository.UpsertAsync(queueDto1);
-            await Fixture.ConfigRepo.SubscriberQueueRepository.UpsertAsync(queueDto2);
+            await Fixture.ConfigRepo.SubscriberQueues.UpsertAsync(queueDto1);
+            await Fixture.ConfigRepo.SubscriberQueues.UpsertAsync(queueDto2);
 
-            var fromRepo1 = await Fixture.ConfigRepo.GetSubscriberQueueAsync(queueDto1.SubscriberId, queueDto1.Id);
+            var fromRepo1 = await Fixture.ConfigRepo.SubscriberQueues.GetAsync(queueDto1.SubscriberId, queueDto1.Id);
 
             Assert.Equal(queueDto1.Id, fromRepo1.Id);
             Assert.Equal(queueDto1.SubscriberId, fromRepo1.SubscriberId);
             Assert.Equal(queueDto1.Disabled, fromRepo1.Disabled);
             Assert.Equal(queueDto1.Name, fromRepo1.Name);
 
-            var fromRepo2 = await Fixture.ConfigRepo.GetSubscriberQueueAsync(queueDto2.SubscriberId, queueDto2.Id);
+            var fromRepo2 = await Fixture.ConfigRepo.SubscriberQueues.GetAsync(queueDto2.SubscriberId, queueDto2.Id);
 
             Assert.Equal(queueDto2.Id, fromRepo2.Id);
         }
@@ -484,17 +484,17 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var dto1 = new SubscriberSearchIndexDto { SubscriberId = 99, Id = 1099, Disabled = false, Name = "transfers" };
             var dto2 = new SubscriberSearchIndexDto { SubscriberId = 100, Id = 1100, Disabled = false, Name = "approvals" };
 
-            await Fixture.ConfigRepo.SubscriberSearchIndexRepository.UpsertAsync(dto1);
-            await Fixture.ConfigRepo.SubscriberSearchIndexRepository.UpsertAsync(dto2);
+            await Fixture.ConfigRepo.SubscriberSearchIndexes.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.SubscriberSearchIndexes.UpsertAsync(dto2);
 
-            var fromRepo1 = await Fixture.ConfigRepo.GetSubscriberSearchIndexAsync(dto1.SubscriberId, dto1.Id);
+            var fromRepo1 = await Fixture.ConfigRepo.SubscriberSearchIndexes.GetAsync(dto1.SubscriberId, dto1.Id);
 
             Assert.Equal(dto1.Id, fromRepo1.Id);
             Assert.Equal(dto1.SubscriberId, fromRepo1.SubscriberId);
             Assert.Equal(dto1.Disabled, fromRepo1.Disabled);
             Assert.Equal(dto1.Name, fromRepo1.Name);
 
-            var fromRepo2 = await Fixture.ConfigRepo.GetSubscriberSearchIndexAsync(dto2.SubscriberId, dto2.Id);
+            var fromRepo2 = await Fixture.ConfigRepo.SubscriberSearchIndexes.GetAsync(dto2.SubscriberId, dto2.Id);
 
             Assert.Equal(dto2.Id, fromRepo2.Id);
         }
@@ -505,17 +505,17 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var dto1 = new SubscriberStorageDto { SubscriberId = 99, Id = 1099, Disabled = false, Name = "transfers" };
             var dto2 = new SubscriberStorageDto { SubscriberId = 100, Id = 1100, Disabled = false, Name = "approvals" };
 
-            await Fixture.ConfigRepo.SubscriberStorageRepository.UpsertAsync(dto1);
-            await Fixture.ConfigRepo.SubscriberStorageRepository.UpsertAsync(dto2);
+            await Fixture.ConfigRepo.SubscriberStorage.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.SubscriberStorage.UpsertAsync(dto2);
 
-            var fromRepo1 = await Fixture.ConfigRepo.GetSubscriberStorageAsync(dto1.SubscriberId, dto1.Id);
+            var fromRepo1 = await Fixture.ConfigRepo.SubscriberStorage.GetAsync(dto1.SubscriberId, dto1.Id);
 
             Assert.Equal(dto1.Id, fromRepo1.Id);
             Assert.Equal(dto1.SubscriberId, fromRepo1.SubscriberId);
             Assert.Equal(dto1.Disabled, fromRepo1.Disabled);
             Assert.Equal(dto1.Name, fromRepo1.Name);
 
-            var fromRepo2 = await Fixture.ConfigRepo.GetSubscriberStorageAsync(dto2.SubscriberId, dto2.Id);
+            var fromRepo2 = await Fixture.ConfigRepo.SubscriberStorage.GetAsync(dto2.SubscriberId, dto2.Id);
 
             Assert.Equal(dto2.Id, fromRepo2.Id);
         }
@@ -527,24 +527,24 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             var dto2 = new EventHandlerHistoryDto { SubscriberId = 99, EventSubscriptionId = 101, EventHandlerId = 987, EventKey = "xyz2" };
             var dto3 = new EventHandlerHistoryDto { SubscriberId = 100, EventSubscriptionId = 102, EventHandlerId = 988, EventKey = "xyz1" };
 
-            await Fixture.ConfigRepo.AddAsync(dto1);
-            await Fixture.ConfigRepo.AddAsync(dto2);
-            await Fixture.ConfigRepo.AddAsync(dto3);
+            await Fixture.ConfigRepo.EventHandlerHistoryRepo.UpsertAsync(dto1);
+            await Fixture.ConfigRepo.EventHandlerHistoryRepo.UpsertAsync(dto2);
+            await Fixture.ConfigRepo.EventHandlerHistoryRepo.UpsertAsync(dto3);
 
-            Assert.True(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(dto1.EventHandlerId, dto1.EventKey));
-            Assert.True(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(dto2.EventHandlerId, dto2.EventKey));
-            Assert.True(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(dto2.EventHandlerId, dto2.EventKey));
+            Assert.True(await Fixture.ConfigRepo.EventHandlerHistoryRepo.ContainsAsync(dto1.EventHandlerId, dto1.EventKey));
+            Assert.True(await Fixture.ConfigRepo.EventHandlerHistoryRepo.ContainsAsync(dto2.EventHandlerId, dto2.EventKey));
+            Assert.True(await Fixture.ConfigRepo.EventHandlerHistoryRepo.ContainsAsync(dto2.EventHandlerId, dto2.EventKey));
 
-            Assert.False(await Fixture.ConfigRepo.ContainsEventHandlerHistoryAsync(1232345346, "blahblah"));
+            Assert.False(await Fixture.ConfigRepo.EventHandlerHistoryRepo.ContainsAsync(1232345346, "blahblah"));
 
-            var fromRep = await Fixture.ConfigRepo.EventHandlerHistoryRepository.GetAsync(dto1.EventHandlerId, dto1.EventKey);
+            var fromRep = await Fixture.ConfigRepo.EventHandlerHistoryRepo.GetAsync(dto1.EventHandlerId, dto1.EventKey);
 
             Assert.Equal(dto1.EventHandlerId, fromRep.EventHandlerId);
             Assert.Equal(dto1.EventKey, fromRep.EventKey);
             Assert.Equal(dto1.EventSubscriptionId, fromRep.EventSubscriptionId);
             Assert.Equal(dto1.SubscriberId, fromRep.SubscriberId);
 
-            var fromRepoForHandler = await Fixture.ConfigRepo.EventHandlerHistoryRepository.GetAsync(dto1.EventHandlerId);
+            var fromRepoForHandler = await Fixture.ConfigRepo.EventHandlerHistoryRepo.GetManyAsync(dto1.EventHandlerId);
             Assert.Equal(dto1.EventKey, fromRepoForHandler[0].EventKey);
             Assert.Equal(dto2.EventKey, fromRepoForHandler[1].EventKey);
 

@@ -5,7 +5,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface ISubscriberRepository
     {
-        Task<ISubscriberDto[]> GetSubscribersAsync(long partitionId);
+        Task<ISubscriberDto[]> GetManyAsync(long partitionId);
 
         Task<ISubscriberDto> UpsertAsync(ISubscriberDto subscriber);
     }

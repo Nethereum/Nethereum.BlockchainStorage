@@ -40,13 +40,13 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // search components
             var searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
-            var searchIndexFactory = new AzureSubscriberSearchIndexFactory(configurationRepository, searchService);
+            var searchIndexFactory = new AzureSubscriberSearchIndexFactory(searchService);
 
             // queue components
-            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString, configurationRepository);
+            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString);
 
             // subscriber repository
-            var repositoryFactory = new AzureTablesSubscriberRepositoryFactory(azureStorageConnectionString, configurationRepository);
+            var repositoryFactory = new AzureTablesSubscriberRepositoryFactory(azureStorageConnectionString, configurationRepository.SubscriberStorage);
 
             // load subscribers and event subscriptions
             var eventSubscriptionFactory = new EventSubscriptionFactory(
@@ -77,7 +77,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             }
 
             // save event subscription state
-            await configurationRepository.UpsertAsync(eventSubscriptions.Select(s => s.State));
+            await configurationRepository.EventSubscriptionStates.UpsertAsync(eventSubscriptions.Select(s => s.State));
             
             // assertions
             Assert.NotNull(rangeProcessed);

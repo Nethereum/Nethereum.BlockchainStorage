@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface IEventSubscriptionAddressRepository
     {
-        Task<IEventSubscriptionAddressDto[]> GetEventSubscriptionAddressesAsync(long eventSubscriptionId);
+        Task<IEventSubscriptionAddressDto[]> GetManyAsync(long eventSubscriptionId);
         Task<IEventSubscriptionAddressDto> UpsertAsync(IEventSubscriptionAddressDto dto);
     }
 }

@@ -16,12 +16,12 @@ namespace Nethereum.BlockchainStore.Repositories.Handlers
         public async Task HandleAsync(TransactionLogWrapper txLog)
         {
             await _transactionLogRepository.UpsertAsync(
-                txLog.Log);
+                txLog.Log).ConfigureAwait(false);
         }
 
         public async Task HandleAsync(FilterLog log)
         {
-            await _transactionLogRepository.UpsertAsync(log);
+            await _transactionLogRepository.UpsertAsync(log).ConfigureAwait(false);
         }
     }
 

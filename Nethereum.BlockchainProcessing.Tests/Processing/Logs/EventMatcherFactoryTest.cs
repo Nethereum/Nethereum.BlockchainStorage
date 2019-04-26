@@ -1,5 +1,4 @@
 ﻿using Moq;
-using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using System.Linq;
@@ -11,7 +10,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
     public class EventMatcherFactoryTest
     {
         EventMatcherFactory _factory;
-        Mock<IEventProcessingConfigurationRepository> _mockDb;
+        Mock<IParameterConditionRepository> _mockParameterConditionRepository;
+        Mock<IEventSubscriptionAddressRepository> _mockEventSubscriptionAddressRepository;
+        Mock<ISubscriberContractRepository> _mockSubscriberContractRepository;
 
         SubscriberDto _subscriberOneConfig;
         SubscriberContractDto _contractDto;
@@ -21,8 +22,14 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         public EventMatcherFactoryTest()
         {
-            _mockDb = new Mock<IEventProcessingConfigurationRepository>();
-            _factory = new EventMatcherFactory(_mockDb.Object);
+            _mockParameterConditionRepository = new Mock<IParameterConditionRepository>();
+            _mockEventSubscriptionAddressRepository = new Mock<IEventSubscriptionAddressRepository>();
+            _mockSubscriberContractRepository = new Mock<ISubscriberContractRepository>();
+
+            _factory = new EventMatcherFactory(
+                _mockParameterConditionRepository.Object,
+                _mockEventSubscriptionAddressRepository.Object,
+                _mockSubscriberContractRepository.Object);
 
             _subscriberOneConfig = new SubscriberDto{Id = 1};
             _contractDto = new SubscriberContractDto
@@ -54,10 +61,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 Value = "xyz"
             };
 
-            _mockDb.Setup(d => d.GetSubscriberContractAsync(_subscriberOneConfig.Id, _contractDto.Id)).ReturnsAsync(_contractDto);
-            _mockDb.Setup(d => d.GetEventSubscriptionsAsync(_subscriberOneConfig.Id)).ReturnsAsync(new []{_eventSubscriptionConfig});
-            _mockDb.Setup(d => d.GetEventSubscriptionAddressesAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_addressesConfig});
-            _mockDb.Setup(d => d.GetParameterConditionsAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_parameterConditionConfig});
+            _mockSubscriberContractRepository.Setup(d => d.GetAsync(_subscriberOneConfig.Id, _contractDto.Id)).ReturnsAsync(_contractDto);
+            _mockEventSubscriptionAddressRepository.Setup(d => d.GetManyAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_addressesConfig});
+            _mockParameterConditionRepository.Setup(d => d.GetManyAsync(_eventSubscriptionConfig.Id)).ReturnsAsync(new []{_parameterConditionConfig});
         }
 
         [Fact]

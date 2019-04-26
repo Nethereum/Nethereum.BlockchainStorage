@@ -42,7 +42,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfigu
 
         public ISubscriberRepository GetSubscriberRepository() => new SubscriberRepository(GetSubscribersTable());
 
-        public ISubscriberContractsRepository GetSubscriberContractsRepository() => new SubscriberContractsRepository(GetSubscriberContractsTable());
+        public ISubscriberContractRepository GetSubscriberContractsRepository() => new SubscriberContractsRepository(GetSubscriberContractsTable());
 
         public IEventSubscriptionRepository GetEventSubscriptionsRepository() => new EventSubscriptionRepository(GetEventSubscriptionsTable());
 

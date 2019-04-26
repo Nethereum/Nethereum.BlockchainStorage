@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.Repositories.Handlers;
@@ -12,22 +13,21 @@ namespace Nethereum.BlockchainStore.AzureTables.Factories
         Dictionary<string, CloudTableSetup> _cloudTableSetups = new Dictionary<string, CloudTableSetup>();
         public AzureTablesSubscriberRepositoryFactory( 
             string azureStorageConnectionString,
-            ISubscriberStorageConfigurationRepository configurationFactory)
+            ISubscriberStorageRepository configurationFactory)
         {
             ConfigurationFactory = configurationFactory;
             AzureStorageConnectionString = azureStorageConnectionString;
         }
 
-        public ISubscriberStorageConfigurationRepository ConfigurationFactory { get; }
+        public ISubscriberStorageRepository ConfigurationFactory { get; }
         public string AzureStorageConnectionString { get; }
 
-        public async Task<ILogHandler> GetLogRepositoryAsync(long subscriberId, long subscriberReposistoryId)
+        public Task<ILogHandler> GetLogRepositoryAsync(ISubscriberStorageDto config)
         {
-           var config = await ConfigurationFactory.GetSubscriberStorageAsync(subscriberId, subscriberReposistoryId);
            CloudTableSetup cloudTableSetup = GetCloudTableSetup(config.Name);
            var repo = cloudTableSetup.CreateTransactionLogRepository();
            var handler = new TransactionLogRepositoryHandler(repo);
-           return handler; 
+           return Task.FromResult(handler as ILogHandler); 
         }
 
         private CloudTableSetup GetCloudTableSetup(string tablePrefix)

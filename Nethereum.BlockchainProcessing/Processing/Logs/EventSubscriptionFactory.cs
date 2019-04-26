@@ -19,10 +19,15 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             IBlockchainProxyService blockchainProxy,
             IEventProcessingConfigurationRepository configurationRepository,
             ISubscriberQueueFactory subscriberQueueFactory = null,
-            Handling.ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
+            ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
             ISubscriberStorageFactory subscriberRepositoryFactory = null):this(
                 configurationRepository, 
-                new EventMatcherFactory(configurationRepository), 
+
+                new EventMatcherFactory(
+                    configurationRepository.ParameterConditions,
+                    configurationRepository.EventSubscriptionAddresses,
+                    configurationRepository.SubscriberContracts), 
+
                 new EventHandlerFactory(
                     blockchainProxy, 
                     configurationRepository, 
@@ -33,28 +38,28 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         public EventSubscriptionFactory(
-            IEventProcessingConfigurationRepository db, 
+            IEventProcessingConfigurationRepository configurationRepository, 
             IEventMatcherFactory eventMatcherFactory, 
-            IEventHandlerFactory decodedEventHandlerFactory)
+            IEventHandlerFactory eventHandlerFactory)
         {
-            ConfigurationRepository = db;
+            ConfigurationRepository = configurationRepository;
             EventMatcherFactory = eventMatcherFactory;
-            EventHandlerFactory = decodedEventHandlerFactory;
+            EventHandlerFactory = eventHandlerFactory;
         }
 
         public async Task<List<IEventSubscription>> LoadAsync(long partitionId)
         {
-            var subscriberConfigurations = await ConfigurationRepository.GetSubscribersAsync(partitionId);
+            var subscriberConfigurations = await ConfigurationRepository.Subscribers.GetManyAsync(partitionId).ConfigureAwait(false);
 
             var eventSubscriptions = new List<IEventSubscription>(subscriberConfigurations.Length);
 
             foreach (var subscriberConfiguration in subscriberConfigurations.Where(c => !c.Disabled))
             {
-                var eventSubscriptionConfigurations = await ConfigurationRepository.GetEventSubscriptionsAsync(subscriberConfiguration.Id);
+                var eventSubscriptionConfigurations = await ConfigurationRepository.EventSubscriptions.GetManyAsync(subscriberConfiguration.Id).ConfigureAwait(false);
 
                 foreach (var eventSubscriptionConfig in eventSubscriptionConfigurations.Where(s => !s.Disabled))
                 {
-                    var eventSubscription = await LoadEventSubscriptionsAsync(eventSubscriptionConfig);
+                    var eventSubscription = await LoadEventSubscriptionsAsync(eventSubscriptionConfig).ConfigureAwait(false);
                     eventSubscriptions.Add(eventSubscription);
                 }
             }
@@ -64,25 +69,25 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         private async Task<EventSubscription> LoadEventSubscriptionsAsync(IEventSubscriptionDto subscriptionConfig)
         {
-            var matcher = await EventMatcherFactory.LoadAsync(subscriptionConfig);
-            var state = await ConfigurationRepository.GetOrCreateEventSubscriptionStateAsync(subscriptionConfig.Id);
-            var handlerCoOrdinator = new EventHandlerManager(ConfigurationRepository);
+            var matcher = await EventMatcherFactory.LoadAsync(subscriptionConfig).ConfigureAwait(false);
+            var state = await ConfigurationRepository.EventSubscriptionStates.GetAsync(subscriptionConfig.Id).ConfigureAwait(false);
+            var handlerCoOrdinator = new EventHandlerManager(ConfigurationRepository.EventHandlerHistory);
 
             var subscription = new EventSubscription(
                 subscriptionConfig.Id, subscriptionConfig.SubscriberId, matcher, handlerCoOrdinator, state);
 
-            await AddEventHandlers(subscription);
+            await AddEventHandlers(subscription).ConfigureAwait(false);
 
             return subscription;
         }
 
         private async Task AddEventHandlers(EventSubscription eventSubscription)
         {
-            var handlerConfiguration = await ConfigurationRepository.GetEventHandlersAsync(eventSubscription.Id);
+            var handlerConfiguration = await ConfigurationRepository.EventHandlers.GetManyAsync(eventSubscription.Id).ConfigureAwait(false);
 
             foreach(var configItem in handlerConfiguration.Where(c => !c.Disabled).OrderBy(h => h.Order))
             {
-                eventSubscription.AddHandler(await EventHandlerFactory.LoadAsync(eventSubscription, configItem));
+                eventSubscription.AddHandler(await EventHandlerFactory.LoadAsync(eventSubscription, configItem).ConfigureAwait(false));
             }
 
         }

@@ -2,9 +2,7 @@
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
-    public interface ISubscriberQueueRepository
+    public interface ISubscriberQueueRepository: ISubscriberOwnedRepository<ISubscriberQueueDto>
     {
-        Task<ISubscriberQueueDto> GetAsync(long subscriberId, long queueId);
-        Task<ISubscriberQueueDto> UpsertAsync(ISubscriberQueueDto dto);
     }
 }

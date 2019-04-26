@@ -12,9 +12,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
     public class EventAggregator : EventHandlerBase, IEventHandler
     {
-        public EventAggregatorConfiguration Configuration { get; }
+        public IEventAggregatorDto Configuration { get; }
 
-        public EventAggregator(IEventSubscription subscription, long id, EventAggregatorConfiguration aggregatorConfiguration):
+        public EventAggregator(IEventSubscription subscription, long id, IEventAggregatorDto aggregatorConfiguration):
             base(subscription, id)
         {
             Configuration = aggregatorConfiguration;

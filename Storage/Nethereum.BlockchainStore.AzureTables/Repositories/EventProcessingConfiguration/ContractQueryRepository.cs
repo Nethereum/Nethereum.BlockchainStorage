@@ -1,26 +1,17 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguration;
-using System;
-using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
-    public class ContractQueryRepository : AzureTableRepository<ContractQueryEntity>, IContractQueryRepository
+    public class ContractQueryRepository : OneToOneRepository<IContractQueryDto, ContractQueryEntity>, IContractQueryRepository
     {
         public ContractQueryRepository(CloudTable table) : base(table)
         {
         }
 
-        public async Task<IContractQueryDto> GetContractQueryAsync(long eventHandlerId)
+        protected override ContractQueryEntity Map(IContractQueryDto dto)
         {
-            return await GetAsync(eventHandlerId.ToString(), eventHandlerId.ToString());
-        }
-
-        public static ContractQueryEntity Map(IContractQueryDto dto)
-        {
-            if(dto is ContractQueryEntity e) return e;
-
             return new ContractQueryEntity
             {
                 Id = dto.EventHandlerId,
@@ -34,12 +25,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
                 FunctionSignature = dto.FunctionSignature,
                 SubscriptionStateOutputName = dto.SubscriptionStateOutputName
             };
-        }
-
-        public async Task<IContractQueryDto> UpsertAsync(IContractQueryDto dto)
-        {
-            var entity = Map(dto);
-            return await base.UpsertAsync(entity) as IContractQueryDto;
         }
     }
 }

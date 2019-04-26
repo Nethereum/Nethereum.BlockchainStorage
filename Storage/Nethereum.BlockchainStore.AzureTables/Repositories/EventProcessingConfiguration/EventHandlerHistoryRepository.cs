@@ -5,16 +5,14 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
-    public class EventHandlerHistoryRepository : AzureTableRepository<EventHandlerHistoryEntity>, IEventHandlerHistoryRepository
+    public class EventHandlerHistoryRepository : OwnedRepository<IEventHandlerHistoryDto, EventHandlerHistoryEntity>, IEventHandlerHistoryRepository
     {
         public EventHandlerHistoryRepository(CloudTable table) : base(table)
         {
         }
 
-        public static EventHandlerHistoryEntity Map(IEventHandlerHistoryDto dto)
+        protected override EventHandlerHistoryEntity Map(IEventHandlerHistoryDto dto)
         {
-            if(dto is EventHandlerHistoryEntity e) return e;
-
             return new EventHandlerHistoryEntity
             {
                 EventHandlerId = dto.EventHandlerId,
@@ -24,25 +22,15 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             };
         }
 
-        public async Task<IEventHandlerHistoryDto> AddAsync(IEventHandlerHistoryDto dto) 
-        {
-            var entity = Map(dto);
-            return await base.UpsertAsync(entity) as IEventHandlerHistoryDto;
-        }
-
         public async Task<bool> ContainsAsync(long eventHandlerId, string eventKey)
         {
-            return await GetAsync(eventHandlerId, eventKey) != null;
+            return await GetAsync(eventHandlerId, eventKey).ConfigureAwait(false) != null;
         }
 
         public async Task<IEventHandlerHistoryDto> GetAsync(long eventHandlerId, string eventKey)
         {
-            return await GetAsync(eventHandlerId.ToString(), eventKey);
+            return await GetAsync(eventHandlerId.ToString(), eventKey).ConfigureAwait(false);
         }
 
-        public async Task<IEventHandlerHistoryDto[]> GetAsync(long eventHandlerId)
-        {
-            return await GetManyAsync(eventHandlerId.ToString());
-        }
     }
 }

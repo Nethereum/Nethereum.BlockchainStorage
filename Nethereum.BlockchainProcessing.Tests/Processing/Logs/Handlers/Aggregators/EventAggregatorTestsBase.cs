@@ -8,11 +8,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
 {
     public abstract class EventAggregatorTestsBase
     {
-        protected EventAggregatorConfiguration AggregatorConfig;
+        protected IEventAggregatorDto AggregatorConfig;
         protected EventSubscriptionStateDto EventSubscriptionState;
         protected EventAggregator Aggregator;
         protected Mock<IEventSubscription> MockEventSubscription;
-        protected abstract EventAggregatorConfiguration CreateConfiguration();
+        protected abstract IEventAggregatorDto CreateConfiguration();
 
         public EventAggregatorTestsBase()
         {

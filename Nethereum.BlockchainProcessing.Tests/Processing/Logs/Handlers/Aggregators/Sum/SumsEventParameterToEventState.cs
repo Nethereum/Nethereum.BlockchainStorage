@@ -15,9 +15,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         private const string OUTPUT_NAME = "RunningTotal";
         private const int EVENT_PARAMETER_NUMBER = 3;
 
-        protected override EventAggregatorConfiguration CreateConfiguration()
+        protected override IEventAggregatorDto CreateConfiguration()
         {
-            return new EventAggregatorConfiguration
+            return new EventAggregatorDto
             {
                 Operation = AggregatorOperation.Sum,
                 Source = AggregatorSource.EventParameter,

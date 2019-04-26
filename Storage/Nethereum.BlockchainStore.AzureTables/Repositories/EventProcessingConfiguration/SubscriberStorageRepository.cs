@@ -4,17 +4,16 @@ using Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguratio
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
-    public class SubscriberSearchIndexRepository :
-        SubscriberOwnedRepository<ISubscriberSearchIndexDto, SubscriberSearchIndexEntity>,
-        ISubscriberSearchIndexRepository
+    public class SubscriberStorageRepository :
+        SubscriberOwnedRepository<ISubscriberStorageDto, SubscriberStorageEntity>, ISubscriberStorageRepository
     {
-        public SubscriberSearchIndexRepository(CloudTable table) : base(table)
+        public SubscriberStorageRepository(CloudTable table) : base(table)
         {
         }
 
-        protected override SubscriberSearchIndexEntity Map(ISubscriberSearchIndexDto dto)
+        protected override SubscriberStorageEntity Map(ISubscriberStorageDto dto)
         {
-            return new SubscriberSearchIndexEntity
+            return new SubscriberStorageEntity
             {
                 Disabled = dto.Disabled,
                 Id = dto.Id,

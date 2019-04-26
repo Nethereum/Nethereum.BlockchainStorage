@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
                 SetStateValues(subscription, decodedEvent);
 
-                await InvokeHandlers(subscription, decodedEvent);
+                await InvokeHandlers(subscription, decodedEvent).ConfigureAwait(false);
             }
         }
 
@@ -39,7 +39,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             {
                 if(History != null)
                 { 
-                    if (await History.ContainsEventHandlerHistoryAsync(handler.Id, decodedEvent.Key))
+                    if (await History.ContainsEventHandlerHistoryAsync(handler.Id, decodedEvent.Key).ConfigureAwait(false))
                     {
                         continue;
                     }
@@ -47,11 +47,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
                 decodedEvent.State["HandlerInvocations"] = 1 + (int)decodedEvent.State["HandlerInvocations"];
 
-                var invokeNextHandler = await handler.HandleAsync(decodedEvent);
+                var invokeNextHandler = await handler.HandleAsync(decodedEvent).ConfigureAwait(false);
 
                 if(History != null)
                 {
-                    await WriteToHistoryAsync(decodedEvent, handler);
+                    await WriteToHistoryAsync(decodedEvent, handler).ConfigureAwait(false);
                 }
 
                 if (!invokeNextHandler)

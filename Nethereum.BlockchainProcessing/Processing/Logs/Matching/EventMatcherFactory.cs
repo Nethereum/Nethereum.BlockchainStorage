@@ -10,25 +10,33 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
     {
         private readonly ABIDeserialiser _abiDeserializer = new ABIDeserialiser();
 
-        public EventMatcherFactory(IEventProcessingConfigurationRepository configurationRepository)
+        public EventMatcherFactory(
+            IParameterConditionRepository parameterConditionRepository,
+            IEventSubscriptionAddressRepository eventSubscriptionAddressRepository,
+            ISubscriberContractRepository subscriberContractRepository)
         {
-            _repo = configurationRepository;
+            ParameterConditionRepository = parameterConditionRepository;
+            EventSubscriptionAddressRepository = eventSubscriptionAddressRepository;
+            SubscriberContractRepository = subscriberContractRepository;
         }
 
         private IEventProcessingConfigurationRepository _repo { get; }
+        public IParameterConditionRepository ParameterConditionRepository { get; }
+        public IEventSubscriptionAddressRepository EventSubscriptionAddressRepository { get; }
+        public ISubscriberContractRepository SubscriberContractRepository { get; }
 
         public async Task<IEventMatcher> LoadAsync(IEventSubscriptionDto eventSubscription)
         {
-            var eventAbis = await GetEventAbisAsync(eventSubscription);
-            var addressMatcher = await CreateEventAddressMatcherAsync(eventSubscription);
-            var parameterMatcher = await CreateParameterMatcherAsync(eventSubscription);
+            var eventAbis = await GetEventAbisAsync(eventSubscription).ConfigureAwait(false);
+            var addressMatcher = await CreateEventAddressMatcherAsync(eventSubscription).ConfigureAwait(false);
+            var parameterMatcher = await CreateParameterMatcherAsync(eventSubscription).ConfigureAwait(false);
             var matcher = new EventMatcher(eventAbis, addressMatcher, parameterMatcher);
             return matcher;
         }
 
         private async Task<EventParameterMatcher> CreateParameterMatcherAsync(IEventSubscriptionDto eventSubscription)
         {
-            var parameterConditionDtos = await _repo.GetParameterConditionsAsync(eventSubscription.Id);
+            var parameterConditionDtos = await ParameterConditionRepository.GetManyAsync(eventSubscription.Id).ConfigureAwait(false);
             var parameterConditions = parameterConditionDtos.Select(c => ParameterCondition.Create(c.ParameterOrder, c.Operator, c.Value));
             var parameterMatcher = new EventParameterMatcher(parameterConditions);
             return parameterMatcher;
@@ -36,7 +44,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
 
         private async Task<EventAddressMatcher> CreateEventAddressMatcherAsync(IEventSubscriptionDto eventSubscription)
         {
-            var addressDtos = await _repo.GetEventSubscriptionAddressesAsync(eventSubscription.Id);
+            var addressDtos = await EventSubscriptionAddressRepository.GetManyAsync(eventSubscription.Id).ConfigureAwait(false);
             var addressMatcher = new EventAddressMatcher(addressDtos.Select(a => a.Address));
             return addressMatcher;
         }
@@ -50,7 +58,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Matching
                 return null;
             }
 
-            var contractDto = await _repo.GetSubscriberContractAsync(eventSubscription.SubscriberId, eventSubscription.ContractId.Value);
+            var contractDto = await SubscriberContractRepository.GetAsync(eventSubscription.SubscriberId, eventSubscription.ContractId.Value).ConfigureAwait(false);
             ContractABI contractAbi = contractDto.Abi == null ? null : _abiDeserializer.DeserialiseContract(contractDto.Abi);
 
             if(contractAbi == null) return null;

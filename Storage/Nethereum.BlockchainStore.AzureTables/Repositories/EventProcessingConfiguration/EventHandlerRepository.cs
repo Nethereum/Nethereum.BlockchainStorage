@@ -1,21 +1,17 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguration;
-using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
-    public class EventHandlerRepository : AzureTableRepository<EventHandlerEntity>, IEventHandlerRepository
+    public class EventHandlerRepository : OwnedRepository<IEventHandlerDto, EventHandlerEntity>, IEventHandlerRepository
     {
         public EventHandlerRepository(CloudTable table) : base(table)
         {
         }
 
-        public static EventHandlerEntity Map(IEventHandlerDto dto)
+        protected override EventHandlerEntity Map(IEventHandlerDto dto)
         {
-            if (dto is EventHandlerEntity entity) return entity;
-
             return new EventHandlerEntity
             {
                 Id = dto.Id,
@@ -27,17 +23,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
                 SubscriberRepositoryId = dto.SubscriberRepositoryId,
                 SubscriberSearchIndexId = dto.SubscriberSearchIndexId
             };
-        }
-
-        public async Task<IEventHandlerDto[]> GetEventHandlersAsync(long eventSubscriptionId)
-        {
-            return await GetManyAsync(eventSubscriptionId.ToString());
-        }
-
-        public async Task<IEventHandlerDto> UpsertAsync(IEventHandlerDto dto)
-        {
-            var entity = Map(dto);
-            return await base.UpsertAsync(entity) as IEventHandlerDto;
         }
     }
 }

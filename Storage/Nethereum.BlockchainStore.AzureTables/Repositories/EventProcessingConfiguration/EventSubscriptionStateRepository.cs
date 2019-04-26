@@ -1,21 +1,19 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
-using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainStore.AzureTables.Entities.EventProcessingConfiguration;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration
 {
-    public class EventSubscriptionStateRepository : AzureTableRepository<EventSubscriptionStateEntity>, IEventSubscriptionStateRepository
+    public class EventSubscriptionStateRepository : OneToOneRepository<IEventSubscriptionStateDto, EventSubscriptionStateEntity>, IEventSubscriptionStateRepository
     {
         public EventSubscriptionStateRepository(CloudTable table) : base(table)
         {
         }
 
-        public async Task<IEventSubscriptionStateDto> GetOrCreateEventSubscriptionStateAsync(long eventSubscriptionId)
+        public override async Task<IEventSubscriptionStateDto> GetAsync(long eventSubscriptionId)
         {
-            var existingState = await GetAsync(eventSubscriptionId.ToString(), eventSubscriptionId.ToString());
+            var existingState = await GetAsync(eventSubscriptionId.ToString(), eventSubscriptionId.ToString()).ConfigureAwait(false);
             if(existingState == null)
             {
                 existingState = new EventSubscriptionStateEntity
@@ -27,25 +25,14 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConf
             return existingState;
         }
 
-        public static EventSubscriptionStateEntity Map(IEventSubscriptionStateDto dto)
+        protected override  EventSubscriptionStateEntity Map(IEventSubscriptionStateDto dto)
         {
-            if(dto is EventSubscriptionStateEntity e) return e;
-
             return new EventSubscriptionStateEntity
             {
                 EventSubscriptionId = dto.EventSubscriptionId,
                 Id = dto.Id == 0 ? dto.EventSubscriptionId : dto.Id,
                 Values = dto.Values
             };
-        }
-
-        public async Task UpsertAsync(IEnumerable<IEventSubscriptionStateDto> state)
-        {
-            foreach(var item in state)
-            {
-                var entity = Map(item);
-                await base.UpsertAsync(entity);
-            }
         }
     }
 }

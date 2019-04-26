@@ -15,9 +15,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers.Aggregat
         private const string OUTPUT_NAME = "CalculatedValues";
         private const string INPUT_NAME = "CalculatedValue";
 
-        protected override EventAggregatorConfiguration CreateConfiguration()
+        protected override IEventAggregatorDto CreateConfiguration()
         {
-            return new EventAggregatorConfiguration
+            return new EventAggregatorDto
             {
                 Operation = AggregatorOperation.AddToList,
                 Source = AggregatorSource.EventState,
