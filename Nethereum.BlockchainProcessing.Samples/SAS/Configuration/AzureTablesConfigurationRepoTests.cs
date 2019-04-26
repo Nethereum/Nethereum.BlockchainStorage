@@ -369,16 +369,16 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS.Configuration
             await Fixture.ConfigRepo.ContractQueryParameters.UpsertAsync(queryParam1);
             await Fixture.ConfigRepo.ContractQueryParameters.UpsertAsync(queryParam2);
 
-            var configFromRepo = await Fixture.ConfigRepo.EventContractQueries.GetContractQueryConfigurationAsync(contractDto.SubscriberId, contractQuery.EventHandlerId);
+            var configFromRepo = await Fixture.ConfigRepo.EventContractQueries.GetAsync(contractDto.SubscriberId, contractQuery.EventHandlerId);
 
-            Assert.Equal(contractDto.Abi, configFromRepo.ContractABI);
-            Assert.Equal(contractQuery.ContractAddress, configFromRepo.ContractAddress);
-            Assert.Equal(contractQuery.ContractAddressParameterNumber, configFromRepo.ContractAddressParameterNumber);
-            Assert.Equal(contractQuery.ContractAddressSource, configFromRepo.ContractAddressSource);
-            Assert.Equal(contractQuery.ContractAddressStateVariableName, configFromRepo.ContractAddressStateVariableName);
-            Assert.Equal(contractQuery.EventStateOutputName, configFromRepo.EventStateOutputName);
-            Assert.Equal(contractQuery.FunctionSignature, configFromRepo.FunctionSignature);
-            Assert.Equal(contractQuery.SubscriptionStateOutputName, configFromRepo.SubscriptionStateOutputName);
+            Assert.Equal(contractDto.Abi, configFromRepo.Contract.Abi);
+            Assert.Equal(contractQuery.ContractAddress, configFromRepo.Query.ContractAddress);
+            Assert.Equal(contractQuery.ContractAddressParameterNumber, configFromRepo.Query.ContractAddressParameterNumber);
+            Assert.Equal(contractQuery.ContractAddressSource, configFromRepo.Query.ContractAddressSource);
+            Assert.Equal(contractQuery.ContractAddressStateVariableName, configFromRepo.Query.ContractAddressStateVariableName);
+            Assert.Equal(contractQuery.EventStateOutputName, configFromRepo.Query.EventStateOutputName);
+            Assert.Equal(contractQuery.FunctionSignature, configFromRepo.Query.FunctionSignature);
+            Assert.Equal(contractQuery.SubscriptionStateOutputName, configFromRepo.Query.SubscriptionStateOutputName);
 
             Assert.Equal(queryParameterDtos.Length, configFromRepo.Parameters.Length);
 

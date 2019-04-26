@@ -20,11 +20,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
 
         public ContractQueryMultiFunctionInputTests():base(new ContractQueryConfiguration
             {
-                ContractABI = TestData.Contracts.StandardContract.Abi,
-                ContractAddressSource = ContractAddressSource.Static,
+                Contract = new SubscriberContractDto{Abi = TestData.Contracts.StandardContract.Abi },
+                Query = new ContractQueryDto{ ContractAddressSource = ContractAddressSource.Static,
                 ContractAddress = CONTRACT_ADDRESS,
                 FunctionSignature = SHA3_FUNCTION_SIGNATURES.APPROVE,
-                EventStateOutputName = EVENT_STATE_QUERY_OUTPUT_NAME
+                EventStateOutputName = EVENT_STATE_QUERY_OUTPUT_NAME }
         })
         {
         }
@@ -34,11 +34,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1,
                     Source = EventValueSource.Static,
                     Value = APPROVE_ADDRESS},
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 2,
                     Source = EventValueSource.Static,
                     Value = APPROVE_AMOUNT}
@@ -55,11 +55,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.EventState, 
                     EventStateName = "APPROVE_ADDRESS"},
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 2, 
                     Source = EventValueSource.EventState, 
                     EventStateName = "APPROVE_AMOUNT"}
@@ -79,11 +79,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.EventParameters, 
                     EventParameterNumber = 1},
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 2, 
                     Source = EventValueSource.EventParameters, 
                     EventParameterNumber = 2}
@@ -107,11 +107,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.Static,
                     Value = APPROVE_ADDRESS},
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 2, 
                     Source = EventValueSource.EventParameters, 
                     EventParameterNumber = 2}

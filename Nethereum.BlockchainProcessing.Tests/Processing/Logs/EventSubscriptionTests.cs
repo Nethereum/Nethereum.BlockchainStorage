@@ -107,7 +107,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public void FromEventAbis_SetsDefaultDependencies()
         {
             var state = new EventSubscriptionStateDto();
-            var eventHandlerHistoryDb = new Mock<IEventHandlerHistory>().Object;
+            var eventHandlerHistoryDb = new Mock<IEventHandlerHistoryRepository>().Object;
             var contractAddresses = new []{ "0x243e72b69141f6af525a9a5fd939668ee9f2b354"};
             var parameterConditions = new[] {ParameterCondition.Create(1, ParameterConditionOperator.Equals, "x")};
 

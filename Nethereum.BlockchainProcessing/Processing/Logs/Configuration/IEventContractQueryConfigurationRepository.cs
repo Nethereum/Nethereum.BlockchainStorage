@@ -5,6 +5,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 {
     public interface IEventContractQueryConfigurationRepository
     {
-        Task<ContractQueryConfiguration> GetContractQueryConfigurationAsync(long subscriberId, long eventHandlerId);
+        Task<ContractQueryConfiguration> GetAsync(long subscriberId, long eventHandlerId);
     }
 }

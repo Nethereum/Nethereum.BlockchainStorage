@@ -7,7 +7,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
     {
         public EventContractQueryConfigurationRepository(
             IContractQueryRepository queryRepo,
-            ISubscriberOwnedRepository<ISubscriberContractDto> contractRepo, 
+            ISubscriberContractRepository contractRepo, 
             IContractQueryParameterRepository parameterRepo)
         {
             QueryRepo = queryRepo;
@@ -16,13 +16,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         }
 
         public IContractQueryRepository QueryRepo { get; }
-        public ISubscriberOwnedRepository<ISubscriberContractDto> ContractRepo { get; }
+        public ISubscriberContractRepository ContractRepo { get; }
         public IContractQueryParameterRepository ParameterRepo { get; }
 
-        public async Task<ContractQueryConfiguration> GetContractQueryConfigurationAsync(long subscriberId, long eventHandlerId)
+        public async Task<ContractQueryConfiguration> GetAsync(long subscriberId, long eventHandlerId)
         {
             return await QueryRepo.LoadContractQueryConfiguration(
-                subscriberId, eventHandlerId, ContractRepo, ParameterRepo);
+                subscriberId, eventHandlerId, ContractRepo, ParameterRepo).ConfigureAwait(false);
         }
     }
 }

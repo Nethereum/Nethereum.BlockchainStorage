@@ -11,12 +11,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public class EventHandlerManager : IEventHandlerManager
     {
         public EventHandlerManager(
-            IEventHandlerHistory eventHandlerHistory = null)
+            IEventHandlerHistoryRepository eventHandlerHistory = null)
         {
             History = eventHandlerHistory;
         }
 
-        public IEventHandlerHistory History { get; }
+        public IEventHandlerHistoryRepository History { get; }
 
         public async Task HandleAsync(IEventSubscription subscription, EventABI[] abis, params FilterLog[] eventLogs)
         {
@@ -33,17 +33,22 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             }
         }
 
+        private async Task<bool> IsDuplicate(IEventHandler handler, DecodedEvent decodedEvent)
+        {
+            if (History is null) return false;
+            
+            return await History.ContainsAsync(handler.Id, decodedEvent.Key).ConfigureAwait(false);
+        }
+
         private async Task InvokeHandlers(IEventSubscription subscription, DecodedEvent decodedEvent)
         {
             foreach (var handler in subscription.EventHandlers)
             {
-                if(History != null)
-                { 
-                    if (await History.ContainsEventHandlerHistoryAsync(handler.Id, decodedEvent.Key).ConfigureAwait(false))
-                    {
-                        continue;
-                    }
+                if(await IsDuplicate(handler, decodedEvent).ConfigureAwait(false)) 
+                {
+                    continue;
                 }
+
 
                 decodedEvent.State["HandlerInvocations"] = 1 + (int)decodedEvent.State["HandlerInvocations"];
 
@@ -71,7 +76,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 SubscriberId = handler.Subscription?.SubscriberId ?? 0
             };
 
-            await History.AddAsync(history);
+            await History.UpsertAsync(history);
         }
 
         private void SetStateValues(IEventSubscription subscription, DecodedEvent decodedEvent)

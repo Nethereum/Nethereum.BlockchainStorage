@@ -71,7 +71,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         {
             var matcher = await EventMatcherFactory.LoadAsync(subscriptionConfig).ConfigureAwait(false);
             var state = await ConfigurationRepository.EventSubscriptionStates.GetAsync(subscriptionConfig.Id).ConfigureAwait(false);
-            var handlerCoOrdinator = new EventHandlerManager(ConfigurationRepository.EventHandlerHistory);
+            var handlerCoOrdinator = new EventHandlerManager(ConfigurationRepository.EventHandlerHistoryRepo);
 
             var subscription = new EventSubscription(
                 subscriptionConfig.Id, subscriptionConfig.SubscriberId, matcher, handlerCoOrdinator, state);

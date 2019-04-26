@@ -41,7 +41,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
             SubscriberStorage = subscriberStorageRepository;
 
             EventContractQueries = new EventContractQueryConfigurationRepository(ContractQueries, SubscriberContracts, ContractQueryParameters);
-            EventHandlerHistory = new EventHandlerHistory(EventHandlerHistoryRepo);
         }
 
         public ISubscriberRepository Subscribers { get; }
@@ -63,8 +62,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         public IEventRuleRepository EventRules { get; }
 
         public IEventContractQueryConfigurationRepository EventContractQueries {get; }
-
-        public IEventHandlerHistory EventHandlerHistory {get; }
 
     }
 }

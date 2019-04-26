@@ -122,11 +122,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
 
     public interface IEventSubscriptionStateDto : IDbRow
     {
-
-        Dictionary<string, object> Values { get; set; }
-
         long EventSubscriptionId { get; set; }
-
+        Dictionary<string, object> Values { get; set; }
     }
 
     public class EventSubscriptionStateDto : DbRow, IEventSubscriptionStateDto

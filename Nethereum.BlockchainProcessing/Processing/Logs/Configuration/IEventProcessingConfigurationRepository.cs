@@ -11,7 +11,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         ISubscriberSearchIndexRepository SubscriberSearchIndexes { get; }
         IEventSubscriptionStateRepository EventSubscriptionStates { get;}
         IEventContractQueryConfigurationRepository EventContractQueries { get;}
-        IEventHandlerHistory EventHandlerHistory { get;}
         IEventRuleRepository EventRules { get;}
         IEventAggregatorRepository EventAggregators { get;}
         IEventSubscriptionAddressRepository EventSubscriptionAddresses { get;}

@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             long subscriberId = 0, 
             EventSubscriptionStateDto state = null,
             string[] contractAddressesToMatch = null,
-            IEventHandlerHistory eventHandlerHistoryDb = null,
+            IEventHandlerHistoryRepository eventHandlerHistoryDb = null,
             IEnumerable<IParameterCondition> parameterConditions = null)
             :base(
                  id, 
@@ -44,7 +44,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             long id = 0, 
             long subscriberId = 0,
             IEventSubscriptionStateDto state = null,
-            IEventHandlerHistory eventHandlerHistoryDb = null):
+            IEventHandlerHistoryRepository eventHandlerHistoryDb = null):
             this(
                  id,
                  subscriberId,

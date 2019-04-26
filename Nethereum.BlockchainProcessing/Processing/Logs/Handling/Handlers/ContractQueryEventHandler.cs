@@ -28,16 +28,16 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
             var functionInputs = BuildFunctionInputs(decodedEvent);
 
-            var result = await Proxy.Query(contractAddress, Configuration.ContractABI, Configuration.FunctionSignature, functionInputs);
+            var result = await Proxy.Query(contractAddress, Configuration.Contract.Abi, Configuration.Query.FunctionSignature, functionInputs);
 
-            if(!string.IsNullOrEmpty(Configuration.EventStateOutputName))
+            if(!string.IsNullOrEmpty(Configuration.Query.EventStateOutputName))
             {
-                decodedEvent.State[Configuration.EventStateOutputName] = result;
+                decodedEvent.State[Configuration.Query.EventStateOutputName] = result;
             }
 
-            if (!string.IsNullOrEmpty(Configuration.SubscriptionStateOutputName))
+            if (!string.IsNullOrEmpty(Configuration.Query.SubscriptionStateOutputName))
             {
-                Subscription.State.Set(Configuration.SubscriptionStateOutputName, result);
+                Subscription.State.Set(Configuration.Query.SubscriptionStateOutputName, result);
             }
 
             return true;
@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
             return parameterValues;
         }
 
-        private object GetFunctionInputParameterValue(ContractQueryParameter functionParameter, DecodedEvent decodedEvent)
+        private object GetFunctionInputParameterValue(IContractQueryParameterDto functionParameter, DecodedEvent decodedEvent)
         {
             switch (functionParameter.Source)
             {
@@ -78,7 +78,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
             }
         }
 
-        private static object GetFunctionInputFromMetadata(ContractQueryParameter functionParameter, DecodedEvent decodedEvent)
+        private static object GetFunctionInputFromMetadata(IContractQueryParameterDto functionParameter, DecodedEvent decodedEvent)
         {
             if(string.IsNullOrEmpty(functionParameter.EventStateName)) return null;
 
@@ -86,7 +86,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
                                     decodedEvent.State[functionParameter.EventStateName] : null;
         }
 
-        private static object GetFunctionInputFromEventParameter(ContractQueryParameter functionParameter, DecodedEvent decodedEvent)
+        private static object GetFunctionInputFromEventParameter(IContractQueryParameterDto functionParameter, DecodedEvent decodedEvent)
         {
             if(functionParameter.EventParameterNumber < 1) return null;
 
@@ -95,10 +95,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
         private string GetContractAddress(DecodedEvent decodedEvent)
         {
-            switch (Configuration.ContractAddressSource)
+            switch (Configuration.Query.ContractAddressSource)
             {
                 case ContractAddressSource.Static:
-                    return Configuration.ContractAddress;
+                    return Configuration.Query.ContractAddress;
                 case ContractAddressSource.EventAddress:
                     return decodedEvent.Log.Address;
                 case ContractAddressSource.EventParameter:
@@ -117,9 +117,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
         private string GetAddressFromEventParameter(DecodedEvent decodedEvent)
         {
-            if(Configuration.ContractAddressParameterNumber > 0)
+            if(Configuration.Query.ContractAddressParameterNumber > 0)
             {
-                var matchingEventParameter = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == Configuration.ContractAddressParameterNumber);
+                var matchingEventParameter = decodedEvent.Event.FirstOrDefault(p => p.Parameter.Order == Configuration.Query.ContractAddressParameterNumber);
                 if(matchingEventParameter != null && matchingEventParameter.Result is string a)
                 {
                     return a;
@@ -130,10 +130,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
         private string GetAddressFromEventMetaData(DecodedEvent decodedEvent)
         {
-            if(!string.IsNullOrEmpty(Configuration.ContractAddressStateVariableName))
+            if(!string.IsNullOrEmpty(Configuration.Query.ContractAddressStateVariableName))
             {
-                var addressFromMetaData = decodedEvent.State.ContainsKey(Configuration.ContractAddressStateVariableName) ? 
-                    decodedEvent.State[Configuration.ContractAddressStateVariableName] : null;
+                var addressFromMetaData = decodedEvent.State.ContainsKey(Configuration.Query.ContractAddressStateVariableName) ? 
+                    decodedEvent.State[Configuration.Query.ContractAddressStateVariableName] : null;
 
                 if(addressFromMetaData is string mS)
                 {

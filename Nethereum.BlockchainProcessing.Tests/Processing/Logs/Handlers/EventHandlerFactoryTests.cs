@@ -108,7 +108,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
             var contractQueryConfig = new ContractQueryConfiguration();
 
             _contractQueryFactory
-                .Setup(f => f.GetContractQueryConfigurationAsync(_mockEventSubscription.Object.SubscriberId, config.Id))
+                .Setup(f => f.GetAsync(_mockEventSubscription.Object.SubscriberId, config.Id))
                 .ReturnsAsync(contractQueryConfig);
 
             var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);

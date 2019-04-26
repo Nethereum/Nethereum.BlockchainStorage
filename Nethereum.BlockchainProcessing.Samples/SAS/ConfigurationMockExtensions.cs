@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var EventSubscriptionStateRepository = new Mock<IEventSubscriptionStateRepository>();
             var EventContractQueryConfigurationRepository = new Mock<IEventContractQueryConfigurationRepository>();
 
-            var EventHandlerHistory = new Mock<IEventHandlerHistory>();
+            var EventHandlerHistory = new Mock<IEventHandlerHistoryRepository>();
             var EventAggregatorRepository = new Mock<IEventAggregatorRepository>();
             var EventRuleRepository = new Mock<IEventRuleRepository>();
             var subscriberStorageRepository = new Mock<ISubscriberStorageRepository>();
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             configDb.Setup(c => c.EventSubscriptionStates).Returns(EventSubscriptionStateRepository.Object);
             configDb.Setup(c => c.EventContractQueries).Returns(EventContractQueryConfigurationRepository.Object);
             configDb.Setup(c => c.EventAggregators).Returns(EventAggregatorRepository.Object);
-            configDb.Setup(c => c.EventHandlerHistory).Returns(EventHandlerHistory.Object);
+            configDb.Setup(c => c.EventHandlerHistoryRepo).Returns(EventHandlerHistory.Object);
             configDb.Setup(c => c.EventRules).Returns(EventRuleRepository.Object);
             configDb.Setup(c => c.SubscriberStorage).Returns(subscriberStorageRepository.Object);
             configDb.Setup(c => c.SubscriberSearchIndexes).Returns(subscriberSearchIndexRepository.Object);
@@ -62,14 +62,14 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             configDb.Setup(c => c.ParameterConditions).Returns(parameterConditionsRepository.Object);
             configDb.Setup(c => c.EventHandlers).Returns(eventHandlerRepository.Object);
 
-            EventHandlerHistory.Setup(h => h.AddAsync(It.IsAny<IEventHandlerHistoryDto>()))
+            EventHandlerHistory.Setup(h => h.UpsertAsync(It.IsAny<IEventHandlerHistoryDto>()))
                 .Returns<IEventHandlerHistoryDto>((history) =>
                 {
                     repo.Add(history);
-                    return Task.CompletedTask;
+                    return Task.FromResult(history);
                 });
 
-            EventHandlerHistory.Setup(h => h.ContainsEventHandlerHistoryAsync(It.IsAny<long>(), It.IsAny<string>()))
+            EventHandlerHistory.Setup(h => h.ContainsAsync(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns<long, string>((eventHandlerId, eventKey) =>
                 {
                     var exists = repo.EventHandlerHistories.Any(h => 
@@ -131,7 +131,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 .Returns(Task.CompletedTask);
 
             EventContractQueryConfigurationRepository
-                .Setup(d => d.GetContractQueryConfigurationAsync(It.IsAny<long>(), It.IsAny<long>()))
+                .Setup(d => d.GetAsync(It.IsAny<long>(), It.IsAny<long>()))
                 .Returns<long, long>((subscriberId, eventHandlerId) =>
                 {
                     var contractQuery = repo.ContractQueries.FirstOrDefault(c => c.EventHandlerId == eventHandlerId);
@@ -204,26 +204,14 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             };
         }
 
-        private static ContractQueryConfiguration Map(ContractQueryDto contractQuery, SubscriberContractDto contract, IEnumerable<ContractQueryParameterDto> parameters)
+        private static ContractQueryConfiguration Map(
+            IContractQueryDto contractQuery, ISubscriberContractDto contract, IEnumerable<IContractQueryParameterDto> parameters)
         {
             return new ContractQueryConfiguration
             {
-                ContractABI = contract.Abi,
-                ContractAddress = contractQuery.ContractAddress,
-                ContractAddressParameterNumber = contractQuery.ContractAddressParameterNumber,
-                ContractAddressSource = contractQuery.ContractAddressSource,
-                ContractAddressStateVariableName = contractQuery.ContractAddressStateVariableName,
-                EventStateOutputName = contractQuery.EventStateOutputName,
-                FunctionSignature = contractQuery.FunctionSignature,
-                SubscriptionStateOutputName = contractQuery.SubscriptionStateOutputName,
-                Parameters = parameters.Select(p => new ContractQueryParameter
-                {
-                    Order = p.Order,
-                    EventParameterNumber = p.EventParameterNumber,
-                    EventStateName = p.EventStateName,
-                    Source = p.Source,
-                    Value = p.Value
-                }).ToArray()
+                Contract = contract,
+                Query = contractQuery,
+                Parameters = parameters.ToArray()
             };
         }
     }

@@ -13,10 +13,10 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
 
         public ContractQueryOutputTests():base(new ContractQueryConfiguration
             {
-                ContractABI = TestData.Contracts.StandardContract.Abi,
-                FunctionSignature = SHA3_FUNCTION_SIGNATURES.NAME,
+               Contract = new SubscriberContractDto{ Abi = TestData.Contracts.StandardContract.Abi },
+               Query = new ContractQueryDto{ FunctionSignature = SHA3_FUNCTION_SIGNATURES.NAME,
                 ContractAddressSource = ContractAddressSource.Static,
-                ContractAddress = CONTRACT_ADDRESS,
+                ContractAddress = CONTRACT_ADDRESS}
         })
         {
         }
@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         public async Task CanOutputResultToEventSubscriptionState()
         {
             const string STATE_NAME = "EIRC20_Name";
-            queryConfig.SubscriptionStateOutputName = STATE_NAME;
+            queryConfig.Query.SubscriptionStateOutputName = STATE_NAME;
 
             Assert.True(await contractQueryEventHandler.HandleAsync(decodedEvent));
 
@@ -36,7 +36,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         public async Task CanOutputResultToEventState()
         {
             const string STATE_NAME = "EIRC20_Name";
-            queryConfig.EventStateOutputName = STATE_NAME;
+            queryConfig.Query.EventStateOutputName = STATE_NAME;
 
             Assert.True(await contractQueryEventHandler.HandleAsync(decodedEvent));
 
@@ -49,8 +49,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             const string SUBSCRIPTION_STATE_NAME = "EIRC20_Name_1";
             const string EVENT_STATE_NAME = "EIRC20_Name_2";
 
-            queryConfig.EventStateOutputName = EVENT_STATE_NAME;
-            queryConfig.SubscriptionStateOutputName = SUBSCRIPTION_STATE_NAME;
+            queryConfig.Query.EventStateOutputName = EVENT_STATE_NAME;
+            queryConfig.Query.SubscriptionStateOutputName = SUBSCRIPTION_STATE_NAME;
 
             Assert.True(await contractQueryEventHandler.HandleAsync(decodedEvent));
 

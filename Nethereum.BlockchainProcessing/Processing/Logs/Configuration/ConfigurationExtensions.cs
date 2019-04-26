@@ -16,9 +16,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
             ISubscriberOwnedRepository<ISubscriberContractDto> subscriberContractsRepository,
             IContractQueryParameterRepository contractQueryParameterRepository)
         {
-            var queryConfig = await contractQueryRepository.GetAsync(eventHandlerId);
-            var contractConfig = await subscriberContractsRepository.GetAsync(subscriberId, queryConfig.ContractId);
-            var queryParameters = await contractQueryParameterRepository.GetManyAsync(queryConfig.Id);
+            var queryConfig = await contractQueryRepository.GetAsync(eventHandlerId).ConfigureAwait(false);
+            var contractConfig = await subscriberContractsRepository.GetAsync(subscriberId, queryConfig.ContractId).ConfigureAwait(false);
+            var queryParameters = await contractQueryParameterRepository.GetManyAsync(queryConfig.Id).ConfigureAwait(false);
 
             return queryConfig.ToContractQueryConfiguration(contractConfig, queryParameters);
         }
@@ -30,22 +30,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Configuration
         {
             return new ContractQueryConfiguration
             {
-                ContractAddress = queryConfig.ContractAddress,
-                ContractAddressParameterNumber = queryConfig.ContractAddressParameterNumber,
-                ContractAddressSource = queryConfig.ContractAddressSource,
-                ContractAddressStateVariableName = queryConfig.ContractAddressStateVariableName,
-                EventStateOutputName = queryConfig.EventStateOutputName,
-                FunctionSignature = queryConfig.FunctionSignature,
-                SubscriptionStateOutputName = queryConfig.SubscriptionStateOutputName,
-                ContractABI = contractConfig.Abi,
-                Parameters = queryParameters.Select(p => new ContractQueryParameter
-                {
-                    EventParameterNumber = p.EventParameterNumber,
-                    EventStateName = p.EventStateName,
-                    Order = p.Order,
-                    Source = p.Source,
-                    Value = p.Value
-                }).ToArray()
+                Contract = contractConfig,
+                Query = queryConfig,
+                Parameters = queryParameters
             };
         }
     }

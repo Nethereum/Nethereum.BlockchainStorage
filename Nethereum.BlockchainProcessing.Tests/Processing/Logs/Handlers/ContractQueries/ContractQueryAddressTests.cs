@@ -17,9 +17,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
 
         public ContractQueryAddressTests():base(new ContractQueryConfiguration
             {
-                ContractABI = TestData.Contracts.StandardContract.Abi,
-                FunctionSignature = SHA3_FUNCTION_SIGNATURES.NAME,
-                EventStateOutputName = "EIRC20_Name"
+                Contract = new SubscriberContractDto{Abi = TestData.Contracts.StandardContract.Abi },
+                Query = new ContractQueryDto{ FunctionSignature = SHA3_FUNCTION_SIGNATURES.NAME,
+                EventStateOutputName = "EIRC20_Name" }
             }){}
 
         [Fact]
@@ -27,8 +27,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
 
-            queryConfig.ContractAddressSource = ContractAddressSource.Static;
-            queryConfig.ContractAddress = CONTRACT_TO_QUERY;
+            queryConfig.Query.ContractAddressSource = ContractAddressSource.Static;
+            queryConfig.Query.ContractAddress = CONTRACT_TO_QUERY;
 
             await ExecuteAndVerify(CONTRACT_TO_QUERY);
         }
@@ -38,7 +38,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
 
-            queryConfig.ContractAddressSource = ContractAddressSource.EventAddress;
+            queryConfig.Query.ContractAddressSource = ContractAddressSource.EventAddress;
             decodedEvent.Log.Address = CONTRACT_TO_QUERY;
 
             await ExecuteAndVerify(CONTRACT_TO_QUERY);
@@ -50,8 +50,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
             const int PARAMETER_NUMBER = 1;
 
-            queryConfig.ContractAddressSource = ContractAddressSource.EventParameter;
-            queryConfig.ContractAddressParameterNumber = PARAMETER_NUMBER;
+            queryConfig.Query.ContractAddressSource = ContractAddressSource.EventParameter;
+            queryConfig.Query.ContractAddressParameterNumber = PARAMETER_NUMBER;
             decodedEvent.Event.Add(new ParameterOutput{
                 Result = CONTRACT_TO_QUERY, 
                 Parameter = new Parameter("address", PARAMETER_NUMBER)});
@@ -65,8 +65,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
             const string STATE_VARIABLE_NAME = "ContractAddressToQuery";
 
-            queryConfig.ContractAddressSource = ContractAddressSource.EventState;
-            queryConfig.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
+            queryConfig.Query.ContractAddressSource = ContractAddressSource.EventState;
+            queryConfig.Query.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
             decodedEvent.State[STATE_VARIABLE_NAME] = CONTRACT_TO_QUERY;
         
             await ExecuteAndVerify(CONTRACT_TO_QUERY);
@@ -78,8 +78,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
             const string STATE_VARIABLE_NAME = "ContractAddressToQuery";
 
-            queryConfig.ContractAddressSource = ContractAddressSource.TransactionFrom;
-            queryConfig.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
+            queryConfig.Query.ContractAddressSource = ContractAddressSource.TransactionFrom;
+            queryConfig.Query.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
             decodedEvent.Transaction = new RPC.Eth.DTOs.Transaction{From = CONTRACT_TO_QUERY };
         
             await ExecuteAndVerify(CONTRACT_TO_QUERY);
@@ -91,8 +91,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
             const string CONTRACT_TO_QUERY = CONTRACT_ADDRESS;
             const string STATE_VARIABLE_NAME = "ContractAddressToQuery";
 
-            queryConfig.ContractAddressSource = ContractAddressSource.TransactionTo;
-            queryConfig.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
+            queryConfig.Query.ContractAddressSource = ContractAddressSource.TransactionTo;
+            queryConfig.Query.ContractAddressStateVariableName = STATE_VARIABLE_NAME;
             decodedEvent.Transaction = new RPC.Eth.DTOs.Transaction{To = CONTRACT_TO_QUERY };
         
             await ExecuteAndVerify(CONTRACT_TO_QUERY);

@@ -18,11 +18,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
 
         public ContractQueryFunctionInputTests():base(new ContractQueryConfiguration
             {
-                ContractABI = TestData.Contracts.StandardContract.Abi,
+                Contract = new SubscriberContractDto{Abi = TestData.Contracts.StandardContract.Abi },
+                Query = new ContractQueryDto { 
                 ContractAddressSource = ContractAddressSource.Static,
                 ContractAddress = CONTRACT_ADDRESS,
                 FunctionSignature = SHA3_FUNCTION_SIGNATURES.BALANCE_OF,
-                EventStateOutputName = EVENT_STATE_QUERY_OUTPUT_NAME
+                EventStateOutputName = EVENT_STATE_QUERY_OUTPUT_NAME }
         })
         {
         }
@@ -32,7 +33,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.EventParameters, 
                     EventParameterNumber = 1}
@@ -55,7 +56,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.Static, 
                     Value = OWNER_ADDRESS}
@@ -71,7 +72,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
         {
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.EventAddress}
             };
@@ -90,7 +91,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.HandlerTests.Cont
 
             queryConfig.Parameters = new[]
             {
-                new ContractQueryParameter{
+                new ContractQueryParameterDto{
                     Order = 1, 
                     Source = EventValueSource.EventState, 
                     EventStateName = EVENT_STATE_KEY}

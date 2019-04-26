@@ -183,32 +183,32 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         }
 
 
-        private static Mock<IEventHandlerHistory> CreateMockHistoryDb(List<IEventHandlerHistoryDto> history = null)
+        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(List<IEventHandlerHistoryDto> history = null)
         {
             return CreateMockHistoryDb(out List<IEventHandlerHistoryDto> h);
         }
 
-        private static Mock<IEventHandlerHistory> CreateMockHistoryDb(out List<IEventHandlerHistoryDto> history)
+        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(out List<IEventHandlerHistoryDto> history)
         {
             history = new List<IEventHandlerHistoryDto>();
             return CreateMockHistoryDb(out List<IEventHandlerHistoryDto> h, history);
         }
 
-        private static Mock<IEventHandlerHistory> CreateMockHistoryDb(out List<IEventHandlerHistoryDto> historyList, List<IEventHandlerHistoryDto> history = null)
+        private static Mock<IEventHandlerHistoryRepository> CreateMockHistoryDb(out List<IEventHandlerHistoryDto> historyList, List<IEventHandlerHistoryDto> history = null)
         {
             history = history ?? new List<IEventHandlerHistoryDto>();
             historyList = history;
 
-            var mock = new Mock<IEventHandlerHistory>();
+            var mock = new Mock<IEventHandlerHistoryRepository>();
             mock
-                .Setup(m => m.AddAsync(It.IsAny<IEventHandlerHistoryDto>()))
+                .Setup(m => m.UpsertAsync(It.IsAny<IEventHandlerHistoryDto>()))
                 .Returns<IEventHandlerHistoryDto>((item) =>
                 {
                     history.Add(item);
-                    return Task.CompletedTask;
+                    return Task.FromResult(item);
                 });
             mock
-                .Setup(m => m.ContainsEventHandlerHistoryAsync(It.IsAny<long>(), It.IsAny<string>()))
+                .Setup(m => m.ContainsAsync(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns<long, string>((handlerId, eventKey) =>
                 {
                     var exists = history.Any(h => h.EventHandlerId == handlerId && h.EventKey == eventKey);
