@@ -77,7 +77,7 @@ Solidity Contract Excerpt
         /// However - it will work with any elastic search service
         /// Just configure the ElasticClient the way you need to
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Turned off to avoid AWS hosting costs")]
         public async Task StartHere()
         {
             ElasticClient elasticClient = CreateElasticClient();
