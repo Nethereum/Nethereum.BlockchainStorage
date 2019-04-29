@@ -108,7 +108,7 @@ Solidity Contract Excerpt
         /// <summary>
         /// Dictating exactly what you want stored in the index - using a custom mapper to translate to a search document
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Turned off to avoid AWS hosting costs")]
         public async Task StoringCustomSearchDocuments_UsingMapper()
         {
             ElasticClient elasticClient = CreateElasticClient();
