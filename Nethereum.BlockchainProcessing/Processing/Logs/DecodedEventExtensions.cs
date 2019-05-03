@@ -21,6 +21,17 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return decodedEvent;
         }
 
+        public static DecodedEvent ToDecodedEvent<TEvent>(this FilterLog log, EventABI abi) where TEvent: new()
+        {
+            var decodedParameterOutputs = abi.DecodeEventDefaultTopics(log);
+
+            var decodedDto = log.DecodeEvent<TEvent>();
+
+            var decodedEvent = new DecodedEvent(decodedParameterOutputs.Event, decodedParameterOutputs.Log, decodedDto.Event);
+            decodedEvent.AddStateData(abi, log);
+            return decodedEvent;
+        }
+
         private static void AddStateData(this DecodedEvent decodedEvent, EventABI abi, FilterLog log)
         {
             decodedEvent.State["EventAbiName"] = abi?.Name;

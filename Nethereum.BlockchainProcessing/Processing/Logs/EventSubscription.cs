@@ -4,11 +4,12 @@ using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class EventSubscription<TEvent> : EventSubscription
+    public class EventSubscription<TEvent> : EventSubscription where TEvent : new()
     {
         public EventSubscription(
             long id = 0, 
@@ -27,6 +28,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                  state ?? new EventSubscriptionStateDto(id))
         {
             
+        }
+
+        public override Task ProcessLogsAsync(params FilterLog[] eventLogs)
+        {
+            State.Increment("HandlerInvocations");
+            return HandlerManager.HandleAsync<TEvent>(this, Matcher.Abis.First(), eventLogs);
         }
     }
 
@@ -100,7 +107,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return Matcher.IsMatch(log);
         }
 
-        public Task ProcessLogsAsync(params FilterLog[] eventLogs)
+        public virtual Task ProcessLogsAsync(params FilterLog[] eventLogs)
         {
             State.Increment("HandlerInvocations");
             return HandlerManager.HandleAsync(this, Matcher.Abis, eventLogs);

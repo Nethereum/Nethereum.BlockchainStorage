@@ -18,6 +18,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 
         public IEventHandlerHistoryRepository History { get; }
 
+        public async Task HandleAsync<TEventDto>(IEventSubscription subscription, EventABI abi, params FilterLog[] eventLogs) where TEventDto : new()
+        {
+            foreach (var log in eventLogs)
+            {
+                if (!TryDecode<TEventDto>(log, abi, out DecodedEvent decodedEvent))
+                {
+                    continue;
+                }
+
+                SetStateValues(subscription, decodedEvent);
+
+                await InvokeHandlers(subscription, decodedEvent).ConfigureAwait(false);
+            }
+        }
+
         public async Task HandleAsync(IEventSubscription subscription, EventABI[] abis, params FilterLog[] eventLogs)
         {
             foreach(var log in eventLogs)
@@ -102,6 +117,23 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             try
             {
                 decodedEvent = log.ToDecodedEvent(abi);
+                return true;
+            }
+            catch (Exception x) when (x.Message.StartsWith("Number of indexes don't match the number of topics"))
+            {
+                return false;
+            }
+        }
+
+        private bool TryDecode<TEventDto>(FilterLog log, EventABI abi, out DecodedEvent decodedEvent) where TEventDto : new()
+        {
+            decodedEvent = null;
+
+            if (abi is null) return false;
+
+            try
+            {
+                decodedEvent = log.ToDecodedEvent<TEventDto>(abi);
                 return true;
             }
             catch (Exception x) when (x.Message.StartsWith("Number of indexes don't match the number of topics"))
