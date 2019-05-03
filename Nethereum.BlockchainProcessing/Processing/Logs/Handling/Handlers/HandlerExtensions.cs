@@ -2,11 +2,18 @@
 using System;
 using System.Linq;
 using Nethereum.Contracts;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
+using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 {
-    public static class QueueMessageExtensions 
+    public static class HandlerExtensions 
     {
+        public static void AddStorageHandler(this EventSubscription subscription, ILogHandler logHandler, long id = 0)
+        {
+            subscription.AddHandler(new StorageHandler(subscription, id, logHandler));
+        }
+
         public static void AddQueueHandler(
             this EventSubscription subscription, IQueue queue, IQueueMessageMapper mapper = null, long id = 0)
         {

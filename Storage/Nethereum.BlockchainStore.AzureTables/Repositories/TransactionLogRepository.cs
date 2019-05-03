@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Entities;
 using Nethereum.RPC.Eth.DTOs;
 using TransactionLog = Nethereum.BlockchainStore.AzureTables.Entities.TransactionLog;
+using Nethereum.BlockchainProcessing.Handlers;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class TransactionLogRepository : AzureTableRepository<TransactionLog>, ITransactionLogRepository
+    public class TransactionLogRepository : AzureTableRepository<TransactionLog>, ITransactionLogRepository, ILogHandler
     {
         public TransactionLogRepository(CloudTable table) : base(table)
         {
@@ -20,6 +21,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
             return results.Result as TransactionLog;
         }
+
+        public Task HandleAsync(FilterLog log) => UpsertAsync(log);
 
         public async Task UpsertAsync(FilterLog log)
         {

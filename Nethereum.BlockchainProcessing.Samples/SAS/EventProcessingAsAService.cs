@@ -46,7 +46,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString);
 
             // subscriber repository
-            var repositoryFactory = new AzureTablesSubscriberRepositoryFactory(azureStorageConnectionString, configurationRepository.SubscriberStorage);
+            var repositoryFactory = new AzureTablesSubscriberRepositoryFactory(azureStorageConnectionString);
 
             // load subscribers and event subscriptions
             var eventSubscriptionFactory = new EventSubscriptionFactory(

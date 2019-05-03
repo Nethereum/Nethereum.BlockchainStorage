@@ -170,7 +170,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 .ReturnsAsync(storageConfig);
 
             _subscriberStorageFactory
-                .Setup(f => f.GetLogRepositoryAsync(storageConfig))
+                .Setup(f => f.GetLogRepositoryHandlerAsync(storageConfig))
                 .ReturnsAsync(repo.Object);
 
             var handler = await _eventHandlerFactory.LoadAsync(_mockEventSubscription.Object, config);

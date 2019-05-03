@@ -114,7 +114,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 case EventHandlerType.Store:
                     CheckDependency(SubscriberRepositoryFactory);
                     var storageConfig = await SubscriberStorageRepository.GetAsync(subscription.SubscriberId, config.SubscriberRepositoryId).ConfigureAwait(false);
-                    var logRepository = await SubscriberRepositoryFactory.GetLogRepositoryAsync(storageConfig).ConfigureAwait(false);
+                    var logRepository = await SubscriberRepositoryFactory.GetLogRepositoryHandlerAsync(storageConfig).ConfigureAwait(false);
                     return new StorageHandler(subscription, config.Id, logRepository);
 
                 default:

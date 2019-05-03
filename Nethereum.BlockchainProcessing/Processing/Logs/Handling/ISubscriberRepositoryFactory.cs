@@ -6,6 +6,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
 {
     public interface ISubscriberStorageFactory
     {
-        Task<ILogHandler> GetLogRepositoryAsync(ISubscriberStorageDto dto);
+        Task<ILogHandler> GetLogRepositoryHandlerAsync(ISubscriberStorageDto dto);
     }
 }

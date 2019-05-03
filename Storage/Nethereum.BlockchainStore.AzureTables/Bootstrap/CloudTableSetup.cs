@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 
         public CloudTable GetTransactionsLogTable()
         {
-            return GetPrefixedTable("TransactionsLog");
+            return GetPrefixedTable("TransactionLogs");
         }
 
         public CloudTable GetTransactionsTable()
