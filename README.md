@@ -1,5 +1,9 @@
 # Nethereum Blockchain Store
 
+# NOTE: Deprecated repository
+Blockchain storage has been combined (moved to) the Blockchain Processing repository for simplicity.
+The new home is here: https://github.com/Nethereum/Nethereum.BlockchainProcessing/tree/master/Storage
+
 ## Blockchain Storage
 
 The Nethereum blockhain store is a library that allows the retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
