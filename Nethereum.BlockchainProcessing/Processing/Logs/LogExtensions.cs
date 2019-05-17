@@ -2,11 +2,48 @@
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Linq;
+using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public static class LogExtensions
     {
+        public static List<EventLog<TEventDto>> DecodeAllEventsIgnoringIndexMisMatches<TEventDto>(this FilterLog[] logs) where TEventDto : class, new()
+        {
+            var list = new List<EventLog<TEventDto>>(logs.Length);
+
+            foreach (var log in logs)
+            {
+                if (log.TryDecodeEvent(out EventLog<TEventDto> eventLog))
+                {
+                    list.Add(eventLog);
+                }
+            }
+
+            return list;
+        }
+
+
+        public static bool TryDecodeEvent<TEventDto>(this FilterLog log, out EventLog<TEventDto> eventLog) where TEventDto : class, new()
+        {
+            eventLog = null;
+            try
+            {
+                eventLog = log.DecodeEvent<TEventDto>();
+                return true;
+            }
+            catch (Exception ex) when (ex.IsEventDecodingIndexMisMatch())
+            {
+                //ignore;
+                return false;
+            }
+        }
+
+        public static bool IsEventDecodingIndexMisMatch(this Exception ex)
+        {
+            return ex.Message.StartsWith("Number of indexes don't match the number of topics");
+        }
+        
         public static string Key(this FilterLog log)
         {
             if (log.TransactionHash == null || log.LogIndex == null)

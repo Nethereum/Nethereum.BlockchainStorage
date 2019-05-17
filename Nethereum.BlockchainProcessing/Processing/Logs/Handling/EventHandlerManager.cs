@@ -119,7 +119,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 decodedEvent = log.ToDecodedEvent(abi);
                 return true;
             }
-            catch (Exception x) when (x.Message.StartsWith("Number of indexes don't match the number of topics"))
+            catch (Exception x) when (x.IsEventDecodingIndexMisMatch())
             {
                 return false;
             }
@@ -136,7 +136,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
                 decodedEvent = log.ToDecodedEvent<TEventDto>(abi);
                 return true;
             }
-            catch (Exception x) when (x.Message.StartsWith("Number of indexes don't match the number of topics"))
+            catch (Exception x) when (x.IsEventDecodingIndexMisMatch())
             {
                 return false;
             }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -15,8 +16,12 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public string JsonFileNameAndPath { get; } 
 
-        public JsonBlockProgressRepository(string jsonFileNameAndPath)
+        public JsonBlockProgressRepository(string jsonFileNameAndPath, bool deleteExistingFile = false)
         {
+            if(deleteExistingFile)
+            {
+                if (File.Exists(jsonFileNameAndPath)) File.Delete(jsonFileNameAndPath);
+            }
             this.JsonFileNameAndPath = jsonFileNameAndPath;
             Initialise();
         }

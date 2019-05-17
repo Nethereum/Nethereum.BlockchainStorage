@@ -81,7 +81,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             
             // assertions
             Assert.NotNull(rangeProcessed);
-            Assert.Equal((ulong)11, rangeProcessed.Value.BlockCount);
+            Assert.Equal((ulong)10, rangeProcessed.Value.BlockCount);
 
             var subscriptionState1 = configurationContext.GetEventSubscriptionState(eventSubscriptionId: 1); // interested in transfers with contract queries and aggregations
             var subscriptionState2 = configurationContext.GetEventSubscriptionState(eventSubscriptionId: 2); // interested in transfers with simple aggregation

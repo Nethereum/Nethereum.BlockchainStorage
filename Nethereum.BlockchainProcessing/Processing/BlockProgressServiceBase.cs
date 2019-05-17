@@ -49,9 +49,15 @@ namespace Nethereum.BlockchainProcessing.Processing
             if (to < from) 
                 return null;
 
-            if ((to - from) > maxNumberOfBlocksPerBatch)
+            //if we start at say block 10
+            //and we only want 1 block processed
+            //we should process from block 10 to block 10
+
+            var zeroBasedMaxBlock = maxNumberOfBlocksPerBatch == 0 ? maxNumberOfBlocksPerBatch : maxNumberOfBlocksPerBatch - 1;
+
+            if ((to - from) > zeroBasedMaxBlock)
             {
-                to = from + maxNumberOfBlocksPerBatch;
+                to = from + zeroBasedMaxBlock;
             }
 
             return new BlockRange(from, to);

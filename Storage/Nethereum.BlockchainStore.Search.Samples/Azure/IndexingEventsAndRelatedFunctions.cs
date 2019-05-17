@@ -120,8 +120,8 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                         await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName);
 
                     Assert.Equal(32, transferEventCount);
-                    Assert.Equal(1, transferFunctionCount);
-                    Assert.Equal(3, transferFromFunctionCount);
+                    Assert.Equal(2, transferFunctionCount);
+                    Assert.Equal(2, transferFromFunctionCount);
                 }
                 finally
                 {
@@ -244,7 +244,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                         await processor.SearchService.CountDocumentsAsync(TransferFunctionIndexName);
 
                     Assert.Equal(19, transferEventCount);
-                    Assert.Equal(2, transferFunctionCount);
+                    Assert.Equal(1, transferFunctionCount);
                 }
                 finally
                 {

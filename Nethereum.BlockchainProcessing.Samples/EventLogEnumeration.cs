@@ -20,29 +20,34 @@ namespace Nethereum.BlockchainProcessing.Samples
     public class EventLogEnumeration
     {
         /*
-Solidity Contract Excerpt
+Solidity Contract Excerpt from ERC721 
 * event Transfer(address indexed _from, address indexed _to, uint256 indexed _value);
-Other contracts may have transfer events with different signatures, this won't work for those.
+* Note: all parameters are indexed
+
+Other contracts (e.g. ERC20) may have transfer events where the parameters are indexed differently,
+For instance, the third event parameter for ERC20 is not indexed.  
+The class below this won't work for those.
+The event signature will match (as it "indexed" is not part of the signature) but decoding will fail
 */
         [Event("Transfer")]
-        public class TransferEvent
+        public class TransferEventERC721
         {
-            [Parameter("address", "_from", 1, true)]
+            [Parameter(type: "address", name: "_from", order: 1, indexed: true)]
             public string From {get; set;}
 
-            [Parameter("address", "_to", 2, true)]
+            [Parameter(type: "address", name: "_to", order: 2, indexed: true)]
             public string To {get; set;}
 
-            [Parameter("uint256", "_value", 3, true)]
-            public BigInteger Value {get; set;}
+            [Parameter(type: "uint256", name: "_tokenId", order: 3, indexed: true)]
+            public BigInteger TokenId {get; set;}
         }
 
         public class TransferEventProcessor : ILogProcessor
         {
-            public List<(FilterLog, EventLog<TransferEvent>)> ProcessedEvents = new List<(FilterLog, EventLog<TransferEvent>)>();
+            public List<(FilterLog, EventLog<TransferEventERC721>)> ProcessedEvents = new List<(FilterLog, EventLog<TransferEventERC721>)>();
             public List<(FilterLog, Exception)> DecodingErrors = new List<(FilterLog, Exception)>();
 
-            public bool IsLogForEvent(FilterLog log) => log.IsLogForEvent<TransferEvent>();
+            public bool IsLogForEvent(FilterLog log) => log.IsLogForEvent<TransferEventERC721>();
 
             public Task ProcessLogsAsync(params FilterLog[] eventLogs)
             {
@@ -50,7 +55,7 @@ Other contracts may have transfer events with different signatures, this won't w
                 {
                     try
                     {
-                        var eventDto = eventLog.DecodeEvent<TransferEvent>();
+                        var eventDto = eventLog.DecodeEvent<TransferEventERC721>();
                         ProcessedEvents.Add((eventLog, eventDto));
            
                     }
@@ -145,17 +150,17 @@ Other contracts may have transfer events with different signatures, this won't w
             var blocksProcessed = await batchProcessorService.ProcessContinuallyAsync(
                 cancellationTokenSource.Token, rangesProcessedCallback);
 
-            Assert.Equal((ulong)22, blocksProcessed);
+            Assert.Equal((ulong)20, blocksProcessed);
             Assert.Equal(2, blockRangesProcessed.Count);
-            Assert.Equal(new BlockRange(3379061, 3379071), blockRangesProcessed[0]);
-            Assert.Equal(new BlockRange(3379072, 3379082), blockRangesProcessed[1]);
+            Assert.Equal(new BlockRange(3379061, 3379070), blockRangesProcessed[0]);
+            Assert.Equal(new BlockRange(3379071, 3379080), blockRangesProcessed[1]);
             
-            Assert.Equal(395, catchAllEventProcessor.ProcessedEvents.Count);
+            Assert.Equal(350, catchAllEventProcessor.ProcessedEvents.Count);
             Assert.Equal(4, transferEventProcessor.ProcessedEvents.Count);
 
             //there are Transfer events on other contracts with differing number of indexed fields
             //they can't be decoded into our TransferEvent
-            Assert.Equal(46, transferEventProcessor.DecodingErrors.Count);
+            Assert.Equal(42, transferEventProcessor.DecodingErrors.Count);
 
             
         }
@@ -171,11 +176,11 @@ Other contracts may have transfer events with different signatures, this won't w
 
             //create filter to catch multiple from addresses
             //and multiple values
-            var filter = new NewFilterInputBuilder<TransferEvent>()
+            var filter = new NewFilterInputBuilder<TransferEventERC721>()
                 .AddTopic(e => e.From, "0x15829f2c25563481178cc4669b229775c6a49a85")
                 .AddTopic(e => e.From, "0x84b1383edee2babfe839b2a177425f0682e679f6")
-                .AddTopic(e => e.Value, new BigInteger(95))
-                .AddTopic(e => e.Value, new BigInteger(94))
+                .AddTopic(e => e.TokenId, new BigInteger(95))
+                .AddTopic(e => e.TokenId, new BigInteger(94))
                 .Build();
 
             var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
@@ -215,7 +220,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             var distinctValues =
                 transferEventProcessor.ProcessedEvents
-                    .Select(e => (int)e.Item2.Event.Value)
+                    .Select(e => (int)e.Item2.Event.TokenId)
                     .Distinct()
                     .ToArray();
 
@@ -245,7 +250,7 @@ Other contracts may have transfer events with different signatures, this won't w
             // we want the event from any contract - so we pass null for the contract address
             const string AnyContract = null;
 
-            var eventAbi = ABITypedRegistry.GetEvent<TransferEvent>();
+            var eventAbi = ABITypedRegistry.GetEvent<TransferEventERC721>();
 
             //the "to" address is the second indexed parameter on the event
             var filter = eventAbi.CreateFilterInput(AnyContract, AnyFromAddress, TransferToAddress);
@@ -276,7 +281,7 @@ Other contracts may have transfer events with different signatures, this won't w
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
 
-            var filter = new NewFilterInputBuilder<TransferEvent>()
+            var filter = new NewFilterInputBuilder<TransferEventERC721>()
                 .AddTopic(eventVal => eventVal.To, "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
                 .Build();
 
@@ -308,7 +313,7 @@ Other contracts may have transfer events with different signatures, this won't w
 
             var ContractAddresses = new []{ "0xC03cDD393C89D169bd4877d58f0554f320f21037"};
 
-            var filter = new NewFilterInputBuilder<TransferEvent>().Build(ContractAddresses);
+            var filter = new NewFilterInputBuilder<TransferEventERC721>().Build(ContractAddresses);
 
             var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
 

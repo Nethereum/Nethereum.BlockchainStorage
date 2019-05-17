@@ -227,10 +227,10 @@ Solidity Contract Excerpt
         {
             var web3 = new Web3.Web3(BlockchainUrl);
             var currentBlockNumber = (ulong)(await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync()).Value;
-            var startingBlock = currentBlockNumber - 10;
-            var maxBlock = currentBlockNumber + 1;
+            var startingBlock = currentBlockNumber - 9;
+            var maxBlock = currentBlockNumber;
 
-            const ulong expectedBlocks = 12;  // current block + 10 + 1
+            const ulong expectedBlocks = 10; 
 
             using (var processor =
                 new AzureEventIndexingProcessor(
