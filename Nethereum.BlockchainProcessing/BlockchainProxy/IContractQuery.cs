@@ -14,9 +14,9 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
 
     public class ContractQueryHelper : IContractQuery
     {
-        private readonly Web3.Web3 web3;
+        private readonly Web3.IWeb3 web3;
 
-        public ContractQueryHelper(Web3.Web3 web3)
+        public ContractQueryHelper(Web3.IWeb3 web3)
         {
             this.web3 = web3;
         }

@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Nethereum.BlockchainProcessing.Queue.Azure\Nethereum.BlockchainProcessing.Queue.Azure.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
     <ProjectReference Include="..\Storage\Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj" />
+    <ProjectReference Include="..\Storage\Nethereum.BlockchainStore.Entities.Mapping\Nethereum.BlockchainStore.Entities.Mapping.csproj" />
     <ProjectReference Include="..\Storage\Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj" />
   </ItemGroup>
 

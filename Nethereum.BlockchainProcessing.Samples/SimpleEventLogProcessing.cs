@@ -1,6 +1,8 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
+using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
@@ -65,13 +67,14 @@ namespace Nethereum.BlockchainProcessing.Samples
             //initialise the processor with a blockchain url
             //contract address or addresses is optional
             //we don't need an account because this is read only
-            //RunInBackgroundAsync does not block the current thread (RunAsync does block)
-            var backgroundTask = await
+            var processor = 
                 new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet, ContractAddress)
                 .Configure(c => c.MinimumBlockNumber = 7540000) //optional: default is to start at current block on chain
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)) // transfer events
-                .RunInBackgroundAsync(cancellationTokenSource.Token);
+                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)); // transfer events
 
+            //RunInBackgroundAsync does not block the current thread (RunAsync does block)
+            var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
+                
             //simulate doing something else whilst the listener works its magic!
             while (!cancellationTokenSource.IsCancellationRequested)
             {
@@ -279,6 +282,8 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task UsingAzureTableStorageProgressRepository()
         {
+            // Requires: Nethereum.BlockchainStore.AzureTables
+
             // Load config
             //  - this will contain the secrets and connection strings we don't want to hard code
             var config = TestConfiguration.LoadConfig();
@@ -320,6 +325,145 @@ namespace Nethereum.BlockchainProcessing.Samples
             await new CloudTableSetup(azureStorageConnectionString, "EventLogProcessingSample")
                 .GetCountersTable()
                 .DeleteIfExistsAsync();
+        }
+
+        /// <summary>
+        /// Demonstrates how to write events to a queue
+        /// </summary>
+        [Fact]
+        public async Task WritingEventsToAnAzureQueue()
+        {
+            // Requires: Nethereum.BlockchainProcessing.Queue.Azure
+
+            // Load config
+            //  - this will contain the secrets and connection strings we don't want to hard code
+            var config = TestConfiguration.LoadConfig();
+            string azureStorageConnectionString = config["AzureStorageConnectionString"];
+
+            //cancellation token to enable the listener to be stopped
+            //passing in a time limit as a safety valve for the unit test
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+
+            //initialise the processor
+            using(var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
+                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
+                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
+                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .SubscribeAndQueueAsync<TransferEventDto>(azureStorageConnectionString, "sep-transfers"))
+            { 
+                //run the processor for a while
+                var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+            }
+
+            await Task.Delay(5000); //give azure time to update
+            
+            //clean up
+            var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString);
+            var queue = await queueFactory.GetOrCreateQueueAsync("sep-transfers");
+            Assert.True(await queue.GetApproxMessageCountAsync() > 0);
+
+            //clean up
+            await queueFactory.CloudQueueClient.GetQueueReference(queue.Name).DeleteIfExistsAsync();
+        }
+
+        /// <summary>
+        /// Demonstrates how to write events to a search index
+        /// </summary>
+        [Fact]
+        public async Task WritingEventsToASearchIndex()
+        {
+            //Requires: Nethereum.BlockchainStore.Search
+
+            // Load config
+            //  - this will contain the secrets and connection strings we don't want to hard code
+            var config = TestConfiguration.LoadConfig();
+            string ApiKeyName = "AzureSearchApiKey";
+            string AzureSearchServiceName = "blockchainsearch";
+            var apiKey = config[ApiKeyName];
+
+            //cancellation token to enable the listener to be stopped
+            //passing in a time limit as a safety valve for the unit test
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+
+            //initialise the processor
+            //within "using" block so that the processor cleans up the search resources it creates
+            using (var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
+                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
+                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
+                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .AddToSearchIndexAsync<TransferEventDto>(AzureSearchServiceName, apiKey, "sep-transfers"))
+            {
+                //run the processor for a while
+                var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+            }
+
+            await Task.Delay(5000); //give azure time to update
+            
+            using(var searchService = new AzureSearchService(AzureSearchServiceName, apiKey))
+            { 
+                Assert.True(await searchService.CountDocumentsAsync("sep-transfers") > 0);
+                await searchService.DeleteIndexAsync("sep-transfers");
+            }
+        }
+
+        /// <summary>
+        /// Demonstrates how to write events to Azure table storage
+        /// </summary>
+        [Fact]
+        public async Task WritingEventsToAzureTableStorage()
+        {
+            // Requires: Nethereum.BlockchainStore.AzureTables
+
+            // Load config
+            //  - this will contain the secrets and connection strings we don't want to hard code
+            var config = TestConfiguration.LoadConfig();
+            string azureStorageConnectionString = config["AzureStorageConnectionString"];
+
+            //cancellation token to enable the processor to be stopped
+            //passing in a time limit as a safety valve for the unit test
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+
+            //initialise the processor
+            using (var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
+                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
+                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
+                // configure this to stop after processing a batch
+                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                // wire up to azure table storage
+                .StoreInAzureTable<TransferEventDto>(azureStorageConnectionString, "septransfers"))
+            {
+                //run the processor for a while
+                var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+            }
+
+            var expectedLogs = new
+            (string TransactionHash, long LogIndex)[]{
+                ( "0xd24d77d48b9c19eb8547fb2b2cbe06ee6cfb72b306785fbb65092c38ea665382", 17),
+                ("0xd92620a74a3d656fed316eeed859ec290aff825d9d9ecf587163860ef16546a3",15),
+                ("0xc4d5f3ec633b26801be9d3fc53251e6eefcdda9e2d4c3175a68faeb2ff098085",11),
+                ("0x7c61ded6b3a36c9b997ea2049eb1b07c890a574a707b9910e79b1a88095f8703",10),
+                ("0x2af1b081a6a43c02964e645467df79b3c99f934faf6452592cd21fdbbf29cdff",9),
+                ("0xc2480ad47fe5a9ebb1931be91b17a846218e5655a25ef97eea020d0b8b41bc63",7),
+                ("0x7b17144d88c4dc9503a72804aa3bb4f32ae4c9941a28e5d88532c85179c638d4",6),
+                ("0x7b17144d88c4dc9503a72804aa3bb4f32ae4c9941a28e5d88532c85179c638d4",5),
+                ("0x7b17144d88c4dc9503a72804aa3bb4f32ae4c9941a28e5d88532c85179c638d4",4),
+                ("0x7d054ad829c2a8bb2152454eedc654220a0d989d77dba751bae652ea8eb3dcf6",3),
+                ("0x66f09e21f822bca39b317b9bd67317a7388f76f04c78bc2c74c66e4fb8b1e57e",2),
+                ("0xc7099c2e4e02c354ae5d19df1628a0c15c1288693301722a804f19b941b809e8",1),
+                ("0x5d824e1e088ef3e78d27166bec59a79e3b6b8dfaaa7559e24e46fdc54805f817",0)
+            };
+
+            //verify
+            var cloudTableSetup = new CloudTableSetup(azureStorageConnectionString, "septransfers");
+            var repo = cloudTableSetup.CreateTransactionLogRepository();
+            foreach(var logId in expectedLogs)
+            {
+                var logFromRepo = await repo.FindByTransactionHashAndLogIndexAsync(logId.TransactionHash, logId.LogIndex);
+                Assert.NotNull(logFromRepo);
+            }
+
+            //clean up
+            await cloudTableSetup.GetTransactionsLogTable().DeleteIfExistsAsync();
         }
     }
 }

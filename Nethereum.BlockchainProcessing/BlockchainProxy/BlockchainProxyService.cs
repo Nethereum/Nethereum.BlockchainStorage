@@ -16,13 +16,13 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
         public BlockchainProxyService(string url):this(new Web3.Web3(url))
         {}
 
-        public BlockchainProxyService(Web3.Web3 web3)
+        public BlockchainProxyService(Web3.IWeb3 web3)
         {
             Web3 = web3;
             _queryHelper = new ContractQueryHelper(web3);
         }
 
-        private Web3.Web3 Web3 { get; }
+        private Web3.IWeb3 Web3 { get; }
 
         public Task<BlockWithTransactions> GetBlockWithTransactionsAsync
             (ulong blockNumber)

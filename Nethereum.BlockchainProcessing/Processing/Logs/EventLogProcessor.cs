@@ -1,39 +1,44 @@
 ﻿using Microsoft.Extensions.Logging;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class EventLogProcessor
+
+    public class EventLogProcessor : IEventLogProcessor
     {
         ILogger _logger = ApplicationLogging.CreateLogger<EventLogProcessor>();
 
-        public EventLogProcessor(string blockchainUrl) : 
-            this(new Web3.Web3(blockchainUrl)) { }
+        public event EventHandler OnDisposing;
 
-        public EventLogProcessor(string blockchainUrl, string contractAddress):
-            this(new Web3.Web3(blockchainUrl), contractAddress) { }
+        public EventLogProcessor(string blockchainUrl) :
+            this(new Web3.Web3(blockchainUrl))
+        { }
+
+        public EventLogProcessor(string blockchainUrl, string contractAddress) :
+            this(new Web3.Web3(blockchainUrl), contractAddress)
+        { }
 
         public EventLogProcessor(string blockchainUrl, string[] contractAddresses) :
             this(new Web3.Web3(blockchainUrl), contractAddresses)
         { }
 
-        public EventLogProcessor(Web3.Web3 web3) :
+        public EventLogProcessor(Web3.IWeb3 web3) :
             this(new BlockchainProxyService(web3), contractAddresses: null)
         { }
-        public EventLogProcessor(Web3.Web3 web3, string contractAddress):
-            this(new BlockchainProxyService(web3), new[]{ contractAddress }) { }
+        public EventLogProcessor(Web3.IWeb3 web3, string contractAddress) :
+            this(new BlockchainProxyService(web3), new[] { contractAddress })
+        { }
 
-        public EventLogProcessor(Web3.Web3 web3, string[] contractAddresses) :
+        public EventLogProcessor(Web3.IWeb3 web3, string[] contractAddresses) :
             this(new BlockchainProxyService(web3), contractAddresses)
         { }
 
@@ -44,20 +49,20 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
             if (ContractAddresses != null)
             {
-                CreateFilter(ContractAddresses);
+                AddContractAddressFilter(ContractAddresses);
             }
         }
 
-        public string[] ContractAddresses { get;}
+        public string[] ContractAddresses { get; }
 
         public Action<Exception> FatalErrorCallback { get; set; }
 
-        public Action<uint, BlockRange> RangesProcessedCallback { get;set;}
+        public Action<uint, BlockRange> RangesProcessedCallback { get; set; }
 
         /// <summary>
         /// The earliest block to start at - important when there has been no prior processing
         /// </summary>
-        public uint? MinimumBlockNumber { get;set;}
+        public uint? MinimumBlockNumber { get; set; }
 
         /// <summary>
         /// eEnsure that new blocks aren't processed until the miniumum number of confirmations have been exceeded
@@ -73,61 +78,80 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public IBlockchainProxyService BlockchainProxyService { get; set; }
 
-        public List<ILogProcessor> Processors { get;set;} = new List<ILogProcessor>();
+        public List<ILogProcessor> Processors { get; set; } = new List<ILogProcessor>();
 
-        public List<NewFilterInput> Filters { get;set;} = new List<NewFilterInput>();
+        public List<NewFilterInput> Filters { get; set; } = new List<NewFilterInput>();
 
-        public EventLogProcessor Configure(Action<EventLogProcessor> configAction)
+        public IEventLogProcessor Configure(Action<IEventLogProcessor> configAction)
         {
             configAction(this);
             return this;
         }
 
-        public EventLogProcessor OnFatalError(Action<Exception> callBack)
+        public IEventLogProcessor OnFatalError(Action<Exception> callBack)
         {
             FatalErrorCallback = callBack;
             return this;
         }
 
-        public EventLogProcessor Subscribe<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new()
+        public IEventLogProcessor Subscribe<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new()
         {
-            var asyncCallback = new Func<IEnumerable<EventLog<TEventDto>>, Task>(async (events) => await Task.Run(() => callBack(events)));
+            var asyncCallback = new Func<IEnumerable<EventLog<TEventDto>>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
             return Subscribe(asyncCallback);
         }
 
-        public EventLogProcessor Subscribe<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new()
+        public IEventLogProcessor Subscribe<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new()
         {
             Processors.Add(new LogProcessor<TEventDto>(callBack));
             return this;
         }
 
-        public EventLogProcessor CatchAll(Action<IEnumerable<FilterLog>> callBack)
+        public IEventLogProcessor SubscribeAndQueue<TEventDto>(IQueue queue, Predicate<EventLog<TEventDto>> predicate = null, Func<EventLog<TEventDto>, object> mapper = null) where TEventDto : class, new()
         {
-            var asyncCallback = new Func<IEnumerable<FilterLog>, Task>(async (events) => await Task.Run(() => callBack(events)));
-            return CatchAll(asyncCallback);
-        }
-
-        public EventLogProcessor CatchAll(Func<IEnumerable<FilterLog>, Task> callBack)
-        {
-            Processors.Add(new CatchAllLogProcessor(callBack));
+            Processors.Add(new EventLogQueueProcessor<TEventDto>(queue, predicate, mapper));
             return this;
         }
 
-        public EventLogProcessor Subscribe(ILogProcessor processor)
+        public IEventLogProcessor Subscribe(ILogProcessor processor)
         {
             Processors.Add(processor);
             return this;
         }
 
-        public EventLogProcessor OnBatchProcessed(Action<uint, BlockRange> rangesProcessedCallback)
+        public IEventLogProcessor CatchAll(Action<IEnumerable<FilterLog>> callBack)
+        {
+            var asyncCallback = new Func<IEnumerable<FilterLog>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
+            return CatchAll(asyncCallback);
+        }
+
+        public IEventLogProcessor CatchAll(Func<IEnumerable<FilterLog>, Task> callBack)
+        {
+            Processors.Add(new CatchAllLogProcessor(callBack));
+            return this;
+        }
+
+        public IEventLogProcessor CatchAllAndQueue(IQueue queue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null)
+        {
+            Processors.Add(new EventLogQueueProcessor(queue, predicate, mapper));
+            return this;
+        }
+
+
+        public IEventLogProcessor OnBatchProcessed(Action<uint, BlockRange> rangesProcessedCallback)
         {
             RangesProcessedCallback = rangesProcessedCallback;
             return this;
         }
 
-        public EventLogProcessor UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false)
+        public IEventLogProcessor UseBlockProgressRepository(IBlockProgressRepository repo)
         {
-            BlockProgressRepository =  new JsonBlockProgressRepository(jsonFilePath, deleteExistingFile: deleteExistingFile);
+            BlockProgressRepository = repo;
+            return this;
+        }
+
+        public IEventLogProcessor UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false)
+        {
+            BlockProgressRepository = new JsonBlockProgressRepository(jsonFilePath, deleteExistingFile: deleteExistingFile);
             return this;
         }
 
@@ -140,13 +164,19 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// </summary>
         /// <typeparam name="TEventDto"></typeparam>
         /// <returns></returns>
-        public EventLogProcessor Filter<TEventDto>() where TEventDto : class, IEventDTO, new()
+        public IEventLogProcessor Filter<TEventDto>() where TEventDto : class, IEventDTO, new()
         {
             Filters.Add(new NewFilterInputBuilder<TEventDto>().Build(ContractAddresses));
             return this;
         }
 
-        private void CreateFilter(string[] contractAddresses)
+        public IEventLogProcessor Filter(NewFilterInput filter)
+        {
+            Filters.Add(filter);
+            return this;
+        }
+
+        private void AddContractAddressFilter(string[] contractAddresses)
         {
             Filters.Add(new NewFilterInput { Address = contractAddresses });
         }
@@ -196,7 +226,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// Runs on a background thread until cancellation
         /// Returns a Task wrapper for the background Task
         /// Usage: await processor.RunInBackgroundAsync(ctx)
-        /// awaiting ensures that any setup errors are caught on the calling thread
+        /// awaiting ensures that any initial setup errors are caught on the calling thread
         /// once processing begins - it is on a non blocking background thread
         /// </summary>
         public async Task<Task> RunInBackgroundAsync(
@@ -238,70 +268,15 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 throw;
             }
         }
-    }
 
-    public static class EventLogProcessingExtensions
-    {
-        public static void AddRange<T>(this ConcurrentBag<T> bag, IEnumerable<T> items)
+        public void Dispose()
         {
-            foreach(var item in items) bag.Add(item);
-        }
-    }
+            foreach(var processor in Processors)
+            {
+                if(processor is IDisposable d) d.Dispose();
+            }
 
-
-    public class CatchAllLogProcessor : ILogProcessor
-    {
-        public CatchAllLogProcessor(Func<IEnumerable<FilterLog>, Task> callBack)
-        {
-            CallBack = callBack;
-        }
-
-        protected Func<IEnumerable<FilterLog>, Task> CallBack { get; set; }
-
-        public virtual bool IsLogForEvent(FilterLog log) => true;
-
-        public virtual async Task ProcessLogsAsync(params FilterLog[] eventLogs)
-        {
-            await CallBack(eventLogs);
-        }
-    }
-
-    public class LogProcessor<TEventDto> : ILogProcessor where TEventDto : class, new()
-    {
-        public LogProcessor(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack)
-        {
-            CallBack = callBack;
-        }
-
-        protected Func<IEnumerable<EventLog<TEventDto>>, Task> CallBack { get; set; }
-
-        public virtual bool IsLogForEvent(FilterLog log) => log.IsLogForEvent<TEventDto>();
-
-        public virtual async Task ProcessLogsAsync(params FilterLog[] eventLogs)
-        {
-            var list = eventLogs.DecodeAllEventsIgnoringIndexMisMatches<TEventDto>();
-            await CallBack(list);
-        }
-    }
-
-    public class InMemoryBlockchainProgressRepository : IBlockProgressRepository
-    {
-        public InMemoryBlockchainProgressRepository(ulong startingBlockNumber)
-        {
-            StartingBlockNumber = startingBlockNumber;
-            CurrentBlockNumber = StartingBlockNumber;
-        }
-
-        public ulong StartingBlockNumber { get; }
-
-        public ulong CurrentBlockNumber { get; private set;}
-
-        public Task<ulong?> GetLastBlockNumberProcessedAsync() => Task.FromResult((ulong?)CurrentBlockNumber);
-
-        public Task UpsertProgressAsync(ulong blockNumber)
-        {
-            CurrentBlockNumber = CurrentBlockNumber + 1;
-            return Task.CompletedTask;
+            OnDisposing?.Invoke(this, new EventArgs());
         }
     }
 }
