@@ -99,16 +99,5 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return searchService;
         }
 
-        private static void MarkForDisposal(this IEventLogProcessor eventLogProcessor, IDisposable dependency)
-        {
-            eventLogProcessor.OnDisposing += disposeHandler;
-
-            void disposeHandler(object s, EventArgs src)
-            {
-                dependency.Dispose();
-                eventLogProcessor.OnDisposing -= disposeHandler;
-            }
-        }
-
     }
 }

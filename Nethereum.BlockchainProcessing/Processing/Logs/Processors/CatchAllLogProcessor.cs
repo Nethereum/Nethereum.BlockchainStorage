@@ -9,7 +9,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     {
         public CatchAllLogProcessor(Func<IEnumerable<FilterLog>, Task> callBack)
         {
-            CallBack = callBack;
+            CallBack = callBack ?? throw new ArgumentNullException(nameof(callBack));
         }
 
         protected Func<IEnumerable<FilterLog>, Task> CallBack { get; set; }

@@ -33,17 +33,17 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         Task<ulong> RunAsync(CancellationToken cancellationToken);
         Task<BlockRange?> RunForLatestBlocksAsync(CancellationToken cancellationToken);
         Task<Task> RunInBackgroundAsync(CancellationToken cancellationToken);
-
         IEventLogProcessor CatchAll(Action<IEnumerable<FilterLog>> callBack);
         IEventLogProcessor CatchAll(Func<IEnumerable<FilterLog>, Task> callBack);
-
         IEventLogProcessor CatchAllAndQueue(IQueue queue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null);
         IEventLogProcessor Subscribe(ILogProcessor processor);
         IEventLogProcessor Subscribe<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new();
         IEventLogProcessor Subscribe<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new();
+        IEventLogProcessor Subscribe(EventSubscription eventSubscription);
+        IEventLogProcessor Subscribe<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new();
         IEventLogProcessor SubscribeAndQueue<TEventDto>(IQueue queue, Predicate<EventLog<TEventDto>> predicate = null, Func<EventLog<TEventDto>, object> mapper = null) where TEventDto : class, new();
-
         IEventLogProcessor UseBlockProgressRepository(IBlockProgressRepository repo);
         IEventLogProcessor UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false);
     }
+
 }

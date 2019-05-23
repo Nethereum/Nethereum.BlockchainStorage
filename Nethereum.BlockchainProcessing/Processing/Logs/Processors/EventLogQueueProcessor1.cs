@@ -7,7 +7,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class EventLogQueueProcessor : ILogProcessor
     {
-        public EventLogQueueProcessor(IQueue destinationQueue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null)
+        public EventLogQueueProcessor(
+            IQueue destinationQueue, 
+            Predicate<FilterLog> predicate = null, 
+            Func<FilterLog, object> mapper = null)
         {
             Mapper = mapper;
             DestinationQueue = destinationQueue;

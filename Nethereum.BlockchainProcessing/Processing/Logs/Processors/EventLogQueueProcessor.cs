@@ -8,7 +8,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class EventLogQueueProcessor<TEventDto> : LogProcessorBase<TEventDto> where TEventDto : class, new()
     {
-        public EventLogQueueProcessor(IQueue destinationQueue, Predicate<EventLog<TEventDto>> predicate = null, Func<EventLog<TEventDto>, object> mapper = null)
+        public EventLogQueueProcessor(
+            IQueue destinationQueue, 
+            Predicate<EventLog<TEventDto>> predicate = null, 
+            Func<EventLog<TEventDto>, object> mapper = null)
         {
             DestinationQueue = destinationQueue;
             Predicate = predicate ?? new Predicate<EventLog<TEventDto>>((e) => true);

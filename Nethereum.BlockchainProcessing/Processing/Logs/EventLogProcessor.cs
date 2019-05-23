@@ -112,6 +112,18 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return this;
         }
 
+        public IEventLogProcessor Subscribe(EventSubscription eventSubscription)
+        {
+            Processors.Add(eventSubscription);
+            return this;
+        }
+
+        public IEventLogProcessor Subscribe<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new()
+        {
+            Processors.Add(eventSubscription);
+            return this;
+        }
+
         public IEventLogProcessor Subscribe(ILogProcessor processor)
         {
             Processors.Add(processor);
@@ -135,7 +147,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             Processors.Add(new EventLogQueueProcessor(queue, predicate, mapper));
             return this;
         }
-
 
         public IEventLogProcessor OnBatchProcessed(Action<uint, BlockRange> rangesProcessedCallback)
         {
@@ -271,11 +282,6 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public void Dispose()
         {
-            foreach(var processor in Processors)
-            {
-                if(processor is IDisposable d) d.Dispose();
-            }
-
             OnDisposing?.Invoke(this, new EventArgs());
         }
     }

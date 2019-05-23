@@ -277,7 +277,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         /// <summary>
         /// Demonstrates how to use a progress repository with the processor
         /// This stores the block progress so that the processor can be restarted
-        /// And pick up where it left off
+        /// and pick up where it left off
         /// </summary>
         [Fact]
         public async Task UsingAzureTableStorageProgressRepository()
