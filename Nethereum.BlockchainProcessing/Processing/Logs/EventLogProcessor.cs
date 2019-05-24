@@ -7,6 +7,7 @@ using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
     public class EventLogProcessor : IEventLogProcessor
     {
+        private NewFilterInput _contractAddressFilter;
         ILogger _logger = ApplicationLogging.CreateLogger<EventLogProcessor>();
 
         public event EventHandler OnDisposing;
@@ -44,12 +46,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public EventLogProcessor(IBlockchainProxyService blockchainProxyService, string[] contractAddresses = null)
         {
-            BlockchainProxyService = blockchainProxyService;
+            BlockchainProxyService = blockchainProxyService ?? throw new ArgumentNullException(nameof(blockchainProxyService));
             ContractAddresses = contractAddresses;
 
             if (ContractAddresses != null)
             {
-                AddContractAddressFilter(ContractAddresses);
+                SetContractAddressFilter(ContractAddresses);
             }
         }
 
@@ -62,7 +64,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// <summary>
         /// The earliest block to start at - important when there has been no prior processing
         /// </summary>
-        public uint? MinimumBlockNumber { get; set; }
+        public ulong? MinimumBlockNumber { get; set; }
 
         /// <summary>
         /// eEnsure that new blocks aren't processed until the miniumum number of confirmations have been exceeded
@@ -78,9 +80,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public IBlockchainProxyService BlockchainProxyService { get; set; }
 
-        public List<ILogProcessor> Processors { get; set; } = new List<ILogProcessor>();
+        public List<ILogProcessor> Processors { get; private set; } = new List<ILogProcessor>();
 
-        public List<NewFilterInput> Filters { get; set; } = new List<NewFilterInput>();
+        public List<NewFilterInput> Filters { get; private set; } = new List<NewFilterInput>();
 
         public IEventLogProcessor Configure(Action<IEventLogProcessor> configAction)
         {
@@ -177,7 +179,18 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// <returns></returns>
         public IEventLogProcessor Filter<TEventDto>() where TEventDto : class, IEventDTO, new()
         {
-            Filters.Add(new NewFilterInputBuilder<TEventDto>().Build(ContractAddresses));
+            //if we're already filtering for contract addresses but not by event
+            //clear the existing filter so we can add a new one which is event specific
+
+            var filter = new NewFilterInputBuilder<TEventDto>().Build(ContractAddresses);
+
+            if (_contractAddressFilter != null )
+            {
+                Filters.Remove(_contractAddressFilter);
+                _contractAddressFilter = filter;
+            }
+
+            Filters.Add(filter);
             return this;
         }
 
@@ -187,9 +200,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return this;
         }
 
-        private void AddContractAddressFilter(string[] contractAddresses)
+        private void SetContractAddressFilter(string[] contractAddresses)
         {
-            Filters.Add(new NewFilterInput { Address = contractAddresses });
+            _contractAddressFilter = new NewFilterInput { Address = contractAddresses };
+            Filters.Add(_contractAddressFilter);
         }
 
         private async Task<BlockchainBatchProcessorService> BuildService()
@@ -199,7 +213,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
             var startingBlock = MinimumBlockNumber ?? await BlockchainProxyService.GetMaxBlockNumberAsync().ConfigureAwait(false);
 
-            BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(startingBlock);
+            var lastBlockProcessed = startingBlock == 0 ? (ulong?)null : startingBlock - 1;
+
+            BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(lastBlockProcessed);
             var progressService = new BlockProgressService(BlockchainProxyService, startingBlock, BlockProgressRepository, MinimumBlockConfirmations ?? 0);
             var processor = new BlockchainLogProcessor(BlockchainProxyService, Processors, Filters?.ToArray());
             var batchProcessorService = new BlockchainBatchProcessorService(processor, progressService, MaximumBlocksPerBatch);
@@ -214,11 +230,20 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<BlockRange?> RunForLatestBlocksAsync(
+        public async Task<BlockRange?> RunOnceAsync(
             CancellationToken cancellationToken)
         {
-            var batchProcessorService = await BuildService().ConfigureAwait(false);
-            return await batchProcessorService.ProcessLatestBlocksAsync(cancellationToken).ConfigureAwait(false);
+            try 
+            { 
+                var batchProcessorService = await BuildService().ConfigureAwait(false);
+                return await batchProcessorService.ProcessOnceAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                FatalErrorCallback?.Invoke(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -229,16 +254,25 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public async Task<ulong> RunAsync(
             CancellationToken cancellationToken)
         {
-            var batchProcessorService = await BuildService().ConfigureAwait(false);
-            return await batchProcessorService.ProcessContinuallyAsync(cancellationToken, RangesProcessedCallback).ConfigureAwait(false);
+            try 
+            { 
+                var batchProcessorService = await BuildService().ConfigureAwait(false);
+                return await batchProcessorService.ProcessContinuallyAsync(cancellationToken, RangesProcessedCallback).ConfigureAwait(false);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                FatalErrorCallback?.Invoke(ex);
+                throw;
+            }
         }
 
         /// <summary>
-        /// Runs on a background thread until cancellation
+        /// Runs on a background thread until cancellation or fatal error
         /// Returns a Task wrapper for the background Task
-        /// Usage: await processor.RunInBackgroundAsync(ctx)
+        /// Usage: var backgroundProcessingTask = await processor.RunInBackgroundAsync(ctx)
         /// awaiting ensures that any initial setup errors are caught on the calling thread
-        /// once processing begins - it is on a non blocking background thread
+        /// once processing begins - it is on the non blocking background thread
         /// </summary>
         public async Task<Task> RunInBackgroundAsync(
             CancellationToken cancellationToken)
@@ -255,27 +289,25 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                         TaskCreationOptions.LongRunning,
                         TaskScheduler.Default
                     )
-                    .ContinueWith<ulong>
+                    .Unwrap()
+                    .ContinueWith
                     (
                         (t) =>
                         {
-
                             if (t.IsFaulted)
                             {
-                                _logger.LogError(t.Exception, t.Exception.GetBaseException().Message);
-                                FatalErrorCallback?.Invoke(t.Exception.GetBaseException());
+                                var baseEx = t.Exception.GetBaseException();
+                                _logger.LogError(baseEx, baseEx.Message);
+                                FatalErrorCallback?.Invoke(baseEx);
                             }
-
-                            return t.Result.Result;
-
                         },
                         TaskContinuationOptions.OnlyOnFaulted
                     );
-
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{nameof(EventLogProcessor)}.RunInBackgroundAsync threw an initialisation error");
+                FatalErrorCallback?.Invoke(ex);
                 throw;
             }
         }

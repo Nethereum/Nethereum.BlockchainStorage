@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             CallBack = callBack;
         }
 
-        protected Func<IEnumerable<EventLog<TEventDto>>, Task> CallBack { get; set; }
+        public Func<IEnumerable<EventLog<TEventDto>>, Task> CallBack { get; protected set; }
 
         public override async Task ProcessLogsAsync(params FilterLog[] eventLogs)
         {

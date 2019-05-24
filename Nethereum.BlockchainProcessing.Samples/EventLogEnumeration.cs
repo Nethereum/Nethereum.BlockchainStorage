@@ -103,7 +103,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
-            var rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync();
+            var rangeProcessed = await batchProcessorService.ProcessOnceAsync();
 
             Assert.NotNull(rangeProcessed);
             Assert.Equal((ulong?)3146684, rangeProcessed.Value.To);
@@ -267,7 +267,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
-            await batchProcessorService.ProcessLatestBlocksAsync();
+            await batchProcessorService.ProcessOnceAsync();
 
             Assert.Single(transferEventProcessor.ProcessedEvents);
             Assert.Single(catchAllEventProcessor.ProcessedEvents);
@@ -297,7 +297,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
-            await batchProcessorService.ProcessLatestBlocksAsync();
+            await batchProcessorService.ProcessOnceAsync();
 
             Assert.Single(transferEventProcessor.ProcessedEvents);
             Assert.Equal("0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91", transferEventProcessor.ProcessedEvents.First().Item2.Event.To);
@@ -327,7 +327,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
-            await batchProcessorService.ProcessLatestBlocksAsync();
+            await batchProcessorService.ProcessOnceAsync();
 
             Assert.Single(transferEventProcessor.ProcessedEvents);
             Assert.Single(catchAllEventProcessor.ProcessedEvents);

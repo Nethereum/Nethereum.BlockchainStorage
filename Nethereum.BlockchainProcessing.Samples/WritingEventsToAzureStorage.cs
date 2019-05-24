@@ -128,7 +128,7 @@ namespace Nethereum.BlockchainProcessing.Samples
 
                 // instruct the service to get and process the next range of blocks
                 // when the rangeProcessed is null - it means there was nothing to process 
-                var rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
+                var rangeProcessed = await batchProcessorService.ProcessOnceAsync(ctx.Token);
 
                 // ensure we have processed the expected number of events
                 // the event subscription has state which can record running totals across many processing batches
@@ -260,7 +260,7 @@ namespace Nethereum.BlockchainProcessing.Samples
 
                 // instruct the service to get and process the next range of blocks
                 // when the rangeProcessed is null - it means there was nothing to process 
-                var rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
+                var rangeProcessed = await batchProcessorService.ProcessOnceAsync(ctx.Token);
 
                 // ensure we have processed the expected number of events
                 // the event subscription has state which can record running totals across many processing batches

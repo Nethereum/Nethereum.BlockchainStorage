@@ -76,7 +76,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
                 
             //simulate doing something else whilst the listener works its magic!
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!backgroundTask.IsCompleted)
             {
                 if (erc20Transfers.Any())
                 {
@@ -131,7 +131,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
 
             //simulate doing something else whilst the listener works its magic!
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!backgroundTask.IsCompleted)
             {
                 await Task.Delay(1000);
             }
@@ -174,7 +174,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
 
             //simulate doing something else whilst the listener works its magic!
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!backgroundTask.IsCompleted)
             {
                 if (erc20Transfers.Any())
                 {
@@ -347,7 +347,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             //initialise the processor
             using(var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
                 .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
+                .Configure(c => c.MinimumBlockNumber = 7540103) //optional: default is to start at current block on chain
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
                 .SubscribeAndQueueAsync<TransferEventDto>(azureStorageConnectionString, "sep-transfers"))
             { 
@@ -360,7 +360,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             //clean up
             var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString);
             var queue = await queueFactory.GetOrCreateQueueAsync("sep-transfers");
-            Assert.True(await queue.GetApproxMessageCountAsync() > 0);
+            Assert.Equal(13, await queue.GetApproxMessageCountAsync());
 
             //clean up
             await queueFactory.CloudQueueClient.GetQueueReference(queue.Name).DeleteIfExistsAsync();
@@ -389,7 +389,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             //within "using" block so that the processor cleans up the search resources it creates
             using (var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
                 .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
+                .Configure(c => c.MinimumBlockNumber = 7540103) //optional: default is to start at current block on chain
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
                 .AddToSearchIndexAsync<TransferEventDto>(AzureSearchServiceName, apiKey, "sep-transfers"))
             {
@@ -401,7 +401,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             
             using(var searchService = new AzureSearchService(AzureSearchServiceName, apiKey))
             { 
-                Assert.True(await searchService.CountDocumentsAsync("sep-transfers") > 0);
+                Assert.Equal((long)13, await searchService.CountDocumentsAsync("sep-transfers"));
                 await searchService.DeleteIndexAsync("sep-transfers");
             }
         }
@@ -426,7 +426,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             //initialise the processor
             using (var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
                 .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
+                .Configure(c => c.MinimumBlockNumber = 7540103) //optional: default is to start at current block on chain
                 // configure this to stop after processing a batch
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
                 // wire up to azure table storage

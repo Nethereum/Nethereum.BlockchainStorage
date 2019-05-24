@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
                 for(var i = 0 ; i < 2; i ++) // 2 batch iterations
                 { 
                     var ctx = new System.Threading.CancellationTokenSource();
-                    var rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
+                    var rangeProcessed = await batchProcessorService.ProcessOnceAsync(ctx.Token);
                     blockRangesProcessed.Add(rangeProcessed);
 
                     // save event subscription state after each batch

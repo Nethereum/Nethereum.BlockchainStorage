@@ -4,21 +4,18 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class InMemoryBlockchainProgressRepository : IBlockProgressRepository
     {
-        public InMemoryBlockchainProgressRepository(ulong startingBlockNumber)
+        public InMemoryBlockchainProgressRepository(ulong? lastBlockProcessed)
         {
-            StartingBlockNumber = startingBlockNumber;
-            CurrentBlockNumber = StartingBlockNumber;
+            LastBlockProcessed = lastBlockProcessed;
         }
 
-        public ulong StartingBlockNumber { get; }
+        public ulong? LastBlockProcessed { get; private set;}
 
-        public ulong CurrentBlockNumber { get; private set;}
-
-        public Task<ulong?> GetLastBlockNumberProcessedAsync() => Task.FromResult((ulong?)CurrentBlockNumber);
+        public Task<ulong?> GetLastBlockNumberProcessedAsync() => Task.FromResult((ulong?)LastBlockProcessed);
 
         public Task UpsertProgressAsync(ulong blockNumber)
         {
-            CurrentBlockNumber = CurrentBlockNumber + 1;
+            LastBlockProcessed = blockNumber;
             return Task.CompletedTask;
         }
     }

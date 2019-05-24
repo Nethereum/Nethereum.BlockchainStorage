@@ -69,7 +69,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             try
             {
                 var ctx = new System.Threading.CancellationTokenSource();
-                rangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx.Token);
+                rangeProcessed = await batchProcessorService.ProcessOnceAsync(ctx.Token);
             }
             finally
             {

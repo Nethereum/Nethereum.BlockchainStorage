@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.TestData
         {
 
             [Event("Transfer")]
-            public class TransferEvent
+            public class TransferEvent : IEventDTO
             {
                 [Parameter("address", "_from", 1, true)]
                 public string From { get; set; }

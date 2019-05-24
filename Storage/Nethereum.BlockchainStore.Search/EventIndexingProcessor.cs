@@ -99,7 +99,7 @@ namespace Nethereum.BlockchainStore.Search
             BlockRange? lastBlockRangeProcessed;
             do
             {
-                lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx?.Token ?? new CancellationToken());
+                lastBlockRangeProcessed = await batchProcessorService.ProcessOnceAsync(ctx?.Token ?? new CancellationToken());
 
                 if (lastBlockRangeProcessed != null)
                 {

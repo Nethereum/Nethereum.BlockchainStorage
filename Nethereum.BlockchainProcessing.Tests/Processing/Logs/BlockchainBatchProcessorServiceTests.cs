@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                     .Setup(s => s.GetNextBlockRangeToProcessAsync(MaxBlocksPerBatch))
                     .ReturnsAsync((BlockRange?) null);
 
-                var processedRange = await Service.ProcessLatestBlocksAsync();
+                var processedRange = await Service.ProcessOnceAsync();
 
                 Assert.Null(processedRange);
                 MockProcessor.Verify(p => p.ProcessAsync(It.IsAny<BlockRange>()), Times.Never);
@@ -57,7 +57,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                     .Setup(s => s.SaveLastBlockProcessedAsync(range.To))
                     .Returns(Task.CompletedTask);
 
-                var processedRange = await Service.ProcessLatestBlocksAsync();
+                var processedRange = await Service.ProcessOnceAsync();
 
                 Assert.Equal(range, processedRange);
 

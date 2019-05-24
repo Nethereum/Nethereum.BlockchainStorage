@@ -18,11 +18,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         IBlockProgressRepository BlockProgressRepository { get; set; }
         string[] ContractAddresses { get; }
         Action<Exception> FatalErrorCallback { get; set; }
-        List<NewFilterInput> Filters { get; set; }
+        List<NewFilterInput> Filters { get; }
         uint? MaximumBlocksPerBatch { get; set; }
         uint? MinimumBlockConfirmations { get; set; }
-        uint? MinimumBlockNumber { get; set; }
-        List<ILogProcessor> Processors { get; set; }
+        ulong? MinimumBlockNumber { get; set; }
+        List<ILogProcessor> Processors { get; }
         Action<uint, BlockRange> RangesProcessedCallback { get; set; }
 
         IEventLogProcessor Configure(Action<IEventLogProcessor> configAction);
@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         IEventLogProcessor OnBatchProcessed(Action<uint, BlockRange> rangesProcessedCallback);
         IEventLogProcessor OnFatalError(Action<Exception> callBack);
         Task<ulong> RunAsync(CancellationToken cancellationToken);
-        Task<BlockRange?> RunForLatestBlocksAsync(CancellationToken cancellationToken);
+        Task<BlockRange?> RunOnceAsync(CancellationToken cancellationToken);
         Task<Task> RunInBackgroundAsync(CancellationToken cancellationToken);
         IEventLogProcessor CatchAll(Action<IEnumerable<FilterLog>> callBack);
         IEventLogProcessor CatchAll(Func<IEnumerable<FilterLog>, Task> callBack);

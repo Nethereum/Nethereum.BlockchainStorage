@@ -344,7 +344,7 @@ Solidity Contract Excerpt
                             BlockRange? lastBlockRangeProcessed;
                             do
                             {
-                                lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync();
+                                lastBlockRangeProcessed = await batchProcessorService.ProcessOnceAsync();
                             } while (lastBlockRangeProcessed != null);
 
                             Assert.Equal(19, transferIndexer.Indexed);

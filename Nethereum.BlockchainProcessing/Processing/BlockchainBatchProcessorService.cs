@@ -31,16 +31,16 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// Processes the blocks dictated by the progress service
         /// </summary>
         /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
-        public Task<BlockRange?> ProcessLatestBlocksAsync()
+        public Task<BlockRange?> ProcessOnceAsync()
         {
-            return ProcessLatestBlocksAsync(new CancellationToken());
+            return ProcessOnceAsync(new CancellationToken());
         }
 
         /// <summary>
         /// Processes the blocks dictated by the progress service
         /// </summary>
         /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
-        public async Task<BlockRange?> ProcessLatestBlocksAsync(CancellationToken cancellationToken)
+        public async Task<BlockRange?> ProcessOnceAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Getting block number range to process");
 
@@ -86,7 +86,7 @@ namespace Nethereum.BlockchainProcessing.Processing
                 if (cancellationToken.IsCancellationRequested) break;
 
                 rangeAttemptCount++;
-                var range = await ProcessLatestBlocksAsync(cancellationToken)
+                var range = await ProcessOnceAsync(cancellationToken)
                     .ConfigureAwait(false);
                 
                 if (cancellationToken.IsCancellationRequested) break;
