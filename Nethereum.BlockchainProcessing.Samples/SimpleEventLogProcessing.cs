@@ -7,6 +7,7 @@ using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -464,6 +465,27 @@ namespace Nethereum.BlockchainProcessing.Samples
 
             //clean up
             await cloudTableSetup.GetTransactionsLogTable().DeleteIfExistsAsync();
+        }
+
+        [Fact(Skip ="A deliberately long running test to be run when required (certainly not on CI!)")]
+        public async Task LongRunningProcessing()
+        {
+            int eventsCaught = 0;
+            int transfers = 0;
+            int approvals = 0;
+
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromHours(1));
+
+            var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
+                .Configure(c => c.MaximumBlocksPerBatch = 1)
+                .Configure(c => c.MinimumBlockConfirmations = 6)
+                .CatchAll((events) =>  { eventsCaught += events.Count(); Debug.WriteLine($"Events: {eventsCaught}"); }) 
+                .Subscribe<TransferEventDto>((events) => { transfers += events.Count(); Debug.WriteLine($"Transfers: {transfers}"); }) 
+                .Subscribe<ApprovalEventDTO>((events) => { approvals += events.Count(); Debug.WriteLine($"Approvals: {approvals}"); })                                                                    
+                .OnFatalError((ex) => Debug.WriteLine($"Fatal Error: {ex.Message}"))
+                .OnBatchProcessed((batchesProcessedCount, lastBlockRange) => 
+                    Debug.WriteLine($"Batch Processed. Batches: {batchesProcessedCount}, Last Range: From:{lastBlockRange.From} To{lastBlockRange.To}"))
+                .RunAsync(cancellationTokenSource.Token);
         }
     }
 }

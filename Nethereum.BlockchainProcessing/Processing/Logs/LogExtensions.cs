@@ -3,11 +3,17 @@ using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using Nethereum.Contracts;
+using System.Collections.Concurrent;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public static class LogExtensions
     {
+        // an internal cache of index mismatch decoding signatures
+        // used to intercept attempts to decode logs with the same signature and throwing unecessary errors 
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<int, bool>> _invalidTopicLengthsPerEvent = 
+            new ConcurrentDictionary<Type, ConcurrentDictionary<int, bool>>();
+
         public static List<EventLog<TEventDto>> DecodeAllEventsIgnoringIndexMisMatches<TEventDto>(this FilterLog[] logs) where TEventDto : class, new()
         {
             var list = new List<EventLog<TEventDto>>(logs.Length);
@@ -23,19 +29,53 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return list;
         }
 
-
         public static bool TryDecodeEvent<TEventDto>(this FilterLog log, out EventLog<TEventDto> eventLog) where TEventDto : class, new()
         {
+            var eventDtoType = typeof(TEventDto);
             eventLog = null;
             try
             {
+                if(log.MatchesPreviousDecodingIndexMismatch(eventDtoType)) return false;
+
                 eventLog = log.DecodeEvent<TEventDto>();
+
                 return true;
             }
             catch (Exception ex) when (ex.IsEventDecodingIndexMisMatch())
             {
+                CacheDecodingIndexMismatch(log, eventDtoType);
+
                 //ignore;
                 return false;
+            }
+        }
+
+        private static bool MatchesPreviousDecodingIndexMismatch(this FilterLog log, Type eventDtoType)
+        {
+            if(!_invalidTopicLengthsPerEvent.Any()) return false;
+
+            if(_invalidTopicLengthsPerEvent.TryGetValue(eventDtoType, out ConcurrentDictionary<int, bool> topicLengths))
+            {
+                if(topicLengths.TryGetValue(log.Topics.Length, out _)) return true;
+            }
+
+            return false;
+
+        }
+
+        private static void CacheDecodingIndexMismatch(FilterLog log, Type eventDtoType)
+        {
+            if (!_invalidTopicLengthsPerEvent.ContainsKey(eventDtoType))
+            {
+                _invalidTopicLengthsPerEvent.TryAdd(eventDtoType, new ConcurrentDictionary<int, bool>());
+            }
+
+            if (!_invalidTopicLengthsPerEvent.TryGetValue(eventDtoType, out ConcurrentDictionary<int, bool> topicLengths))
+            {
+                if (!topicLengths.ContainsKey(log.Topics.Length))
+                {
+                    topicLengths.TryAdd(log.Topics.Length, true);
+                }
             }
         }
 
