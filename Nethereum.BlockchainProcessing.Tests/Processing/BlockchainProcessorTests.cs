@@ -249,7 +249,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
                     Requests_Last_Block_Processed_From_Strategy_And_Uses_The_Previous_Block_Number()
                 {
                     const ulong LastBlockProcessed = 11;
-                    const ulong ExpectedStartBlock = LastBlockProcessed - 1;
+                    const ulong ExpectedStartBlock = LastBlockProcessed + 1;
                     const ulong EndingBlock = ExpectedStartBlock;
 
                     MockProcessingStrategy

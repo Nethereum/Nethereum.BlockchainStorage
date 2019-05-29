@@ -34,13 +34,13 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task<ulong> GetMaxBlockNumberAsync()
+        public async Task<ulong?> GetMaxBlockNumberAsync()
         {
             var countQuery = await Client.CreateDocumentQuery<CosmosBlock>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName)).CountAsync();
 
             if (countQuery == 0)
-                return 0;
+                return null;
 
             var sqlQuery = "SELECT VALUE MAX(b.BlockNumber) FROM Blocks b";
 

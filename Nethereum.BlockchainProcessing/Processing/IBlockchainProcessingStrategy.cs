@@ -12,7 +12,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         Task WaitForNextBlock(uint retryNumber);
         Task PauseFollowingAnError(uint retryNumber);
 
-        Task<ulong> GetLastBlockProcessedAsync();
+        Task<ulong?> GetLastBlockProcessedAsync();
         Task FillContractCacheAsync();
 
         Task ProcessBlockAsync(ulong blockNumber);

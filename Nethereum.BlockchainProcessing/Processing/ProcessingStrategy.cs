@@ -5,7 +5,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 {
     public class ProcessingStrategy : IBlockchainProcessingStrategy
     {
-        private static readonly Task<ulong> TaskReturningZero = Task.FromResult((ulong)0);
+        private static readonly Task<ulong?> TaskReturningNullUlong = Task.FromResult((ulong?)null);
         protected readonly IBlockProcessor BlockProcessor;
 
         public ProcessingStrategy(IBlockProcessor blockProcessor)
@@ -21,7 +21,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public virtual Task FillContractCacheAsync() { return Task.CompletedTask; }
 
-        public virtual Task<ulong> GetLastBlockProcessedAsync() => TaskReturningZero;
+        public virtual Task<ulong?> GetLastBlockProcessedAsync() => TaskReturningNullUlong;
         public virtual Task PauseFollowingAnError(uint retryNumber) => WaitStrategy.Apply(retryNumber);
         public virtual Task WaitForNextBlock(uint retryNumber) => WaitStrategy.Apply(retryNumber);
         public virtual Task ProcessBlockAsync(ulong blockNumber) => BlockProcessor.ProcessBlockAsync(blockNumber);

@@ -27,12 +27,9 @@ namespace Nethereum.BlockchainProcessing.Processing
 
             _log.LogInformation($"GetLastBlockProcessedAsync: {blockNumber}");
 
-            blockNumber = blockNumber <= 0 ? 0 : blockNumber - 1;
+            ulong startingBlock = blockNumber == null ? 0 : blockNumber.Value + 1;
 
-            if (_strategy.MinimumBlockNumber > blockNumber)
-                return _strategy.MinimumBlockNumber;
-
-            return blockNumber;
+            return _strategy.MinimumBlockNumber > startingBlock ? _strategy.MinimumBlockNumber : startingBlock;
         }
 
         /// <summary>

@@ -83,13 +83,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return blockOutput;
         }
 
-        public async Task<ulong> GetMaxBlockNumberAsync()
+        public async Task<ulong?> GetMaxBlockNumberAsync()
         {
             await _lock.WaitAsync();
             try
             {
                 await InitialiseMaxBlock();
-                return (ulong)_maxBlockCounter.Value;
+                return (ulong?)_maxBlockCounter.Value;
             }
             finally
             {

@@ -15,6 +15,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             set => PartitionKey = value.ToPartitionKey();
         }
 
-        public long Value { get; set; } = 0;
+        public long? Value { get; set; }
     }
 }

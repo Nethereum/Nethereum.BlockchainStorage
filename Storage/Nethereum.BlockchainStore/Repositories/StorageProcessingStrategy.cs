@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainStore.Repositories
             _repositoryHandlerContext = repositoryHandlerContext;
         }
 
-        public override async Task<ulong> GetLastBlockProcessedAsync()
+        public override async Task<ulong?> GetLastBlockProcessedAsync()
         {
             return await _repositoryHandlerContext.BlockRepository.GetMaxBlockNumberAsync().ConfigureAwait(false);
         }
