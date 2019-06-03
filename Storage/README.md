@@ -2,7 +2,7 @@
 
 ## Blockchain Storage
 
-The Nethereum blockhain store is a library that allows the retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
+The Nethereum blockchain store is a base library that allows the retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
 
 The current implementation processes and stores Blocks, Transactions, Logs, Contracts and the VM Stack.
 
@@ -25,7 +25,17 @@ All are .Net Standard 2.0 libraries for flexibility.
 ## Entities
 ![Entities](Entities.png)
 
-## Sample of Console processor
+## Samples
+
+Simple console apps have been created to demonstrate storage using different adapters.
+
+* [Azure Table Storage](Nethereum.BlockchainStore.AzureTables.Core.Console/Program.cs)
+* [Cosmos](Nethereum.BlockchainStore.CosmosCore.Console/Program.cs)
+* [CSV](Nethereum.BlockchainStore.Csv.Console/Program.cs)
+* [Sql Server - Entity Framework Core](Nethereum.BlockchainStore.EFCore.SqlServer.Console/Program.cs)
+* [Sqlite - Entity Framework Core](Nethereum.BlockchainStore.EFCore.Sqlite.Console/Program.cs)
+
+## Azure Table Storage In More Detail
 
 The console processor sample demonstrates how to process a range of blocks and initialisation of the library with the azure repository.
 
@@ -75,7 +85,7 @@ var valueTrasactionProcessor = new ValueTransactionProcessor(transactionReposito
 
 The ContractCreationTransactionProcessor has the option to Enabled or Disable the VM processing. Even if using Geth VM processing is rather slow.
 
-A top level transaction processor orchastrates the acess to the granular implementations:
+A top level transaction processor orchestrates the access to the granular implementations:
 
 ```csharp
   var transactionProcessor = new TransactionProcessor(_web3, contractTransactionProcessor,
