@@ -101,6 +101,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 var processedRange = await Service.ProcessOnceAsync();
 
                 Assert.Equal(smallerRange, processedRange);
+                Assert.Equal((ulong)5, Service.MaxNumberOfBlocksPerBatch);
 
                 MockProcessor.Verify();
                 MockProgressService.Verify();
@@ -128,6 +129,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 Assert.Equal((ulong)5, rangesAttempted[1].To);
                 Assert.Equal((ulong)2, rangesAttempted[2].To);
                 Assert.Equal((ulong)1, rangesAttempted[3].To);
+
+                Assert.Equal((ulong)1, Service.MaxNumberOfBlocksPerBatch);
             }
         }
 
