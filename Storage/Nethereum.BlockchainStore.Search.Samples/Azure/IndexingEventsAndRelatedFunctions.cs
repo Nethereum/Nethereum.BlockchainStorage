@@ -120,7 +120,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                         await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName);
 
                     Assert.Equal(32, transferEventCount);
-                    Assert.Equal(2, transferFunctionCount);
+                    Assert.Equal(13, transferFunctionCount);
                     Assert.Equal(2, transferFromFunctionCount);
                 }
                 finally
