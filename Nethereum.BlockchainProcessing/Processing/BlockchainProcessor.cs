@@ -41,10 +41,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// <param name="endBlock">End block - if null, will run continuously and wait for new blocks</param>
         /// <returns>False if processing was cancelled else True</returns>
         public Task<bool> ExecuteAsync(
-            ulong? startBlock, ulong? endBlock)
-        {
-            return ExecuteAsync(startBlock, endBlock, new CancellationToken());
-        }
+            ulong? startBlock, ulong? endBlock) => ExecuteAsync(startBlock, endBlock, new CancellationToken());
 
         public async Task<bool> ExecuteAsync(
             ulong? startBlock, ulong? endBlock, CancellationToken cancellationToken)
@@ -74,14 +71,10 @@ namespace Nethereum.BlockchainProcessing.Processing
                 .ExecuteAsync().ConfigureAwait(false);
         }
 
-        public Task ProcessAsync(BlockRange range)
-        {
-            return ExecuteAsync(range.From, range.To, new CancellationToken());
-        }
+        public Task ProcessAsync(BlockRange range) => ExecuteAsync(range.From, range.To, new CancellationToken());
 
-        public Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
-        {
-            return ExecuteAsync(range.From, range.To, cancellationToken);
-        }
+
+        public Task ProcessAsync(BlockRange range, CancellationToken cancellationToken) => ExecuteAsync(range.From, range.To, cancellationToken);
+       
     }
 }
