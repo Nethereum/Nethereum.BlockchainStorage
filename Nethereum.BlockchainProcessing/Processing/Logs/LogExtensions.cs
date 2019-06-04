@@ -92,6 +92,15 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             return $"{log.TransactionHash}{log.LogIndex.HexValue}";
         }
 
+        public static FilterLog[] Sort(this IEnumerable<FilterLog> logs)
+        {
+            return logs
+                .OrderBy(l => l.BlockNumber?.Value)
+                .OrderBy(l => l.TransactionIndex?.Value)
+                .OrderBy(l => l.LogIndex?.Value)
+                .ToArray();
+        }
+
         public static Dictionary<string, FilterLog> Merge(this Dictionary<string, FilterLog> masterList, FilterLog[] candidates)
         {
             foreach (var log in candidates)

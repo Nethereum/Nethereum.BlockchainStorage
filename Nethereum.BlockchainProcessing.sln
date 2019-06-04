@@ -117,6 +117,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queue", "Queue", "{EFB15A00
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{1AFBA3E1-617B-4EDA-A592-5C276FF64A31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainProcessing.PerformanceTests", "Nethereum.BlockchainProcessing.PerformanceTests\Nethereum.BlockchainProcessing.PerformanceTests.csproj", "{950A988D-81A7-4CAB-90F1-D6252A3709EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -255,6 +257,10 @@ Global
 		{01A1FCBA-97AA-4F6A-A1EB-4FCCF750ED1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01A1FCBA-97AA-4F6A-A1EB-4FCCF750ED1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01A1FCBA-97AA-4F6A-A1EB-4FCCF750ED1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{950A988D-81A7-4CAB-90F1-D6252A3709EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{950A988D-81A7-4CAB-90F1-D6252A3709EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{950A988D-81A7-4CAB-90F1-D6252A3709EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{950A988D-81A7-4CAB-90F1-D6252A3709EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -101,6 +101,10 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
             {
                 return await web3Request().ConfigureAwait(false);
             }
+            catch(RpcResponseException rpcResponseEx) when(rpcResponseEx.Message.StartsWith("query returned more than"))
+            {
+                throw new TooManyRecordsException(rpcResponseEx);
+            }
             catch (RpcClientUnknownException)
             {
                 attempts++;

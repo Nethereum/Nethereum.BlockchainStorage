@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Xunit;
 
@@ -63,6 +64,70 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 MockProcessor.Verify();
                 MockProgressService.Verify();
+            }
+
+            [Fact]
+            public async Task Catches_Too_Many_Records_Exception_And_Retries_With_Reduced_Batch_Size()
+            {
+                var largeRange = new BlockRange(0, 10);
+                //expect the batch size to be reduced by half
+                var smallerRange = new BlockRange(0, 5);
+
+                //expect max of 10 blocks to be requested
+                MockProgressService
+                    .Setup(s => s.GetNextBlockRangeToProcessAsync(MaxBlocksPerBatch))
+                    .ReturnsAsync(largeRange);
+
+                // mock a too-many-records exception
+                MockProcessor
+                    .Setup(p => p.ProcessAsync(largeRange, It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(new TooManyRecordsException());
+
+                //expect max of 5 blocks to be requested
+                MockProgressService
+                    .Setup(s => s.GetNextBlockRangeToProcessAsync(5))
+                    .ReturnsAsync(smallerRange);
+
+                // mock a successfull process attempt
+                MockProcessor
+                    .Setup(p => p.ProcessAsync(smallerRange, It.IsAny<CancellationToken>()))
+                    .Returns(Task.CompletedTask);
+
+                // expect progress to be updated
+                MockProgressService
+                    .Setup(s => s.SaveLastBlockProcessedAsync(smallerRange.To))
+                    .Returns(Task.CompletedTask);
+
+                var processedRange = await Service.ProcessOnceAsync();
+
+                Assert.Equal(smallerRange, processedRange);
+
+                MockProcessor.Verify();
+                MockProgressService.Verify();
+            }
+
+            [Fact]
+            public async Task Catches_Too_Many_Records_Exception_Will_Throw_If_Max_Blocks_Reaches_One()
+            {
+                var largeRange = new BlockRange(0, 10);
+                var rangesAttempted = new List<BlockRange>();
+
+                MockProgressService
+                    .Setup(s => s.GetNextBlockRangeToProcessAsync(It.IsAny<uint>()))
+                    .Returns<uint>((newMax) => Task.FromResult(new BlockRange?(new BlockRange(0, newMax))));
+
+                // mock a too-many-records exception for every call
+                MockProcessor
+                    .Setup(p => p.ProcessAsync(It.IsAny<BlockRange>(), It.IsAny<CancellationToken>()))
+                    .Callback<BlockRange, CancellationToken>((range, token) => rangesAttempted.Add(range))
+                    .ThrowsAsync(new TooManyRecordsException());
+
+                await Assert.ThrowsAsync<TooManyRecordsException>(async () => await Service.ProcessOnceAsync());
+
+                Assert.Equal((ulong)10, rangesAttempted[0].To);
+                Assert.Equal((ulong)5, rangesAttempted[1].To);
+                Assert.Equal((ulong)2, rangesAttempted[2].To);
+                Assert.Equal((ulong)1, rangesAttempted[3].To);
             }
         }
 

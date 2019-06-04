@@ -3,6 +3,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Nethereum.Configuration;
 using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
@@ -11,10 +12,15 @@ namespace Nethereum.BlockchainProcessing.Processing
         private readonly IBlockchainProcessor _processor;
         private readonly ILogger _logger = ApplicationLogging.CreateLogger<BlockchainBatchProcessorService>();
         private readonly IBlockProgressService _progressService;
-        private readonly uint _maxNumberOfBlocksPerBatch;
         private static readonly uint DefaultMaxNumberOfBlocksPerBatch = 100;
 
         public IWaitStrategy WaitForBlockStrategy { get; set; } = new WaitStrategy();
+
+        /// <summary>
+        /// When clients return "too many records" error - automatically retry with reduced batch size
+        /// </summary>
+        public bool EnableAutoBatchResizing { get;set;} = true;
+        public uint MaxNumberOfBlocksPerBatch { get; set; }
 
         public BlockchainBatchProcessorService(
             IBlockchainProcessor processor, 
@@ -24,7 +30,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             _processor = processor;
             _progressService = progressService;
 
-            _maxNumberOfBlocksPerBatch = maxNumberOfBlocksPerBatch ?? DefaultMaxNumberOfBlocksPerBatch;
+            MaxNumberOfBlocksPerBatch = maxNumberOfBlocksPerBatch ?? DefaultMaxNumberOfBlocksPerBatch;
         }
 
         /// <summary>
@@ -36,35 +42,57 @@ namespace Nethereum.BlockchainProcessing.Processing
             return ProcessOnceAsync(new CancellationToken());
         }
 
+
+
         /// <summary>
         /// Processes the blocks dictated by the progress service
         /// </summary>
         /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
         public async Task<BlockRange?> ProcessOnceAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting block number range to process");
+            try 
+            { 
+                _logger.LogInformation("Getting block number range to process");
 
-            var nullableRange = await _progressService
-                .GetNextBlockRangeToProcessAsync(_maxNumberOfBlocksPerBatch)
-                .ConfigureAwait(false);
+                var nullableRange = await _progressService
+                    .GetNextBlockRangeToProcessAsync(MaxNumberOfBlocksPerBatch)
+                    .ConfigureAwait(false);
 
-            if (nullableRange == null)
-            {
-                _logger.LogInformation("No block range to process - the most recent block may already have been processed");
-                return null;
+                if (nullableRange == null)
+                {
+                    _logger.LogInformation("No block range to process - the most recent block may already have been processed");
+                    return null;
+                }
+
+                var range = nullableRange.Value;
+
+                _logger.LogInformation($"Processing Block Range. from: {range.From} to {range.To}");
+                await _processor.ProcessAsync(range, cancellationToken)
+                    .ConfigureAwait(false);
+
+                _logger.LogInformation($"Updating current process progress to: {range.To}");
+                await _progressService.SaveLastBlockProcessedAsync(range.To)
+                    .ConfigureAwait(false);
+
+                return range;
             }
+            catch(TooManyRecordsException ex)
+            {
+                _logger.LogWarning($"Too many results error. : {ex.Message}");
 
-            var range = nullableRange.Value;
+                if (MaxNumberOfBlocksPerBatch > 1 && EnableAutoBatchResizing) // try again with a smaller batch size
+                {
+                    uint newBatchLimit = MaxNumberOfBlocksPerBatch / 2;
 
-            _logger.LogInformation($"Processing Block Range. from: {range.From} to {range.To}");
-            await _processor.ProcessAsync(range, cancellationToken)
-                .ConfigureAwait(false);
+                    _logger.LogWarning($"Resetting _maxNumberOfBlocksPerBatch. Old Value:{MaxNumberOfBlocksPerBatch}, New Value: {newBatchLimit}");
 
-            _logger.LogInformation($"Updating current process progress to: {range.To}");
-            await _progressService.SaveLastBlockProcessedAsync(range.To)
-                .ConfigureAwait(false);
+                    MaxNumberOfBlocksPerBatch = newBatchLimit;
 
-            return range;
+                    return await ProcessOnceAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                throw;
+            }
         }
 
         /// <summary>

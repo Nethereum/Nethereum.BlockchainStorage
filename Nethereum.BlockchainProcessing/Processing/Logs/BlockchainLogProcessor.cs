@@ -102,10 +102,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
                 logs.Merge(logsMatchingFilter);
 
-                if (cancellationToken.IsCancellationRequested) return logs.Values.ToArray();
+                if (cancellationToken.IsCancellationRequested) return logs.Values.Sort();
             }
 
-            return logs.Values.ToArray();
+            return logs.Values.Sort();
         }
 
         private async Task<FilterLog[]> RetrieveLogsAsync(
@@ -118,6 +118,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 _log.LogInformation($"RetrieveLogsAsync - getting logs. RetryNumber:{retryNumber}, from:{range.From}, to:{range.To}.");
 
                 return await _eventLogProxy.GetLogs(filter).ConfigureAwait(false);
+            }
+            catch (TooManyRecordsException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
