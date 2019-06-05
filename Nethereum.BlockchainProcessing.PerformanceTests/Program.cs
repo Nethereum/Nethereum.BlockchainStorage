@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
@@ -14,21 +15,32 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.PerformanceTests
 {
+
+
     class Program
     {
+        private static readonly ILogger _log = ApplicationLogging.CreateLogger<Program>();
+
         static async Task Main(string[] args)
         {
             try
             {
+                Config.LogOutputToConsole();
+                _log.LogInformation("Starting");
 
                 //var test = new WritingTransfersToTheConsole(numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 1000);
-                var test = new WritingTransfersToTheAzureStorage(Config.AzureConnectionString, "perfTest", numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 100);
+                var test = new WritingTransfersToTheAzureStorage(
+                    Config.AzureConnectionString, 
+                    "perfTest", 
+                    numberOfBlocksToProcess: 171_000, 
+                    maxDuration: TimeSpan.FromHours(5), 
+                    maxBlocksPerBatch: 100);
                 //WritingTransfersToTheAzureStorage
                 await test.RunTestAsync();
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _log.LogError(ex.ToString());
             }
 
             Console.ReadLine();
@@ -38,6 +50,11 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
     public class Config
     {
         static IConfigurationRoot _config;
+
+        public static void LogOutputToConsole()
+        {
+            Configuration.AddConsoleLogging();
+        }
 
         public static IConfigurationRoot Configuration
         {
@@ -51,8 +68,6 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
                     //e.g. dotnet user-secrets set "AzureStorageConnectionString" "<put key here>"
                     _config = ConfigurationUtils
                         .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainProcessing.PerformanceTests");
-
-                    ConfigurationUtils.AddConsoleLogging(_config);
                 }
                 return _config;
             }
@@ -63,19 +78,23 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
     public abstract class PerfTest
     {
+        protected static readonly ILogger _log = ApplicationLogging.CreateLogger<PerfTest>();
+
         public virtual Task ConfigureAsync() => Task.CompletedTask;
         protected abstract Task RunAsync();
+
+        protected Stopwatch stopWatch;
 
         public virtual async Task RunTestAsync()
         {
             await ConfigureAsync();
-            var stopWatch = Stopwatch.StartNew();
+            stopWatch = Stopwatch.StartNew();
             await RunAsync();
             var elapsed = stopWatch.Elapsed;
             stopWatch.Stop();
 
-            Console.WriteLine("Finished");
-            Console.WriteLine($"Elapsed: Hours: {elapsed.Hours}, Minutes: {elapsed.Minutes}, Seconds: {elapsed.Seconds}, Ms: {elapsed.Milliseconds}");
+            _log.LogInformation("** Finished");
+            _log.LogInformation($"** Elapsed: Hours: {elapsed.Hours}, Minutes: {elapsed.Minutes}, Seconds: {elapsed.Seconds}, Ms: {elapsed.Milliseconds}");
         }
     }
 
@@ -94,11 +113,17 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             cancellationTokenSource = new CancellationTokenSource(maxDuration);
             processor = new EventLogProcessor("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
                 .Filter<TransferEventDto>()
-                .StoreInAzureTable<TransferEventDto>(azureConnectionString, tablePrefix, (tfr) => { EventsHandled ++; BlocksContainingTransfers.Add(tfr.Log.BlockNumber); return true; })
+                .StoreInAzureTable(azureConnectionString, tablePrefix, (Predicate<EventLog<TransferEventDto>>)((tfr) => TransferCallback(tfr)))
                 .OnBatchProcessed((rangesProcessed, lastRange) => Output(rangesProcessed, lastRange));
 
             processor.MaximumBlocksPerBatch = maxBlocksPerBatch;
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
+        }
+
+        private bool TransferCallback(EventLog<TransferEventDto> tfr)
+        {
+            EventsHandled++; 
+            BlocksContainingTransfers.Add(tfr.Log.BlockNumber); return true;
         }
 
         private void Output(uint rangesProcessed, BlockRange lastRange)
@@ -106,7 +131,9 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             BlocksProcessed += lastRange.BlockCount; LastBlock = lastRange.To; 
             if (lastRange.To >= MaxBlockNumber) { cancellationTokenSource.Cancel(); }
 
-            Console.WriteLine($"Blocks: {BlocksProcessed}, Last Block: {LastBlock}, Blocks With Transfers: {BlocksContainingTransfers.Count}, Transfers: {EventsHandled}");
+            var elapsed = stopWatch.Elapsed;
+            _log.LogInformation($"** ELAPSED: Hours: {elapsed.Hours}, Minutes: {elapsed.Minutes}, Seconds: {elapsed.Seconds}");
+            _log.LogInformation($"** PROGRESS: Blocks: {BlocksProcessed}, Last Block: {LastBlock}, Blocks With Transfers: {BlocksContainingTransfers.Count}, Transfers: {EventsHandled}");
         }
 
         public uint NumberOfBlocksToProcess { get; }
@@ -140,10 +167,23 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             processor = new EventLogProcessor("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
                 .Filter<TransferEventDto>()
                 .Subscribe<TransferEventDto>((events) => Output(events))
-                .OnBatchProcessed((rangesProcessed, lastRange) => { BlocksProcessed += lastRange.BlockCount; LastBlock = lastRange.To; if (lastRange.To >= MaxBlockNumber) { cancellationTokenSource.Cancel(); } });
+                .OnBatchProcessed((_, lastRange) =>
+                {
+                    HandleBatchProcessed(lastRange);
+                });
 
             processor.MaximumBlocksPerBatch = maxBlocksPerBatch;
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
+        }
+
+        private void HandleBatchProcessed(BlockRange lastRange)
+        {
+            BlocksProcessed += lastRange.BlockCount;
+            LastBlock = lastRange.To;
+            if (lastRange.To >= MaxBlockNumber)
+            {
+                cancellationTokenSource.Cancel();
+            }
         }
 
         public uint NumberOfBlocksToProcess { get; }
@@ -163,14 +203,14 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         {
             events = events ?? Array.Empty<EventLog<TransferEventDto>>();
 
-            Console.WriteLine(DateTime.Now.ToLongTimeString());
+            _log.LogInformation(DateTime.Now.ToLongTimeString());
             foreach(var e in events)
             {
-                Console.WriteLine($"\tBlock: {e.Log.BlockNumber.Value}, Hash: {e.Log.TransactionHash}, Index: {e.Log.LogIndex.Value}, From: {e.Event.From}, To: {e.Event.To}, Value: {e.Event.Value}");
+                _log.LogInformation($"\tBlock: {e.Log.BlockNumber.Value}, Hash: {e.Log.TransactionHash}, Index: {e.Log.LogIndex.Value}, From: {e.Event.From}, To: {e.Event.To}, Value: {e.Event.Value}");
                 EventsHandled++;
                 BlocksContainingTransfers.Add(e.Log.BlockNumber);
             }
-            Console.WriteLine($"Blocks: {BlocksProcessed}, Last Block: {LastBlock}, Blocks With Transfers: {BlocksContainingTransfers.Count}, Transfers: {EventsHandled}");
+            _log.LogInformation($"Blocks: {BlocksProcessed}, Last Block: {LastBlock}, Blocks With Transfers: {BlocksContainingTransfers.Count}, Transfers: {EventsHandled}");
         }
 
     }
