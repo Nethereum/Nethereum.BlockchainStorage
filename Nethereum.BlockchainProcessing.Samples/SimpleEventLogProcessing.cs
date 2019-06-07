@@ -128,10 +128,13 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .SetMinimumBlockNumber(10)
                 .SetBlocksPerBatch(1)
                 .Build();
+            
+            var filters = new [] { 
+                new NewFilterInputBuilder<TransferEventDto>().Build(), 
+                new NewFilterInputBuilder<ApprovalEventDTO>().Build() 
+            };
 
-            var manyEventsProcessor = web3.Eth.LogsProcessor()
-                .Filter<ApprovalEventDTO>()
-                .Filter<TransferEventDto>(f => f.AddTopic(t => t.From, "xyz").AddTopic(t => t.To, "abc"))
+            var manyEventsProcessor = web3.Eth.LogsProcessor(filters)
                 .Add((logs) => { }) //FilterLogs
                 .Build();
 
