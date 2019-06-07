@@ -2,6 +2,7 @@
 using Nethereum.ABI.Decoders;
 using Nethereum.ABI.Model;
 using Nethereum.Contracts;
+using Nethereum.Contracts.Services;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,15 +15,20 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
 
     public class ContractQueryHelper : IContractQuery
     {
-        private readonly Web3.IWeb3 web3;
+        private readonly IEthApiContractService eth;
 
-        public ContractQueryHelper(Web3.IWeb3 web3)
+        public ContractQueryHelper(Web3.IWeb3 web3):this(web3.Eth)
         {
-            this.web3 = web3;
         }
+
+        public ContractQueryHelper(IEthApiContractService ethApiContractService)
+        {
+            this.eth = ethApiContractService;
+        }
+
         public async Task<object> Query(string contractAddress, string contractABI, string functionSignature, object[] functionInputs = null)
         {
-            var contract = web3.Eth.GetContract(contractABI, contractAddress);
+            var contract = eth.GetContract(contractABI, contractAddress);
             var functionAbi =  contract.ContractBuilder.ContractABI.Functions.FirstOrDefault(f => f.Sha3Signature == functionSignature);
             var function = new Function(contract, new FunctionBuilder(contractAddress, functionAbi));
 

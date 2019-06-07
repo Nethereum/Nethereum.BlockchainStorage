@@ -25,6 +25,14 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         {
             try
             {
+                //var p = new Web3.Web3().Eth.CreateLogProcesssor<T>(() => DOsoMETO, );
+
+                //p.WriteToLocalStorage();
+
+                // p.Start()
+
+
+
                 Config.LogOutputToConsole();
                 _log.LogInformation("Starting");
 

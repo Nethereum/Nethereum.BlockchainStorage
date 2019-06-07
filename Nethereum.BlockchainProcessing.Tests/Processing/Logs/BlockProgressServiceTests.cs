@@ -24,6 +24,19 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         public class GetNextBlockRangeTests : BlockProgressServiceTests
         {
+            [Fact]
+            public async Task When_Nothing_Has_Been_Processed_And_Default_Starting_Block_Is_Null_Returns_Current_Block_On_The_Chain_Less_Min_Confirmations()
+            {
+                Service = new BlockProgressService(Web3.Object, null, ProgressRepo.Object, minimumBlockConfirmations: 6);
+
+                Web3.Setup(r => r.GetMaxBlockNumberAsync()).ReturnsAsync((ulong)20);
+                ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong?)null);
+
+                var range = await Service.GetNextBlockRangeToProcessAsync(100);
+
+                Assert.Equal(new BlockRange(14, 14), range);
+            }
+
 
             [Fact]
             public async Task When_Nothing_Has_Been_Processed_Returns_Specified_Starting_Block()

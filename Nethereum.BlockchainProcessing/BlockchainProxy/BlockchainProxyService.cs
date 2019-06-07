@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nethereum.Contracts.Services;
 using Nethereum.Geth;
 using Nethereum.Geth.RPC.Debug.DTOs;
 using Nethereum.Hex.HexTypes;
@@ -16,13 +17,20 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
         public BlockchainProxyService(string url):this(new Web3.Web3(url))
         {}
 
-        public BlockchainProxyService(Web3.IWeb3 web3)
+        public BlockchainProxyService(Web3.IWeb3 web3):this(web3.Eth)
         {
             Web3 = web3;
-            _queryHelper = new ContractQueryHelper(web3);
+        }
+
+        public BlockchainProxyService(IEthApiContractService ethApiContractService)
+        {
+            Eth = ethApiContractService;
+            _queryHelper = new ContractQueryHelper(ethApiContractService);
         }
 
         private Web3.IWeb3 Web3 { get; }
+
+        private IEthApiContractService Eth { get;}
 
         public Task<BlockWithTransactions> GetBlockWithTransactionsAsync
             (ulong blockNumber)
@@ -31,7 +39,7 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
             {
                 var block =
                     await
-                        Web3.Eth.Blocks.GetBlockWithTransactionsByNumber
+                        Eth.Blocks.GetBlockWithTransactionsByNumber
                             .SendRequestAsync(
                             new HexBigInteger(blockNumber))
                             .ConfigureAwait(false);
@@ -41,13 +49,13 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
 
         public Task<string> GetCode(string address)
         {
-            return Wrap(async () => await Web3.Eth.GetCode.SendRequestAsync(address)
+            return Wrap(async () => await Eth.GetCode.SendRequestAsync(address)
                 .ConfigureAwait(false));
         }
 
         public Task<FilterLog[]> GetLogs(NewFilterInput newFilter, object id = null)
         {
-            return Wrap(async () => await Web3.Eth.Filters.GetLogs
+            return Wrap(async () => await Eth.Filters.GetLogs
                 .SendRequestAsync(newFilter, id)
                 .ConfigureAwait(false));
         }
@@ -56,21 +64,21 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
         {
             return Wrap(async () =>
             {
-                var blockNumber = await Web3.Eth.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false);
+                var blockNumber = await Eth.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false);
                 return (ulong) blockNumber.Value;
             });
         }
 
         public Task<Transaction> GetTransactionByHash(string txnHash)
         {
-            return Wrap(async () => await Web3.Eth.Transactions.GetTransactionByHash
+            return Wrap(async () => await Eth.Transactions.GetTransactionByHash
                 .SendRequestAsync(txnHash)
                 .ConfigureAwait(false));
         }
 
         public Task<TransactionReceipt> GetTransactionReceipt(string txnHash)
         {
-            return Wrap(async () => await Web3.Eth.Transactions.
+            return Wrap(async () => await Eth.Transactions.
                 GetTransactionReceipt.
                 SendRequestAsync(txnHash).
                 ConfigureAwait(false));

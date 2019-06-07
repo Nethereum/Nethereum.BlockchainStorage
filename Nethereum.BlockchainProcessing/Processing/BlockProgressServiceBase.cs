@@ -4,11 +4,11 @@ namespace Nethereum.BlockchainProcessing.Processing
 {
     public abstract class BlockProgressServiceBase: IBlockProgressService
     {
-        protected ulong DefaultStartingBlockNumber;
+        protected ulong? DefaultStartingBlockNumber;
         private readonly IBlockProgressRepository _blockProgressRepository;
 
         protected BlockProgressServiceBase(
-            ulong defaultStartingBlockNumber, 
+            ulong? defaultStartingBlockNumber, 
             IBlockProgressRepository blockProgressRepository)
         {
             DefaultStartingBlockNumber = defaultStartingBlockNumber;
@@ -22,20 +22,31 @@ namespace Nethereum.BlockchainProcessing.Processing
                 .ConfigureAwait(false);
         }
 
+        protected virtual Task<ulong> GetMinBlockNumber() => Task.FromResult((ulong)0);
+
+        private async Task<ulong> LazyLoadDefaultStartingBlockNumber()
+        {
+            if(DefaultStartingBlockNumber == null)
+            {
+                DefaultStartingBlockNumber = await GetMinBlockNumber().ConfigureAwait(false);
+            }
+
+            return DefaultStartingBlockNumber.Value;
+        } 
+
         public virtual async Task<ulong> GetBlockNumberToProcessFrom()
         {
             var lastBlockProcessed = await _blockProgressRepository
                 .GetLastBlockNumberProcessedAsync()
                 .ConfigureAwait(false);
 
-            var blockNumber = DefaultStartingBlockNumber;
-
             if (lastBlockProcessed != null)
             {
                 //last block plus one
-                blockNumber = lastBlockProcessed.Value + 1;
+                return lastBlockProcessed.Value + 1;
             }
-            return blockNumber;
+
+            return await LazyLoadDefaultStartingBlockNumber().ConfigureAwait(false);
         }
 
         public abstract Task<ulong> GetBlockNumberToProcessTo();

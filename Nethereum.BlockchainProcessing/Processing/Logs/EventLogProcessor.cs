@@ -4,6 +4,7 @@ using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
+using Nethereum.Contracts.Services;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public EventLogProcessor(Web3.IWeb3 web3, string[] contractAddresses) :
             this(new BlockchainProxyService(web3), contractAddresses)
+        { }
+
+        public EventLogProcessor(IEthApiContractService eth, string[] contractAddresses) :
+            this(new BlockchainProxyService(eth), contractAddresses)
         { }
 
         public EventLogProcessor(IBlockchainProxyService blockchainProxyService, string[] contractAddresses = null)

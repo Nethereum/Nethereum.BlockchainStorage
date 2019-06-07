@@ -26,5 +26,21 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 eventLogProcessor.OnDisposing -= disposeHandler;
             }
         }
+
+        /// <summary>
+        /// Ensures the dependency will be disposed when the event log processor is disposed
+        /// </summary>
+        /// <param name="eventLogProcessor"></param>
+        /// <param name="dependency"></param>
+        public static void MarkForDisposal(this BlockchainBatchProcessorService eventLogProcessor, IDisposable dependency)
+        {
+            eventLogProcessor.OnDisposing += disposeHandler;
+
+            void disposeHandler(object s, EventArgs src)
+            {
+                dependency.Dispose();
+                eventLogProcessor.OnDisposing -= disposeHandler;
+            }
+        }
     }
 }

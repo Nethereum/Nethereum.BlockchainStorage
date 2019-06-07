@@ -91,6 +91,87 @@ namespace Nethereum.BlockchainProcessing.Samples
         }
 
         /// <summary>
+        /// One contract, one event, minimal setup
+        /// </summary>
+        [Fact]
+        public async Task SubscribingToOneEventOnAContract_v2()
+        {
+            //cancellation token to enable the listener to be stopped
+            //passing in a time limit as a safety valve for the unit test
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+            //instantiate web3 
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
+            //somewhere to put matching events
+            //using ConcurrentBag because we'll be referencing the collection on different threads
+            var erc20Transfers = new ConcurrentBag<EventLog<TransferEventDto>>();
+
+            //this is the contract we want to listen to
+            //the processor also accepts an array of addresses
+            const string ContractAddress = "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2";
+
+            //build a processor based on event and contract address
+            //pass in a lambda to handle the events 
+            var processor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddress)
+                .OnEvents((transfers) => erc20Transfers.AddRange(transfers))
+                .SetMinimumBlockNumber(7540000)
+                .Build();
+
+            var eventSpecificProcessor = web3.Eth.LogsProcessor<TransferEventDto>()
+                .OnEvents((transfers) => { })
+                .SetMinimumBlockNumber(10)
+                .SetBlocksPerBatch(1)
+                .Build();
+
+            var nonEventSpecificProcessor = web3.Eth.LogsProcessor()
+                .Add((logs) => { }) //any FilterLogs
+                .SetMinimumBlockNumber(10)
+                .SetBlocksPerBatch(1)
+                .Build();
+
+            var manyEventsProcessor = web3.Eth.LogsProcessor()
+                .Filter<ApprovalEventDTO>()
+                .Filter<TransferEventDto>(f => f.AddTopic(t => t.From, "xyz").AddTopic(t => t.To, "abc"))
+                .Add((logs) => { }) //FilterLogs
+                .Build();
+
+            //event and topic specific
+            var eventAndTopicProcesor = web3.Eth.LogsProcessor()
+                .Filter<TransferEventDto>(f => f.AddTopic(t => t.From, "xyz").AddTopic(t => t.To, "abc"))
+                .Add<TransferEventDto>((transfers) => { })
+                .Build();
+
+            //events on a contract
+            var contractEventsProcessor = web3.Eth.LogsProcessor(ContractAddress)
+                .Add<ApprovalEventDTO>(approvals => { })
+                .Add<TransferEventDto>(transfers => { })
+                .Build();
+
+            //events on many contracts
+            var manyContractEventsProcessor = web3.Eth.LogsProcessor(new []{ContractAddress })
+                .Add<ApprovalEventDTO>(approvals => { })
+                .Add<TransferEventDto>(transfers => { })
+                .Build();
+
+
+            //run the processor in the background
+            var backgroundTask = processor.ProcessContinuallyInBackgroundAsync(cancellationTokenSource.Token);
+
+            //simulate doing something else whilst the listener works its magic!
+            while (!backgroundTask.IsCompleted)
+            {
+                if (erc20Transfers.Any())
+                {
+                    cancellationTokenSource.Cancel();
+                    break;
+                }
+                await Task.Delay(1000);
+            }
+
+            Assert.True(erc20Transfers.Any());
+        }
+
+        /// <summary>
         /// One contract, many events, more advanced setup, running in the background
         /// </summary>
         [Fact]

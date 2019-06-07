@@ -11,18 +11,22 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public BlockProgressService(
             IBlockchainProxyService blockchainProxyService, 
-            ulong defaultStartingBlockNumber, 
+            ulong? defaultStartingBlockNumber, 
             IBlockProgressRepository blockProgressRepository,
-            uint minimumBlockConfirmations = 0) : 
+            uint? minimumBlockConfirmations = null) : 
             base(
             defaultStartingBlockNumber, 
             blockProgressRepository)
         {
             _web3 = blockchainProxyService;
-            MinimumBlockConfirmations = minimumBlockConfirmations;
+            MinimumBlockConfirmations = minimumBlockConfirmations ?? 0;
         }
 
-        public override async Task<ulong> GetBlockNumberToProcessTo()
+        protected override Task<ulong> GetMinBlockNumber() => GetCurrentBlockNumberLessMinimumConfirmations();
+
+        public override Task<ulong> GetBlockNumberToProcessTo() => GetCurrentBlockNumberLessMinimumConfirmations();
+
+        private  async Task<ulong> GetCurrentBlockNumberLessMinimumConfirmations()
         {
             return await _web3.GetMaxBlockNumberAsync()
                        .ConfigureAwait(false) - MinimumBlockConfirmations;

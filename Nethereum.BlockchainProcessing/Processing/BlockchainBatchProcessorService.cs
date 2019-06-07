@@ -7,7 +7,7 @@ using Nethereum.BlockchainProcessing.BlockchainProxy;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class BlockchainBatchProcessorService
+    public class BlockchainBatchProcessorService : ILogsProcessor
     {
         private readonly IBlockchainProcessor _processor;
         private readonly ILogger _logger = ApplicationLogging.CreateLogger<BlockchainBatchProcessorService>();
@@ -16,42 +16,40 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public IWaitStrategy WaitForBlockStrategy { get; set; } = new WaitStrategy();
 
+        public event EventHandler OnDisposing;
+
         /// <summary>
         /// When clients return "too many records" error - automatically retry with reduced batch size
         /// </summary>
-        public bool EnableAutoBatchResizing { get;set;} = true;
+        public bool EnableAutoBatchResizing { get; set; } = true;
         public uint MaxNumberOfBlocksPerBatch { get; set; }
+        public Action<uint, BlockRange> BatchProcessedCallback { get; private set; }
+        public Action<Exception> FatalErrorCallback { get; private set; }
 
         public BlockchainBatchProcessorService(
-            IBlockchainProcessor processor, 
-            IBlockProgressService  progressService, 
-            uint? maxNumberOfBlocksPerBatch = null)
+            IBlockchainProcessor processor,
+            IBlockProgressService progressService,
+            uint? maxNumberOfBlocksPerBatch = null,
+            Action<uint, BlockRange> rangesProcessedCallback = null,
+            Action<Exception> fatalErrorCallback = null)
         {
             _processor = processor;
             _progressService = progressService;
 
             MaxNumberOfBlocksPerBatch = maxNumberOfBlocksPerBatch ?? DefaultMaxNumberOfBlocksPerBatch;
+            BatchProcessedCallback = rangesProcessedCallback;
+            FatalErrorCallback = fatalErrorCallback;
         }
-
-        /// <summary>
-        /// Processes the blocks dictated by the progress service
-        /// </summary>
-        /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
-        public Task<BlockRange?> ProcessOnceAsync()
-        {
-            return ProcessOnceAsync(new CancellationToken());
-        }
-
 
 
         /// <summary>
         /// Processes the blocks dictated by the progress service
         /// </summary>
         /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
-        public async Task<BlockRange?> ProcessOnceAsync(CancellationToken cancellationToken)
+        public async Task<BlockRange?> ProcessOnceAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            try 
-            { 
+            try
+            {
                 _logger.LogInformation("Getting block number range to process");
 
                 var nullableRange = await _progressService
@@ -76,7 +74,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
                 return range;
             }
-            catch(TooManyRecordsException ex)
+            catch (TooManyRecordsException ex)
             {
                 _logger.LogWarning($"Too many results error. : {ex.Message}");
 
@@ -102,38 +100,94 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// <param name="rangesProcessedCallback"></param>
         /// <returns>The total number of blocks processed</returns>
         public async Task<ulong> ProcessContinuallyAsync(
-            CancellationToken cancellationToken, 
+            CancellationToken cancellationToken,
             Action<uint, BlockRange> rangesProcessedCallback = null)
         {
-            uint rangesProcessed = 0;
-            uint rangeAttemptCount = 0;
-            ulong blocksProcessed = 0;
+            if (rangesProcessedCallback != null)
+            {
+                BatchProcessedCallback = rangesProcessedCallback;
+            }
+
+            uint batchesProcessed = 0;
+            uint currentBatchAttemptCount = 0;
+            ulong totalBlocksProcessed = 0;
 
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                rangeAttemptCount++;
+                currentBatchAttemptCount++;
                 var range = await ProcessOnceAsync(cancellationToken)
                     .ConfigureAwait(false);
-                
+
                 if (cancellationToken.IsCancellationRequested) break;
 
                 if (range == null) // assume we're up to date - wait for next block
                 {
-                    await WaitForBlockStrategy.Apply(rangeAttemptCount)
+                    await WaitForBlockStrategy.Apply(currentBatchAttemptCount)
                         .ConfigureAwait(false);
                 }
                 else // block range was processed so continue straight to the next
                 {
-                    rangesProcessed++;
-                    blocksProcessed += range.Value.BlockCount;
-                    rangeAttemptCount = 0;
-                    rangesProcessedCallback?.Invoke(rangesProcessed, range.Value);
+                    batchesProcessed++;
+                    totalBlocksProcessed += range.Value.BlockCount;
+                    currentBatchAttemptCount = 0;
+                    BatchProcessedCallback?.Invoke(batchesProcessed, range.Value);
                 }
             }
 
-            return blocksProcessed;
+            return totalBlocksProcessed;
+        }
+
+        /// <summary>
+        /// Runs on a background thread until cancellation or fatal error
+        /// </summary>
+        public Task ProcessContinuallyInBackgroundAsync(
+            CancellationToken cancellationToken,
+            Action<uint, BlockRange> rangesProcessedCallback = null,
+            Action<Exception> fatalErrorCallback = null)
+        {
+            try
+            {
+                if (rangesProcessedCallback != null)
+                {
+                    BatchProcessedCallback = rangesProcessedCallback;
+                }
+
+                if (fatalErrorCallback != null)
+                {
+                    FatalErrorCallback = fatalErrorCallback;
+                }
+
+                return Task.Factory
+                    .StartNew
+                    (
+                        async () => await ProcessContinuallyAsync(cancellationToken, BatchProcessedCallback),
+                        cancellationToken,
+                        TaskCreationOptions.LongRunning,
+                        TaskScheduler.Default
+                    )
+                    .Unwrap()
+                    .ContinueWith
+                    (
+                        (t) =>
+                        {
+                            if (t.IsFaulted)
+                            {
+                                var baseEx = t.Exception.GetBaseException();
+                                _logger.LogError(baseEx, baseEx.Message);
+                                FatalErrorCallback?.Invoke(baseEx);
+                            }
+                        },
+                        TaskContinuationOptions.OnlyOnFaulted
+                    );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{nameof(BlockchainBatchProcessorService)}.ProcessContinuallyInBackgroundAsync threw an initialisation error");
+                FatalErrorCallback?.Invoke(ex);
+                throw;
+            }
         }
 
     }
