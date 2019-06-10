@@ -36,5 +36,57 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             Assert.Contains(log2, masterList.Values);
             Assert.DoesNotContain(dupe, masterList.Values);
         }
+
+        [Fact]
+        public void Sort_By_Block_TxIndex_LogIndex()
+        {
+            var arbitrarilySortedLogs = new[] {
+                CreateLog(2, 1, 3),
+                CreateLog(2, 1, 2),
+                CreateLog(2, 1, 1),
+
+                CreateLog(1, 3, 3),
+                CreateLog(1, 3, 2),
+                CreateLog(1, 3, 1),
+
+                CreateLog(1, 2, 3),
+                CreateLog(1, 2, 2),
+                CreateLog(1, 2, 1),
+
+                CreateLog(1, 1, 3),
+                CreateLog(1, 1, 2),
+                CreateLog(1, 1, 1)
+                };
+
+            var sorted = arbitrarilySortedLogs.Sort();
+            Assert.Equal(arbitrarilySortedLogs.Length, sorted.Length);
+
+
+            VerifyLog(sorted[0], 1, 1, 1);
+            VerifyLog(sorted[1], 1, 1, 2);
+            VerifyLog(sorted[2], 1, 1, 3);
+            VerifyLog(sorted[3], 1, 2, 1);
+            VerifyLog(sorted[4], 1, 2, 2);
+            VerifyLog(sorted[5], 1, 2, 3);
+            VerifyLog(sorted[6], 1, 3, 1);
+            VerifyLog(sorted[7], 1, 3, 2);
+            VerifyLog(sorted[8], 1, 3, 3);
+            VerifyLog(sorted[9], 2, 1, 1);
+            VerifyLog(sorted[10], 2, 1, 2);
+            VerifyLog(sorted[11], 2, 1, 3);
+
+        }
+
+        private void VerifyLog(FilterLog log, int expectedBlockNumber, int expectedTxIndex, int expectedLogIndex)
+        {
+            Assert.Equal(expectedBlockNumber, log.BlockNumber.Value);
+            Assert.Equal(expectedTxIndex, log.TransactionIndex.Value);
+            Assert.Equal(expectedLogIndex, log.LogIndex.Value);
+        }
+
+        private FilterLog CreateLog(int blockNumber, int txIndex, int logIndex)
+        {
+            return new FilterLog { BlockNumber = new HexBigInteger(blockNumber), TransactionIndex = new HexBigInteger(txIndex), LogIndex = new HexBigInteger(logIndex) };
+        }
     }
 }

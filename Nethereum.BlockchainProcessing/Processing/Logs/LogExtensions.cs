@@ -96,8 +96,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         {
             return logs
                 .OrderBy(l => l.BlockNumber?.Value)
-                .OrderBy(l => l.TransactionIndex?.Value)
-                .OrderBy(l => l.LogIndex?.Value)
+                .ThenBy(l => l.TransactionIndex?.Value)
+                .ThenBy(l => l.LogIndex?.Value)
                 .ToArray();
         }
 
