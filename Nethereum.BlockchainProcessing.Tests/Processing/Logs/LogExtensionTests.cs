@@ -77,6 +77,22 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
         }
 
+        [Fact]
+        public void Sort_Is_Null_Safe()
+        {
+            var logs = new[] {
+                new FilterLog{BlockNumber = new HexBigInteger(1), TransactionIndex = new HexBigInteger(1), LogIndex = new HexBigInteger(1) },
+                new FilterLog{BlockNumber = null, TransactionIndex = null, LogIndex = null}
+                };
+
+            var sorted = logs.Sort();
+            Assert.Equal(logs.Length, sorted.Length);
+
+            //nulls will be treat as zero and rise to the top
+            Assert.Same(logs[1], sorted[0]);
+            Assert.Same(logs[0], sorted[1]);
+        }
+
         private void VerifyLog(FilterLog log, int expectedBlockNumber, int expectedTxIndex, int expectedLogIndex)
         {
             Assert.Equal(expectedBlockNumber, log.BlockNumber.Value);
