@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public interface ILogsProcessor
+    public interface ILogsProcessor: IDisposable
     {
         event EventHandler OnDisposing;
 

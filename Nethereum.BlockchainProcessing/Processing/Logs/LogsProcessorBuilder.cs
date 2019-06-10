@@ -10,50 +10,11 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class LogsProcessorBuilder<TEventDto> : LogsProcessorBuilder where TEventDto : class, IEventDTO, new()
-    {
-
-        public LogsProcessorBuilder(IEthApiContractService ethApiContractService) 
-            : base(new BlockchainProxyService(ethApiContractService), new NewFilterInputBuilder<TEventDto>().Build())
-        {
-        }
-
-        public LogsProcessorBuilder(IEthApiContractService ethApiContractService, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
-            : base(new BlockchainProxyService(ethApiContractService))
-        {
-            var filterBuilder = new NewFilterInputBuilder<TEventDto>();
-            configureFilterBuilder(filterBuilder);
-            Filters.Add(filterBuilder.Build());
-        }
-
-        public LogsProcessorBuilder(IEthApiContractService ethApiContractService, string contractAddress) 
-            : base(new BlockchainProxyService(ethApiContractService), new NewFilterInputBuilder<TEventDto>().Build(contractAddress))
-        {
-        }
-
-        public LogsProcessorBuilder(IEthApiContractService ethApiContractServicem, string[] contractAddresses) 
-            : base(new BlockchainProxyService(ethApiContractServicem), new NewFilterInputBuilder<TEventDto>().Build(contractAddresses))
-        {
-        }
-
-        public LogsProcessorBuilder<TEventDto> OnEvents(Action<IEnumerable<EventLog<TEventDto>>> callBack)
-        {
-            var asyncCallback = new Func<IEnumerable<EventLog<TEventDto>>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
-            return OnEvents(asyncCallback);
-        }
-
-        public LogsProcessorBuilder<TEventDto> OnEvents(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack)
-        {
-            Processors.Add(new LogProcessor<TEventDto>(callBack));
-            return this;
-        }
-    }
-
-    public class LogsProcessorBuilder
+    public class LogsProcessorBuilder : ILogsProcessorBuilder
     {
         private NewFilterInput _contractAddressFilter;
 
-        public Stack<IDisposable> _disposalStack = new Stack<IDisposable>();
+        private Stack<IDisposable> _disposalStack = new Stack<IDisposable>();
 
         public LogsProcessorBuilder(string blockchainUrl) :
             this(new Web3.Web3(blockchainUrl))
@@ -79,7 +40,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         { }
 
         public LogsProcessorBuilder(IEthApiContractService eth, string contractAddress) :
-            this(new BlockchainProxyService(eth), string.IsNullOrEmpty(contractAddress) ? null : new[]{ contractAddress})
+            this(new BlockchainProxyService(eth), string.IsNullOrEmpty(contractAddress) ? null : new[] { contractAddress })
         { }
 
         public LogsProcessorBuilder(IEthApiContractService eth, string[] contractAddresses) :
@@ -145,109 +106,115 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public List<NewFilterInput> Filters { get; private set; } = new List<NewFilterInput>();
 
-        public LogsProcessorBuilder Set(Action<LogsProcessorBuilder> configAction)
+        public ILogsProcessorBuilder Set(Action<ILogsProcessorBuilder> configAction)
         {
             configAction(this);
             return this;
         }
 
-        public LogsProcessorBuilder SetMinimumBlockNumber(ulong minimumBlockNumber)
+        public ILogsProcessorBuilder SetMinimumBlockNumber(ulong minimumBlockNumber)
         {
             MinimumBlockNumber = minimumBlockNumber;
             return this;
         }
 
-        public LogsProcessorBuilder SetBlocksPerBatch(uint blocksPerBatch)
+        public ILogsProcessorBuilder SetBlocksPerBatch(uint blocksPerBatch)
         {
             BlocksPerBatch = blocksPerBatch;
             return this;
         }
 
-        public LogsProcessorBuilder SetMinimumBlockConfirmations(uint minBlockConfirmations)
+        public ILogsProcessorBuilder SetMinimumBlockConfirmations(uint minBlockConfirmations)
         {
             MinimumBlockNumber = minBlockConfirmations;
             return this;
         }
 
-        public LogsProcessorBuilder SetBlockProgressRepository(IBlockProgressRepository blockProgressRepository)
+        public ILogsProcessorBuilder SetBlockProgressRepository(IBlockProgressRepository blockProgressRepository)
         {
             BlockProgressRepository = blockProgressRepository;
             return this;
         }
 
-        public LogsProcessorBuilder OnFatalError(Action<Exception> callBack)
+        public ILogsProcessorBuilder OnFatalError(Action<Exception> callBack)
         {
             FatalErrorCallback = callBack;
             return this;
         }
 
-        public LogsProcessorBuilder Add<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new()
+        public ILogsProcessorBuilder Add<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new()
         {
             var asyncCallback = new Func<IEnumerable<EventLog<TEventDto>>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
             return Add(asyncCallback);
         }
 
-        public LogsProcessorBuilder Add<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new()
+        public ILogsProcessorBuilder Add<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new()
         {
             Processors.Add(new LogProcessor<TEventDto>(callBack));
             return this;
         }
 
-        public LogsProcessorBuilder AddAndQueue<TEventDto>(IQueue queue, Predicate<EventLog<TEventDto>> predicate = null, Func<EventLog<TEventDto>, object> mapper = null) where TEventDto : class, new()
+        public ILogsProcessorBuilder AddToQueue<TEventDto>(IQueue queue, Predicate<EventLog<TEventDto>> predicate = null, Func<EventLog<TEventDto>, object> mapper = null) where TEventDto : class, new()
         {
             Processors.Add(new EventLogQueueProcessor<TEventDto>(queue, predicate, mapper));
             return this;
         }
 
-        public LogsProcessorBuilder Add(EventSubscription eventSubscription)
+        public ILogsProcessorBuilder Add(EventSubscription eventSubscription)
         {
             Processors.Add(eventSubscription);
             return this;
         }
 
-        public LogsProcessorBuilder Add<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new()
+        public ILogsProcessorBuilder Add<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new()
         {
             Processors.Add(eventSubscription);
             return this;
         }
 
-        public LogsProcessorBuilder Add(ILogProcessor processor)
+        public ILogsProcessorBuilder Add(ILogProcessor processor)
         {
             Processors.Add(processor);
             return this;
         }
 
-        public LogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack)
+        public ILogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack)
         {
             var asyncCallback = new Func<IEnumerable<FilterLog>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
             return Add(asyncCallback);
         }
 
-        public LogsProcessorBuilder Add(Func<IEnumerable<FilterLog>, Task> callBack)
+        public ILogsProcessorBuilder Add(Func<IEnumerable<FilterLog>, Task> callBack)
         {
             Processors.Add(new CatchAllLogProcessor(callBack));
             return this;
         }
 
-        public LogsProcessorBuilder AddAndQueue(IQueue queue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null)
+        public ILogsProcessorBuilder AddToQueue(IQueue queue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null)
         {
             Processors.Add(new EventLogQueueProcessor(queue, predicate, mapper));
             return this;
         }
 
-        public LogsProcessorBuilder OnBatchProcessed(Action<uint, BlockRange> batchProcessedCallback)
+        public ILogsProcessorBuilder OnBatchProcessed(Action<uint, BlockRange> batchProcessedCallback)
         {
             BatchProcessedCallback = batchProcessedCallback;
             return this;
         }
 
-        public LogsProcessorBuilder UseBlockProgressRepository(IBlockProgressRepository repo)
+        public ILogsProcessorBuilder OnBatchProcessed(Action batchProcessedCallback)
+        {
+            BatchProcessedCallback = (c, r) => { batchProcessedCallback();};
+            return this;
+        }
+
+        public ILogsProcessorBuilder UseBlockProgressRepository(IBlockProgressRepository repo)
         {
             BlockProgressRepository = repo;
             return this;
         }
 
-        public LogsProcessorBuilder UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false)
+        public ILogsProcessorBuilder UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false)
         {
             BlockProgressRepository = new JsonBlockProgressRepository(jsonFilePath, deleteExistingFile: deleteExistingFile);
             return this;
@@ -262,25 +229,38 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// </summary>
         /// <typeparam name="TEventDto"></typeparam>
         /// <returns></returns>
-        public LogsProcessorBuilder Filter<TEventDto>() where TEventDto : class, IEventDTO, new()
+        public ILogsProcessorBuilder Filter<TEventDto>() where TEventDto : class, IEventDTO, new()
         {
             var filter = new NewFilterInputBuilder<TEventDto>().Build(ContractAddresses);
-            Filters.Add(filter);
-            return this;
+
+            AddOrReplaceContractAddressFilter(filter);
+
+            return Filter(filter);
         }
 
-        public LogsProcessorBuilder Filter<TEventDto>(Action<NewFilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new()
+        public ILogsProcessorBuilder Filter<TEventDto>(Action<NewFilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new()
         {
             var filterBuilder = new NewFilterInputBuilder<TEventDto>();
             configureFilter(filterBuilder);
-            Filters.Add(filterBuilder.Build(ContractAddresses));
-            return this;
+            var filter = filterBuilder.Build(ContractAddresses);
+            AddOrReplaceContractAddressFilter(filter);
+            return Filter(filter);
         }
 
-        public LogsProcessorBuilder Filter(NewFilterInput filter)
+        public ILogsProcessorBuilder Filter(NewFilterInput filter)
         {
             Filters.Add(filter);
             return this;
+        }
+
+        private void AddOrReplaceContractAddressFilter(NewFilterInput filter)
+        {
+            //if we only have an event agnostic contract address filter in place - replace it with an event specific filter
+            if (Filters.Count == 1 && _contractAddressFilter != null && _contractAddressFilter.Topics?[0] == null)
+            {
+                Filters.Clear();
+                _contractAddressFilter = filter;
+            }
         }
 
         private void SetContractAddressFilter(string[] contractAddresses)
@@ -294,7 +274,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// </summary>
         /// <param name="objectToDisposeWithProcessor"></param>
         /// <returns></returns>
-        public LogsProcessorBuilder OnProcessorDisposing(IDisposable objectToDisposeWithProcessor)
+        public ILogsProcessorBuilder DisposeOnProcessorDisposing(IDisposable objectToDisposeWithProcessor)
         {
             _disposalStack.Push(objectToDisposeWithProcessor);
             return this;

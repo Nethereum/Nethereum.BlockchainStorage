@@ -48,11 +48,39 @@ namespace Nethereum.BlockchainProcessing.Samples
         }
 
         /// <summary>
+        /// Minimal setup - any logs regardless of event
+        /// </summary>
+        [Fact]
+        public async Task SuperSimple()
+        {
+            //cancellation token to enable the listener to be stopped
+            //passing in a time limit as a safety valve for the unit test
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
+            int logsProcessed = 0, transfersProcessed = 0;
+
+            await new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet)
+                .Eth
+                .LogsProcessor()
+                .Add((logs) => logsProcessed += logs.Count()) // any log
+                .Add<TransferEventDto>(transfers => transfersProcessed += transfers.Count()) // any transfer
+                .SetBlocksPerBatch(1) // restrict to one block at a time
+                .OnBatchProcessed(() => cancellationTokenSource.Cancel()) // cancel after 1st batch
+                .Build() // build the processor
+                .ProcessContinuallyAsync(cancellationTokenSource.Token); // run until cancellation
+
+            //event though we're running in real time - we can safely assume there will have been some event logs
+            Assert.True(logsProcessed > 0);
+        }
+
+        /// <summary>
         /// One contract, one event, minimal setup
         /// </summary>
         [Fact]
         public async Task SubscribingToOneEventOnAContract()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
             //cancellation token to enable the listener to be stopped
             //passing in a time limit as a safety valve for the unit test
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
@@ -68,13 +96,13 @@ namespace Nethereum.BlockchainProcessing.Samples
             //initialise the processor with a blockchain url
             //contract address or addresses is optional
             //we don't need an account because this is read only
-            var processor = 
-                new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet, ContractAddress)
-                .Configure(c => c.MinimumBlockNumber = 7540000) //optional: default is to start at current block on chain
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)); // transfer events
+            var processor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddress)
+                .OnEvents((events) => erc20Transfers.AddRange(events))
+                .SetMinimumBlockNumber(7540000) //optional: default is to start at current block on chain 
+                .Build(); // transfer events
 
             //RunInBackgroundAsync does not block the current thread (RunAsync does block)
-            var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
+            var backgroundTask = processor.ProcessContinuallyInBackgroundAsync(cancellationTokenSource.Token);
                 
             //simulate doing something else whilst the listener works its magic!
             while (!backgroundTask.IsCompleted)
@@ -117,47 +145,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .SetMinimumBlockNumber(7540000)
                 .Build();
 
-            var eventSpecificProcessor = web3.Eth.LogsProcessor<TransferEventDto>()
-                .OnEvents((transfers) => { })
-                .SetMinimumBlockNumber(10)
-                .SetBlocksPerBatch(1)
-                .Build();
-
-            var nonEventSpecificProcessor = web3.Eth.LogsProcessor()
-                .Add((logs) => { }) //any FilterLogs
-                .SetMinimumBlockNumber(10)
-                .SetBlocksPerBatch(1)
-                .Build();
             
-            var filters = new [] { 
-                new NewFilterInputBuilder<TransferEventDto>().Build(), 
-                new NewFilterInputBuilder<ApprovalEventDTO>().Build() 
-            };
-
-            var manyEventsProcessor = web3.Eth.LogsProcessor(filters)
-                .Add((logs) => { }) //all (FilterLogs)
-                .Add<TransferEventDto>((transfers) => { })
-                .Add<ApprovalEventDTO>((approvals) => { })
-                .Build();
-
-            //event and topic specific
-            var eventAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>((f) => f.AddTopic(t => t.From, "xyz"))
-                .OnEvents((transfers) => { })
-                .Build();
-
-            //events on a contract
-            var contractEventsProcessor = web3.Eth.LogsProcessor(ContractAddress)
-                .Add<ApprovalEventDTO>(approvals => { })
-                .Add<TransferEventDto>(transfers => { })
-                .Build();
-
-            //events on many contracts
-            var manyContractEventsProcessor = web3.Eth.LogsProcessor(new []{ContractAddress })
-                .Add<ApprovalEventDTO>(approvals => { })
-                .Add<TransferEventDto>(transfers => { })
-                .Build();
-
-
             //run the processor in the background
             var backgroundTask = processor.ProcessContinuallyInBackgroundAsync(cancellationTokenSource.Token);
 
@@ -181,6 +169,8 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task SubscribingToMultipleEventsOnAContract()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
             //cancellation token to enable the listener to be stopped
             //passing in a time limit as a safety valve for the unit test
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
@@ -201,20 +191,21 @@ namespace Nethereum.BlockchainProcessing.Samples
             //initialise the processor
             //contract address or addresses is optional
             //we don't need an account because this is read only
-            var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet, ContractAddress)
-                .Configure(c => c.MinimumBlockNumber = 7540000) //optional: default is to start at current block on chain
-                .Configure(c => c.MaximumBlocksPerBatch = 100) //optional: number of blocks to scan at once, default is 100 
-                .CatchAll((events) => all.AddRange(events)) // any event for the contract/s - useful for logging
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)) // transfer events
-                .Subscribe<ApprovalEventDTO>((events) => approvals.AddRange(events)) // approval events
+            var processor = web3.Eth.LogsProcessor(ContractAddress)
+                .SetMinimumBlockNumber(7540000) //optional: default is to start at current block on chain
+                .SetBlocksPerBatch(100) //optional: number of blocks to scan at once, default is 100 
+                .Add((events) => all.AddRange(events)) // any event for the contract/s - useful for logging
+                .Add<TransferEventDto>((events) => erc20Transfers.AddRange(events)) // transfer events
+                .Add<ApprovalEventDTO>((events) => approvals.AddRange(events)) // approval events
                 // optional: a handler for a fatal error which would stop processing
                 .OnFatalError((ex) => fatalException = ex)
                 // for test purposes we'll cancel after a batch or block range has been processed
                 // setting this is optional but is useful for monitoring progress
-                .OnBatchProcessed((batchesProcessedCount, lastBlockRange) => cancellationTokenSource.Cancel());
+                .OnBatchProcessed((batchesProcessedCount, lastBlockRange) => cancellationTokenSource.Cancel())
+                .Build();
 
             // begin processing
-            var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
+            var backgroundTask = processor.ProcessContinuallyInBackgroundAsync(cancellationTokenSource.Token);
 
             //simulate doing something else whilst the listener works its magic!
             while (!backgroundTask.IsCompleted)
@@ -237,6 +228,8 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task SubscribingToOneEventOnManyContracts()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
             //cancellation token to enable the listener to be stopped
             //passing in a time limit as a safety valve for the unit test
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
@@ -252,12 +245,13 @@ namespace Nethereum.BlockchainProcessing.Samples
             //initialise the processor
             //contract address or addresses is optional
             //we don't need an account because this is read only
-            var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet, ContractAddresses)
-                .Configure(c => c.MinimumBlockNumber = 7540000) //optional: default is to start at current block on chain
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)); // transfer events
+            var processor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddresses)
+                .OnEvents((events) => erc20Transfers.AddRange(events))
+                .SetMinimumBlockNumber(7540000) //optional: default is to start at current block on chain 
+                .Build();
 
             // begin processing in the background
-            var backgroundTask = await processor.RunInBackgroundAsync(cancellationTokenSource.Token);
+            var backgroundTask = processor.ProcessContinuallyInBackgroundAsync(cancellationTokenSource.Token);
 
             //simulate doing something else whilst the listener works its magic!
             while (!backgroundTask.IsCompleted)
@@ -281,6 +275,8 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task SubscribingToAnEventOnAnyContract()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
             //cancellation token to enable the listener to be stopped
             //passing in a time limit as a safety valve for the unit test
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
@@ -290,20 +286,16 @@ namespace Nethereum.BlockchainProcessing.Samples
             var erc20Transfers = new ConcurrentBag<EventLog<TransferEventDto>>();
 
             //initialise the processor with a blockchain url
-            var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
-                //this example is not limited by contract addresses
-                //therefore - so far - so we have no filters
-                //without filters every event log for the block range will be retrieved from the chain and evaluated by the subscribers
-                //so - to improve performance - we add a filter to ensure only transfer events are retrieved for evaulation
-                .Filter<TransferEventDto>() 
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)) // subscribe to transfer events
+            var processor = web3.Eth.LogsProcessor<TransferEventDto>()
+                .OnEvents((events) => erc20Transfers.AddRange(events)) // subscribe to transfer events
+                .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
+                .SetMinimumBlockNumber(7540102) //optional: default is to start at current block on chain                
                 // for test purposes we'll stop after processing a batch
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel());
+                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .Build();
 
             // run continually until cancellation token is fired
-            var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+            var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
 
             Assert.True(erc20Transfers.Any());
             Assert.Equal((ulong)1, rangesProcessed);
@@ -317,6 +309,8 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task UsingJsonFileProgressRepository()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
             //cancellation token to enable the listener to be stopped
             //passing in a time limit as a safety valve for the unit test
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
@@ -332,27 +326,29 @@ namespace Nethereum.BlockchainProcessing.Samples
             // it can prevent duplicate processing that could occur after a restart
             var jsonFilePath = Path.Combine(Path.GetTempPath(), "EventProcessingBlockProgress.json");
 
-            //initialise the processor
-            var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)) // transfer events
+            //initialise the builder
+            var builder = web3.Eth.LogsProcessor< TransferEventDto>()
+                .OnEvents((events) => erc20Transfers.AddRange(events)) // transfer events
+                .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
+                .SetMinimumBlockNumber(7540102) //optional: default is to start at current block on chain
                 // for test purposes we'll stop after processing a batch
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
                 // tell the processor to use a Json File based Block Progress Repository
                 // for test purposes only we delete any existing file to ensure we start afresh with no previous state
                 .UseJsonFileForBlockProgress(jsonFilePath, deleteExistingFile: true);
 
+            var processor = builder.Build();
+
             //we should have a BlockProgressRepository
-            Assert.NotNull(processor.BlockProgressRepository);
+            Assert.NotNull(builder.BlockProgressRepository);
             //there should be no prior progress
-            Assert.Null(await processor.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
+            Assert.Null(await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
 
             //run the processor for a while
-            var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+            var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
 
             //the last block processed should have been saved
-            Assert.NotNull(await processor.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
+            Assert.NotNull(await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
 
             //we should have captured some events
             Assert.True(erc20Transfers.Any());
@@ -368,6 +364,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task UsingAzureTableStorageProgressRepository()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
             // Requires: Nethereum.BlockchainStore.AzureTables
 
             // Load config
@@ -384,26 +381,28 @@ namespace Nethereum.BlockchainProcessing.Samples
             var erc20Transfers = new ConcurrentBag<EventLog<TransferEventDto>>();
 
             //initialise the processor
-            var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540102) //optional: default is to start at current block on chain
-                .Subscribe<TransferEventDto>((events) => erc20Transfers.AddRange(events)) // transfer events
+            var builder = web3.Eth.LogsProcessor< TransferEventDto>()
+                .OnEvents((events) => erc20Transfers.AddRange(events)) // transfer events
+                .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
+                .SetMinimumBlockNumber(7540102) //optional: default is to start at current block on chain
                 // for test purposes we'll stop after processing a batch
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((numberOfBatchesProcessed, lastBlockRange) => cancellationTokenSource.Cancel())
                 // tell the processor to reference an Azure Storage table for block progress
                 // this is an extension method from Nethereum.BlockchainStore.AzureTables
                 .UseAzureTableStorageForBlockProgress(azureStorageConnectionString, "EventLogProcessingSample");
 
+            var processor = builder.Build();
+
             //we should have a BlockProgressRepository
-            Assert.NotNull(processor.BlockProgressRepository);
+            Assert.NotNull(builder.BlockProgressRepository);
             //there should be no prior progress
-            Assert.Null(await processor.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
+            Assert.Null(await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
 
             //run the processor for a while
-            var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+            var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
 
             //the last block processed should have been saved
-            Assert.NotNull(await processor.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
+            Assert.NotNull(await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
 
             //we should have captured some events
             Assert.True(erc20Transfers.Any());
@@ -419,6 +418,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task WritingEventsToAnAzureQueue()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
             // Requires: Nethereum.BlockchainProcessing.Queue.Azure
 
             // Load config
@@ -431,14 +431,16 @@ namespace Nethereum.BlockchainProcessing.Samples
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
 
             //initialise the processor
-            using(var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540103) //optional: default is to start at current block on chain
+            using(var processor = web3.Eth.LogsProcessor<TransferEventDto>()
+                .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
+                .SetMinimumBlockNumber(7540103) //optional: default is to start at current block on chain
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
-                .SubscribeAndQueueAsync<TransferEventDto>(azureStorageConnectionString, "sep-transfers"))
+                .AddToQueueAsync(azureStorageConnectionString, "sep-transfers")
+                .Result
+                .Build())
             { 
                 //run the processor for a while
-                var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+                var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
             }
 
             await Task.Delay(5000); //give azure time to update
@@ -458,6 +460,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task WritingEventsToASearchIndex()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
             //Requires: Nethereum.BlockchainStore.Search
 
             // Load config
@@ -473,14 +476,16 @@ namespace Nethereum.BlockchainProcessing.Samples
 
             //initialise the processor
             //within "using" block so that the processor cleans up the search resources it creates
-            using (var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540103) //optional: default is to start at current block on chain
+            using (var processor = web3.Eth.LogsProcessor<TransferEventDto>()
+                .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
+                .SetMinimumBlockNumber(7540103) //optional: default is to start at current block on chain
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
-                .AddToSearchIndexAsync<TransferEventDto>(AzureSearchServiceName, apiKey, "sep-transfers"))
+                .AddToSearchIndexAsync<TransferEventDto>(AzureSearchServiceName, apiKey, "sep-transfers")
+                .Result
+                .Build())
             {
                 //run the processor for a while
-                var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+                var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
             }
 
             await Task.Delay(5000); //give azure time to update
@@ -498,6 +503,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task WritingEventsToAzureTableStorage()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
             // Requires: Nethereum.BlockchainStore.AzureTables
 
             // Load config
@@ -510,16 +516,17 @@ namespace Nethereum.BlockchainProcessing.Samples
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
 
             //initialise the processor
-            using (var processor = new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1) //optional: restrict batches to one block at a time
-                .Configure(c => c.MinimumBlockNumber = 7540103) //optional: default is to start at current block on chain
+            using (var processor = web3.Eth.LogsProcessor<TransferEventDto>()
+                .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
+                .SetMinimumBlockNumber(7540103) //optional: default is to start at current block on chain
                 // configure this to stop after processing a batch
                 .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
                 // wire up to azure table storage
-                .StoreInAzureTable<TransferEventDto>(azureStorageConnectionString, "septransfers"))
+                .StoreInAzureTable<TransferEventDto>(azureStorageConnectionString, "septransfers")
+                .Build())
             {
                 //run the processor for a while
-                var rangesProcessed = await processor.RunAsync(cancellationTokenSource.Token);
+                var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
             }
 
             var expectedLogs = new
@@ -555,22 +562,89 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact(Skip ="A deliberately long running test to be run when required (certainly not on CI!)")]
         public async Task LongRunningProcessing()
         {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
             int eventsCaught = 0;
             int transfers = 0;
             int approvals = 0;
 
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromHours(1));
 
-            var processor = await new EventLogProcessor(TestConfiguration.BlockchainUrls.Infura.Mainnet)
-                .Configure(c => c.MaximumBlocksPerBatch = 1)
-                .Configure(c => c.MinimumBlockConfirmations = 6)
-                .CatchAll((events) =>  { eventsCaught += events.Count(); Debug.WriteLine($"Events: {eventsCaught}"); }) 
-                .Subscribe<TransferEventDto>((events) => { transfers += events.Count(); Debug.WriteLine($"Transfers: {transfers}"); }) 
-                .Subscribe<ApprovalEventDTO>((events) => { approvals += events.Count(); Debug.WriteLine($"Approvals: {approvals}"); })                                                                    
+            await web3.Eth.LogsProcessor()
+                .SetBlocksPerBatch(1)
+                .SetMinimumBlockConfirmations(6)
+                .Add((events) =>  { eventsCaught += events.Count(); Debug.WriteLine($"Events: {eventsCaught}"); }) 
+                .Add<TransferEventDto>((events) => { transfers += events.Count(); Debug.WriteLine($"Transfers: {transfers}"); }) 
+                .Add<ApprovalEventDTO>((events) => { approvals += events.Count(); Debug.WriteLine($"Approvals: {approvals}"); })                                                                    
                 .OnFatalError((ex) => Debug.WriteLine($"Fatal Error: {ex.Message}"))
                 .OnBatchProcessed((batchesProcessedCount, lastBlockRange) => 
                     Debug.WriteLine($"Batch Processed. Batches: {batchesProcessedCount}, Last Range: From:{lastBlockRange.From} To{lastBlockRange.To}"))
-                .RunAsync(cancellationTokenSource.Token);
+                .Build()
+                .ProcessContinuallyAsync(cancellationTokenSource.Token);
+        }
+
+        [Fact]
+        public void Web3ExtensionMethods()
+        {
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+
+            const string ContractAddress = "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2";
+            var ContractAddresses = new[] { ContractAddress };
+
+            var eventAndContractSpecificProcessor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddress)
+                .OnEvents((transfers) =>{ })
+                .Build();
+
+            var eventSpecificProcessor = web3.Eth.LogsProcessor<TransferEventDto>()
+                .OnEvents((transfers) => { })
+                .Build();
+
+            var eventSpecificProcessorAsync = web3.Eth.LogsProcessor<TransferEventDto>()
+                .OnEvents(async (transfers) => await Task.CompletedTask)
+                .Build();
+
+            //event and topic specific
+            var eventAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>((filterBuilder) => filterBuilder.AddTopic(t => t.From, "xyz"))
+                .OnEvents((transfers) => { })
+                .Build();
+
+            //event and topic specific for one contract
+            var eventContractAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddress, (filterBuilder) => filterBuilder.AddTopic(t => t.From, "xyz"))
+                .OnEvents((transfers) => { })
+                .Build();
+
+            //event and topic specific for multiple contracts
+            var eventContractsAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddresses, (filterBuilder) => filterBuilder.AddTopic(t => t.From, "xyz"))
+                .OnEvents((transfers) => { })
+                .Build();
+
+            var anyLogsProcessor = web3.Eth.LogsProcessor()
+                .Add((logs) => { }) //any FilterLogs
+                .Build();
+
+            // multiple events any contract
+            var filters = new[] {
+                new NewFilterInputBuilder<TransferEventDto>().Build(),
+                new NewFilterInputBuilder<ApprovalEventDTO>().Build()
+            };
+
+            var manyEventsProcessor = web3.Eth.LogsProcessor(filters)
+                .Add<TransferEventDto>((transfers) => { })
+                .Add<ApprovalEventDTO>((approvals) => { })
+                .Build();
+
+            //multiple events on a contract
+            var contractEventsProcessor = web3.Eth.LogsProcessor(ContractAddress)
+                .Add((logs) => { }) //any log
+                .Add<ApprovalEventDTO>(approvals => { })
+                .Add<TransferEventDto>(transfers => { })
+                .Build();
+
+            //events on many contracts
+            var manyContractEventsProcessor = web3.Eth.LogsProcessor(ContractAddresses)
+                .Add<ApprovalEventDTO>(approvals => { })
+                .Add<TransferEventDto>(transfers => { })
+                .Build();
         }
     }
 }

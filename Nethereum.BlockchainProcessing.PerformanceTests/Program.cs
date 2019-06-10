@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Configuration;
@@ -110,21 +111,25 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
     {
         public int EventsHandled = 0;
         public HashSet<HexBigInteger> BlocksContainingTransfers = new HashSet<HexBigInteger>();
-        private IEventLogProcessor processor;
+        private ILogsProcessor _processor;
         private CancellationTokenSource cancellationTokenSource;
         private ulong MaxBlockNumber;
         private ulong BlocksProcessed;
         private ulong LastBlock;
+        private ILogsProcessorBuilder _builder;
+        private IBlockchainProxyService _blockchainProxyService;
 
         public WritingTransfersToTheAzureStorage(string azureConnectionString, string tablePrefix, uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
         {
             cancellationTokenSource = new CancellationTokenSource(maxDuration);
-            processor = new EventLogProcessor("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
+            _builder = new LogsProcessorBuilder("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
                 .Filter<TransferEventDto>()
                 .StoreInAzureTable(azureConnectionString, tablePrefix, (Predicate<EventLog<TransferEventDto>>)((tfr) => TransferCallback(tfr)))
-                .OnBatchProcessed((rangesProcessed, lastRange) => Output(rangesProcessed, lastRange));
+                .OnBatchProcessed((rangesProcessed, lastRange) => Output(rangesProcessed, lastRange))
+                .SetBlocksPerBatch(maxBlocksPerBatch);
 
-            processor.MaximumBlocksPerBatch = maxBlocksPerBatch;
+            _blockchainProxyService = _builder.BlockchainProxyService;
+
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
         }
 
@@ -148,13 +153,14 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
         public override async Task ConfigureAsync()
         {
-            MaxBlockNumber = await processor.BlockchainProxyService.GetMaxBlockNumberAsync();
-            processor.MinimumBlockNumber = MaxBlockNumber - NumberOfBlocksToProcess;
+            MaxBlockNumber = await _blockchainProxyService.GetMaxBlockNumberAsync();
+            _builder.SetMinimumBlockNumber(MaxBlockNumber - NumberOfBlocksToProcess);
+            _processor = _builder.Build();
         }
 
         protected override async Task RunAsync()
         {
-            await processor.RunAsync(cancellationTokenSource.Token);
+            await _processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
         }
 
     }
@@ -163,24 +169,26 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
     {
         public int EventsHandled = 0;
         public HashSet<HexBigInteger> BlocksContainingTransfers = new HashSet<HexBigInteger>();
-        private IEventLogProcessor processor;
+        private ILogsProcessor _processor;
         private CancellationTokenSource cancellationTokenSource;
         private ulong MaxBlockNumber; 
         private ulong BlocksProcessed;
         private ulong LastBlock;
+        private ILogsProcessorBuilder _builder;
+        private IBlockchainProxyService _blockchainProxyService;
 
         public WritingTransfersToTheConsole(uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
         {
             cancellationTokenSource = new CancellationTokenSource(maxDuration);
-            processor = new EventLogProcessor("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
+            _builder = new LogsProcessorBuilder("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
                 .Filter<TransferEventDto>()
-                .Subscribe<TransferEventDto>((events) => Output(events))
+                .Add<TransferEventDto>((events) => Output(events))
                 .OnBatchProcessed((_, lastRange) =>
                 {
                     HandleBatchProcessed(lastRange);
-                });
+                })
+                .SetBlocksPerBatch(maxBlocksPerBatch);
 
-            processor.MaximumBlocksPerBatch = maxBlocksPerBatch;
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
         }
 
@@ -198,13 +206,14 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
         public override async Task ConfigureAsync()
         {
-            MaxBlockNumber = await processor.BlockchainProxyService.GetMaxBlockNumberAsync();
-            processor.MinimumBlockNumber = MaxBlockNumber - NumberOfBlocksToProcess;
+            MaxBlockNumber = await _blockchainProxyService.GetMaxBlockNumberAsync();
+            _builder.SetMinimumBlockNumber(MaxBlockNumber - NumberOfBlocksToProcess);
+            _processor = _builder.Build();
         }
 
         protected override async Task RunAsync()
         {
-            await processor.RunAsync(cancellationTokenSource.Token);
+            await _processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
         }
 
         protected virtual void Output(IEnumerable<EventLog<TransferEventDto>> events)

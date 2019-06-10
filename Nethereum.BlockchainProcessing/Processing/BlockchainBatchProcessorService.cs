@@ -190,5 +190,15 @@ namespace Nethereum.BlockchainProcessing.Processing
             }
         }
 
+        bool disposed = false;
+
+        public void Dispose()
+        {
+            if(!disposed)
+            { 
+                OnDisposing?.Invoke(this, new EventArgs());
+                disposed = true;
+            }
+        }
     }
 }

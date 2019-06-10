@@ -10,128 +10,65 @@ namespace Nethereum.Contracts
 {
     public static class IEthApiContractServiceExtensions
     {
-        public static LogsProcessorBuilder LogsProcessor
-        (this IEthApiContractService ethApiContractService)
-        {
-            return new LogsProcessorBuilder(ethApiContractService);
-        }
+        #region generic (non-event) specific
+        public static ILogsProcessorBuilder LogsProcessor
+        (this IEthApiContractService ethApiContractService) => new LogsProcessorBuilder(ethApiContractService);
 
-        public static LogsProcessorBuilder LogsProcessor
-        (this IEthApiContractService ethApiContractService, params NewFilterInput[] filters)
-        {
-            return new LogsProcessorBuilder(ethApiContractService, filters);
-        }
+        public static ILogsProcessorBuilder LogsProcessor
+        (this IEthApiContractService ethApiContractService, string contractAddress) => new LogsProcessorBuilder(ethApiContractService, contractAddress);
 
-        public static LogsProcessorBuilder LogsProcessor
-        (this IEthApiContractService ethApiContractService, NewFilterInput filter)
-        {
-            return new LogsProcessorBuilder(ethApiContractService, filter);
-        }
+        public static ILogsProcessorBuilder LogsProcessor
+        (this IEthApiContractService ethApiContractService, string[] contractAddresses) => new LogsProcessorBuilder(ethApiContractService, contractAddresses);
 
-        public static LogsProcessorBuilder LogsProcessor
-        (this IEthApiContractService ethApiContractService,
-        string contractAddress)
-        {
-            return new LogsProcessorBuilder(ethApiContractService, contractAddress);
-        }
+        public static ILogsProcessorBuilder LogsProcessor
+        (this IEthApiContractService ethApiContractService, params NewFilterInput[] filters) => new LogsProcessorBuilder(ethApiContractService, filters);
 
-        public static LogsProcessorBuilder LogsProcessor
-        (this IEthApiContractService ethApiContractService,
-        string[] contractAddresses)
-        {
-            return new LogsProcessorBuilder(ethApiContractService, contractAddresses);
-        }
+        # endregion
 
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+        #region event specific
+        public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
             (this IEthApiContractService ethApiContractService)
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService);
-        }
-
-        public static LogsProcessorBuilder LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            string[] contractAddresses)
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddresses);
-        }
-
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder);
-        }
-
-        public static LogsProcessorBuilder LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            string[] contractAddresses,
-            Func<IEnumerable<EventLog<TEventDto>>, Task> callBack)
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddresses).Add(callBack);
-        }
-
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            string contractAddress,
-            Func<IEnumerable<EventLog<TEventDto>>, Task> callBack
-            )
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddress).OnEvents(callBack);
-        }
+            where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService);
 
 
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            Func<IEnumerable<EventLog<TEventDto>>, Task> callBack
-            )
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService).OnEvents(callBack);
-        }
-
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            string[] contractAddresses,
-            Action<IEnumerable<EventLog<TEventDto>>> callBack)
-            where TEventDto : class, IEventDTO, new() 
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddresses).OnEvents(callBack);
-        }
-
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            string contractAddress,
-            Action<IEnumerable<EventLog<TEventDto>>> callBack
-            )
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddress).OnEvents(callBack);
-        }
-
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
-            (this IEthApiContractService ethApiContractService,
-            string contractAddress
-            )
-            where TEventDto : class, IEventDTO, new()
+        #region for contract
+        public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+            (this IEthApiContractService ethApiContractService, string contractAddress)
+        where TEventDto : class, IEventDTO, new()
         {
             return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddress);
         }
 
-        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+        #endregion
+
+        #region for many contracts
+        public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+            (this IEthApiContractService ethApiContractService, string[] contractAddresses)
+            where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddresses);
+
+        #endregion
+
+        #region with topic specific criteria
+        public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
             (this IEthApiContractService ethApiContractService,
-            Action<IEnumerable<EventLog<TEventDto>>> callBack
-            )
-            where TEventDto : class, IEventDTO, new()
-        {
-            return new LogsProcessorBuilder<TEventDto>(ethApiContractService).OnEvents(callBack);
-        }
+            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder);
 
+        public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+            (this IEthApiContractService ethApiContractService,
+            string contractAddress,
+            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder, contractAddress);
 
+        public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+            (this IEthApiContractService ethApiContractService,
+            string[] contractAddresses,
+            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder, contractAddresses);
+
+        #endregion
+
+        #endregion
 
     }
 }
