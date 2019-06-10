@@ -604,17 +604,17 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .Build();
 
             //event and topic specific
-            var eventAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>((filterBuilder) => filterBuilder.AddTopic(t => t.From, "xyz"))
+            var eventAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>((filterBuilder) => filterBuilder.AddTopic(t => t.From, "0x6f8F72aA9304c8B593d555F12eF6589cC3A579A2"))
                 .OnEvents((transfers) => { })
                 .Build();
 
             //event and topic specific for one contract
-            var eventContractAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddress, (filterBuilder) => filterBuilder.AddTopic(t => t.From, "xyz"))
+            var eventContractAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddress, (filterBuilder) => filterBuilder.AddTopic(t => t.From, "0x6f8F72aA9304c8B593d555F12eF6589cC3A579A2"))
                 .OnEvents((transfers) => { })
                 .Build();
 
             //event and topic specific for multiple contracts
-            var eventContractsAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddresses, (filterBuilder) => filterBuilder.AddTopic(t => t.From, "xyz"))
+            var eventContractsAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>(ContractAddresses, (filterBuilder) => filterBuilder.AddTopic(t => t.From, "0x6f8F72aA9304c8B593d555F12eF6589cC3A579A2"))
                 .OnEvents((transfers) => { })
                 .Build();
 
