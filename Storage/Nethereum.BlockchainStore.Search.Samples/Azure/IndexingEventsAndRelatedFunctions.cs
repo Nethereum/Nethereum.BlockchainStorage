@@ -107,7 +107,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                     });
 
                     //process the range
-                    await processor.ProcessAsync(3900007, 3900030);
+                    await processor.ProcessAsync(3900007, 3900009);
 
                     //allow time for azure indexing to finish
                     await Task.Delay(TimeSpan.FromSeconds(5));
@@ -119,9 +119,9 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                     long transferFromFunctionCount =
                         await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName);
 
-                    Assert.Equal(32, transferEventCount);
-                    Assert.Equal(13, transferFunctionCount);
-                    Assert.Equal(2, transferFromFunctionCount);
+                    Assert.Equal(16, transferEventCount);
+                    Assert.Equal(1, transferFunctionCount);
+                    Assert.Equal(1, transferFromFunctionCount);
                 }
                 finally
                 {
