@@ -135,13 +135,14 @@ namespace Nethereum.BlockchainProcessing.Samples
             };
 
             var manyEventsProcessor = web3.Eth.LogsProcessor(filters)
-                .Add((logs) => { }) //FilterLogs
+                .Add((logs) => { }) //all (FilterLogs)
+                .Add<TransferEventDto>((transfers) => { })
+                .Add<ApprovalEventDTO>((approvals) => { })
                 .Build();
 
             //event and topic specific
-            var eventAndTopicProcesor = web3.Eth.LogsProcessor()
-                .Filter<TransferEventDto>(f => f.AddTopic(t => t.From, "xyz").AddTopic(t => t.To, "abc"))
-                .Add<TransferEventDto>((transfers) => { })
+            var eventAndTopicProcesor = web3.Eth.LogsProcessor<TransferEventDto>((f) => f.AddTopic(t => t.From, "xyz"))
+                .OnEvents((transfers) => { })
                 .Build();
 
             //events on a contract

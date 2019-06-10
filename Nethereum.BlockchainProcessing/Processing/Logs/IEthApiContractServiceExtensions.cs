@@ -57,6 +57,14 @@ namespace Nethereum.Contracts
             return new LogsProcessorBuilder<TEventDto>(ethApiContractService, contractAddresses);
         }
 
+        public static LogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
+            (this IEthApiContractService ethApiContractService,
+            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            where TEventDto : class, IEventDTO, new()
+        {
+            return new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder);
+        }
+
         public static LogsProcessorBuilder LogsProcessor<TEventDto>
             (this IEthApiContractService ethApiContractService,
             string[] contractAddresses,

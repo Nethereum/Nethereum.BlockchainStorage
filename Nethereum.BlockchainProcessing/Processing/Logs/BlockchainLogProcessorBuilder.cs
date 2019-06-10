@@ -18,6 +18,14 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         {
         }
 
+        public LogsProcessorBuilder(IEthApiContractService ethApiContractService, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            : base(new BlockchainProxyService(ethApiContractService))
+        {
+            var filterBuilder = new NewFilterInputBuilder<TEventDto>();
+            configureFilterBuilder(filterBuilder);
+            Filters.Add(filterBuilder.Build());
+        }
+
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService, string contractAddress) 
             : base(new BlockchainProxyService(ethApiContractService), new NewFilterInputBuilder<TEventDto>().Build(contractAddress))
         {
