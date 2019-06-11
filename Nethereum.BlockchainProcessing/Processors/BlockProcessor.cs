@@ -7,12 +7,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs;
+using Nethereum.RPC.Eth.Services;
+using Nethereum.Hex.HexTypes;
+using Nethereum.Contracts.Services;
+using Nethereum.Web3;
 
 namespace Nethereum.BlockchainProcessing.Processors
 {
     public class BlockProcessor : IBlockProcessor
     {
-        protected IBlockProxy BlockProxy { get; }
+        protected IEthApiContractService BlockProxy { get; }
         protected IBlockHandler BlockHandler { get; }
         protected IEnumerable<IBlockFilter> BlockFilters { get; }
         protected ITransactionProcessor TransactionProcessor { get; }
@@ -22,13 +26,13 @@ namespace Nethereum.BlockchainProcessing.Processors
         private readonly object _sync = new object();
 
         public BlockProcessor(
-            IBlockProxy blockProxy, 
+            IWeb3 web3, 
             IBlockHandler blockHandler,
             ITransactionProcessor transactionProcessor, 
             IEnumerable<IBlockFilter> blockFilters = null
            )
         {
-            BlockProxy = blockProxy;
+            BlockProxy = web3.Eth;
             BlockHandler = blockHandler;
             TransactionProcessor = transactionProcessor;
             BlockFilters = blockFilters ?? new IBlockFilter[0];
@@ -45,7 +49,8 @@ namespace Nethereum.BlockchainProcessing.Processors
             }
 
             var block = await BlockProxy
-                .GetBlockWithTransactionsAsync(blockNumber)
+                .Blocks
+                .GetBlockWithTransactionsByNumber.SendRequestAsync(blockNumber.ToHexBigInteger())
                 .ConfigureAwait(false);
 
             if(block == null)
@@ -62,9 +67,10 @@ namespace Nethereum.BlockchainProcessing.Processors
             }
         }
 
-        public virtual Task<ulong> GetMaxBlockNumberAsync()
+        public virtual async Task<ulong> GetMaxBlockNumberAsync()
         {
-            return BlockProxy.GetMaxBlockNumberAsync();
+            var blockNumber = await BlockProxy.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false);
+            return blockNumber.ToUlong();
         }
 
         protected virtual void ClearCacheOfProcessedTransactions()

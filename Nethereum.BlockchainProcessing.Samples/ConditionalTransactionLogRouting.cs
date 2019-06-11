@@ -60,7 +60,7 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task Run()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var catchAllHandler = new CatchAllEventLogHandler();
             var transferHandler = new SpecificEventLogHandler<TransferEvent>();
@@ -78,7 +78,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             var handlers = new HandlerContainer{ TransactionLogHandler = transactionLogRouter};
 
             var blockProcessor = BlockProcessorFactory.Create(
-                blockchainProxyService, 
+                web3, 
                 handlers,
                 processTransactionsInParallel: false);
 

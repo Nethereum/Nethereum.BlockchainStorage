@@ -71,7 +71,6 @@ namespace Nethereum.BlockchainProcessing.Samples
             const ulong ToBlock = 4347;
 
             var web3geth = new Web3Geth();
-            var blockchainProxyService = new BlockchainProxyService(web3geth);
             var transactionHandler = new SimpleTransactionHandler();
             var vmStackHandler = new VmStackHandler();
             var contractHandler = new ContractHandler();
@@ -84,7 +83,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             var handlers = new HandlerContainer{ ContractHandler = contractHandler, TransactionHandler = transactionHandler, TransactionVmStackHandler = vmStackHandler};
 
             var blockProcessor = BlockProcessorFactory.Create(
-                blockchainProxyService, 
+                web3geth, 
                 handlers, 
                 processTransactionsInParallel: false,
                 postVm: true);

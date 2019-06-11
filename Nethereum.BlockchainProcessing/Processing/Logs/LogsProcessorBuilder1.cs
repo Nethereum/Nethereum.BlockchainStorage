@@ -36,12 +36,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService)
-            : base(new BlockchainProxyService(ethApiContractService), new NewFilterInputBuilder<TEventDto>().Build())
+            : base(ethApiContractService, new NewFilterInputBuilder<TEventDto>().Build())
         {
         }
 
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder, params string[] contractAddresses)
-            : base(new BlockchainProxyService(ethApiContractService))
+            : base(ethApiContractService)
         {
             var filterBuilder = new NewFilterInputBuilder<TEventDto>();
             configureFilterBuilder(filterBuilder);
@@ -49,12 +49,12 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService, string contractAddress)
-            : base(new BlockchainProxyService(ethApiContractService), new NewFilterInputBuilder<TEventDto>().Build(contractAddress))
+            : base(ethApiContractService, new NewFilterInputBuilder<TEventDto>().Build(contractAddress))
         {
         }
 
-        public LogsProcessorBuilder(IEthApiContractService ethApiContractServicem, string[] contractAddresses)
-            : base(new BlockchainProxyService(ethApiContractServicem), new NewFilterInputBuilder<TEventDto>().Build(contractAddresses))
+        public LogsProcessorBuilder(IEthApiContractService ethApiContractService, string[] contractAddresses)
+            : base(ethApiContractService, new NewFilterInputBuilder<TEventDto>().Build(contractAddresses))
         {
         }
 

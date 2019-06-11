@@ -2,6 +2,7 @@
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Contracts;
+using Nethereum.Contracts.Services;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
     public interface ILogsProcessorBuilder
     {
         Action<uint, BlockRange> BatchProcessedCallback { get; set; }
-        IBlockchainProxyService BlockchainProxyService { get; set; }
+        IEthApiContractService Eth { get; set; }
         IBlockProgressRepository BlockProgressRepository { get; set; }
         uint? BlocksPerBatch { get; set; }
         string[] ContractAddresses { get; }

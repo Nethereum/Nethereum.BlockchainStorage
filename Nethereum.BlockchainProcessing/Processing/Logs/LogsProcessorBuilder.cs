@@ -29,36 +29,23 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         { }
 
         public LogsProcessorBuilder(Web3.IWeb3 web3) :
-            this(new BlockchainProxyService(web3), contractAddresses: null)
+            this(web3.Eth, contractAddresses: null)
         { }
         public LogsProcessorBuilder(Web3.IWeb3 web3, string contractAddress) :
-            this(new BlockchainProxyService(web3), new[] { contractAddress })
+            this(web3.Eth, new[] { contractAddress })
         { }
 
         public LogsProcessorBuilder(Web3.IWeb3 web3, string[] contractAddresses) :
-            this(new BlockchainProxyService(web3), contractAddresses)
+            this(web3.Eth, contractAddresses)
         { }
 
         public LogsProcessorBuilder(IEthApiContractService eth, string contractAddress) :
-            this(new BlockchainProxyService(eth), string.IsNullOrEmpty(contractAddress) ? null : new[] { contractAddress })
+            this(eth, string.IsNullOrEmpty(contractAddress) ? null : new[] { contractAddress })
         { }
 
-        public LogsProcessorBuilder(IEthApiContractService eth, string[] contractAddresses) :
-            this(new BlockchainProxyService(eth), contractAddresses)
-        { }
-
-        public LogsProcessorBuilder(IEthApiContractService eth, params NewFilterInput[] filters) :
-            this(new BlockchainProxyService(eth), filters)
-        { }
-
-        public LogsProcessorBuilder(IEthApiContractService eth) :
-            this(new BlockchainProxyService(eth), contractAddresses: null)
-        { }
-
-
-        public LogsProcessorBuilder(IBlockchainProxyService blockchainProxyService, string[] contractAddresses = null)
+        public LogsProcessorBuilder(IEthApiContractService eth, string[] contractAddresses)
         {
-            BlockchainProxyService = blockchainProxyService ?? throw new ArgumentNullException(nameof(blockchainProxyService));
+            Eth = eth ?? throw new ArgumentNullException(nameof(eth));
             ContractAddresses = contractAddresses;
 
             if (ContractAddresses != null)
@@ -67,14 +54,19 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             }
         }
 
-        public LogsProcessorBuilder(IBlockchainProxyService blockchainProxyService, params NewFilterInput[] filters)
+        public LogsProcessorBuilder(IEthApiContractService eth, params NewFilterInput[] filters)
         {
-            BlockchainProxyService = blockchainProxyService ?? throw new ArgumentNullException(nameof(blockchainProxyService));
+            Eth = eth ?? throw new ArgumentNullException(nameof(eth));
 
             if (filters != null)
             {
                 Filters.AddRange(filters);
             }
+        }
+
+        public LogsProcessorBuilder(IEthApiContractService eth)
+        {
+            Eth = eth ?? throw new ArgumentNullException(nameof(eth));
         }
 
         public string[] ContractAddresses { get; }
@@ -100,11 +92,10 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public IBlockProgressRepository BlockProgressRepository { get; set; }
 
-        public IBlockchainProxyService BlockchainProxyService { get; set; }
-
         public List<ILogProcessor> Processors { get; private set; } = new List<ILogProcessor>();
 
         public List<NewFilterInput> Filters { get; private set; } = new List<NewFilterInput>();
+        public IEthApiContractService Eth { get; set; }
 
         public ILogsProcessorBuilder Set(Action<ILogsProcessorBuilder> configAction)
         {
@@ -283,13 +274,13 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public ILogsProcessor Build()
         {
             if (Processors == null || Processors.Count == 0) throw new ArgumentNullException(nameof(Processors));
-            if (BlockchainProxyService == null) throw new ArgumentNullException(nameof(BlockchainProxyService));
+            if (Eth == null) throw new ArgumentNullException(nameof(Eth));
 
             ulong? lastBlockProcessed = (MinimumBlockNumber == null || MinimumBlockNumber == 0) ? null : MinimumBlockNumber - 1;
 
             BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(lastBlockProcessed);
-            var progressService = new BlockProgressService(BlockchainProxyService, MinimumBlockNumber, BlockProgressRepository, MinimumBlockConfirmations);
-            var processor = new BlockchainLogProcessor(BlockchainProxyService, Processors, Filters?.ToArray());
+            var progressService = new BlockProgressService(Eth.Blocks, MinimumBlockNumber, BlockProgressRepository, MinimumBlockConfirmations);
+            var processor = new BlockchainLogProcessor(Eth.Filters.GetLogs, Processors, Filters?.ToArray());
             var batchProcessorService = new BlockchainBatchProcessorService(processor, progressService, BlocksPerBatch, BatchProcessedCallback, FatalErrorCallback);
 
             batchProcessorService.OnDisposing += disposeHandler;

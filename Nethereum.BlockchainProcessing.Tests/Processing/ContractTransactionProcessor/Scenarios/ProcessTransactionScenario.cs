@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Xunit;
+using Nethereum.Web3;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests.Scenarios
 {
@@ -21,10 +22,14 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
                  _receipt.Logs = JArray.FromObject(logAddresses.Select(a => new {address = a}));
             }
 
+            protected void ClearVmStackMocks()
+            {
+                _web3Mock.Web3?.ClearVmStackMocks();
+            }
+
             protected void MockGetVmStack(JObject stackToReturn)
             {
-                _vmStackProxy.Setup(p => p.GetTransactionVmStack(_transaction.TransactionHash))
-                    .ReturnsAsync(stackToReturn);
+                _web3Mock.Web3.SetupMockForGetTransactionVmStack(_transaction.TransactionHash, stackToReturn);
             }
 
             protected void MockGetErrorFromVmStack(JObject vmStack, string errorToReturn)
@@ -75,7 +80,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             protected void VerifyVmStackInfoHasNotBeenProcessed()
             {
-                _vmStackProxy.Verify(p => p.GetTransactionVmStack(It.IsAny<string>()), Times.Never);
                 _vmStackErrorChecker.Verify(e => e.GetError(It.IsAny<JObject>()), Times.Never());
                 _transactionVmStackHandler
                     .Verify(r => r.HandleAsync(It.IsAny<TransactionVmStack>()), Times.Never);
@@ -83,8 +87,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             protected void MockExceptionFromGetTransactionVmStack()
             {
-                _vmStackProxy.Setup(p => p.GetTransactionVmStack(_transaction.TransactionHash))
-                    .Throws(new Exception("Fake GetVMStack exception"));
+                _web3Mock.Web3.SetupMockForGetTransactionVmStack(_transaction.TransactionHash, new Exception("Fake GetVMStack exception"));
             }
         }
     }

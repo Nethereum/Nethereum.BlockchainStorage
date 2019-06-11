@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Xunit;
+using Nethereum.BlockchainProcessing.Tests.Processing;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
 {
     public class TransactionProcessorTests
     {
+        readonly Web3Mock _web3Mock = new Web3Mock();
         private const string TxHash = "0xc185cc7b9f7862255b82fd41be561fdc94d030567d0b41292008095bf31c39b9";
         readonly Mock<ITransactionProxy> _mockTransactionProxy = new Mock<ITransactionProxy>();
         readonly Mock<IContractTransactionProcessor> _mockContractTransactionProcessor = new Mock<IContractTransactionProcessor>();
@@ -31,7 +33,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
         private TransactionProcessor CreateTransactionProcessor()
         {
             return new TransactionProcessor(
-                _mockTransactionProxy.Object,
+                _web3Mock.Web3,
                 _mockContractTransactionProcessor.Object,
                 _mockValueTransactionProcessor.Object,
                 _mockContractCreationTransactionProcessor.Object,
@@ -330,7 +332,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
         private void MockGetReceiptCalls(Transaction stubTransaction, TransactionReceipt stubTransactionReceipt)
         {
-            _mockTransactionProxy.Setup(p => p.GetTransactionReceipt(stubTransaction.TransactionHash)).ReturnsAsync(stubTransactionReceipt);
+            _web3Mock.GetTransactionReceiptMock.Setup(p => p.SendRequestAsync(stubTransaction.TransactionHash, null)).ReturnsAsync(stubTransactionReceipt);
         }
 
         protected void MockHandleTransactionLog(Transaction tx, TransactionReceipt receipt)

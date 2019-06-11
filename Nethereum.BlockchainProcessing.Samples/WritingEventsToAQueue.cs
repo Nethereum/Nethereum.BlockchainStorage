@@ -38,11 +38,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
 
             // Create a proxy for the blockchain
-            //  - It will get the logs from the chain
-            //  - It provides a log processing friendly abstraction
-            //  - Under the hood it wraps the Nethereum.Web3.Web3 object
-            //  - In this sample we're hardcoded to target mainnet 
-            var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
 
             // Create Queue Factory 
             //  - In this sample we're targetting Azure
@@ -83,7 +79,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             // Create a progress service
             // - This uses the progress repo to dictate what blocks to process next
             // - The MIN_BLOCK_NUMBER dictates the starting point if the progress repo is empty or has fallen too far behind 
-            var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var progressService = new BlockProgressService(web3, MIN_BLOCK_NUMBER, blockProgressRepo);
 
             // Create a filter
             //  - This is essentially the query that is sent to the chain when retrieving logs
@@ -98,7 +94,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             // - This uses the blockchainProxy to get the logs
             // - It sends each log to the event subscriptions to indicate if the logs matches the subscription criteria
             // - It then allocates matching logs to separate batches per event subscription 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, new[] { eventSubscription }, makerAddressFilter);
+            var logProcessor = new BlockchainLogProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
 
             // Create a batch log processor service
             // - It uses the progress service to calculates the block range to progress
@@ -160,7 +156,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             //  - It provides a log processing friendly abstraction
             //  - Under the hood it wraps the Nethereum.Web3.Web3 object
             //  - In this sample we're hardcoded to target mainnet 
-            var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
 
             // Create Queue Factory 
             //  - In this sample we're targetting Azure
@@ -199,7 +195,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             // Create a progress service
             // - This uses the progress repo to dictate what blocks to process next
             // - The MIN_BLOCK_NUMBER dictates the starting point if the progress repo is empty or has fallen too far behind 
-            var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var progressService = new BlockProgressService(web3, MIN_BLOCK_NUMBER, blockProgressRepo);
 
             // Create a filter
             //  - This is essentially the query that is sent to the chain when retrieving logs
@@ -214,7 +210,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             // - This uses the blockchainProxy to get the logs
             // - It sends each log to the event subscriptions to indicate if the logs matches the subscription criteria
             // - It then allocates matching logs to separate batches per event subscription 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, new[] { eventSubscription }, makerAddressFilter);
+            var logProcessor = new BlockchainLogProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
 
             // Create a batch log processor service
             // - It uses the progress service to calculates the block range to progress
@@ -259,11 +255,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             string azureStorageConnectionString = config["AzureStorageConnectionString"];
 
             // Create a proxy for the blockchain
-            //  - It will get the logs from the chain
-            //  - It provides a log processing friendly abstraction
-            //  - Under the hood it wraps the Nethereum.Web3.Web3 object
-            //  - In this sample we're hardcoded to target mainnet 
-            var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
 
             // Create Queue Factory 
             //  - In this sample we're targetting Azure
@@ -316,7 +308,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             // Create a progress service
             // - This uses the progress repo to dictate what blocks to process next
             // - The MIN_BLOCK_NUMBER dictates the starting point if the progress repo is empty or has fallen too far behind 
-            var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var progressService = new BlockProgressService(web3, MIN_BLOCK_NUMBER, blockProgressRepo);
 
             // Create a filter
             //  - This is essentially the query that is sent to the chain when retrieving logs
@@ -331,7 +323,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             // - This uses the blockchainProxy to get the logs
             // - It sends each log to the event subscriptions to indicate if the logs matches the subscription criteria
             // - It then allocates matching logs to separate batches per event subscription 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, new[] { eventSubscription }, makerAddressFilter);
+            var logProcessor = new BlockchainLogProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
 
             // Create a batch log processor service
             // - It uses the progress service to calculates the block range to progress

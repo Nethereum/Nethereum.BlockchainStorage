@@ -2,6 +2,7 @@
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.BlockchainProcessing.Processing.Logs.Matching;
+using Nethereum.Web3;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         public IEventProcessingConfigurationRepository ConfigurationRepository { get; }
 
         public EventSubscriptionFactory(
-            IBlockchainProxyService blockchainProxy,
+            IWeb3 web3,
             IEventProcessingConfigurationRepository configurationRepository,
             ISubscriberQueueFactory subscriberQueueFactory = null,
             ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
@@ -29,7 +30,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                     configurationRepository.SubscriberContracts), 
 
                 new EventHandlerFactory(
-                    blockchainProxy, 
+                    web3, 
                     configurationRepository, 
                     subscriberQueueFactory, 
                     subscriberSearchIndexFactory,

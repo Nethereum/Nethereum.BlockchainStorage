@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public void EventSpecific_Construction_FromUrl_CreatesBlockchainProxyService()
         {
             var processor = new LogsProcessorBuilder<TestData.Contracts.StandardContract.TransferEvent>(blockchainUrl: BLOCKCHAIN_URL);
-            Assert.NotNull(processor.BlockchainProxyService);
+            Assert.NotNull(processor.Eth);
         }
 
         [Fact]
@@ -100,15 +100,15 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public void Construction_FromUrl_CreatesBlockchainProxyService()
         {
             var processor = new LogsProcessorBuilder(blockchainUrl: BLOCKCHAIN_URL);
-            Assert.NotNull(processor.BlockchainProxyService);
+            Assert.NotNull(processor.Eth);
         }
 
         [Fact]
         public void Construction_FromWeb3_CreatesBlockchainProxyService()
         {
-            var mockWeb3 = new Mock<IWeb3>();
-            var processor = new LogsProcessorBuilder(mockWeb3.Object);
-            Assert.NotNull(processor.BlockchainProxyService);
+            var mockWeb3 = new Web3Mock();
+            var processor = new LogsProcessorBuilder(mockWeb3.Web3);
+            Assert.NotNull(processor.Eth);
         }
 
         [Fact]
@@ -131,15 +131,15 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public void Construction_BlockchainProxyCanNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new LogsProcessorBuilder(blockchainProxyService:null));
+            Assert.Throws<ArgumentNullException>(() => new LogsProcessorBuilder(eth:null));
         }
 
         [Fact]
         public void Construction_BlockchainProxyCanBePassed()
         {
-            var mockProxy = new Mock<IBlockchainProxyService>();
-            var processor = new LogsProcessorBuilder(mockProxy.Object);
-            Assert.Same(mockProxy.Object, processor.BlockchainProxyService);
+            var mockProxy = new Web3Mock();
+            var processor = new LogsProcessorBuilder(mockProxy.Eth);
+            Assert.Same(mockProxy.Eth, processor.Eth);
         }
 
         [Fact]
@@ -414,18 +414,18 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public async Task ProcessOnceAsync()
         {            
             var mockLogProcessor = new Mock<ILogProcessor>();
-            var mockBlockchainProxy = new Mock<IBlockchainProxyService>();
+            var web3Mock = new Web3Mock();
             var logs = new[] { new FilterLog() };
 
-            mockBlockchainProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
-            mockBlockchainProxy
-                .Setup(p => p.GetMaxBlockNumberAsync())
-                .ReturnsAsync((ulong)100);
+            web3Mock.BlockNumberMock
+                .Setup(p => p.SendRequestAsync(null))
+                .ReturnsAsync(100.ToHexBigInteger());
 
-            var builder = new LogsProcessorBuilder(mockBlockchainProxy.Object)
+            var builder = new LogsProcessorBuilder(web3Mock.Mock.Object.Eth)
                 .Set(p => p.BlocksPerBatch = 1)
                 .Set(p => p.MinimumBlockNumber = 0)
                 .Add(mockLogProcessor.Object);
@@ -451,20 +451,20 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             (ulong batchCount, BlockRange lastRange)? lastBatchProcessedArgs = null;
 
             var mockLogProcessor = new Mock<ILogProcessor>();
-            var mockBlockchainProxy = new Mock<IBlockchainProxyService>();
+            var web3Mock = new Web3Mock();
             var logs = new[] { new FilterLog() };
 
-            mockBlockchainProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
-            mockBlockchainProxy
-                .Setup(p => p.GetMaxBlockNumberAsync())
-                .ReturnsAsync((ulong)100);
+            web3Mock.BlockNumberMock
+                .Setup(p => p.SendRequestAsync(null))
+                .ReturnsAsync(100.ToHexBigInteger());
 
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            var builder = new LogsProcessorBuilder(mockBlockchainProxy.Object)
+            var builder = new LogsProcessorBuilder(web3Mock.ContractServiceMock.Object)
                 .Set(p => p.BlocksPerBatch = 1)
                 .Set(p => p.MinimumBlockNumber = 0)
                 // escape hatch
@@ -493,20 +493,20 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             (ulong batchCount, BlockRange lastRange)? lastBatchProcessedArgs = null;
 
             var mockLogProcessor = new Mock<ILogProcessor>();
-            var mockBlockchainProxy = new Mock<IBlockchainProxyService>();
+            var web3Mock = new Web3Mock();
             var logs = new[] { new FilterLog() };
 
-            mockBlockchainProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
-            mockBlockchainProxy
-                .Setup(p => p.GetMaxBlockNumberAsync())
-                .ReturnsAsync((ulong)100);
+            web3Mock.BlockNumberMock
+                .Setup(p => p.SendRequestAsync(null))
+                .ReturnsAsync(100.ToHexBigInteger());
 
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            var builder = new LogsProcessorBuilder(mockBlockchainProxy.Object)
+            var builder = new LogsProcessorBuilder(web3Mock.Eth)
                 .Set(p => p.BlocksPerBatch = 1)
                 .Set(p => p.MinimumBlockNumber = 0)
                 // escape hatch
@@ -538,18 +538,18 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public async Task IfMinimumBlockNumberIsNull_AndThereIsNoPreviousProgress_StartsAtCurrentBlockOnChain()
         {
             var mockLogProcessor = new Mock<ILogProcessor>();
-            var mockBlockchainProxy = new Mock<IBlockchainProxyService>();
+            var web3Mock = new Web3Mock();
             var logs = new[] { new FilterLog() };
 
-            mockBlockchainProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
-            mockBlockchainProxy
-                .Setup(p => p.GetMaxBlockNumberAsync())
-                .ReturnsAsync((ulong)100);
+            web3Mock.BlockNumberMock
+                .Setup(p => p.SendRequestAsync(null))
+                .ReturnsAsync(100.ToHexBigInteger());
 
-            var processor = new LogsProcessorBuilder(mockBlockchainProxy.Object)
+            var processor = new LogsProcessorBuilder(web3Mock.Eth)
                 .Set(p => p.BlocksPerBatch = 1)
                 .Add(mockLogProcessor.Object)
                 .Build();
@@ -631,22 +631,22 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         public async Task WillRequestLogsForEachFilter()
         {
             var mockLogProcessor = new Mock<ILogProcessor>();
-            var mockBlockchainProxy = new Mock<IBlockchainProxyService>();
+            var web3Mock = new Web3Mock();
             var logs = new[] { new FilterLog() };
             var filtersExecuted = new List<NewFilterInput>();
 
             var filters = new[] {new NewFilterInput(), new NewFilterInput()};
 
-            mockBlockchainProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .Callback<NewFilterInput, object>((f,o) => filtersExecuted.Add(f))
                 .ReturnsAsync(logs);
 
-            mockBlockchainProxy
-                .Setup(p => p.GetMaxBlockNumberAsync())
-                .ReturnsAsync((ulong)100);
+            web3Mock.BlockNumberMock
+                .Setup(p => p.SendRequestAsync(null))
+                .ReturnsAsync(100.ToHexBigInteger());
 
-            var processor = new LogsProcessorBuilder(mockBlockchainProxy.Object)
+            var processor = new LogsProcessorBuilder(web3Mock.Eth)
                 .Set(p => p.BlocksPerBatch = 1)
                 .Filter(filters[0])
                 .Filter(filters[1])
@@ -671,20 +671,20 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .ThrowsAsync(fakeException);
             
                 
-            var mockBlockchainProxy = new Mock<IBlockchainProxyService>();
+            var web3Mock = new Web3Mock();
             var logs = new[] { new FilterLog() };
 
-            mockBlockchainProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
-            mockBlockchainProxy
-                .Setup(p => p.GetMaxBlockNumberAsync())
-                .ReturnsAsync((ulong)100);
+            web3Mock.BlockNumberMock
+                .Setup(p => p.SendRequestAsync(null))
+                .ReturnsAsync(100.ToHexBigInteger());
 
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            var processor = new LogsProcessorBuilder(mockBlockchainProxy.Object)
+            var processor = new LogsProcessorBuilder(web3Mock.Eth)
                 .Set(p => p.BlocksPerBatch = 1)
                 .Set(p => p.MinimumBlockNumber = 0)
                 .OnFatalError(e => fatalError = e)

@@ -6,6 +6,7 @@ using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
+using Nethereum.Contracts.Services;
 using Nethereum.Hex.HexTypes;
 using System;
 using System.Collections.Generic;
@@ -26,14 +27,6 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         {
             try
             {
-                //var p = new Web3.Web3().Eth.CreateLogProcesssor<T>(() => DOsoMETO, );
-
-                //p.WriteToLocalStorage();
-
-                // p.Start()
-
-
-
                 Config.LogOutputToConsole();
                 _log.LogInformation("Starting");
 
@@ -117,7 +110,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         private ulong BlocksProcessed;
         private ulong LastBlock;
         private ILogsProcessorBuilder _builder;
-        private IBlockchainProxyService _blockchainProxyService;
+        private IEthApiContractService _blockchainProxyService;
 
         public WritingTransfersToTheAzureStorage(string azureConnectionString, string tablePrefix, uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
         {
@@ -128,7 +121,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
                 .OnBatchProcessed((rangesProcessed, lastRange) => Output(rangesProcessed, lastRange))
                 .SetBlocksPerBatch(maxBlocksPerBatch);
 
-            _blockchainProxyService = _builder.BlockchainProxyService;
+            _blockchainProxyService = _builder.Eth;
 
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
         }
@@ -153,7 +146,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
         public override async Task ConfigureAsync()
         {
-            MaxBlockNumber = await _blockchainProxyService.GetMaxBlockNumberAsync();
+            MaxBlockNumber = (await _blockchainProxyService.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false)).ToUlong();
             _builder.SetMinimumBlockNumber(MaxBlockNumber - NumberOfBlocksToProcess);
             _processor = _builder.Build();
         }
@@ -175,7 +168,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         private ulong BlocksProcessed;
         private ulong LastBlock;
         private ILogsProcessorBuilder _builder;
-        private IBlockchainProxyService _blockchainProxyService;
+        private IEthApiContractService _blockchainProxyService;
 
         public WritingTransfersToTheConsole(uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
         {
@@ -189,6 +182,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
                 })
                 .SetBlocksPerBatch(maxBlocksPerBatch);
 
+            _blockchainProxyService = _builder.Eth;
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
         }
 
@@ -206,7 +200,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
         public override async Task ConfigureAsync()
         {
-            MaxBlockNumber = await _blockchainProxyService.GetMaxBlockNumberAsync();
+            MaxBlockNumber = (await _blockchainProxyService.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false)).ToUlong();
             _builder.SetMinimumBlockNumber(MaxBlockNumber - NumberOfBlocksToProcess);
             _processor = _builder.Build();
         }

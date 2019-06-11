@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests.Scenarios;
 using Nethereum.Hex.HexTypes;
 using Newtonsoft.Json.Linq;
@@ -7,7 +8,7 @@ using Xunit;
 namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests
 {
 
-    public class ProcessTransactionTests : ProcessTransactionScenario
+    public class ProcessTransactionTests : ProcessTransactionScenario, IDisposable
     {
         readonly JObject _vmStack = new JObject();
         string _error = "oops";
@@ -108,6 +109,11 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
             //assert
             VerifyVmStackInfoHasNotBeenProcessed();
             EnsureHandleTransactionWasInvoked();
+        }
+
+        public void Dispose()
+        {
+            ClearVmStackMocks();
         }
     }
 

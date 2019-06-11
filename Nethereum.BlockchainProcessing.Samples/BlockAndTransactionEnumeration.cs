@@ -31,12 +31,12 @@ namespace Nethereum.BlockchainProcessing.Samples
         [Fact]
         public async Task Run()
         {
-            var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transactionHandler = new SimpleTransactionHandler();
             var handlers = new HandlerContainer{ TransactionHandler = transactionHandler};
 
             var blockProcessor = BlockProcessorFactory.Create(
-                blockchainProxy, 
+                web3, 
                 handlers, 
                 processTransactionsInParallel: false);
 

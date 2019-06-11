@@ -4,6 +4,7 @@ using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace Nethereum.BlockchainStore.Search
         protected readonly IEventFunctionProcessor FunctionProcessor;
 
         public EventIndexingProcessor(
-            IBlockchainProxyService blockchainProxyService, 
+            IWeb3 web3, 
             ISearchService searchService, 
             IEventFunctionProcessor functionProcessor,
             Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
@@ -31,7 +32,7 @@ namespace Nethereum.BlockchainStore.Search
             uint minimumBlockConfirmations = 0)
         {
             SearchService = searchService;
-            BlockchainProxyService = blockchainProxyService;
+            BlockchainProxyService = web3;
             MaxBlocksPerBatch = maxBlocksPerBatch;
             Filters = filters;
             MinimumBlockConfirmations = minimumBlockConfirmations;
@@ -42,7 +43,7 @@ namespace Nethereum.BlockchainStore.Search
         }
 
         public ISearchService SearchService {get;}
-        public IBlockchainProxyService BlockchainProxyService { get; }
+        public IWeb3 BlockchainProxyService { get; }
         public uint MaxBlocksPerBatch { get; }
         public uint MinimumBlockConfirmations { get; }
 
@@ -73,7 +74,7 @@ namespace Nethereum.BlockchainStore.Search
             if(!LogProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
 
             var logProcessor = new BlockchainLogProcessor(
-                BlockchainProxyService,
+                BlockchainProxyService.Eth.Filters.GetLogs,
                 LogProcessors,
                 Filters);
 
@@ -124,7 +125,7 @@ namespace Nethereum.BlockchainStore.Search
             IBlockProgressService progressService = null;
             if (to == null)
             {
-                progressService = new BlockProgressService(BlockchainProxyService, from, progressRepository, MinimumBlockConfirmations);
+                progressService = new BlockProgressService(BlockchainProxyService.Eth.Blocks, from, progressRepository, MinimumBlockConfirmations);
             }
             else
             {

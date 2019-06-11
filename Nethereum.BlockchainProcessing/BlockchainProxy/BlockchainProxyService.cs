@@ -12,7 +12,10 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
 {
     public class BlockchainProxyService: IBlockchainProxyService
     {
-        ContractQueryHelper _queryHelper;
+        private ContractQueryHelper _queryHelper;
+        private Web3.IWeb3 Web3 { get; }
+
+        private IEthApiContractService Eth { get; }
 
         public BlockchainProxyService(string url):this(new Web3.Web3(url))
         {}
@@ -27,10 +30,6 @@ namespace Nethereum.BlockchainProcessing.BlockchainProxy
             Eth = ethApiContractService;
             _queryHelper = new ContractQueryHelper(ethApiContractService);
         }
-
-        private Web3.IWeb3 Web3 { get; }
-
-        private IEthApiContractService Eth { get;}
 
         public Task<BlockWithTransactions> GetBlockWithTransactionsAsync
             (ulong blockNumber)

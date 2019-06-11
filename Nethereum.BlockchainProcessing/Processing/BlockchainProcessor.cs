@@ -22,12 +22,12 @@ namespace Nethereum.BlockchainProcessing.Processing
         private async Task<ulong> GetStartingBlockNumber()
         {
             _log.LogInformation("Begin GetStartingBlockNumber / _strategy.GetLastBlockProcessedAsync()");
-            var blockNumber = await _strategy.GetLastBlockProcessedAsync()
+            var lastBlockProcessed = await _strategy.GetLastBlockProcessedAsync()
                 .ConfigureAwait(false);
 
-            _log.LogInformation($"GetLastBlockProcessedAsync: {blockNumber}");
+            _log.LogInformation($"GetLastBlockProcessedAsync: {lastBlockProcessed}");
 
-            ulong startingBlock = blockNumber == null ? 0 : blockNumber.Value + 1;
+            ulong startingBlock = lastBlockProcessed == null ? 0 : lastBlockProcessed.Value + 1;
 
             return _strategy.MinimumBlockNumber > startingBlock ? _strategy.MinimumBlockNumber : startingBlock;
         }

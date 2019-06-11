@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
+using Nethereum.BlockchainProcessing.Tests.Processing;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
 {
@@ -14,7 +15,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing
     {
         public class ProcessTransactionAsync
         {
-            private readonly Mock<IGetCode> _getCodeProxy = new Mock<IGetCode>();
+            private readonly Web3Mock _web3Mock = new Web3Mock();
             private readonly Mock<IContractHandler> _contractHandler = new Mock<IContractHandler>();
             private readonly Mock<ITransactionHandler> _transactionHandler = new Mock<ITransactionHandler>();
             private ContractCreationTransactionProcessor _processor;
@@ -106,13 +107,13 @@ namespace Nethereum.BlockchainStore.Tests.Processing
             private ContractCreationTransactionProcessor CreateProcessor()
             {
                 return new ContractCreationTransactionProcessor(
-                    _getCodeProxy.Object, _contractHandler.Object, _transactionHandler.Object);
+                    _web3Mock.Web3, _contractHandler.Object, _transactionHandler.Object);
             }
 
             private void EnsureNothingWasProcessed(Transaction transaction, TransactionReceipt receipt)
             {
-                _getCodeProxy
-                    .Verify(p => p.GetCode(It.IsAny<string>()),
+                _web3Mock.GetCodeMock
+                    .Verify(p => p.SendRequestAsync(It.IsAny<string>(), (object)null),
                         Times.Never);
 
                 _contractHandler
@@ -154,8 +155,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing
 
             private void MockGetCode(TransactionReceipt receipt, string code)
             {
-                _getCodeProxy
-                    .Setup(p => p.GetCode(receipt.ContractAddress))
+                _web3Mock.GetCodeMock
+                    .Setup(p => p.SendRequestAsync(receipt.ContractAddress, (object)null))
                     .ReturnsAsync(code);
             }
 

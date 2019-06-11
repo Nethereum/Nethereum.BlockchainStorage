@@ -3,19 +3,20 @@ using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.PostProcessors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
+using Nethereum.Web3;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public static class BlockProcessorFactory
     {
-        public static IBlockProcessor Create(IBlockchainProxyService web3,
+        public static IBlockProcessor Create(IWeb3 web3,
             HandlerContainer handlers, FilterContainer filters = null, bool postVm = false, bool processTransactionsInParallel = true)
         {
             return Create(web3, new VmStackErrorCheckerWrapper(), handlers, filters, postVm, processTransactionsInParallel);
         }
 
         public static IBlockProcessor Create(
-            IBlockchainProxyService web3, IVmStackErrorChecker vmStackErrorChecker, 
+            IWeb3 web3, IVmStackErrorChecker vmStackErrorChecker, 
             HandlerContainer handlers, FilterContainer filters = null, bool postVm = false, bool processTransactionsInParallel = true)
         {
 

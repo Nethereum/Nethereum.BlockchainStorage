@@ -36,7 +36,6 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             IEventProcessingConfigurationRepository configurationRepository = configurationContext.CreateMockRepository(idGenerator);
 
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
-            var blockchainProxy = new BlockchainProxyService(web3);
 
             // search components
             var searchService = new AzureSearchService(serviceName: AZURE_SEARCH_SERVICE_NAME, searchApiKey: azureSearchKey);
@@ -50,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // load subscribers and event subscriptions
             var eventSubscriptionFactory = new EventSubscriptionFactory(
-                blockchainProxy, configurationRepository, queueFactory, searchIndexFactory, repositoryFactory);
+                web3, configurationRepository, queueFactory, searchIndexFactory, repositoryFactory);
 
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PARTITION);
 
@@ -60,8 +59,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var blockProgressRepo = storageCloudSetup.CreateBlockProgressRepository();
 
             // load service
-            var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions);
+            var progressService = new BlockProgressService(web3, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var logProcessor = new BlockchainLogProcessor(web3, eventSubscriptions);
             var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute

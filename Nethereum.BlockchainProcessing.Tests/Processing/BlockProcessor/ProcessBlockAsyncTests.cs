@@ -5,6 +5,7 @@ using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
 using Xunit;
 using IBlockFilter = Nethereum.BlockchainProcessing.Processors.IBlockFilter;
+using System;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 {
@@ -16,8 +17,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
             public async Task ThrowsBlockNotFoundException()
             {
                 //setup
-                MockBlockProxy
-                    .Setup(p => p.GetBlockWithTransactionsAsync(BlockNumber))
+                Web3Mock.GetBlockWithTransactionsByNumberMock
+                    .Setup(p => p.SendRequestAsync(BlockNumber.ToHexBigInteger(), null))
                     .ReturnsAsync((BlockWithTransactions) null);
 
                 //execute
@@ -44,8 +45,8 @@ namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
                     }
                 };
 
-                MockBlockProxy
-                    .Setup(p => p.GetBlockWithTransactionsAsync(BlockNumber))
+                Web3Mock.GetBlockWithTransactionsByNumberMock
+                    .Setup(p => p.SendRequestAsync(BlockNumber.ToHexBigInteger(), null))
                     .ReturnsAsync(_stubBlock);
             }
 

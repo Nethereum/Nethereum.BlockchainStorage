@@ -1,13 +1,13 @@
-using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
+using Nethereum.Web3;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processors.PostProcessors
 {
     public class BlockVmPostProcessor : BlockPostProcessor
     {
-        public BlockVmPostProcessor(IBlockProxy blockProxy, IBlockHandler blockHandler, ITransactionProcessor transactionProcessor) : base(blockProxy, blockHandler, transactionProcessor)
+        public BlockVmPostProcessor(IWeb3 web3, IBlockHandler blockHandler, ITransactionProcessor transactionProcessor) : base(web3, blockHandler, transactionProcessor)
         {
         }
 

@@ -30,14 +30,14 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var configurationContext = MakerDAOEventProcessingConfig.Create(PARTITION, out IdGenerator idGenerator);
             IEventProcessingConfigurationRepository configurationRepository = configurationContext.CreateMockRepository(idGenerator);
 
-            var blockchainProxy = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
 
             // queue components
             var queueFactory = new AzureSubscriberQueueFactory(azureStorageConnectionString);
 
             // load subscribers and event subscriptions
             var eventSubscriptionFactory = new EventSubscriptionFactory(
-                blockchainProxy, configurationRepository, queueFactory);
+                web3, configurationRepository, queueFactory);
 
             List<IEventSubscription> eventSubscriptions = await eventSubscriptionFactory.LoadAsync(PARTITION);
 
@@ -50,8 +50,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
             var makerAddressFilter = new NewFilterInput() { Address = new[] { MakerDAOEventProcessingConfig.MAKER_CONTRACT_ADDRESS} };
 
             // load service
-            var progressService = new BlockProgressService(blockchainProxy, MIN_BLOCK_NUMBER, blockProgressRepo);
-            var logProcessor = new BlockchainLogProcessor(blockchainProxy, eventSubscriptions, makerAddressFilter);
+            var progressService = new BlockProgressService(web3, MIN_BLOCK_NUMBER, blockProgressRepo);
+            var logProcessor = new BlockchainLogProcessor(web3, eventSubscriptions, makerAddressFilter);
             var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute

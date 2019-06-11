@@ -62,9 +62,8 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                             new FunctionIndexTransactionHandler<TransferFunction>(azureFunctionMessageIndexer);
 
                         var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
-                        var blockchainProxy = new BlockchainProxyService(web3);
                         var handlers = new HandlerContainer {TransactionHandler = transferHandler};
-                        var blockProcessor = BlockProcessorFactory.Create(blockchainProxy, handlers);
+                        var blockProcessor = BlockProcessorFactory.Create(web3, handlers);
                         var processingStrategy = new ProcessingStrategy(blockProcessor);
                         var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 

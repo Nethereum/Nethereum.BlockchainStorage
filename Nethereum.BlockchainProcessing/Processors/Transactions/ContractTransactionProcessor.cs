@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Configuration;
+using Nethereum.Contracts.Services;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
 using Newtonsoft.Json.Linq;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
@@ -13,20 +15,20 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
 {
     public class ContractTransactionProcessor : IContractTransactionProcessor
     {
-        private readonly IGetTransactionVMStack _vmStackProxy;
+        private readonly IWeb3 _web3;
         private readonly IVmStackErrorChecker _vmStackErrorChecker;
         private readonly IContractHandler _contractHandler;
         private readonly ITransactionHandler _transactionHandler;
         private readonly ITransactionVMStackHandler _transactionVmStackHandler;
 
         public ContractTransactionProcessor(
-          IGetTransactionVMStack vmStackProxy, 
+          IWeb3 web3, 
           IVmStackErrorChecker vmStackErrorChecker,
           IContractHandler contractHandler,
           ITransactionHandler transactionHandler, 
           ITransactionVMStackHandler transactionVmStackHandler)
         {
-            _vmStackProxy = vmStackProxy;
+            _web3 = web3;
             _vmStackErrorChecker = vmStackErrorChecker;
             _contractHandler = contractHandler;
             _transactionHandler = transactionHandler;
@@ -57,7 +59,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             {
                 try
                 {
-                    stackTrace = await _vmStackProxy
+                    stackTrace = await _web3
                         .GetTransactionVmStack(transactionHash)
                         .ConfigureAwait(false);
                 }

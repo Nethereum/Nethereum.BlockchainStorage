@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.Configuration;
+using Nethereum.RPC.Eth.Filters;
+using Nethereum.Web3;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
@@ -18,19 +20,39 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public IWaitStrategy RetryWaitStrategy { get; set; } = new WaitStrategy();
 
-        private readonly IEventLogProxy _eventLogProxy;
+        private readonly IEthGetLogs _eventLogProxy;
         private readonly IEnumerable<ILogProcessor> _logProcessors;
         private readonly List<NewFilterInput> _filters;
 
         public BlockchainLogProcessor(
-            IEventLogProxy eventLogProxy, 
+            IWeb3 web3,
+            IEnumerable<ILogProcessor> logProcessors) : this(web3.Eth.Filters.GetLogs, logProcessors, filter: null)
+        {
+        }
+
+        public BlockchainLogProcessor(
+            IWeb3 web3,
+            IEnumerable<ILogProcessor> logProcessors,
+            NewFilterInput filter) : this(web3.Eth.Filters.GetLogs, logProcessors, filter)
+        {
+        }
+
+        public BlockchainLogProcessor(
+            IWeb3 web3,
+            IEnumerable<ILogProcessor> logProcessors,
+            IEnumerable<NewFilterInput> filters) : this(web3.Eth.Filters.GetLogs, logProcessors, filters)
+        {
+        }
+
+        public BlockchainLogProcessor(
+            IEthGetLogs eventLogProxy, 
             IEnumerable<ILogProcessor> logProcessors, 
             NewFilterInput filter):this(eventLogProxy, logProcessors, filter == null ? null : new NewFilterInput[]{filter})
         {
         }
 
         public BlockchainLogProcessor(
-            IEventLogProxy eventLogProxy, 
+            IEthGetLogs eventLogProxy, 
             IEnumerable<ILogProcessor> logProcessors, 
             IEnumerable<NewFilterInput> filters = null)
         {
@@ -117,7 +139,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
                 _log.LogInformation($"RetrieveLogsAsync - getting logs. RetryNumber:{retryNumber}, from:{range.From}, to:{range.To}.");
 
-                return await _eventLogProxy.GetLogs(filter).ConfigureAwait(false);
+                return await _eventLogProxy.SendRequestAsync(filter).ConfigureAwait(false);
             }
             catch (TooManyRecordsException)
             {

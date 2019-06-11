@@ -15,11 +15,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
     {
         EventHandlerFactory _eventHandlerFactory;
 
+        Web3Mock web3Mock = new Web3Mock();
+
         Mock<IEventSubscriptionStateRepository> _stateFactory = new Mock<IEventSubscriptionStateRepository>();
         Mock<IEventContractQueryConfigurationRepository> _contractQueryFactory = new Mock<IEventContractQueryConfigurationRepository>();
         Mock<IContractQuery> _contractQueryHandler = new Mock<IContractQuery>();
         Mock<IEventAggregatorRepository> _eventAggregatorConfigurationFactory = new Mock<IEventAggregatorRepository>();
-        Mock<IGetTransactionByHash> _getTransactionProxy = new Mock<IGetTransactionByHash>();
         Mock<ISubscriberQueueFactory> _subscriberQueueFactory = new Mock<ISubscriberQueueFactory>();
         Mock<ISubscriberSearchIndexFactory> _subscriberSearchIndexFactory = new Mock<BlockchainProcessing.Processing.Logs.Handling.ISubscriberSearchIndexFactory>();
         Mock<IEventRuleRepository> _eventRuleRepository = new Mock<IEventRuleRepository>();
@@ -39,7 +40,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
                 _contractQueryFactory.Object, 
                 _contractQueryHandler.Object, 
                 _eventAggregatorConfigurationFactory.Object, 
-                _getTransactionProxy.Object,
+                web3Mock.GetTransactionByHashMock.Object,
                 _subscriberQueueRepository.Object,
                 _subscriberQueueFactory.Object,
                 _subscriberSearchIndexRepository.Object,
@@ -198,7 +199,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Handlers
             Assert.NotNull(getTransactionHandler);
             Assert.Equal(config.Id, getTransactionHandler.Id);
             Assert.Same(_mockEventSubscription.Object, getTransactionHandler.Subscription);
-            Assert.Same(_getTransactionProxy.Object, getTransactionHandler.Proxy);
+            Assert.Same(web3Mock.GetTransactionByHashMock.Object, getTransactionHandler.GetTransactionProxy);
         }
 
         [Fact]

@@ -11,15 +11,15 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {
     public class BlockProgressServiceTests
     {
-        protected internal Mock<IBlockchainProxyService> Web3;
+        protected internal Web3Mock Web3Mock;
         protected internal Mock<IBlockProgressRepository> ProgressRepo;
         protected internal BlockProgressService Service;
 
         public BlockProgressServiceTests()
         {
-            Web3 = new Mock<IBlockchainProxyService>();
+            Web3Mock = new Web3Mock();
             ProgressRepo = new Mock<IBlockProgressRepository>();
-            Service = new BlockProgressService(Web3.Object, 10, ProgressRepo.Object);
+            Service = new BlockProgressService(Web3Mock.Web3, 10, ProgressRepo.Object);
         }
 
         public class GetNextBlockRangeTests : BlockProgressServiceTests
@@ -27,9 +27,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             [Fact]
             public async Task When_Nothing_Has_Been_Processed_And_Default_Starting_Block_Is_Null_Returns_Current_Block_On_The_Chain_Less_Min_Confirmations()
             {
-                Service = new BlockProgressService(Web3.Object, null, ProgressRepo.Object, minimumBlockConfirmations: 6);
+                Service = new BlockProgressService(Web3Mock.Web3, null, ProgressRepo.Object, minimumBlockConfirmations: 6);
 
-                Web3.Setup(r => r.GetMaxBlockNumberAsync()).ReturnsAsync((ulong)20);
+                Web3Mock.BlockNumberMock.Setup(r => r.SendRequestAsync(null)).ReturnsAsync(20.ToHexBigInteger());
                 ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong?)null);
 
                 var range = await Service.GetNextBlockRangeToProcessAsync(100);
@@ -41,7 +41,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             [Fact]
             public async Task When_Nothing_Has_Been_Processed_Returns_Specified_Starting_Block()
             {
-                Web3.Setup(r => r.GetMaxBlockNumberAsync()).ReturnsAsync((ulong) 20);
+                Web3Mock.BlockNumberMock.Setup(r => r.SendRequestAsync(null)).ReturnsAsync(20.ToHexBigInteger());
                 ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong?) null);
 
                 var range = await Service.GetNextBlockRangeToProcessAsync(100);
@@ -52,7 +52,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             [Fact]
             public async Task Returns_Next_Unprocessed_Block()
             {
-                Web3.Setup(r => r.GetMaxBlockNumberAsync()).ReturnsAsync((ulong) 50);
+                Web3Mock.BlockNumberMock.Setup(r => r.SendRequestAsync(null)).ReturnsAsync(50.ToHexBigInteger());
                 ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong) 5);
 
                 var range = await Service.GetNextBlockRangeToProcessAsync(100);
@@ -69,7 +69,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             [Fact]
             public async Task When_Last_Block_Processed_Exceeds_Starting_Block_Returns_Null()
             {
-                Web3.Setup(r => r.GetMaxBlockNumberAsync()).ReturnsAsync((ulong) 50);
+                Web3Mock.BlockNumberMock.Setup(r => r.SendRequestAsync(null)).ReturnsAsync(50.ToHexBigInteger());
                 ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong) 50);
 
                 Assert.Null(await Service.GetNextBlockRangeToProcessAsync(100));

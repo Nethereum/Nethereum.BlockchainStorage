@@ -18,7 +18,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task Allocates_Matching_Logs_To_Processors()
         {
-            var eventLogProxy = new Mock<IEventLogProxy>();
+            var web3Mock = new Web3Mock();
             var log1Processor = new Mock<ILogProcessor>();
             var log2Processor = new Mock<ILogProcessor>();
             var catchAllProcessor = new Mock<ILogProcessor>();
@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var mockProcessors = new[] {log1Processor, log2Processor, catchAllProcessor };
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, mockProcessors.Select(p => p.Object));
+                web3Mock.Web3, mockProcessors.Select(p => p.Object));
 
             var log1 = new FilterLog();
             var log2 = new FilterLog();
@@ -41,8 +41,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Setup(p => p.IsLogForEvent(It.IsAny<FilterLog>()))
                 .Returns(true);
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
             var processedLogs = new Dictionary<Mock<ILogProcessor>, List<FilterLog>>();
@@ -65,7 +65,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task Dedupes_Logs_Matching_Multiple_Filters()
         {
-            var eventLogProxy = new Mock<IEventLogProxy>();
+            var web3Mock = new Web3Mock();
             var catchAllProcessor = new Mock<ILogProcessor>();
 
             var filter1 = new NewFilterInput();
@@ -75,7 +75,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var mockProcessors = new[] {catchAllProcessor };
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, mockProcessors.Select(p => p.Object), filters);
+                web3Mock.Web3, mockProcessors.Select(p => p.Object), filters);
 
             var log1 = new FilterLog(){TransactionHash = "x", LogIndex = new HexBigInteger(0)};
             var duplicateLog = new FilterLog(){TransactionHash = "x", LogIndex = new HexBigInteger(0)};
@@ -88,12 +88,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Setup(p => p.IsLogForEvent(It.IsAny<FilterLog>()))
                 .Returns(true);
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(filter1, null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(filter1, null))
                 .ReturnsAsync(logsFromFilter1);
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(filter2, null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(filter2, null))
                 .ReturnsAsync(logsFromFilter2);
 
             var processedLogs = new List<FilterLog>();
@@ -112,7 +112,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task Retrieves_Logs_For_Each_Filter()
         {
-            var eventLogProxy = new Mock<IEventLogProxy>();
+            var web3Mock = new Web3Mock();
             var catchAllProcessor = new Mock<ILogProcessor>();
 
             var filter1 = new NewFilterInput();
@@ -122,7 +122,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var mockProcessors = new[] {catchAllProcessor };
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, mockProcessors.Select(p => p.Object), filters);
+                web3Mock.Web3, mockProcessors.Select(p => p.Object), filters);
 
             var log1 = new FilterLog(){TransactionHash = "x", LogIndex = new HexBigInteger(0)};
             var log2 = new FilterLog(){TransactionHash = "y", LogIndex = new HexBigInteger(0)};
@@ -131,12 +131,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Setup(p => p.IsLogForEvent(It.IsAny<FilterLog>()))
                 .Returns(true);
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(filter1, null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(filter1, null))
                 .ReturnsAsync(new []{log1});
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(filter2, null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(filter2, null))
                 .ReturnsAsync(new []{log2});
 
             var processedLogs = new List<FilterLog>();
@@ -154,17 +154,17 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task Passes_Correct_Block_Range_To_Proxy()
         {
-            var eventLogProxy = new Mock<IEventLogProxy>();
+            var web3Mock = new Web3Mock();
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, Array.Empty<ILogProcessor>());
+                web3Mock.Web3, Array.Empty<ILogProcessor>());
 
             var logs = Array.Empty<FilterLog>();
 
             NewFilterInput actualFilter = null;
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .Callback<NewFilterInput, object>((f,o) => actualFilter = f)
                 .ReturnsAsync(logs);
 
@@ -178,11 +178,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task When_Cancellation_Is_Requested_Does_Not_Call_Processor()
         {
-            var eventLogProxy = new Mock<IEventLogProxy>();
+            var web3Mock = new Web3Mock();
             var catchAllProcessor = new Mock<ILogProcessor>();
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, new []{catchAllProcessor.Object});
+                web3Mock.Web3, new []{catchAllProcessor.Object});
 
             catchAllProcessor
                 .Setup(p => p.IsLogForEvent(It.IsAny<FilterLog>()))
@@ -193,8 +193,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var cancellationToken = new CancellationTokenSource();
 
             //fake cancellation being raised after logs are retrieved but before processing
-            eventLogProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .Callback<NewFilterInput, object>((f, o) => cancellationToken.Cancel())
                 .ReturnsAsync(logs);
 
@@ -207,7 +207,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task Checks_For_Cancellation_Before_Each_Processing_Batch()
         {
-            var eventLogProxy = new Mock<IEventLogProxy>();
+            var web3Mock = new Web3Mock();
             var catchAllProcessor1 = new Mock<ILogProcessor>();
             var catchAllProcessor2 = new Mock<ILogProcessor>();
 
@@ -220,14 +220,14 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Returns(true);
 
             var logProcessor = new BlockchainLogProcessor(
-                eventLogProxy.Object, new []{catchAllProcessor1.Object, catchAllProcessor2.Object});
+                web3Mock.Web3, new []{catchAllProcessor1.Object, catchAllProcessor2.Object});
 
             var logs = new [] {new FilterLog()};
 
             var cancellationToken = new CancellationTokenSource();
 
-            eventLogProxy
-                .Setup(p => p.GetLogs(It.IsAny<NewFilterInput>(), null))
+            web3Mock.GetLogsMock
+                .Setup(p => p.SendRequestAsync(It.IsAny<NewFilterInput>(), null))
                 .ReturnsAsync(logs);
 
             //cancel after processor 1 finishes

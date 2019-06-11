@@ -2,6 +2,7 @@
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Geth;
+using Nethereum.Web3;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -16,10 +17,10 @@ namespace Nethereum.BlockchainStore.Processing
             FilterContainer filterContainer = null,
             bool useGeth = false)
         {
-            IBlockchainProxyService web3 = new BlockchainProxyService(
+            IWeb3 web3 = 
                 useGeth 
                     ? new Web3Geth(configuration.BlockchainUrl) 
-                    : new Web3.Web3(configuration.BlockchainUrl));
+                    : new Web3.Web3(configuration.BlockchainUrl);
 
             using(var repositoryHandlerContext = new RepositoryHandlerContext(repositoryFactory))
             {
@@ -27,6 +28,7 @@ namespace Nethereum.BlockchainStore.Processing
                         .Create(
                             web3, 
                             repositoryHandlerContext.Handlers, 
+                            filters: filterContainer,
                             postVm: configuration.PostVm,
                             processTransactionsInParallel: configuration.ProcessBlockTransactionsInParallel);
 

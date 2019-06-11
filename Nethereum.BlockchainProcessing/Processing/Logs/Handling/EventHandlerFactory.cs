@@ -2,6 +2,8 @@
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
+using Nethereum.RPC.Eth.Transactions;
+using Nethereum.Web3;
 using System;
 using System.Threading.Tasks;
 
@@ -11,7 +13,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
     public class EventHandlerFactory: IEventHandlerFactory
     {
         public EventHandlerFactory(
-            IBlockchainProxyService blockchainProxy, 
+            IWeb3 web3, 
             IEventProcessingConfigurationRepository configRepo, 
             ISubscriberQueueFactory subscriberQueueFactory = null,
             ISubscriberSearchIndexFactory subscriberSearchIndexFactory = null,
@@ -19,9 +21,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             :this(
                  configRepo.EventSubscriptionStates, 
                  configRepo.EventContractQueries, 
-                 blockchainProxy,  
+                 new ContractQueryHelper(web3.Eth),  
                  configRepo.EventAggregators, 
-                 blockchainProxy, 
+                 web3.Eth.Transactions.GetTransactionByHash, 
                  configRepo.SubscriberQueues,
                  subscriberQueueFactory,
                  configRepo.SubscriberSearchIndexes,
@@ -37,7 +39,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
             IEventContractQueryConfigurationRepository contractQueryFactory = null,
             IContractQuery contractQueryHandler = null,
             IEventAggregatorRepository eventAggregatorRepository = null,
-            IGetTransactionByHash getTransactionProxy = null,
+            IEthGetTransactionByHash getTransactionProxy = null,
             ISubscriberQueueRepository subscriberQueueRepository = null,
             ISubscriberQueueFactory subscriberQueueFactory = null,
             ISubscriberSearchIndexRepository subscriberSearchIndexRepository = null,
@@ -64,7 +66,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling
         public IEventContractQueryConfigurationRepository ContractQueryFactory { get; }
         public IContractQuery ContractQueryHandler { get; }
         public IEventAggregatorRepository EventAggregatorRepository { get; }
-        public IGetTransactionByHash GetTransactionProxy { get; }
+        public IEthGetTransactionByHash GetTransactionProxy { get; }
         public ISubscriberQueueRepository SubscriberQueueRepository { get; }
         public ISubscriberQueueFactory SubscriberQueueFactory { get; }
         public ISubscriberSearchIndexRepository SubscriberSearchIndexRepository { get; }

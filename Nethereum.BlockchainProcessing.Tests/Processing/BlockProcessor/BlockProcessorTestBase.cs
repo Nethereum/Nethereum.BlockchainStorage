@@ -4,26 +4,27 @@ using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using System.Collections.Generic;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Tests.Processing;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
 {
     public class BlockProcessorTestBase
     {
-        protected internal const long BlockNumber = 9;
-        protected readonly Mock<IBlockProxy> MockBlockProxy;
+        protected internal const ulong BlockNumber = 9;
         protected readonly Mock<IBlockHandler> MockBlockHandler;
         protected readonly Mock<ITransactionProcessor> MockTransactionProcessor;
         protected readonly List<IBlockFilter> BlockFilters;
         protected readonly BlockProcessor BlockProcessor;
+        protected readonly Web3Mock Web3Mock;
 
         public BlockProcessorTestBase()
         {
-            MockBlockProxy = new Mock<IBlockProxy>();
+            Web3Mock = new Web3Mock();
             MockBlockHandler = new Mock<IBlockHandler>();
             MockTransactionProcessor = new Mock<ITransactionProcessor>();
             BlockFilters = new List<IBlockFilter>();
             BlockProcessor = new BlockProcessor(
-                MockBlockProxy.Object,
+                Web3Mock.Web3,
                 MockBlockHandler.Object,
                 MockTransactionProcessor.Object,
                 BlockFilters);

@@ -1,7 +1,8 @@
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.RPC.Eth.Services;
+using Nethereum.Web3;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Processors.Transactions
 {
@@ -14,7 +15,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
         private readonly List<ITransactionReceiptFilter> _transactionReceiptFilters;
         private readonly List<ITransactionAndReceiptFilter> _transactionAndReceiptFilters;
 
-        protected readonly ITransactionProxy TransactionProxy;
+        protected readonly IEthApiTransactionsService TransactionProxy;
 
         public bool EnabledContractCreationProcessing { get; set; } = true;
         public bool EnabledContractProcessing { get; set; } = true;
@@ -22,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
         public IContractTransactionProcessor ContractTransactionProcessor { get; }
 
         public TransactionProcessor(
-            ITransactionProxy transactionProxy, 
+            IWeb3 web3, 
             IContractTransactionProcessor contractTransactionProcessor, 
             IValueTransactionProcessor valueTransactionProcessor, 
             IContractCreationTransactionProcessor contractCreationTransactionProcessor,
@@ -31,7 +32,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             IEnumerable<ITransactionReceiptFilter> transactionReceiptFilters = null,
             IEnumerable<ITransactionAndReceiptFilter> transactionAndReceiptFilters = null)
         {
-            TransactionProxy = transactionProxy;
+            TransactionProxy = web3.Eth.Transactions;
             ContractTransactionProcessor = contractTransactionProcessor;
             _valueTransactionProcessor = valueTransactionProcessor;
             _contractCreationTransactionProcessor = contractCreationTransactionProcessor;
@@ -51,7 +52,7 @@ namespace Nethereum.BlockchainProcessing.Processors.Transactions
             if (await _transactionFilters.IgnoreAsync(tx)) return;
 
             var receipt = await TransactionProxy
-                .GetTransactionReceipt(tx.TransactionHash)
+                .GetTransactionReceipt.SendRequestAsync(tx.TransactionHash)
                 .ConfigureAwait(false);
 
             if (await _transactionReceiptFilters

@@ -313,7 +313,7 @@ Solidity Contract Excerpt
             TransferMetadata.CurrentChainUrl = BlockchainUrl;
 
             var blockchainProxyService =
-                new BlockchainProxyService(BlockchainUrl);
+                new Web3.Web3(BlockchainUrl);
 
             using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
             {
@@ -329,7 +329,7 @@ Solidity Contract Excerpt
                         {
 
                             var logProcessor = new BlockchainLogProcessor(
-                                blockchainProxyService,
+                                blockchainProxyService.Eth.Filters.GetLogs,
                                 new ILogProcessor[] {transferProcessor});
 
                             var progressRepository =

@@ -85,13 +85,13 @@ The event signature will match (as it "indexed" is not part of the signature) bu
         [Fact]
         public async Task RunOnce()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors);
+            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -115,13 +115,13 @@ The event signature will match (as it "indexed" is not part of the signature) bu
         [Fact]
         public async Task RunContinually()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors);
+            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -130,7 +130,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             //this will get the last block on the chain each time a "to" block is requested
             var progressService = new BlockProgressService(
-                blockchainProxyService, 3379061, progressRepository, minimumBlockConfirmations: 6);
+                web3, 3379061, progressRepository, minimumBlockConfirmations: 6);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
@@ -169,7 +169,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
         [Fact]
         public async Task Filtering_By_Many_Values()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
 
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
@@ -183,7 +183,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
                 .AddTopic(e => e.TokenId, new BigInteger(94))
                 .Build();
 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -192,7 +192,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             //this will get the last block on the chain each time a "to" block is requested
             var progressService = new BlockProgressService(
-                blockchainProxyService, 3379061, progressRepository, minimumBlockConfirmations: 6);
+                web3, 3379061, progressRepository, minimumBlockConfirmations: 6);
 
             var batchProcessorService = new BlockchainBatchProcessorService(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
@@ -236,7 +236,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
         [Fact]
         public async Task TargetSpecificEventAndIndexedValueForAnyContract()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
@@ -255,7 +255,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             //the "to" address is the second indexed parameter on the event
             var filter = eventAbi.CreateFilterInput(AnyContract, AnyFromAddress, TransferToAddress);
 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -277,7 +277,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
         [Fact]
         public async Task UsingFilterInputBuilder()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
 
@@ -285,7 +285,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
                 .AddTopic(eventVal => eventVal.To, "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
                 .Build();
 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -306,7 +306,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
         [Fact]
         public async Task TargetSpecificEventForSpecificContracts()
         {
-            var blockchainProxyService = new BlockchainProxyService(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
             var transferEventProcessor = new TransferEventProcessor();
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
@@ -315,7 +315,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             var filter = new NewFilterInputBuilder<TransferEventERC721>().Build(ContractAddresses);
 
-            var logProcessor = new BlockchainLogProcessor(blockchainProxyService, eventProcessors, filter);
+            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
