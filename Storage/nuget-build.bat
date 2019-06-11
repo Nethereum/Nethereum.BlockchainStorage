@@ -54,6 +54,10 @@ cd Nethereum.BlockchainStore.EFCore
 CALL :restorepack
 cd ..
 
+cd Nethereum.BlockchainStore.MongoDb
+CALL :restorepack
+cd ..
+
 setlocal
 set DIR=%~dp0
 set OUTPUTDIR=%~dp0\deploy-packages
