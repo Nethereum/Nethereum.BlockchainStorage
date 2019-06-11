@@ -7,6 +7,7 @@ using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -646,5 +647,14 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .Add<TransferEventDto>(transfers => { })
                 .Build();
         }
+    }
+
+    public static class ConcurrentBagExtensions
+    {
+        public static void AddRange<T>(this ConcurrentBag<T> bag, IEnumerable<T> items)
+        {
+            foreach (var item in items) bag.Add(item);
+        }
+
     }
 }
