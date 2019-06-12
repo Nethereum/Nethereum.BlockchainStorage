@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         const string BLOCKCHAIN_URL = "http://localhost:8545/";
 
         [Fact]
-        public void EventSpecific_Construction_FromUrl_CreatesBlockchainProxyService()
+        public void EventSpecific_Construction_FromUrl_CreatesEthApiContractService()
         {
             var processor = new LogsProcessorBuilder<TestData.Contracts.StandardContract.TransferEvent>(blockchainUrl: BLOCKCHAIN_URL);
             Assert.NotNull(processor.Eth);
@@ -98,14 +98,14 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
 
         [Fact]
-        public void Construction_FromUrl_CreatesBlockchainProxyService()
+        public void Construction_FromUrl_CreatesEthApiContractService()
         {
             var processor = new LogsProcessorBuilder(blockchainUrl: BLOCKCHAIN_URL);
             Assert.NotNull(processor.Eth);
         }
 
         [Fact]
-        public void Construction_FromWeb3_CreatesBlockchainProxyService()
+        public void Construction_FromWeb3_CreatesEthApiContractService()
         {
             var mockWeb3 = new Web3Mock();
             var processor = new LogsProcessorBuilder(mockWeb3.Web3);

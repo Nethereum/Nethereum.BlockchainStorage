@@ -31,14 +31,14 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
         }
 
         public ElasticEventIndexingProcessor(
-            IWeb3 blockchainProxyService, 
+            IWeb3 web3, 
             IElasticSearchService searchService, 
             IEventFunctionProcessor functionProcessor, 
             Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2, 
             IEnumerable<NewFilterInput> filters = null, 
             uint minimumBlockConfirmations = 0) : 
-            base(blockchainProxyService, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations)
+            base(web3, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations)
         {
             this._elasticSearchService = searchService;
         }

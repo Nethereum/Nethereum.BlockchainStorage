@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Search.Models;
 using Xunit;
+using Nethereum.LogProcessing;
 
 namespace Nethereum.BlockchainStore.Search.Samples.Azure
 {
@@ -312,7 +313,7 @@ Solidity Contract Excerpt
         {
             TransferMetadata.CurrentChainUrl = BlockchainUrl;
 
-            var blockchainProxyService =
+            var web3 =
                 new Web3.Web3(BlockchainUrl);
 
             using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
@@ -329,7 +330,7 @@ Solidity Contract Excerpt
                         {
 
                             var logProcessor = new BlockRangeLogsProcessor(
-                                blockchainProxyService.Eth.Filters.GetLogs,
+                                web3.Eth.Filters.GetLogs,
                                 new ILogProcessor[] {transferProcessor});
 
                             var progressRepository =

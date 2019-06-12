@@ -33,18 +33,18 @@ namespace Nethereum.BlockchainStore.Search
             uint minimumBlockConfirmations = 0)
         {
             SearchService = searchService;
-            BlockchainProxyService = web3;
+            Web3 = web3;
             MaxBlocksPerBatch = maxBlocksPerBatch;
             Filters = filters;
             MinimumBlockConfirmations = minimumBlockConfirmations;
             BlockProgressServiceCallBack = blockProgressServiceCallBack;
             LogProcessors = new List<ILogProcessor>();
             _indexers = new List<IIndexer>();
-            FunctionProcessor = functionProcessor ?? new EventFunctionProcessor(BlockchainProxyService);
+            FunctionProcessor = functionProcessor ?? new EventFunctionProcessor(Web3);
         }
 
         public ISearchService SearchService {get;}
-        public IWeb3 BlockchainProxyService { get; }
+        public IWeb3 Web3 { get; }
         public uint MaxBlocksPerBatch { get; }
         public uint MinimumBlockConfirmations { get; }
 
@@ -75,7 +75,7 @@ namespace Nethereum.BlockchainStore.Search
             if(!LogProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
 
             var logProcessor = new BlockRangeLogsProcessor(
-                BlockchainProxyService.Eth.Filters.GetLogs,
+                Web3.Eth.Filters.GetLogs,
                 LogProcessors,
                 Filters);
 
@@ -126,7 +126,7 @@ namespace Nethereum.BlockchainStore.Search
             IBlockProgressService progressService = null;
             if (to == null)
             {
-                progressService = new BlockProgressService(BlockchainProxyService.Eth.Blocks, from, progressRepository, MinimumBlockConfirmations);
+                progressService = new BlockProgressService(Web3.Eth.Blocks, from, progressRepository, MinimumBlockConfirmations);
             }
             else
             {
