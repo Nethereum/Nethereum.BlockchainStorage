@@ -24,14 +24,14 @@ namespace Nethereum.LogProcessing
         /// </summary>
         public bool EnableAutoBatchResizing { get; set; } = true;
         public uint MaxNumberOfBlocksPerBatch { get; set; }
-        public Action<uint, BlockRange> BatchProcessedCallback { get; private set; }
+        public Action<LogBatchProcessedArgs> BatchProcessedCallback { get; private set; }
         public Action<Exception> FatalErrorCallback { get; private set; }
 
         public LogsProcessor(
             IBlockchainProcessor processor,
             IBlockProgressService progressService,
             uint? maxNumberOfBlocksPerBatch = null,
-            Action<uint, BlockRange> rangesProcessedCallback = null,
+            Action<LogBatchProcessedArgs> rangesProcessedCallback = null,
             Action<Exception> fatalErrorCallback = null)
         {
             _processor = processor;
@@ -102,7 +102,7 @@ namespace Nethereum.LogProcessing
         /// <returns>The total number of blocks processed</returns>
         public async Task<ulong> ProcessContinuallyAsync(
             CancellationToken cancellationToken,
-            Action<uint, BlockRange> rangesProcessedCallback = null)
+            Action<LogBatchProcessedArgs> rangesProcessedCallback = null)
         {
             if (rangesProcessedCallback != null)
             {
@@ -133,7 +133,7 @@ namespace Nethereum.LogProcessing
                     batchesProcessed++;
                     totalBlocksProcessed += range.Value.BlockCount;
                     currentBatchAttemptCount = 0;
-                    BatchProcessedCallback?.Invoke(batchesProcessed, range.Value);
+                    BatchProcessedCallback?.Invoke(new LogBatchProcessedArgs(batchesProcessed, range.Value));
                 }
             }
 
@@ -145,7 +145,7 @@ namespace Nethereum.LogProcessing
         /// </summary>
         public Task ProcessContinuallyInBackgroundAsync(
             CancellationToken cancellationToken,
-            Action<uint, BlockRange> rangesProcessedCallback = null,
+            Action<LogBatchProcessedArgs> rangesProcessedCallback = null,
             Action<Exception> fatalErrorCallback = null)
         {
             try

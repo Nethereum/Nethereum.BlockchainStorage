@@ -70,7 +70,7 @@ namespace Nethereum.BlockchainStore.Search
             return CreateProcessor(functionHandlers, indexer);
         }
 
-        public virtual async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<uint, BlockRange> rangeProcessedCallback = null)
+        public virtual async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<LogBatchProcessedArgs> logBatchProcessedCallback = null)
         {
             if(!LogProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
 
@@ -86,14 +86,14 @@ namespace Nethereum.BlockchainStore.Search
 
             if (to != null)
             {
-                return await ProcessRange(ctx, rangeProcessedCallback, batchProcessorService);
+                return await ProcessRange(ctx, logBatchProcessedCallback, batchProcessorService);
             }
 
-            return await batchProcessorService.ProcessContinuallyAsync(ctx?.Token ?? new CancellationToken(), rangeProcessedCallback);
+            return await batchProcessorService.ProcessContinuallyAsync(ctx?.Token ?? new CancellationToken(), logBatchProcessedCallback);
             
         }
 
-        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<uint, BlockRange> rangeProcessedCallback, LogsProcessor batchProcessorService)
+        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<LogBatchProcessedArgs> logBatchProcessedCallBack, LogsProcessor batchProcessorService)
         {
             uint blockRangesProcessed = 0;
             ulong blocksProcessed = 0;
@@ -107,7 +107,7 @@ namespace Nethereum.BlockchainStore.Search
                 {
                     blockRangesProcessed++;
                     blocksProcessed += lastBlockRangeProcessed.Value.BlockCount;
-                    rangeProcessedCallback?.Invoke(blockRangesProcessed, lastBlockRangeProcessed.Value);
+                    logBatchProcessedCallBack?.Invoke(new LogBatchProcessedArgs(blockRangesProcessed, lastBlockRangeProcessed.Value));
                 }
 
             } while (lastBlockRangeProcessed != null);

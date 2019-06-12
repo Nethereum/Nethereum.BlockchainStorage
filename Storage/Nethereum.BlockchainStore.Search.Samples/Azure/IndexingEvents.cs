@@ -244,16 +244,16 @@ Solidity Contract Excerpt
                     await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
                     var cancellationToken = new CancellationTokenSource();
-                    var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
+                    var shortCircuit = new Action<LogBatchProcessedArgs>((args) =>
                     {
-                        if (lastRange.To >= maxBlock) // escape hatch!
+                        if (args.LastRangeProcessed.To >= maxBlock) // escape hatch!
                         {
                             cancellationToken.Cancel();
                         }
                     });
 
                     var blocksProcessed = await processor.ProcessAsync(startingBlock,
-                        ctx: cancellationToken, rangeProcessedCallback: shortCircuit);
+                        ctx: cancellationToken, logBatchProcessedCallback: shortCircuit);
 
                     Assert.Equal(expectedBlocks, blocksProcessed);
                 }

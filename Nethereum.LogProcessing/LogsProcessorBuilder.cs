@@ -75,7 +75,7 @@ namespace Nethereum.LogProcessing
 
         public Action<Exception> FatalErrorCallback { get; set; }
 
-        public Action<uint, BlockRange> BatchProcessedCallback { get; set; }
+        public Action<LogBatchProcessedArgs> BatchProcessedCallback { get; set; }
 
         /// <summary>
         /// The earliest block to start at - important when there has been no prior processing
@@ -198,7 +198,7 @@ namespace Nethereum.LogProcessing
             return this;
         }
 
-        public ILogsProcessorBuilder OnBatchProcessed(Action<uint, BlockRange> batchProcessedCallback)
+        public ILogsProcessorBuilder OnBatchProcessed(Action<LogBatchProcessedArgs> batchProcessedCallback)
         {
             BatchProcessedCallback = batchProcessedCallback;
             return this;
@@ -206,7 +206,7 @@ namespace Nethereum.LogProcessing
 
         public ILogsProcessorBuilder OnBatchProcessed(Action batchProcessedCallback)
         {
-            BatchProcessedCallback = (c, r) => { batchProcessedCallback(); };
+            BatchProcessedCallback = (args) => { batchProcessedCallback(); };
             return this;
         }
 

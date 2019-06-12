@@ -194,9 +194,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                     .Returns(Task.CompletedTask);
 
                 //short circuit callback used to exit process
-                var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
+                var shortCircuit = new Action<LogBatchProcessedArgs>((args) =>
                 {
-                    if(lastRange.Equals(range2)) cancellationSource.Cancel();
+                    if(args.LastRangeProcessed.Equals(range2)) cancellationSource.Cancel();
                 });
 
                 var blocksProcessed = await Service.ProcessContinuallyAsync(

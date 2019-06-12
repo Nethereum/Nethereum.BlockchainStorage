@@ -140,16 +140,16 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             var blockRangesProcessed = new List<BlockRange>();
 
-            var rangesProcessedCallback = new Action<uint, BlockRange>((countOfRangesProcessed, lastRange) => 
+            var batchCompleteCallback = new Action<LogBatchProcessedArgs>((args) => 
             {  
-                blockRangesProcessed.Add(lastRange);
+                blockRangesProcessed.Add(args.LastRangeProcessed);
 
                 // short circuit - something to trigger the cancellation token
-                if (countOfRangesProcessed == 2) cancellationTokenSource.Cancel();
+                if (args.BatchesProcessedSoFar == 2) cancellationTokenSource.Cancel();
             });
 
             var blocksProcessed = await batchProcessorService.ProcessContinuallyAsync(
-                cancellationTokenSource.Token, rangesProcessedCallback);
+                cancellationTokenSource.Token, batchCompleteCallback);
 
             Assert.Equal((ulong)20, blocksProcessed);
             Assert.Equal(2, blockRangesProcessed.Count);
@@ -202,12 +202,12 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             var blockRangesProcessed = new List<BlockRange>();
 
-            var rangesProcessedCallback = new Action<uint, BlockRange>((countOfRangesProcessed, lastRange) => 
+            var rangesProcessedCallback = new Action<LogBatchProcessedArgs>((args) => 
             {  
-                blockRangesProcessed.Add(lastRange);
+                blockRangesProcessed.Add(args.LastRangeProcessed);
 
                 // short circuit - something to trigger the cancellation token
-                if (countOfRangesProcessed == 2) cancellationTokenSource.Cancel();
+                if (args.BatchesProcessedSoFar == 2) cancellationTokenSource.Cancel();
             });
 
             await batchProcessorService.ProcessContinuallyAsync(

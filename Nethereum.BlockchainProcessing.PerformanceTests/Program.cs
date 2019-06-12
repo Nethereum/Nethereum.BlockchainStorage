@@ -119,7 +119,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             _builder = new LogsProcessorBuilder("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
                 .Filter<TransferEventDto>()
                 .StoreInAzureTable(azureConnectionString, tablePrefix, (Predicate<EventLog<TransferEventDto>>)((tfr) => TransferCallback(tfr)))
-                .OnBatchProcessed((rangesProcessed, lastRange) => Output(rangesProcessed, lastRange))
+                .OnBatchProcessed((args) => Output(args.LastRangeProcessed))
                 .SetBlocksPerBatch(maxBlocksPerBatch);
 
             ethApiContractService = _builder.Eth;
@@ -133,7 +133,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             BlocksContainingTransfers.Add(tfr.Log.BlockNumber); return true;
         }
 
-        private void Output(uint rangesProcessed, BlockRange lastRange)
+        private void Output(BlockRange lastRange)
         {
             BlocksProcessed += lastRange.BlockCount; LastBlock = lastRange.To; 
             if (lastRange.To >= MaxBlockNumber) { cancellationTokenSource.Cancel(); }
@@ -177,9 +177,9 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             _builder = new LogsProcessorBuilder("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
                 .Filter<TransferEventDto>()
                 .Add<TransferEventDto>((events) => Output(events))
-                .OnBatchProcessed((_, lastRange) =>
+                .OnBatchProcessed((args) =>
                 {
-                    HandleBatchProcessed(lastRange);
+                    HandleBatchProcessed(args.LastRangeProcessed);
                 })
                 .SetBlocksPerBatch(maxBlocksPerBatch);
 

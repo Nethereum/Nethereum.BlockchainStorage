@@ -205,7 +205,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .OnFatalError((ex) => fatalException = ex)
                 // for test purposes we'll cancel after a batch or block range has been processed
                 // setting this is optional but is useful for monitoring progress
-                .OnBatchProcessed((batchesProcessedCount, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 .Build();
 
             // begin processing
@@ -295,7 +295,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
                 .SetMinimumBlockNumber(7540102) //optional: default is to start at current block on chain                
                 // for test purposes we'll stop after processing a batch
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 .Build();
 
             // run continually until cancellation token is fired
@@ -336,7 +336,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
                 .SetMinimumBlockNumber(7540102) //optional: default is to start at current block on chain
                 // for test purposes we'll stop after processing a batch
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 // tell the processor to use a Json File based Block Progress Repository
                 // for test purposes only we delete any existing file to ensure we start afresh with no previous state
                 .UseJsonFileForBlockProgress(jsonFilePath, deleteExistingFile: true);
@@ -390,7 +390,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
                 .SetMinimumBlockNumber(7540102) //optional: default is to start at current block on chain
                 // for test purposes we'll stop after processing a batch
-                .OnBatchProcessed((numberOfBatchesProcessed, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 // tell the processor to reference an Azure Storage table for block progress
                 // this is an extension method from Nethereum.BlockchainStore.AzureTables
                 .UseAzureTableStorageForBlockProgress(azureStorageConnectionString, "EventLogProcessingSample");
@@ -438,7 +438,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             using(var processor = web3.Eth.LogsProcessor<TransferEventDto>()
                 .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
                 .SetMinimumBlockNumber(7540103) //optional: default is to start at current block on chain
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 .AddToQueueAsync(azureStorageConnectionString, "sep-transfers")
                 .Result
                 .Build())
@@ -483,7 +483,7 @@ namespace Nethereum.BlockchainProcessing.Samples
             using (var processor = web3.Eth.LogsProcessor<TransferEventDto>()
                 .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
                 .SetMinimumBlockNumber(7540103) //optional: default is to start at current block on chain
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 .AddToSearchIndexAsync<TransferEventDto>(AzureSearchServiceName, apiKey, "sep-transfers")
                 .Result
                 .Build())
@@ -524,7 +524,7 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .SetBlocksPerBatch(1) //optional: restrict batches to one block at a time
                 .SetMinimumBlockNumber(7540103) //optional: default is to start at current block on chain
                 // configure this to stop after processing a batch
-                .OnBatchProcessed((rangeCountProcessedSoFar, lastBlockRange) => cancellationTokenSource.Cancel())
+                .OnBatchProcessed((args) => cancellationTokenSource.Cancel())
                 // wire up to azure table storage
                 .StoreInAzureTable<TransferEventDto>(azureStorageConnectionString, "septransfers")
                 .Build())
@@ -581,8 +581,8 @@ namespace Nethereum.BlockchainProcessing.Samples
                 .Add<TransferEventDto>((events) => { transfers += events.Count(); Debug.WriteLine($"Transfers: {transfers}"); }) 
                 .Add<ApprovalEventDTO>((events) => { approvals += events.Count(); Debug.WriteLine($"Approvals: {approvals}"); })                                                                    
                 .OnFatalError((ex) => Debug.WriteLine($"Fatal Error: {ex.Message}"))
-                .OnBatchProcessed((batchesProcessedCount, lastBlockRange) => 
-                    Debug.WriteLine($"Batch Processed. Batches: {batchesProcessedCount}, Last Range: From:{lastBlockRange.From} To{lastBlockRange.To}"))
+                .OnBatchProcessed((args) => 
+                    Debug.WriteLine($"Batch Processed. Batches: {args.BatchesProcessedSoFar}, Last Range: From:{args.LastRangeProcessed.From} To{args.LastRangeProcessed.To}"))
                 .Build()
                 .ProcessContinuallyAsync(cancellationTokenSource.Token);
         }

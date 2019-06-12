@@ -511,7 +511,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task ProcessContinuallyAsync_Using_OnBatchProcessed()
         {
-            (ulong batchCount, BlockRange lastRange)? lastBatchProcessedArgs = null;
+            LogBatchProcessedArgs lastBatchProcessedArgs = null;
 
             var mockLogProcessor = new Mock<ILogProcessor>();
             var web3Mock = new Web3Mock();
@@ -531,9 +531,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Set(p => p.BlocksPerBatch = 1)
                 .Set(p => p.MinimumBlockNumber = 0)
                 // escape hatch
-                .OnBatchProcessed((batchCount, lastRange) => 
+                .OnBatchProcessed((args) => 
                 { 
-                    lastBatchProcessedArgs = (batchCount, lastRange); 
+                    lastBatchProcessedArgs = args; 
                     cancellationTokenSource.Cancel();
                 })
                 .Add(mockLogProcessor.Object);
@@ -543,9 +543,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
 
             Assert.Equal((ulong)1, rangesProcessed);
-            Assert.Equal((ulong)1, lastBatchProcessedArgs.Value.batchCount);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.Value.lastRange.From);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.Value.lastRange.To);
+            Assert.Equal((ulong)1, lastBatchProcessedArgs.BatchesProcessedSoFar);
+            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.From);
+            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.To);
 
             Assert.Equal((ulong)0, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
         }
@@ -553,7 +553,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         [Fact]
         public async Task RunInBackgroundAsync_Using_OnBatchProcessed()
         {
-            (ulong batchCount, BlockRange lastRange)? lastBatchProcessedArgs = null;
+            LogBatchProcessedArgs lastBatchProcessedArgs = null;
 
             var mockLogProcessor = new Mock<ILogProcessor>();
             var web3Mock = new Web3Mock();
@@ -573,9 +573,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 .Set(p => p.BlocksPerBatch = 1)
                 .Set(p => p.MinimumBlockNumber = 0)
                 // escape hatch
-                .OnBatchProcessed((batchCount, lastRange) =>
+                .OnBatchProcessed((args) =>
                 {
-                    lastBatchProcessedArgs = (batchCount, lastRange);
+                    lastBatchProcessedArgs = args;
                     cancellationTokenSource.Cancel();
                 })
                 .Add(mockLogProcessor.Object);
@@ -590,9 +590,9 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 await Task.Delay(10);
             }
 
-            Assert.Equal((ulong)1, lastBatchProcessedArgs.Value.batchCount);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.Value.lastRange.From);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.Value.lastRange.To);
+            Assert.Equal((ulong)1, lastBatchProcessedArgs.BatchesProcessedSoFar);
+            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.From);
+            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.To);
 
             Assert.Equal((ulong)0, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
         }

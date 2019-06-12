@@ -14,7 +14,7 @@ namespace Nethereum.LogProcessing
 {
     public interface ILogsProcessorBuilder
     {
-        Action<uint, BlockRange> BatchProcessedCallback { get; set; }
+        Action<LogBatchProcessedArgs> BatchProcessedCallback { get; set; }
         IEthApiContractService Eth { get; set; }
         IBlockProgressRepository BlockProgressRepository { get; set; }
         uint? BlocksPerBatch { get; set; }
@@ -45,7 +45,7 @@ namespace Nethereum.LogProcessing
         ILogsProcessorBuilder Filter<TEventDto>(Action<NewFilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new();
 
         ILogsProcessorBuilder OnBatchProcessed(Action batchProcessedCallback);
-        ILogsProcessorBuilder OnBatchProcessed(Action<uint, BlockRange> batchProcessedCallback);
+        ILogsProcessorBuilder OnBatchProcessed(Action<LogBatchProcessedArgs> batchProcessedCallback);
         ILogsProcessorBuilder OnFatalError(Action<Exception> callBack);
         ILogsProcessorBuilder DisposeOnProcessorDisposing(IDisposable objectToDisposeWithProcessor);
         ILogsProcessorBuilder Set(Action<ILogsProcessorBuilder> configAction);
