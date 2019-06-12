@@ -5,22 +5,6 @@ using System.Threading.Tasks;
 
 namespace Nethereum.LogProcessing
 {
-    public class LogBatchProcessedArgs
-    {
-        public LogBatchProcessedArgs()
-        {
-
-        }
-
-        public LogBatchProcessedArgs(uint batchesProcessedSoFar, BlockRange lastRangeProcessed)
-        {
-            BatchesProcessedSoFar = batchesProcessedSoFar;
-            LastRangeProcessed = lastRangeProcessed;
-        }
-
-        public uint BatchesProcessedSoFar {get; }
-        public BlockRange LastRangeProcessed { get;}
-    }
 
     public interface ILogsProcessor : IDisposable
     {
