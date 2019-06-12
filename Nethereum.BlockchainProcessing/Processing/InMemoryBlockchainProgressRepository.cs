@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.BlockchainProcessing.Processing
 {
     public class InMemoryBlockchainProgressRepository : IBlockProgressRepository
     {

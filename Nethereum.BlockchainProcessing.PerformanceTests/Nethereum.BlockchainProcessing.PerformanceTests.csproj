@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.Common.csproj" />
     <ProjectReference Include="..\Storage\Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj" />
   </ItemGroup>
 
