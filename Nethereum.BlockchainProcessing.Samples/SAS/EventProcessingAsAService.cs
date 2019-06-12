@@ -60,8 +60,8 @@ namespace Nethereum.BlockchainProcessing.Samples.SAS
 
             // load service
             var progressService = new BlockProgressService(web3, MIN_BLOCK_NUMBER, blockProgressRepo);
-            var logProcessor = new BlockchainLogProcessor(web3, eventSubscriptions);
-            var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventSubscriptions);
+            var batchProcessorService = new LogsProcessor(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute
             BlockRange? rangeProcessed;

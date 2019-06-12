@@ -30,13 +30,13 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
                 Config.LogOutputToConsole();
                 _log.LogInformation("Starting");
 
-                //var test = new WritingTransfersToTheConsole(numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 1000);
-                var test = new WritingTransfersToTheAzureStorage(
-                    Config.AzureConnectionString, 
-                    "perfTest", 
-                    numberOfBlocksToProcess: 171_000, 
-                    maxDuration: TimeSpan.FromHours(5), 
-                    maxBlocksPerBatch: 100);
+                var test = new WritingTransfersToTheConsole(numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 1000);
+                //var test = new WritingTransfersToTheAzureStorage(
+                //    Config.AzureConnectionString, 
+                //    "perfTest", 
+                //    numberOfBlocksToProcess: 171_000, 
+                //    maxDuration: TimeSpan.FromHours(5), 
+                //    maxBlocksPerBatch: 100);
                 //WritingTransfersToTheAzureStorage
                 await test.RunTestAsync();
             }

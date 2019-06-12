@@ -107,13 +107,13 @@ namespace Nethereum.BlockchainProcessing.Samples
             // - This uses the blockchainProxy to get the logs
             // - It sends each log to the event subscriptions to indicate if the logs matches the subscription criteria
             // - It then allocates matching logs to separate batches per event subscription 
-            var logProcessor = new BlockchainLogProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
+            var logProcessor = new BlockRangeLogsProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
 
             // Create a batch log processor service
             // - It uses the progress service to calculates the block range to progress
             // - It then invokes the log processor - passing in the range to process
             // - It updates progress via the progress service
-            var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
+            var batchProcessorService = new LogsProcessor(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute
             try
@@ -239,13 +239,13 @@ namespace Nethereum.BlockchainProcessing.Samples
             // - This uses the blockchainProxy to get the logs
             // - It sends each log to the event subscriptions to indicate if the logs matches the subscription criteria
             // - It then allocates matching logs to separate batches per event subscription 
-            var logProcessor = new BlockchainLogProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
+            var logProcessor = new BlockRangeLogsProcessor(web3, new[] { eventSubscription }, makerAddressFilter);
 
             // Create a batch log processor service
             // - It uses the progress service to calculates the block range to progress
             // - It then invokes the log processor - passing in the range to process
             // - It updates progress via the progress service
-            var batchProcessorService = new BlockchainBatchProcessorService(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
+            var batchProcessorService = new LogsProcessor(logProcessor, progressService, MAX_BLOCKS_PER_BATCH);
 
             // execute
             try

@@ -135,8 +135,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public ILogsProcessorBuilder Add<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new()
         {
-            var asyncCallback = new Func<IEnumerable<EventLog<TEventDto>>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
-            return Add(asyncCallback);
+            return Add(callBack.ToFunc());
         }
 
         public ILogsProcessorBuilder Add<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new()
@@ -171,13 +170,23 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public ILogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack)
         {
-            var asyncCallback = new Func<IEnumerable<FilterLog>, Task>(async (events) => await Task.Run(() => callBack(events)).ConfigureAwait(false));
-            return Add(asyncCallback);
+            return Add(callBack.ToFunc());
         }
 
         public ILogsProcessorBuilder Add(Func<IEnumerable<FilterLog>, Task> callBack)
         {
-            Processors.Add(new CatchAllLogProcessor(callBack));
+            Processors.Add(new CatchAllFilterLogProcessor(callBack));
+            return this;
+        }
+
+        public ILogsProcessorBuilder Add(Predicate<FilterLog> isItForMe, Action<IEnumerable<FilterLog>> action)
+        {
+            return Add(isItForMe, action.ToFunc());
+        }
+
+        public ILogsProcessorBuilder Add(Predicate<FilterLog> isItForMe, Func<IEnumerable<FilterLog>, Task> func)
+        {
+            Processors.Add(new FilterLogProcessor(isItForMe, func));
             return this;
         }
 
@@ -280,8 +289,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
             BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(lastBlockProcessed);
             var progressService = new BlockProgressService(Eth.Blocks, MinimumBlockNumber, BlockProgressRepository, MinimumBlockConfirmations);
-            var processor = new BlockchainLogProcessor(Eth.Filters.GetLogs, Processors, Filters?.ToArray());
-            var batchProcessorService = new BlockchainBatchProcessorService(processor, progressService, BlocksPerBatch, BatchProcessedCallback, FatalErrorCallback);
+            var processor = new BlockRangeLogsProcessor(Eth.Filters.GetLogs, Processors, Filters?.ToArray());
+            var batchProcessorService = new LogsProcessor(processor, progressService, BlocksPerBatch, BatchProcessedCallback, FatalErrorCallback);
 
             batchProcessorService.OnDisposing += disposeHandler;
 
@@ -297,6 +306,5 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 batchProcessorService.OnDisposing -= disposeHandler;
             }
         }
-
     }
 }

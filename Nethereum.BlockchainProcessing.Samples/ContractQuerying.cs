@@ -15,8 +15,9 @@ namespace Nethereum.BlockchainProcessing.Samples
         {
             var signature_totalSupply = "18160ddd";
             var contractAddress = "0x78c1301520edff0bb14314c64987a71fa5efa407";
-            var blockchainProxyService = new BlockchainProxyService(BlockchainUrl);
-            var decoded = await blockchainProxyService.Query(contractAddress, StandardContractAbi, signature_totalSupply);
+            var web3 = new Web3.Web3(BlockchainUrl);
+            var queryHelper = new ContractQueryHelper(web3);
+            var decoded = await queryHelper.Query(contractAddress, StandardContractAbi, signature_totalSupply);
             Assert.IsType<BigInteger>(decoded);
         }
 
@@ -26,8 +27,10 @@ namespace Nethereum.BlockchainProcessing.Samples
             var signature_name = "06fdde03";
             var contractAddress = "0x78c1301520edff0bb14314c64987a71fa5efa407";
 
-            var blockchainProxyService = new BlockchainProxyService(BlockchainUrl);
-            var decoded = await blockchainProxyService.Query(contractAddress, StandardContractAbi, signature_name);
+            var web3 = new Web3.Web3(BlockchainUrl);
+            var queryHelper = new ContractQueryHelper(web3);
+            var decoded = await queryHelper.Query(contractAddress, StandardContractAbi, signature_name);
+
             Assert.Equal("JGX", decoded);  
         }
 
@@ -38,8 +41,10 @@ namespace Nethereum.BlockchainProcessing.Samples
             var contractAddress = "0x78c1301520edff0bb14314c64987a71fa5efa407";
             var functionInput = new object[]{"0xa13210c21fbbed075ec210a71b477a81cb3da7d8"}; // _owner parameter - type: address
 
-            var blockchainProxyService = new BlockchainProxyService(BlockchainUrl);
-            var decoded = await blockchainProxyService.Query(contractAddress, StandardContractAbi, signature_balanceOf, functionInput);
+            var web3 = new Web3.Web3(BlockchainUrl);
+            var queryHelper = new ContractQueryHelper(web3);
+
+            var decoded = await queryHelper.Query(contractAddress, StandardContractAbi, signature_balanceOf, functionInput);
             Assert.IsType<BigInteger>(decoded);
         }
     }

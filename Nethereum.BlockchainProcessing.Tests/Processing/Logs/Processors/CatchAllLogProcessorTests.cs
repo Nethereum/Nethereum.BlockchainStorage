@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Processors
         [Fact]
         public void IsLogForEvent_AlwaysReturnsTrue()
         {
-            var processor = new CatchAllLogProcessor((logs) => Task.CompletedTask);
+            var processor = new CatchAllFilterLogProcessor((logs) => Task.CompletedTask);
             Assert.True(processor.IsLogForEvent(new FilterLog()));
         }
 
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs.Processors
         public async Task ProcessLogsAsync_InvokesCallback()
         {
             FilterLog[] logsProcessed = null;
-            var processor = new CatchAllLogProcessor((logs) => { logsProcessed = logs.ToArray(); return Task.CompletedTask; });
+            var processor = new CatchAllFilterLogProcessor((logs) => { logsProcessed = logs.ToArray(); return Task.CompletedTask; });
 
             var logsToProcess = new[] {new FilterLog(), new FilterLog()};
 

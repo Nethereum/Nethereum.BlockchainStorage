@@ -60,7 +60,10 @@ namespace Nethereum.BlockchainProcessing.Samples
 
             int logsProcessed = 0, transfersProcessed = 0;
 
-            await new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet)
+            var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
+            //web3.Client.OverridingRequestInterceptor. = new 
+
+            await web3
                 .Eth
                 .LogsProcessor()
                 .Add((logs) => logsProcessed += logs.Count()) // any log

@@ -91,7 +91,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var catchAllEventProcessor = new CatchAllEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
 
-            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -100,7 +100,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
             var rangeProcessed = await batchProcessorService.ProcessOnceAsync();
@@ -121,7 +121,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {catchAllEventProcessor, transferEventProcessor};
 
-            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -132,7 +132,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var progressService = new BlockProgressService(
                 web3, 3379061, progressRepository, minimumBlockConfirmations: 6);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -183,7 +183,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
                 .AddTopic(e => e.TokenId, new BigInteger(94))
                 .Build();
 
-            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -194,7 +194,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var progressService = new BlockProgressService(
                 web3, 3379061, progressRepository, minimumBlockConfirmations: 6);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 10);
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -255,7 +255,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             //the "to" address is the second indexed parameter on the event
             var filter = eventAbi.CreateFilterInput(AnyContract, AnyFromAddress, TransferToAddress);
 
-            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -264,7 +264,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
             await batchProcessorService.ProcessOnceAsync();
@@ -285,7 +285,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
                 .AddTopic(eventVal => eventVal.To, "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
                 .Build();
 
-            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -294,7 +294,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
             await batchProcessorService.ProcessOnceAsync();
@@ -315,7 +315,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             var filter = new NewFilterInputBuilder<TransferEventERC721>().Build(ContractAddresses);
 
-            var logProcessor = new BlockchainLogProcessor(web3, eventProcessors, filter);
+            var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors, filter);
 
             var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");
             if(File.Exists(progressFileNameAndPath)) File.Delete(progressFileNameAndPath);
@@ -324,7 +324,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var progressService = new StaticBlockRangeProgressService(
                 3146684, 3146684, progressRepository);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 1);
 
             await batchProcessorService.ProcessOnceAsync();

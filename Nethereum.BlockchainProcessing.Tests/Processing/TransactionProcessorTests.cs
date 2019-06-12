@@ -1,13 +1,12 @@
 ﻿using Moq;
+using Nethereum.BlockchainProcessing.Processors.Transactions;
+using Nethereum.BlockchainProcessing.Tests.Processing;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Xunit;
-using Nethereum.BlockchainProcessing.Tests.Processing;
 
 namespace Nethereum.BlockchainStore.Tests.Processing
 {
@@ -15,7 +14,6 @@ namespace Nethereum.BlockchainStore.Tests.Processing
     {
         readonly Web3Mock _web3Mock = new Web3Mock();
         private const string TxHash = "0xc185cc7b9f7862255b82fd41be561fdc94d030567d0b41292008095bf31c39b9";
-        readonly Mock<ITransactionProxy> _mockTransactionProxy = new Mock<ITransactionProxy>();
         readonly Mock<IContractTransactionProcessor> _mockContractTransactionProcessor = new Mock<IContractTransactionProcessor>();
         readonly Mock<IValueTransactionProcessor> _mockValueTransactionProcessor = new Mock<IValueTransactionProcessor>();
         readonly Mock<IContractCreationTransactionProcessor> _mockContractCreationTransactionProcessor = new Mock<IContractCreationTransactionProcessor>();

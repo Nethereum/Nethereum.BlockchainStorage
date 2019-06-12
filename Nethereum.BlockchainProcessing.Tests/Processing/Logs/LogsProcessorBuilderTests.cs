@@ -343,6 +343,68 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
         }
 
         [Fact]
+        public async Task Add_Predicate_With_Func_Creates_ExpectedProcessor()
+        {
+            var logsProcessed = new List<FilterLog>();
+            var logsQueried = new List<FilterLog>();
+
+            var predicate = new Predicate<FilterLog>((log) =>
+            {
+                logsQueried.Add(log);
+                return true;
+            });
+
+            var callback = new Func<IEnumerable<FilterLog>, Task>(Logs =>
+            {
+                logsProcessed.AddRange(Logs);
+                return Task.CompletedTask;
+            });
+
+            var processor = new LogsProcessorBuilder(blockchainUrl: BLOCKCHAIN_URL)
+                .Add(predicate, callback);
+
+            var logProcessor = processor.Processors[0];
+
+            var logsToProcess = new[] { new FilterLog() };
+
+            foreach (var log in logsToProcess) logProcessor.IsLogForEvent(log);
+            await logProcessor.ProcessLogsAsync(logsToProcess);
+
+            Assert.Equal(logsToProcess, logsQueried);
+            Assert.Equal(logsToProcess, logsProcessed);
+        }
+
+        [Fact]
+        public async Task Add_Predicate_With_Action_Creates_ExpectedProcessor()
+        {
+            var logsProcessed = new List<FilterLog>();
+            var logsQueried = new List<FilterLog>();
+
+            var predicate = new Predicate<FilterLog>((log) =>
+            {
+                logsQueried.Add(log);
+                return true;
+            });
+
+            var action = new Action<IEnumerable<FilterLog>>(Logs =>
+            {
+                logsProcessed.AddRange(Logs);
+            });
+
+            var processor = new LogsProcessorBuilder(blockchainUrl: BLOCKCHAIN_URL)
+                .Add(predicate, action);
+
+            var logProcessor = processor.Processors[0];
+
+            var logsToProcess = new[] { new FilterLog() };
+            foreach(var log in logsToProcess) logProcessor.IsLogForEvent(log);
+            await logProcessor.ProcessLogsAsync(logsToProcess);
+
+            Assert.Equal(logsToProcess, logsQueried);
+            Assert.Equal(logsToProcess, logsProcessed);
+        }
+
+        [Fact]
         public async Task AddAndQueue_ForFilterLog_CreatesExpectedProcessor()
         {
             var queuedMessages = new List<object>();

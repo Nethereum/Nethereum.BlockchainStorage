@@ -9,12 +9,13 @@ using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.Configuration;
 using Nethereum.RPC.Eth.Filters;
 using Nethereum.Web3;
+using Nethereum.JsonRpc.Client;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class BlockchainLogProcessor : IBlockchainProcessor
+    public class BlockRangeLogsProcessor : IBlockchainProcessor
     {
-        private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockchainLogProcessor>();
+        private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockRangeLogsProcessor>();
 
         public uint MaxRetries { get; set; } = 3;
 
@@ -24,34 +25,34 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         private readonly IEnumerable<ILogProcessor> _logProcessors;
         private readonly List<NewFilterInput> _filters;
 
-        public BlockchainLogProcessor(
+        public BlockRangeLogsProcessor(
             IWeb3 web3,
             IEnumerable<ILogProcessor> logProcessors) : this(web3.Eth.Filters.GetLogs, logProcessors, filter: null)
         {
         }
 
-        public BlockchainLogProcessor(
+        public BlockRangeLogsProcessor(
             IWeb3 web3,
             IEnumerable<ILogProcessor> logProcessors,
             NewFilterInput filter) : this(web3.Eth.Filters.GetLogs, logProcessors, filter)
         {
         }
 
-        public BlockchainLogProcessor(
+        public BlockRangeLogsProcessor(
             IWeb3 web3,
             IEnumerable<ILogProcessor> logProcessors,
             IEnumerable<NewFilterInput> filters) : this(web3.Eth.Filters.GetLogs, logProcessors, filters)
         {
         }
 
-        public BlockchainLogProcessor(
+        public BlockRangeLogsProcessor(
             IEthGetLogs eventLogProxy, 
             IEnumerable<ILogProcessor> logProcessors, 
             NewFilterInput filter):this(eventLogProxy, logProcessors, filter == null ? null : new NewFilterInput[]{filter})
         {
         }
 
-        public BlockchainLogProcessor(
+        public BlockRangeLogsProcessor(
             IEthGetLogs eventLogProxy, 
             IEnumerable<ILogProcessor> logProcessors, 
             IEnumerable<NewFilterInput> filters = null)
@@ -141,9 +142,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
                 return await _eventLogProxy.SendRequestAsync(filter).ConfigureAwait(false);
             }
-            catch (TooManyRecordsException)
+            catch (RpcResponseException rpcResponseEx) when (rpcResponseEx.TooManyRecords())
             {
-                throw;
+                throw rpcResponseEx.TooManyRecordsException();
             }
             catch (Exception ex)
             {

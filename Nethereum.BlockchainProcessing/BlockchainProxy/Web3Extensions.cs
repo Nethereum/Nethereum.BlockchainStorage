@@ -1,75 +1,43 @@
-﻿using Nethereum.Geth;
+﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.Geth;
 using Nethereum.Geth.RPC.Debug.DTOs;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Nethereum.Web3
 {
-    internal class VmStackMockResults 
-    {
-        public Dictionary<string, JObject> MockVmStacks = new Dictionary<string, JObject>();
-    }
-
-    internal class VmStackMockExceptions
-    {
-        public Dictionary<string, Exception> MockVmExceptions = new Dictionary<string, Exception>();
-    }
-
-
     public static class Web3Extensions
     {
-        // a hack to work around the fact that only Geth supports retrieving the stack trace
-        // this is to allow unit testing to insert mocks
-        
-        static Dictionary<IWeb3, VmStackMockResults> _mockVmStackResults = new Dictionary<IWeb3, VmStackMockResults>();
-        static Dictionary<IWeb3, VmStackMockExceptions> _mockVmStackExceptions = new Dictionary<IWeb3, VmStackMockExceptions>();
+        static ConcurrentDictionary<IWeb3, Func<string, JObject>> _getTransactionVmStackInterceptors = new ConcurrentDictionary<IWeb3, Func<string, JObject>>();
 
-        public static void ClearVmStackMocks(this IWeb3 web3)
+        // a hook for unit test interception
+        // GetTransactionVmStack is currently Web3Geth specific
+        // this allows a unit test to simulate Web3Geth
+        public static void RegisterGetVmStackInterceptor(this IWeb3 web3, Func<string, JObject> interceptionFunc) 
+            => _getTransactionVmStackInterceptors.AddOrUpdate(web3, interceptionFunc, (w3, i) => interceptionFunc);
+
+        public static void RemoveGetVmStackInterceptor(this IWeb3 web3) => _getTransactionVmStackInterceptors.TryRemove(web3, out _);
+
+        private static JObject GetInterceptedTransactionVmStackResult(IWeb3 web3, string transactionHash)
         {
-            _mockVmStackExceptions.Remove(web3);
-            _mockVmStackResults.Remove(web3);
-        }
-
-        public static void SetupMockForGetTransactionVmStack(this IWeb3 web3, string transactionHash, JObject vmStack)
-        {
-            if (!_mockVmStackResults.ContainsKey(web3))
+            if(_getTransactionVmStackInterceptors.TryGetValue(web3, out Func<string, JObject> interceptor))
             {
-                _mockVmStackResults.Add(web3, new VmStackMockResults());
-            }
-
-            _mockVmStackResults[web3].MockVmStacks[transactionHash] = vmStack;
-        }
-
-        public static void SetupMockForGetTransactionVmStack(this IWeb3 web3, string transactionHash, Exception exceptionToThrow)
-        {
-            if (!_mockVmStackExceptions.ContainsKey(web3))
-            {
-                _mockVmStackExceptions.Add(web3, new VmStackMockExceptions());
-            }
-
-            _mockVmStackExceptions[web3].MockVmExceptions[transactionHash] = exceptionToThrow;
-        }
-
-        public static JObject GetMockedTransactionVmStack(this IWeb3 web3, string transactionHash)
-        {
-            if(_mockVmStackExceptions.ContainsKey(web3) && _mockVmStackExceptions[web3].MockVmExceptions.TryGetValue(transactionHash, out Exception ex))
-            {
-                _mockVmStackExceptions[web3].MockVmExceptions.Remove(transactionHash);
-                throw ex;
-            }
-
-            if(_mockVmStackResults.ContainsKey(web3) && _mockVmStackResults[web3].MockVmStacks.TryGetValue(transactionHash, out JObject vmStack))
-            {
-                _mockVmStackResults[web3].MockVmStacks.Remove(transactionHash);
-                return vmStack;
+                return interceptor.Invoke(transactionHash);
             }
             return null;
         }
 
+        /// <summary>
+        /// For most purposes this is for Web3Geth only
+        /// If web3 is Web3Geth call web3Geth.Debug.TraceTransaction
+        /// Otherwise call registered interceptors (mainly for unit tests) else null
+        /// </summary>
         public static async Task<JObject> GetTransactionVmStack(this IWeb3 web3, string transactionHash)
         {
+            var interceptedResult = GetInterceptedTransactionVmStackResult(web3, transactionHash);
+            if(interceptedResult != null) return interceptedResult;
 
             if (web3 is Web3Geth web3Geth)
                 return await web3Geth.Debug.
@@ -79,7 +47,7 @@ namespace Nethereum.Web3
                         new TraceTransactionOptions { DisableMemory = true, DisableStorage = true, DisableStack = false })
                     .ConfigureAwait(false);
 
-            return GetMockedTransactionVmStack(web3, transactionHash);
+            return null;
         }
     }
 }

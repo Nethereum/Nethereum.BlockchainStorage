@@ -44,10 +44,10 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
                 TransactionLogHandler = transactionLogRouter,
             };
 
-            var blockchainProxy = new BlockchainProxyService(targetBlockchain.BlockchainUrl);
+            var web3 = new Web3.Web3(targetBlockchain.BlockchainUrl);
 
             var blockProcessor = BlockProcessorFactory.Create(
-                blockchainProxy, 
+                web3, 
                 handlers, 
                 filters, 
                 processTransactionsInParallel: false);

@@ -24,12 +24,12 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             protected void ClearVmStackMocks()
             {
-                _web3Mock.Web3?.ClearVmStackMocks();
+                _web3Mock.ClearVmStackMocks();
             }
 
             protected void MockGetVmStack(JObject stackToReturn)
             {
-                _web3Mock.Web3.SetupMockForGetTransactionVmStack(_transaction.TransactionHash, stackToReturn);
+                _web3Mock.SetupMockForGetTransactionVmStack(_transaction.TransactionHash, stackToReturn);
             }
 
             protected void MockGetErrorFromVmStack(JObject vmStack, string errorToReturn)
@@ -87,7 +87,7 @@ namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcesso
 
             protected void MockExceptionFromGetTransactionVmStack()
             {
-                _web3Mock.Web3.SetupMockForGetTransactionVmStack(_transaction.TransactionHash, new Exception("Fake GetVMStack exception"));
+                _web3Mock.SetupMockForGetTransactionVmStack(_transaction.TransactionHash, new Exception("Fake GetVMStack exception"));
             }
         }
     }

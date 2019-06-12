@@ -73,14 +73,14 @@ namespace Nethereum.BlockchainStore.Search
         {
             if(!LogProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
 
-            var logProcessor = new BlockchainLogProcessor(
+            var logProcessor = new BlockRangeLogsProcessor(
                 BlockchainProxyService.Eth.Filters.GetLogs,
                 LogProcessors,
                 Filters);
 
             IBlockProgressService progressService = CreateProgressService(from, to);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: MaxBlocksPerBatch);
 
             if (to != null)
@@ -92,7 +92,7 @@ namespace Nethereum.BlockchainStore.Search
             
         }
 
-        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<uint, BlockRange> rangeProcessedCallback, BlockchainBatchProcessorService batchProcessorService)
+        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<uint, BlockRange> rangeProcessedCallback, LogsProcessor batchProcessorService)
         {
             uint blockRangesProcessed = 0;
             ulong blocksProcessed = 0;

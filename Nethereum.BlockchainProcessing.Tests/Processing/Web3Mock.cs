@@ -6,11 +6,16 @@ using Nethereum.RPC.Eth.Filters;
 using Nethereum.RPC.Eth.Services;
 using Nethereum.RPC.Eth.Transactions;
 using Nethereum.Web3;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class Web3Mock
     {
+        Dictionary<string, VmStackMockResult> _mockVmStackResults = new Dictionary<string, VmStackMockResult>();
+
         public IWeb3 Web3 => Mock.Object;
 
         public Mock<IWeb3> Mock = new Mock<IWeb3>();
@@ -48,7 +53,50 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
             ContractServiceMock.Setup(c => c.Transactions).Returns(TransactionServiceMock.Object);
             TransactionServiceMock.Setup(t => t.GetTransactionByHash).Returns(GetTransactionByHashMock.Object);
             TransactionServiceMock.Setup(t => t.GetTransactionReceipt).Returns(GetTransactionReceiptMock.Object);
+
+            Web3.RegisterGetVmStackInterceptor((txHash) => GetMockedTransactionVmStack(txHash));
+        }
+
+        public void ClearVmStackMocks()
+        {
+            _mockVmStackResults.Clear();
+            Web3.RemoveGetVmStackInterceptor();
+        }
+
+        public void SetupMockForGetTransactionVmStack(string transactionHash, JObject vmStack) => GetOrAddVmStackMock(transactionHash).MockVmStack = vmStack;
+
+        public void SetupMockForGetTransactionVmStack(string transactionHash, Exception exceptionToThrow) => GetOrAddVmStackMock(transactionHash).MockVmException = exceptionToThrow;
+
+        private VmStackMockResult GetOrAddVmStackMock(string transactionHash)
+        {
+            if (!_mockVmStackResults.ContainsKey(transactionHash))
+            {
+                _mockVmStackResults.Add(transactionHash, new VmStackMockResult());
+            }
+            return _mockVmStackResults[transactionHash];
+        }
+
+        public JObject GetMockedTransactionVmStack(string transactionHash)
+        {
+            if(_mockVmStackResults.TryGetValue(transactionHash, out VmStackMockResult mockResult))
+            {
+                return mockResult.GetOrThrow();
+            }
+            return null;
         }
 
     }
+
+    internal class VmStackMockResult
+    {
+        public JObject MockVmStack { get;set;} 
+        public Exception MockVmException {get;set; }
+
+        public JObject GetOrThrow()
+        {
+            if(MockVmException != null) throw MockVmException;
+            return MockVmStack;
+        }
+    }
+
 }

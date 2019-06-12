@@ -328,7 +328,7 @@ Solidity Contract Excerpt
                             new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
                         {
 
-                            var logProcessor = new BlockchainLogProcessor(
+                            var logProcessor = new BlockRangeLogsProcessor(
                                 blockchainProxyService.Eth.Filters.GetLogs,
                                 new ILogProcessor[] {transferProcessor});
 
@@ -338,7 +338,7 @@ Solidity Contract Excerpt
                             var progressService = new StaticBlockRangeProgressService(
                                 3146684, 3146694, progressRepository);
 
-                            var batchProcessorService = new BlockchainBatchProcessorService(
+                            var batchProcessorService = new LogsProcessor(
                                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 2);
 
                             BlockRange? lastBlockRangeProcessed;

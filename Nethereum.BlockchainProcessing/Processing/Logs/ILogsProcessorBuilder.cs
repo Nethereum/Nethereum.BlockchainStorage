@@ -26,6 +26,11 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         ILogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack);
         ILogsProcessorBuilder Add(EventSubscription eventSubscription);
         ILogsProcessorBuilder Add(Func<IEnumerable<FilterLog>, Task> callBack);
+
+        ILogsProcessorBuilder Add(Predicate<FilterLog> isItForMe, Action<IEnumerable<FilterLog>> action);
+
+        ILogsProcessorBuilder Add(Predicate<FilterLog> isItForMe, Func<IEnumerable<FilterLog>, Task> func);
+
         ILogsProcessorBuilder Add(ILogProcessor processor);
         ILogsProcessorBuilder Add<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new();
         ILogsProcessorBuilder Add<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new();
