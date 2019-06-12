@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handl
 
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            await LogHandler.HandleAsync(decodedEvent.Log);
+            await LogHandler.HandleAsync(decodedEvent.Log).ConfigureAwait(false);
             return true;
         }
 

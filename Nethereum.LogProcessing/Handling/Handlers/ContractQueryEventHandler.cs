@@ -28,7 +28,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
             var functionInputs = BuildFunctionInputs(decodedEvent);
 
-            var result = await Proxy.Query(contractAddress, Configuration.Contract.Abi, Configuration.Query.FunctionSignature, functionInputs);
+            var result = await Proxy.Query(contractAddress, Configuration.Contract.Abi, Configuration.Query.FunctionSignature, functionInputs).ConfigureAwait(false);
 
             if(!string.IsNullOrEmpty(Configuration.Query.EventStateOutputName))
             {

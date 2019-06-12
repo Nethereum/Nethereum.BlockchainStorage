@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
 
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
-            await SubscriberSearchIndex.Index(decodedEvent);
+            await SubscriberSearchIndex.Index(decodedEvent).ConfigureAwait(false);
             return true;
         }
     }

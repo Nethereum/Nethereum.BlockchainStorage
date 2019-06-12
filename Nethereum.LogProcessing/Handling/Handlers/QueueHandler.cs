@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers
         public async Task<bool> HandleAsync(DecodedEvent decodedEvent)
         {
             var msgToQueue = Mapper.Map(decodedEvent);
-            await Queue.AddMessageAsync(msgToQueue);
+            await Queue.AddMessageAsync(msgToQueue).ConfigureAwait(false);
             return true;
         }
     }
