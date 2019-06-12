@@ -15,7 +15,7 @@
     <PackageReference Include="Nethereum.Web3" Version="3.3.0" />  
     <PackageReference Include="Common.Logging" Version="3.4.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />    
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.2.0" />    
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.2.0" />    

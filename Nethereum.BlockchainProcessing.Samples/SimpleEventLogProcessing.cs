@@ -58,16 +58,14 @@ namespace Nethereum.BlockchainProcessing.Samples
             //passing in a time limit as a safety valve for the unit test
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
-            int logsProcessed = 0, transfersProcessed = 0;
+            int logsProcessed = 0;
 
             var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Mainnet);
-            //web3.Client.OverridingRequestInterceptor. = new 
 
             await web3
                 .Eth
                 .LogsProcessor()
                 .Add((logs) => logsProcessed += logs.Count()) // any log
-                .Add<TransferEventDto>(transfers => transfersProcessed += transfers.Count()) // any transfer
                 .SetBlocksPerBatch(1) // restrict to one block at a time
                 .OnBatchProcessed(() => cancellationTokenSource.Cancel()) // cancel after 1st batch
                 .Build() // build the processor
