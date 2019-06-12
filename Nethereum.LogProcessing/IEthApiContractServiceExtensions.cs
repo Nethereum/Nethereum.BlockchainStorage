@@ -1,6 +1,7 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts.Services;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;

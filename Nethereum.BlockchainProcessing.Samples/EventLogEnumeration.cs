@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
+using Nethereum.LogProcessing;
 
 namespace Nethereum.BlockchainProcessing.Samples
 {

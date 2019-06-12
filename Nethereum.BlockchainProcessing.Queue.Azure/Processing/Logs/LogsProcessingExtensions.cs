@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.Contracts;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;

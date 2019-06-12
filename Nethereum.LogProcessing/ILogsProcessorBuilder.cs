@@ -1,5 +1,7 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Services;
@@ -8,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.LogProcessing
 {
     public interface ILogsProcessorBuilder
     {

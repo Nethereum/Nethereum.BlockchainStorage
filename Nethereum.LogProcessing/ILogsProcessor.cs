@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Nethereum.BlockchainProcessing.Processing;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.LogProcessing
 {
-    public interface ILogsProcessor: IDisposable
+    public interface ILogsProcessor : IDisposable
     {
         event EventHandler OnDisposing;
 

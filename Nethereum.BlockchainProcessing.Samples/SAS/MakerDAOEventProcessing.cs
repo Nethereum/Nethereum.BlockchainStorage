@@ -6,6 +6,7 @@ using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.Configuration;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;

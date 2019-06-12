@@ -3,6 +3,7 @@ using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System;

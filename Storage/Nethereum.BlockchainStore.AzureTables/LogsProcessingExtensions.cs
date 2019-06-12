@@ -1,5 +1,6 @@
 ﻿using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.Contracts;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 

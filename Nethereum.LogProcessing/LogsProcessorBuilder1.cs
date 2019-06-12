@@ -1,5 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Services;
 using System;
@@ -7,11 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.LogProcessing
 {
     public class LogsProcessorBuilder<TEventDto> : LogsProcessorBuilder, ILogsProcessorBuilder<TEventDto> where TEventDto : class, IEventDTO, new()
     {
-        public LogsProcessorBuilder(string blockchainUrl):this(new Web3.Web3(blockchainUrl).Eth)
+        public LogsProcessorBuilder(string blockchainUrl) : this(new Web3.Web3(blockchainUrl).Eth)
         {
         }
 

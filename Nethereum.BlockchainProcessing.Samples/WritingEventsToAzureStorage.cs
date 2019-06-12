@@ -10,6 +10,7 @@ using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.BlockchainStore.AzureTables.Factories;
 using Nethereum.BlockchainStore.AzureTables.Repositories;
 using Nethereum.BlockchainStore.Repositories.Handlers;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.LogProcessing
 {
     public interface ILogsProcessorBuilder<TEventDto> : ILogsProcessorBuilder where TEventDto : class, IEventDTO, new()
     {

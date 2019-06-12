@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Nethereum.Contracts;
 using System.Linq;
+using Nethereum.LogProcessing;
 
 namespace Nethereum.BlockchainProcessing.Samples
 {

@@ -8,6 +8,7 @@ using Nethereum.Configuration;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Services;
 using Nethereum.Hex.HexTypes;
+using Nethereum.LogProcessing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

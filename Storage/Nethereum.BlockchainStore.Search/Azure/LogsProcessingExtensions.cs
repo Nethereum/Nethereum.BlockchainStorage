@@ -2,6 +2,7 @@
 using Nethereum.BlockchainStore.Search;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
+using Nethereum.LogProcessing;
 using System;
 using System.Threading.Tasks;
 

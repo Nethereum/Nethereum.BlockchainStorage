@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Moq;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.LogProcessing;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs

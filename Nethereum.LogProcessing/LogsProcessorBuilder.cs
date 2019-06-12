@@ -1,5 +1,7 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Services;
@@ -8,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.LogProcessing
 {
     public class LogsProcessorBuilder : ILogsProcessorBuilder
     {
@@ -204,7 +206,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public ILogsProcessorBuilder OnBatchProcessed(Action batchProcessedCallback)
         {
-            BatchProcessedCallback = (c, r) => { batchProcessedCallback();};
+            BatchProcessedCallback = (c, r) => { batchProcessedCallback(); };
             return this;
         }
 
@@ -285,7 +287,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             if (Processors == null || Processors.Count == 0) throw new ArgumentNullException(nameof(Processors));
             if (Eth == null) throw new ArgumentNullException(nameof(Eth));
 
-            ulong? lastBlockProcessed = (MinimumBlockNumber == null || MinimumBlockNumber == 0) ? null : MinimumBlockNumber - 1;
+            ulong? lastBlockProcessed = MinimumBlockNumber == null || MinimumBlockNumber == 0 ? null : MinimumBlockNumber - 1;
 
             BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(lastBlockProcessed);
             var progressService = new BlockProgressService(Eth.Blocks, MinimumBlockNumber, BlockProgressRepository, MinimumBlockConfirmations);

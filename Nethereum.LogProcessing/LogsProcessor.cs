@@ -4,8 +4,9 @@ using Microsoft.Extensions.Logging;
 using Nethereum.Configuration;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Processing;
 
-namespace Nethereum.BlockchainProcessing.Processing.Logs
+namespace Nethereum.LogProcessing
 {
     public class LogsProcessor : ILogsProcessor
     {
@@ -46,7 +47,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         /// Processes the blocks dictated by the progress service
         /// </summary>
         /// <returns>Returns the BlockRange processed else null if there were no blocks to process</returns>
-        public async Task<BlockRange?> ProcessOnceAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<BlockRange?> ProcessOnceAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -194,8 +195,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public void Dispose()
         {
-            if(!disposed)
-            { 
+            if (!disposed)
+            {
                 OnDisposing?.Invoke(this, new EventArgs());
                 disposed = true;
             }

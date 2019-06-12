@@ -9,6 +9,7 @@ using Nethereum.BlockchainStore.AzureTables.Factories;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Hex.HexTypes;
+using Nethereum.LogProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
