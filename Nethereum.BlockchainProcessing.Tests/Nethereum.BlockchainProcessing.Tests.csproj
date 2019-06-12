@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -34,6 +34,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockProcessing\Nethereum.BlockProcessing.csproj" />
+    <ProjectReference Include="..\Nethereum.LogProcessing\Nethereum.LogProcessing.csproj" />
   </ItemGroup>
 
 </Project>

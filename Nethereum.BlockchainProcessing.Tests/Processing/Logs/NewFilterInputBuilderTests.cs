@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Numerics;
 using Xunit;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {

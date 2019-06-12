@@ -25,8 +25,8 @@ Built on core Nethereum libraries:
 
 There are two main options to traverse the chain.  
 
-* Read block by block (which reads in all transactions and events). 
-* Read events in block order (quicker if the event data is all you need).
+* BlockProcessing: Read block by block (which reads in all transactions and events). 
+* LogProcessing: Read event logs in block order (quicker if the log data is all you need).
 
 **Filters**
 

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockProcessing\Nethereum.BlockProcessing.csproj" />
   </ItemGroup>
 
 </Project>
