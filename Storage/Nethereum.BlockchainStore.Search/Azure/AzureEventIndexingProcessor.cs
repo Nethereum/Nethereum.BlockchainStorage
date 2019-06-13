@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Search.Models;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.Contracts;

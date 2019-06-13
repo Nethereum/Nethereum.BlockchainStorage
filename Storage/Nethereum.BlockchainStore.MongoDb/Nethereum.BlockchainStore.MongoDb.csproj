@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Nethereum.BlockchainProcessing.Common.Logging\Nethereum.BlockchainProcessing.Common.Logging.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities.Mapping\Nethereum.BlockchainStore.Entities.Mapping.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />

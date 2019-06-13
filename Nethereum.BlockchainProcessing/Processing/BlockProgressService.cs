@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.RPC.Eth.Services;
 using Nethereum.Web3;
 

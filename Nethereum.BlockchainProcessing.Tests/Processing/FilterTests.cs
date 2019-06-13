@@ -2,7 +2,7 @@
 using Nethereum.BlockchainProcessing.Processors;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Tests.Processing
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class FilterTests
     {

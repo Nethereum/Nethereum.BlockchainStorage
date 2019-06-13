@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.Configuration;
 using Nethereum.RPC.Eth.Filters;
 using Nethereum.Web3;

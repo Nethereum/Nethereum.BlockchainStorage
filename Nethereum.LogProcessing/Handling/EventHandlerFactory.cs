@@ -1,5 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+﻿using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling.Handlers.Handlers;
 using Nethereum.RPC.Eth.Transactions;

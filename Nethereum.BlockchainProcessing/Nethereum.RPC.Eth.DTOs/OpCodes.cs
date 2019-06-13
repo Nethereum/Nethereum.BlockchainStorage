@@ -2,7 +2,7 @@
 
 namespace Nethereum.RPC.Eth.DTOs
 {
-    public class OpCodes
+    public static class OpCodes
     {
         public const string Call = "CALL";
         public const string DelegateCall = "DELEGATECALL";

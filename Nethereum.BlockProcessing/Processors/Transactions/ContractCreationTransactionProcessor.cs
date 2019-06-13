@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth;

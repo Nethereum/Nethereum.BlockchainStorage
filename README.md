@@ -25,8 +25,8 @@ Built on core Nethereum libraries:
 
 There are two main options to traverse the chain.  
 
-* BlockProcessing: Read block by block (which reads in all transactions and events). 
 * LogProcessing: Read event logs in block order (quicker if the log data is all you need).
+* BlockProcessing: Read block by block (which reads in all transactions and events). 
 
 **Filters**
 
@@ -39,10 +39,14 @@ In addition to the processors there are a library of tools and components that c
 **Storage and Search**
 
 The following projects build on the processing library to provide pluggable off the shelf and re-usable components.
-* Blockchain storage, store chain data - includes adapters for Azure Table Storage, CSV, SQL Server, Sqlite, Cosmos.  https://github.com/Nethereum/Nethereum.BlockchainProcessing/tree/master/Storage
-* Azure Search - index chain data easily  https://github.com/Nethereum/Nethereum.BlockchainProcessing/tree/master/Storage/Nethereum.BlockchainStore.Search.Samples
+* Blockchain storage, store chain data - includes adapters for Azure Table Storage, CSV, SQL Server, Sqlite, Cosmos.  [Storage Samples](Storage/)
+* Azure Search - index chain data easily  [Search Samples](Storage/Nethereum.BlockchainStore.Search.Samples)
 
 **WHERE DO I START?**
 
-Start with the samples!!  https://github.com/Nethereum/Nethereum.BlockchainProcessing/tree/master/Nethereum.BlockchainProcessing.Samples
+Start with the samples!!  
+
+[Log Processing](Nethereum.LogProcessing.Samples)
+
+[Block Processing](Nethereum.BlockProcessing.Samples)
 

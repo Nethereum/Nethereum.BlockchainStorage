@@ -1,5 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Processing;
+﻿using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Geth;
 using Nethereum.Web3;

@@ -1,5 +1,4 @@
 ﻿using Moq;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;

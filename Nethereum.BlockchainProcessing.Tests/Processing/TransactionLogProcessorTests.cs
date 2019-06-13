@@ -7,7 +7,7 @@ using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Tests.Processing
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class TransactionLogProcessorTests
     {

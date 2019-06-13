@@ -1,14 +1,13 @@
+using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Processors;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using BigInteger = System.Numerics.BigInteger;
 
-namespace Nethereum.BlockchainStore.Tests.Processing
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class ExtensionTests
     {

@@ -1,14 +1,10 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.Configuration;
-using Nethereum.Contracts.Services;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Threading.Tasks;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainProcessing.Processors.Transactions

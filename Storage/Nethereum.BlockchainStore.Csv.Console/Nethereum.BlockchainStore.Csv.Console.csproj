@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Nethereum.BlockchainProcessing.Common.Logging\Nethereum.BlockchainProcessing.Common.Logging.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Csv\Nethereum.BlockchainStore.Csv.csproj" />
   </ItemGroup>
 

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Moq;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
+﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.LogProcessing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs

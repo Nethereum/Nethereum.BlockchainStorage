@@ -1,14 +1,12 @@
-﻿using System;
-using System.Numerics;
-using System.Threading.Tasks;
-using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
-using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Numerics;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples.Azure

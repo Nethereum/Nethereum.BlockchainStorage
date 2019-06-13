@@ -3,10 +3,8 @@ using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using System.Collections.Generic;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Tests.Processing;
 
-namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class BlockProcessorTestBase
     {

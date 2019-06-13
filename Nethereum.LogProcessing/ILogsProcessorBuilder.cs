@@ -1,5 +1,4 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;

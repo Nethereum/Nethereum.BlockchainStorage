@@ -1,10 +1,9 @@
-﻿using System;
-using Nethereum.RPC.Eth.DTOs;
+﻿using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.Contracts;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Nethereum.Contracts;
-using System.Collections.Concurrent;
-using Nethereum.BlockchainProcessing.Processing;
 
 namespace Nethereum.RPC.Eth.DTOs
 {
@@ -156,6 +155,20 @@ namespace Nethereum.RPC.Eth.DTOs
                 return new [] {val};
 
             return Array.Empty<object>();
+        }
+
+        public static string EventSignature(this FilterLog log) => log.GetTopic(0);
+        public static string IndexedVal1(this FilterLog log) => log.GetTopic(1);
+        public static string IndexedVal2(this FilterLog log) => log.GetTopic(2);
+        public static string IndexedVal3(this FilterLog log) => log.GetTopic(3);
+        private static string GetTopic(this FilterLog log, int number)
+        {
+            if (log.Topics == null) return null;
+
+            if (log.Topics.Length > number)
+                return log.Topics[number].ToString();
+
+            return null;
         }
     }
 }

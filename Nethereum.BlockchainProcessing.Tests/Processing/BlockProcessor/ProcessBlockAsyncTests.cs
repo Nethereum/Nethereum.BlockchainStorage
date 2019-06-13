@@ -7,7 +7,7 @@ using Xunit;
 using IBlockFilter = Nethereum.BlockchainProcessing.Processors.IBlockFilter;
 using System;
 
-namespace Nethereum.BlockchainStore.Tests.Processing.BlockProcessorTests
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class ProcessBlockAsyncTests
     {

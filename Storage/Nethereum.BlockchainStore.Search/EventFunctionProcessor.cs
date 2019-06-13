@@ -1,5 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Handlers;
+﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;

@@ -5,11 +5,9 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Xunit;
-using Nethereum.BlockchainProcessing.Tests.Processing;
 
-namespace Nethereum.BlockchainStore.Tests.Processing
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class ContractCreationTransactionProcessorTests
     {

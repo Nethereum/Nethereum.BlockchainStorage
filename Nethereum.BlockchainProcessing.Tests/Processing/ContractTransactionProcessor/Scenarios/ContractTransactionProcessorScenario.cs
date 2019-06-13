@@ -1,12 +1,12 @@
 ﻿using Moq;
+using Nethereum.BlockchainProcessing;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
+using Nethereum.BlockchainProcessing.Tests.Processing;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Tests.Processing;
 
 namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests.Scenarios
 {

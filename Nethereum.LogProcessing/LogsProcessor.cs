@@ -3,8 +3,8 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Nethereum.Configuration;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.BlockchainProcessing;
 
 namespace Nethereum.LogProcessing
 {

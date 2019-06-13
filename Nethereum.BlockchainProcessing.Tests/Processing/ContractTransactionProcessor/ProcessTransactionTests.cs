@@ -5,7 +5,7 @@ using Nethereum.Hex.HexTypes;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
 
     public class ProcessTransactionTests : ProcessTransactionScenario, IDisposable

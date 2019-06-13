@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests.Scenarios;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Tests.Processing.ContractTransactionProcessorTests
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class IsTransactionForContractTests: ContractTransactionProcessorScenario
         {

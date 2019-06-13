@@ -1,5 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Handlers;
+﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors;
 using Nethereum.BlockchainProcessing.Processors.PostProcessors;
 using Nethereum.BlockchainProcessing.Processors.Transactions;

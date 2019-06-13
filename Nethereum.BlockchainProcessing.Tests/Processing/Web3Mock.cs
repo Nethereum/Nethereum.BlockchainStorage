@@ -9,6 +9,8 @@ using Nethereum.Web3;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using Nethereum.Geth;
+using Nethereum.BlockchainProcessing.Processors.Transactions;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing
 {

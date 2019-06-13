@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStore.Tests.Processing
+namespace Nethereum.BlockchainProcessing.Tests.Processing
 {
     public class TransactionProcessorTests
     {

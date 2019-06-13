@@ -5,7 +5,6 @@ using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs;
 using Nethereum.RPC.Eth.Services;
 using Nethereum.Hex.HexTypes;

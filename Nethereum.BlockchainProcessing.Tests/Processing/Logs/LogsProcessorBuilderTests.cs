@@ -1,5 +1,4 @@
 ﻿using Moq;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
@@ -7,7 +6,6 @@ using Nethereum.Contracts;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
 using System.IO;
