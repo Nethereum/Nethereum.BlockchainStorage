@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             string desiredFromAddress = "0x943e72b69141f6af525a9a5fd939668ee9f2b354";
 
             var processor = new LogsProcessorBuilder<TestData.Contracts.StandardContract.TransferEvent>(
-                blockchainUrl: BLOCKCHAIN_URL, (filterBuilder) => filterBuilder.AddTopic(f => f.From, desiredFromAddress));
+                blockchainUrl: BLOCKCHAIN_URL, configureFilterBuilder: (filterBuilder) => filterBuilder.AddTopic(f => f.From, desiredFromAddress));
 
             Assert.Equal("0x000000000000000000000000943e72b69141f6af525a9a5fd939668ee9f2b354", processor.Filters[0].GetFirstTopicValueAsString(1));
         }
@@ -74,7 +74,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             string desiredFromAddress = "0x943e72b69141f6af525a9a5fd939668ee9f2b354";
 
             var processor = new LogsProcessorBuilder<TestData.Contracts.StandardContract.TransferEvent>(
-                blockchainUrl: BLOCKCHAIN_URL, CONTRACT_ADDRESS, (filterBuilder) => filterBuilder.AddTopic(f => f.From, desiredFromAddress));
+                blockchainUrl: BLOCKCHAIN_URL, CONTRACT_ADDRESS, configureFilterBuilder: (filterBuilder) => filterBuilder.AddTopic(f => f.From, desiredFromAddress));
 
             Assert.Equal("0x000000000000000000000000943e72b69141f6af525a9a5fd939668ee9f2b354", processor.Filters[0].GetFirstTopicValueAsString(1));
             Assert.Equal(CONTRACT_ADDRESS, processor.Filters[0].Address[0]);
@@ -88,7 +88,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
             string desiredFromAddress = "0x943e72b69141f6af525a9a5fd939668ee9f2b354";
 
             var processor = new LogsProcessorBuilder<TestData.Contracts.StandardContract.TransferEvent>(
-                blockchainUrl: BLOCKCHAIN_URL, CONTRACT_ADDRESSES, (filterBuilder) => filterBuilder.AddTopic(f => f.From, desiredFromAddress));
+                blockchainUrl: BLOCKCHAIN_URL, CONTRACT_ADDRESSES, configureFilterBuilder: (filterBuilder) => filterBuilder.AddTopic(f => f.From, desiredFromAddress));
 
             Assert.Equal("0x000000000000000000000000943e72b69141f6af525a9a5fd939668ee9f2b354", processor.Filters[0].GetFirstTopicValueAsString(1));
             Assert.Equal(CONTRACT_ADDRESSES, processor.Filters[0].Address);

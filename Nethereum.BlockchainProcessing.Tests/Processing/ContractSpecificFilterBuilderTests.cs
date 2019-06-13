@@ -37,7 +37,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
 
             // non contract creation transaction
             Assert.True(await builder.TransactionReceiptFilter.IsMatchAsync(
-                new TransactionReceipt() {ContractAddress = Extensions.EmptyAddressHex}));
+                new TransactionReceipt() {ContractAddress = AddressExtensions.EmptyAddressHex}));
         }
 
         [Fact]

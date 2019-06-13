@@ -140,6 +140,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockProcessing.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainProcessing.Common.Logging", "Nethereum.BlockchainProcessing.Common.Logging\Nethereum.BlockchainProcessing.Common.Logging.csproj", "{67BE5AC8-CA70-4DE1-A793-B9D3EC120E23}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.AzureTables.Tests", "Storage\Nethereum.BlockchainStore.AzureTables.Tests\Nethereum.BlockchainStore.AzureTables.Tests.csproj", "{46617AA0-5E25-460E-9420-5E66279779DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -310,6 +312,10 @@ Global
 		{67BE5AC8-CA70-4DE1-A793-B9D3EC120E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67BE5AC8-CA70-4DE1-A793-B9D3EC120E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67BE5AC8-CA70-4DE1-A793-B9D3EC120E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46617AA0-5E25-460E-9420-5E66279779DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46617AA0-5E25-460E-9420-5E66279779DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46617AA0-5E25-460E-9420-5E66279779DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46617AA0-5E25-460E-9420-5E66279779DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -369,6 +375,7 @@ Global
 		{2E838D9C-CDA7-40CF-971E-CDBBA941E327} = {D7F91F42-66ED-41AD-918E-00F272273B55}
 		{127B9D44-E7BF-40AF-93D3-165426AA7A59} = {1AFBA3E1-617B-4EDA-A592-5C276FF64A31}
 		{45C6C43E-40E8-4A24-85EF-BAEF201FA26E} = {1AFBA3E1-617B-4EDA-A592-5C276FF64A31}
+		{46617AA0-5E25-460E-9420-5E66279779DF} = {D44F6868-27B9-4F10-B12A-A81A65C720DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8BDA708-C821-4538-93BC-8FC3DCC98B7B}
