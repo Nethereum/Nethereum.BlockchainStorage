@@ -271,7 +271,7 @@ Solidity Contract Excerpt
         [Fact]
         public async Task WithAFilter()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new BlockchainProcessing.Processing.Logs.FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.To, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
                 .Build(contractAddress: "0x3678FbEFC663FC28336b93A1FA397B67ae42114d",
                     blockRange: new BlockRange(3860820, 3860820));

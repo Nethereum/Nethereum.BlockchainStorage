@@ -499,13 +499,13 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             var result = await processor.ProcessOnceAsync(new System.Threading.CancellationToken());
 
-            Assert.Equal((ulong)0, result.Value.From);
-            Assert.Equal((ulong)0, result.Value.To);
+            Assert.Equal(0, result.Value.From.Value);
+            Assert.Equal(0, result.Value.To.Value);
 
             result = await processor.ProcessOnceAsync(new System.Threading.CancellationToken());
 
-            Assert.Equal((ulong)1, result.Value.From);
-            Assert.Equal((ulong)1, result.Value.To);
+            Assert.Equal(1, result.Value.From.Value);
+            Assert.Equal(1, result.Value.To.Value);
 
             Assert.Equal((ulong)1, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
         }
@@ -544,12 +544,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             var rangesProcessed = await processor.ProcessContinuallyAsync(cancellationTokenSource.Token);
 
-            Assert.Equal((ulong)1, rangesProcessed);
-            Assert.Equal((ulong)1, lastBatchProcessedArgs.BatchesProcessedSoFar);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.From);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.To);
+            Assert.Equal(1, rangesProcessed);
+            Assert.Equal((uint)1, lastBatchProcessedArgs.BatchesProcessedSoFar);
+            Assert.Equal(0, lastBatchProcessedArgs.LastRangeProcessed.From.Value);
+            Assert.Equal(0, lastBatchProcessedArgs.LastRangeProcessed.To.Value);
 
-            Assert.Equal((ulong)0, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
+            Assert.Equal(0, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
         }
 
         [Fact]
@@ -592,11 +592,11 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 await Task.Delay(10);
             }
 
-            Assert.Equal((ulong)1, lastBatchProcessedArgs.BatchesProcessedSoFar);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.From);
-            Assert.Equal((ulong)0, lastBatchProcessedArgs.LastRangeProcessed.To);
+            Assert.Equal((uint)1, lastBatchProcessedArgs.BatchesProcessedSoFar);
+            Assert.Equal(0, lastBatchProcessedArgs.LastRangeProcessed.From.Value);
+            Assert.Equal(0, lastBatchProcessedArgs.LastRangeProcessed.To.Value);
 
-            Assert.Equal((ulong)0, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
+            Assert.Equal(0, await builder.BlockProgressRepository.GetLastBlockNumberProcessedAsync());
         }
 
         [Fact]
@@ -621,8 +621,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
             var result = await processor.ProcessOnceAsync(new System.Threading.CancellationToken());
 
-            Assert.Equal((ulong)100, result.Value.From);
-            Assert.Equal((ulong)100, result.Value.To);
+            Assert.Equal(100.ToHexBigInteger(), result.Value.From);
+            Assert.Equal(100.ToHexBigInteger(), result.Value.To);
         }
 
         [Fact]

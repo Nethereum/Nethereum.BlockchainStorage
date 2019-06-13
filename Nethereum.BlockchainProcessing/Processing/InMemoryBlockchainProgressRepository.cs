@@ -1,19 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public class InMemoryBlockchainProgressRepository : IBlockProgressRepository
     {
-        public InMemoryBlockchainProgressRepository(ulong? lastBlockProcessed)
+        public InMemoryBlockchainProgressRepository(BigInteger? lastBlockProcessed)
         {
             LastBlockProcessed = lastBlockProcessed;
         }
 
-        public ulong? LastBlockProcessed { get; private set;}
+        public BigInteger? LastBlockProcessed { get; private set;}
 
-        public Task<ulong?> GetLastBlockNumberProcessedAsync() => Task.FromResult((ulong?)LastBlockProcessed);
+        public Task<BigInteger?> GetLastBlockNumberProcessedAsync() => Task.FromResult((BigInteger?)LastBlockProcessed);
 
-        public Task UpsertProgressAsync(ulong blockNumber)
+        public Task UpsertProgressAsync(BigInteger blockNumber)
         {
             LastBlockProcessed = blockNumber;
             return Task.CompletedTask;

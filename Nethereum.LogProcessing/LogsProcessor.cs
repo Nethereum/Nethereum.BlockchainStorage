@@ -5,6 +5,8 @@ using Nethereum.Configuration;
 using System.Threading.Tasks;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing;
+using Nethereum.Contracts;
+using System.Numerics;
 
 namespace Nethereum.LogProcessing
 {
@@ -100,7 +102,7 @@ namespace Nethereum.LogProcessing
         /// <param name="cancellationToken"></param>
         /// <param name="rangesProcessedCallback"></param>
         /// <returns>The total number of blocks processed</returns>
-        public async Task<ulong> ProcessContinuallyAsync(
+        public async Task<BigInteger> ProcessContinuallyAsync(
             CancellationToken cancellationToken,
             Action<LogBatchProcessedArgs> rangesProcessedCallback = null)
         {
@@ -111,7 +113,7 @@ namespace Nethereum.LogProcessing
 
             uint batchesProcessed = 0;
             uint currentBatchAttemptCount = 0;
-            ulong totalBlocksProcessed = 0;
+            BigInteger totalBlocksProcessed = 0;
 
             while (true)
             {

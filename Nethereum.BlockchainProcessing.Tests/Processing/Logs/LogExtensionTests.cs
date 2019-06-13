@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;

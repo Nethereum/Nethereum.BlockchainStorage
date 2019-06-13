@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.Contracts;
 using Nethereum.LogProcessing;
 using System;
 using System.Collections.Generic;
@@ -124,12 +125,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 await Assert.ThrowsAsync<TooManyRecordsException>(async () => await Service.ProcessOnceAsync());
 
-                Assert.Equal((ulong)10, rangesAttempted[0].To);
-                Assert.Equal((ulong)5, rangesAttempted[1].To);
-                Assert.Equal((ulong)2, rangesAttempted[2].To);
-                Assert.Equal((ulong)1, rangesAttempted[3].To);
+                Assert.Equal(10, rangesAttempted[0].To.Value);
+                Assert.Equal(5, rangesAttempted[1].To.Value);
+                Assert.Equal(2, rangesAttempted[2].To.Value);
+                Assert.Equal(1, rangesAttempted[3].To.Value);
 
-                Assert.Equal((ulong)1, Service.MaxNumberOfBlocksPerBatch);
+                Assert.Equal((uint)1, Service.MaxNumberOfBlocksPerBatch);
             }
         }
 

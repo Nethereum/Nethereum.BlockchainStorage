@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Entities;
@@ -83,13 +84,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return blockOutput;
         }
 
-        public async Task<ulong?> GetMaxBlockNumberAsync()
+        public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
             await _lock.WaitAsync();
             try
             {
                 await InitialiseMaxBlock();
-                return (ulong?)_maxBlockCounter.Value;
+                return _maxBlockCounter.Value;
             }
             finally
             {

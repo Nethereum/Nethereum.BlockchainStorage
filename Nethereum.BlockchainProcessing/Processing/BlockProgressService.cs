@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.RPC.Eth.Services;
 using Nethereum.Web3;
@@ -13,7 +14,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public BlockProgressService(
             IWeb3 web3,
-            ulong? defaultStartingBlockNumber,
+            BigInteger? defaultStartingBlockNumber,
             IBlockProgressRepository blockProgressRepository,
             uint? minimumBlockConfirmations = null) :
             this(web3.Eth.Blocks, defaultStartingBlockNumber, blockProgressRepository, minimumBlockConfirmations)
@@ -21,8 +22,8 @@ namespace Nethereum.BlockchainProcessing.Processing
         }
 
         public BlockProgressService(
-            IEthApiBlockService blockService, 
-            ulong? defaultStartingBlockNumber, 
+            IEthApiBlockService blockService,
+            BigInteger? defaultStartingBlockNumber, 
             IBlockProgressRepository blockProgressRepository,
             uint? minimumBlockConfirmations = null) : 
             base(
@@ -33,11 +34,11 @@ namespace Nethereum.BlockchainProcessing.Processing
             MinimumBlockConfirmations = minimumBlockConfirmations ?? 0;
         }
 
-        protected override Task<ulong> GetMinBlockNumber() => GetCurrentBlockNumberLessMinimumConfirmations();
+        protected override Task<BigInteger> GetMinBlockNumber() => GetCurrentBlockNumberLessMinimumConfirmations();
 
-        public override Task<ulong> GetBlockNumberToProcessTo() => GetCurrentBlockNumberLessMinimumConfirmations();
+        public override Task<BigInteger> GetBlockNumberToProcessTo() => GetCurrentBlockNumberLessMinimumConfirmations();
 
-        private  async Task<ulong> GetCurrentBlockNumberLessMinimumConfirmations()
+        private  async Task<BigInteger> GetCurrentBlockNumberLessMinimumConfirmations()
         {
             return (await _web3.GetBlockNumber.SendRequestAsync()
                        .ConfigureAwait(false)).ToUlong() - MinimumBlockConfirmations;

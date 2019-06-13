@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public class StaticBlockRangeProgressService : BlockProgressServiceBase
     {
         public StaticBlockRangeProgressService(
-            ulong blockNumberFrom, 
-            ulong blockNumberTo,
+            BigInteger blockNumberFrom,
+            BigInteger blockNumberTo,
             IBlockProgressRepository blockProgressRepository) : 
             base(
                 blockNumberFrom, 
@@ -15,11 +16,11 @@ namespace Nethereum.BlockchainProcessing.Processing
             BlockNumberTo = blockNumberTo;
         }
 
-        public ulong BlockNumberTo { get; }
+        public BigInteger BlockNumberTo { get; }
 
-        public override Task<ulong> GetBlockNumberToProcessTo()
+        public override Task<BigInteger> GetBlockNumberToProcessTo()
         {
-            return Task.FromResult(BlockNumberTo);
+            return Task.FromResult((BigInteger)BlockNumberTo);
         }
     }
 }

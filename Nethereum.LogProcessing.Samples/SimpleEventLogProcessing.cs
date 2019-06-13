@@ -626,8 +626,8 @@ namespace Nethereum.LogProcessing.Samples
 
             // multiple events any contract
             var filters = new[] {
-                new NewFilterInputBuilder<TransferEventDto>().Build(),
-                new NewFilterInputBuilder<ApprovalEventDTO>().Build()
+                new FilterInputBuilder<TransferEventDto>().Build(),
+                new FilterInputBuilder<ApprovalEventDTO>().Build()
             };
 
             var manyEventsProcessor = web3.Eth.LogsProcessor(filters)

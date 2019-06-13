@@ -1,30 +1,32 @@
-﻿using System.Threading.Tasks;
+﻿using Nethereum.Contracts;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public abstract class BlockProgressServiceBase: IBlockProgressService
     {
-        protected ulong? DefaultStartingBlockNumber;
+        protected BigInteger? DefaultStartingBlockNumber;
         private readonly IBlockProgressRepository _blockProgressRepository;
 
         protected BlockProgressServiceBase(
-            ulong? defaultStartingBlockNumber, 
+            BigInteger? defaultStartingBlockNumber, 
             IBlockProgressRepository blockProgressRepository)
         {
             DefaultStartingBlockNumber = defaultStartingBlockNumber;
             _blockProgressRepository = blockProgressRepository;
         }
 
-        public virtual async Task SaveLastBlockProcessedAsync(ulong blockNumber)
+        public virtual async Task SaveLastBlockProcessedAsync(BigInteger blockNumber)
         {
             await _blockProgressRepository
                 .UpsertProgressAsync(blockNumber)
                 .ConfigureAwait(false);
         }
 
-        protected virtual Task<ulong> GetMinBlockNumber() => Task.FromResult((ulong)0);
+        protected virtual Task<BigInteger> GetMinBlockNumber() => Task.FromResult((BigInteger)0);
 
-        private async Task<ulong> LazyLoadDefaultStartingBlockNumber()
+        private async Task<BigInteger> LazyLoadDefaultStartingBlockNumber()
         {
             if(DefaultStartingBlockNumber == null)
             {
@@ -34,7 +36,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             return DefaultStartingBlockNumber.Value;
         } 
 
-        public virtual async Task<ulong> GetBlockNumberToProcessFrom()
+        public virtual async Task<BigInteger> GetBlockNumberToProcessFrom()
         {
             var lastBlockProcessed = await _blockProgressRepository
                 .GetLastBlockNumberProcessedAsync()
@@ -49,7 +51,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             return await LazyLoadDefaultStartingBlockNumber().ConfigureAwait(false);
         }
 
-        public abstract Task<ulong> GetBlockNumberToProcessTo();
+        public abstract Task<BigInteger> GetBlockNumberToProcessTo();
 
         public virtual async Task<BlockRange?> GetNextBlockRangeToProcessAsync(
             uint maxNumberOfBlocksPerBatch)

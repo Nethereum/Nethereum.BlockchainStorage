@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Nethereum.JsonRpc.Client;
+using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 {

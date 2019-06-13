@@ -23,38 +23,38 @@ namespace Nethereum.LogProcessing
         {
         }
 
-        public LogsProcessorBuilder(string blockchainUrl, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder) : this(new Web3.Web3(blockchainUrl).Eth, configureFilterBuilder)
+        public LogsProcessorBuilder(string blockchainUrl, Action<FilterInputBuilder<TEventDto>> configureFilterBuilder) : this(new Web3.Web3(blockchainUrl).Eth, configureFilterBuilder)
         {
         }
 
-        public LogsProcessorBuilder(string blockchainUrl, string contractAddress, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder) : this(new Web3.Web3(blockchainUrl).Eth, configureFilterBuilder, contractAddress)
+        public LogsProcessorBuilder(string blockchainUrl, string contractAddress, Action<FilterInputBuilder<TEventDto>> configureFilterBuilder) : this(new Web3.Web3(blockchainUrl).Eth, configureFilterBuilder, contractAddress)
         {
         }
 
-        public LogsProcessorBuilder(string blockchainUrl, string[] contractAddresses, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder) : this(new Web3.Web3(blockchainUrl).Eth, configureFilterBuilder, contractAddresses)
+        public LogsProcessorBuilder(string blockchainUrl, string[] contractAddresses, Action<FilterInputBuilder<TEventDto>> configureFilterBuilder) : this(new Web3.Web3(blockchainUrl).Eth, configureFilterBuilder, contractAddresses)
         {
         }
 
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService)
-            : base(ethApiContractService, new NewFilterInputBuilder<TEventDto>().Build())
+            : base(ethApiContractService, new FilterInputBuilder<TEventDto>().Build())
         {
         }
 
-        public LogsProcessorBuilder(IEthApiContractService ethApiContractService, Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder, params string[] contractAddresses)
+        public LogsProcessorBuilder(IEthApiContractService ethApiContractService, Action<FilterInputBuilder<TEventDto>> configureFilterBuilder, params string[] contractAddresses)
             : base(ethApiContractService)
         {
-            var filterBuilder = new NewFilterInputBuilder<TEventDto>();
+            var filterBuilder = new FilterInputBuilder<TEventDto>();
             configureFilterBuilder(filterBuilder);
             Filters.Add(filterBuilder.Build(contractAddresses));
         }
 
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService, string contractAddress)
-            : base(ethApiContractService, new NewFilterInputBuilder<TEventDto>().Build(contractAddress))
+            : base(ethApiContractService, new FilterInputBuilder<TEventDto>().Build(contractAddress))
         {
         }
 
         public LogsProcessorBuilder(IEthApiContractService ethApiContractService, string[] contractAddresses)
-            : base(ethApiContractService, new NewFilterInputBuilder<TEventDto>().Build(contractAddresses))
+            : base(ethApiContractService, new FilterInputBuilder<TEventDto>().Build(contractAddresses))
         {
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
@@ -12,10 +13,10 @@ namespace Nethereum.BlockchainProcessing.Processing
         Task WaitForNextBlock(uint retryNumber);
         Task PauseFollowingAnError(uint retryNumber);
 
-        Task<ulong?> GetLastBlockProcessedAsync();
+        Task<BigInteger?> GetLastBlockProcessedAsync();
         Task FillContractCacheAsync();
 
-        Task ProcessBlockAsync(ulong blockNumber);
-        Task<ulong> GetMaxBlockNumberAsync();
+        Task ProcessBlockAsync(BigInteger blockNumber);
+        Task<BigInteger> GetMaxBlockNumberAsync();
     }
 }

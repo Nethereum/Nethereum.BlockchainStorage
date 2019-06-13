@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
@@ -14,14 +15,14 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         {
         }
 
-        public async Task<ulong?> GetLastBlockNumberProcessedAsync()
+        public async Task<BigInteger?> GetLastBlockNumberProcessedAsync()
         {
             await InitialiseMaxBlock();
             if(_counter.Value < 0) return null;
             return (ulong)_counter.Value;
         }
 
-        public async Task UpsertProgressAsync(ulong blockNumber)
+        public async Task UpsertProgressAsync(BigInteger blockNumber)
         {
             await InitialiseMaxBlock();
             _counter.Value = (long)blockNumber;

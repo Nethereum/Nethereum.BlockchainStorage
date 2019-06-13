@@ -106,9 +106,9 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         public HashSet<HexBigInteger> BlocksContainingTransfers = new HashSet<HexBigInteger>();
         private ILogsProcessor _processor;
         private CancellationTokenSource cancellationTokenSource;
-        private ulong MaxBlockNumber;
-        private ulong BlocksProcessed;
-        private ulong LastBlock;
+        private BigInteger MaxBlockNumber;
+        private BigInteger BlocksProcessed;
+        private BigInteger LastBlock;
         private ILogsProcessorBuilder _builder;
         private IEthApiContractService ethApiContractService;
 
@@ -164,9 +164,9 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         public HashSet<HexBigInteger> BlocksContainingTransfers = new HashSet<HexBigInteger>();
         private ILogsProcessor _processor;
         private CancellationTokenSource cancellationTokenSource;
-        private ulong MaxBlockNumber; 
-        private ulong BlocksProcessed;
-        private ulong LastBlock;
+        private BigInteger MaxBlockNumber; 
+        private BigInteger BlocksProcessed;
+        private BigInteger LastBlock;
         private ILogsProcessorBuilder _builder;
         private IEthApiContractService ethApiContractService;
 

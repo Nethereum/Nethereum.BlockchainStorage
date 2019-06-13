@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.Contracts;
 using Xunit;
 
 namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs

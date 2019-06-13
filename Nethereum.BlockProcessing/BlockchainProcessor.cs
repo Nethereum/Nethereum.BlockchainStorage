@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Nethereum.Configuration;
+using Nethereum.Contracts;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +21,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// <summary>
         /// Allow the processor to resume from where it left off
         /// </summary>
-        private async Task<ulong> GetStartingBlockNumber()
+        private async Task<BigInteger> GetStartingBlockNumber()
         {
             _log.LogInformation("Begin GetStartingBlockNumber / _strategy.GetLastBlockProcessedAsync()");
             var lastBlockProcessed = await _strategy.GetLastBlockProcessedAsync()
@@ -27,7 +29,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
             _log.LogInformation($"GetLastBlockProcessedAsync: {lastBlockProcessed}");
 
-            ulong startingBlock = lastBlockProcessed == null ? 0 : lastBlockProcessed.Value + 1;
+            BigInteger startingBlock = lastBlockProcessed == null ? 0 : lastBlockProcessed.Value + 1;
 
             return _strategy.MinimumBlockNumber > startingBlock ? _strategy.MinimumBlockNumber : startingBlock;
         }
@@ -41,10 +43,10 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// <param name="endBlock">End block - if null, will run continuously and wait for new blocks</param>
         /// <returns>False if processing was cancelled else True</returns>
         public Task<bool> ExecuteAsync(
-            ulong? startBlock, ulong? endBlock) => ExecuteAsync(startBlock, endBlock, new CancellationToken());
+            BigInteger? startBlock, BigInteger? endBlock) => ExecuteAsync(startBlock, endBlock, new CancellationToken());
 
         public async Task<bool> ExecuteAsync(
-            ulong? startBlock, ulong? endBlock, CancellationToken cancellationToken)
+            BigInteger? startBlock, BigInteger? endBlock, CancellationToken cancellationToken)
         {
 
             startBlock = startBlock ?? await GetStartingBlockNumber();

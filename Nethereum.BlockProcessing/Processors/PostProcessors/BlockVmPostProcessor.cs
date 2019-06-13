@@ -1,6 +1,7 @@
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.Web3;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processors.PostProcessors
@@ -11,7 +12,7 @@ namespace Nethereum.BlockchainProcessing.Processors.PostProcessors
         {
         }
 
-        public override Task ProcessBlockAsync(ulong blockNumber)
+        public override Task ProcessBlockAsync(BigInteger blockNumber)
         {
             TransactionProcessor.EnabledValueProcessing = false;
             TransactionProcessor.EnabledContractCreationProcessing = false;

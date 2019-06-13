@@ -6,6 +6,7 @@ using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
@@ -33,7 +34,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             IWeb3 web3, 
             IAzureSearchService searchService, 
             IEventFunctionProcessor functionProcessor,
-            Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
+            Func<BigInteger, BigInteger?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2,
             IEnumerable<NewFilterInput> filters = null,
             uint minimumBlockConfirmations = 0):

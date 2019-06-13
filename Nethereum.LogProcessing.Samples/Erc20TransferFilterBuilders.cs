@@ -27,7 +27,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersInBlock()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .Build(blockRange: new BlockRange(3860820, 3860820));
 
             var expectedLogs = new List<(string txHash, int logIndex)>
@@ -45,7 +45,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersForContract()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .Build(contractAddress: "0x3678FbEFC663FC28336b93A1FA397B67ae42114d",
                     blockRange: new BlockRange(3860820, 3860820));
 
@@ -60,7 +60,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersFrom()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.From, "0x8c0b71d3d3cf9e3a1cd4854ff5555ad43645b44d")
                 .Build(blockRange: new BlockRange(3860820, 3860820));
 
@@ -75,7 +75,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersTo()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.To, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
                 .Build(blockRange: new BlockRange(3860820, 3860820));
 
@@ -90,7 +90,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersForContractTo()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.To, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
                 .Build(contractAddress: "0x3678FbEFC663FC28336b93A1FA397B67ae42114d", blockRange: new BlockRange(3860820, 3860820));
 
@@ -105,7 +105,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersForContractFrom()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.From, "0x8c0b71d3d3cf9e3a1cd4854ff5555ad43645b44d")
                 .Build(contractAddress: "0x7122fea3a32276e6057ece3cb8bed764189b5e95", blockRange: new BlockRange(3860820, 3860820));
 
@@ -121,7 +121,7 @@ namespace Nethereum.LogProcessing.Samples
         [Fact]
         public async Task TransfersForContractFromAndTo()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.From, "0x0000000000000000000000000000000000000000")
                 .AddTopic(tfr => tfr.To, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
                 .Build(contractAddress: "0x3678fbefc663fc28336b93a1fa397b67ae42114d", blockRange: new BlockRange(3860820, 3860820));

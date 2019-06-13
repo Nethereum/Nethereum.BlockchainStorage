@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Numerics;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.MongoDb.Entities;
@@ -23,7 +24,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
             return response;
         }
 
-        public async Task<ulong?> GetMaxBlockNumberAsync()
+        public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
             var count = await Collection.CountDocumentsAsync(FilterDefinition<MongoDbBlock>.Empty);
 
@@ -36,7 +37,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
                 .Sort(new SortDefinitionBuilder<MongoDbBlock>().Descending(block => block.BlockNumber))
                 .Project(block => block.BlockNumber).SingleOrDefaultAsync();
 
-            return ulong.Parse(max);
+            return BigInteger.Parse(max);
         }
 
         public async Task UpsertBlockAsync(Block source)

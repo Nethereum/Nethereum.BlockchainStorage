@@ -1,11 +1,12 @@
 ﻿using Nethereum.BlockchainProcessing.Processors;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public class ProcessingStrategy : IBlockchainProcessingStrategy
     {
-        private static readonly Task<ulong?> TaskReturningNullUlong = Task.FromResult((ulong?)null);
+        private static readonly Task<BigInteger?> TaskReturnNull = Task.FromResult((BigInteger?)null);
         protected readonly IBlockProcessor BlockProcessor;
 
         public ProcessingStrategy(IBlockProcessor blockProcessor)
@@ -21,10 +22,10 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         public virtual Task FillContractCacheAsync() { return Task.CompletedTask; }
 
-        public virtual Task<ulong?> GetLastBlockProcessedAsync() => TaskReturningNullUlong;
+        public virtual Task<BigInteger?> GetLastBlockProcessedAsync() => TaskReturnNull;
         public virtual Task PauseFollowingAnError(uint retryNumber) => WaitStrategy.Apply(retryNumber);
         public virtual Task WaitForNextBlock(uint retryNumber) => WaitStrategy.Apply(retryNumber);
-        public virtual Task ProcessBlockAsync(ulong blockNumber) => BlockProcessor.ProcessBlockAsync(blockNumber);
-        public virtual Task<ulong> GetMaxBlockNumberAsync() => BlockProcessor.GetMaxBlockNumberAsync();
+        public virtual Task ProcessBlockAsync(BigInteger blockNumber) => BlockProcessor.ProcessBlockAsync(blockNumber);
+        public virtual Task<BigInteger> GetMaxBlockNumberAsync() => BlockProcessor.GetMaxBlockNumberAsync();
     }
 }

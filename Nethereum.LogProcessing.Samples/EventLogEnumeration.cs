@@ -106,7 +106,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var rangeProcessed = await batchProcessorService.ProcessOnceAsync();
 
             Assert.NotNull(rangeProcessed);
-            Assert.Equal((ulong?)3146684, rangeProcessed.Value.To);
+            Assert.Equal(3146684, rangeProcessed.Value.To.Value);
 
             Assert.Single(transferEventProcessor.ProcessedEvents);
             Assert.Equal(7, catchAllEventProcessor.ProcessedEvents.Count);
@@ -176,7 +176,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             //create filter to catch multiple from addresses
             //and multiple values
-            var filter = new NewFilterInputBuilder<TransferEventERC721>()
+            var filter = new FilterInputBuilder<TransferEventERC721>()
                 .AddTopic(e => e.From, "0x15829f2c25563481178cc4669b229775c6a49a85")
                 .AddTopic(e => e.From, "0x84b1383edee2babfe839b2a177425f0682e679f6")
                 .AddTopic(e => e.TokenId, new BigInteger(95))
@@ -281,7 +281,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
             var transferEventProcessor = new TransferEventProcessor();
             var eventProcessors = new ILogProcessor[] {transferEventProcessor};
 
-            var filter = new NewFilterInputBuilder<TransferEventERC721>()
+            var filter = new FilterInputBuilder<TransferEventERC721>()
                 .AddTopic(eventVal => eventVal.To, "0xc14934679e71ef4d18b6ae927fe2b953c7fd9b91" )
                 .Build();
 
@@ -313,7 +313,7 @@ The event signature will match (as it "indexed" is not part of the signature) bu
 
             var ContractAddresses = new []{ "0xC03cDD393C89D169bd4877d58f0554f320f21037"};
 
-            var filter = new NewFilterInputBuilder<TransferEventERC721>().Build(ContractAddresses);
+            var filter = new FilterInputBuilder<TransferEventERC721>().Build(ContractAddresses);
 
             var logProcessor = new BlockRangeLogsProcessor(web3, eventProcessors, filter);
 

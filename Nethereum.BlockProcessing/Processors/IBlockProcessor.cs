@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processors
 {
     public interface IBlockProcessor
     {
         bool ProcessTransactionsInParallel { get;set; }
-        Task ProcessBlockAsync(ulong blockNumber);
-        Task<ulong> GetMaxBlockNumberAsync();
+        Task ProcessBlockAsync(BigInteger blockNumber);
+        Task<BigInteger> GetMaxBlockNumberAsync();
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Nethereum.Contracts;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
     public interface IBlockProgressService
     {
-        Task SaveLastBlockProcessedAsync(ulong blockNumber);
+        Task SaveLastBlockProcessedAsync(BigInteger blockNumber);
         Task<BlockRange?> GetNextBlockRangeToProcessAsync(uint maxBlocksToProcessInBatch);
     }
 }

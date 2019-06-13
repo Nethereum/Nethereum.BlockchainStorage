@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.Contracts;
 
 namespace Nethereum.LogProcessing
 {

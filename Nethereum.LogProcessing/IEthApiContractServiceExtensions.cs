@@ -52,19 +52,19 @@ namespace Nethereum.Contracts
         #region with topic specific criteria
         public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
             (this IEthApiContractService ethApiContractService,
-            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            Action<FilterInputBuilder<TEventDto>> configureFilterBuilder)
             where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder);
 
         public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
             (this IEthApiContractService ethApiContractService,
             string contractAddress,
-            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            Action<FilterInputBuilder<TEventDto>> configureFilterBuilder)
             where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder, contractAddress);
 
         public static ILogsProcessorBuilder<TEventDto> LogsProcessor<TEventDto>
             (this IEthApiContractService ethApiContractService,
             string[] contractAddresses,
-            Action<NewFilterInputBuilder<TEventDto>> configureFilterBuilder)
+            Action<FilterInputBuilder<TEventDto>> configureFilterBuilder)
             where TEventDto : class, IEventDTO, new() => new LogsProcessorBuilder<TEventDto>(ethApiContractService, configureFilterBuilder, contractAddresses);
 
         #endregion

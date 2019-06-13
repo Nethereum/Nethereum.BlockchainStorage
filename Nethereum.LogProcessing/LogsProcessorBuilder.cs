@@ -7,6 +7,7 @@ using Nethereum.Contracts.Services;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.LogProcessing
@@ -79,7 +80,7 @@ namespace Nethereum.LogProcessing
         /// <summary>
         /// The earliest block to start at - important when there has been no prior processing
         /// </summary>
-        public ulong? MinimumBlockNumber { get; set; }
+        public BigInteger? MinimumBlockNumber { get; set; }
 
         /// <summary>
         /// eEnsure that new blocks aren't processed until the miniumum number of confirmations have been exceeded
@@ -104,7 +105,7 @@ namespace Nethereum.LogProcessing
             return this;
         }
 
-        public ILogsProcessorBuilder SetMinimumBlockNumber(ulong minimumBlockNumber)
+        public ILogsProcessorBuilder SetMinimumBlockNumber(BigInteger minimumBlockNumber)
         {
             MinimumBlockNumber = minimumBlockNumber;
             return this;
@@ -232,16 +233,16 @@ namespace Nethereum.LogProcessing
         /// <returns></returns>
         public ILogsProcessorBuilder Filter<TEventDto>() where TEventDto : class, IEventDTO, new()
         {
-            var filter = new NewFilterInputBuilder<TEventDto>().Build(ContractAddresses);
+            var filter = new FilterInputBuilder<TEventDto>().Build(ContractAddresses);
 
             AddOrReplaceContractAddressFilter(filter);
 
             return Filter(filter);
         }
 
-        public ILogsProcessorBuilder Filter<TEventDto>(Action<NewFilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new()
+        public ILogsProcessorBuilder Filter<TEventDto>(Action<FilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new()
         {
-            var filterBuilder = new NewFilterInputBuilder<TEventDto>();
+            var filterBuilder = new FilterInputBuilder<TEventDto>();
             configureFilter(filterBuilder);
             var filter = filterBuilder.Build(ContractAddresses);
             AddOrReplaceContractAddressFilter(filter);
@@ -286,7 +287,7 @@ namespace Nethereum.LogProcessing
             if (Processors == null || Processors.Count == 0) throw new ArgumentNullException(nameof(Processors));
             if (Eth == null) throw new ArgumentNullException(nameof(Eth));
 
-            ulong? lastBlockProcessed = MinimumBlockNumber == null || MinimumBlockNumber == 0 ? null : MinimumBlockNumber - 1;
+            BigInteger? lastBlockProcessed = MinimumBlockNumber == null || MinimumBlockNumber == 0 ? null : MinimumBlockNumber - 1;
 
             BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(lastBlockProcessed);
             var progressService = new BlockProgressService(Eth.Blocks, MinimumBlockNumber, BlockProgressRepository, MinimumBlockConfirmations);

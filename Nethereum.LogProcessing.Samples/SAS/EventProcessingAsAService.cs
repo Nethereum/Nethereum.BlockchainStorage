@@ -7,6 +7,7 @@ using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.AzureTables.Factories;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Configuration;
+using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.LogProcessing;
 using System;

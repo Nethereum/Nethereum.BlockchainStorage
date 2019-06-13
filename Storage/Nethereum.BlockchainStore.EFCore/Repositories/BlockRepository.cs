@@ -3,6 +3,7 @@ using Nethereum.BlockchainStore.Entities;
 using Nethereum.BlockchainStore.Entities.Mapping;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
+using System.Numerics;
 using System.Threading.Tasks;
 using Block = Nethereum.BlockchainStore.Entities.Block;
 
@@ -22,12 +23,12 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             }
         }
 
-        public async Task<ulong?> GetMaxBlockNumberAsync()
+        public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
             using (var context = _contextFactory.CreateContext())
             {
                 var max = await context.Blocks.MaxAsync(b => b.BlockNumber).ConfigureAwait(false);
-                return string.IsNullOrEmpty(max) ? (ulong?)null : ulong.Parse(max);
+                return string.IsNullOrEmpty(max) ? (BigInteger?)null : BigInteger.Parse(max);
             }
         }
 

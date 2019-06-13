@@ -7,6 +7,7 @@ using Nethereum.Contracts.Services;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.LogProcessing
@@ -21,7 +22,7 @@ namespace Nethereum.LogProcessing
         Action<Exception> FatalErrorCallback { get; set; }
         List<NewFilterInput> Filters { get; }
         uint? MinimumBlockConfirmations { get; set; }
-        ulong? MinimumBlockNumber { get; set; }
+        BigInteger? MinimumBlockNumber { get; set; }
         List<ILogProcessor> Processors { get; }
 
         ILogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack);
@@ -41,7 +42,7 @@ namespace Nethereum.LogProcessing
         ILogsProcessor Build();
         ILogsProcessorBuilder Filter(NewFilterInput filter);
         ILogsProcessorBuilder Filter<TEventDto>() where TEventDto : class, IEventDTO, new();
-        ILogsProcessorBuilder Filter<TEventDto>(Action<NewFilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new();
+        ILogsProcessorBuilder Filter<TEventDto>(Action<FilterInputBuilder<TEventDto>> configureFilter) where TEventDto : class, IEventDTO, new();
 
         ILogsProcessorBuilder OnBatchProcessed(Action batchProcessedCallback);
         ILogsProcessorBuilder OnBatchProcessed(Action<LogBatchProcessedArgs> batchProcessedCallback);
@@ -51,7 +52,7 @@ namespace Nethereum.LogProcessing
         ILogsProcessorBuilder SetBlockProgressRepository(IBlockProgressRepository blockProgressRepository);
         ILogsProcessorBuilder SetBlocksPerBatch(uint blocksPerBatch);
         ILogsProcessorBuilder SetMinimumBlockConfirmations(uint minBlockConfirmations);
-        ILogsProcessorBuilder SetMinimumBlockNumber(ulong minimumBlockNumber);
+        ILogsProcessorBuilder SetMinimumBlockNumber(BigInteger minimumBlockNumber);
         ILogsProcessorBuilder UseBlockProgressRepository(IBlockProgressRepository repo);
         ILogsProcessorBuilder UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false);
     }

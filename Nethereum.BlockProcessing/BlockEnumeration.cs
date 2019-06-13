@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -8,32 +9,32 @@ namespace Nethereum.BlockchainProcessing.Processing
 {
     public class BlockEnumeration
     {
-        private readonly Func<ulong, Task> _processBlock;
+        private readonly Func<BigInteger, Task> _processBlock;
         private readonly Func<uint, Task> _waitForBlockAvailability;
         private readonly Func<uint, Task> _pauseFollowingAnError;
-        private readonly Func<Task<ulong>> _getMaxBlockNumber;
+        private readonly Func<Task<BigInteger>> _getMaxBlockNumber;
         private readonly uint _minimumBlockConfirmations;
-        private readonly ulong _endBlock;
+        private readonly BigInteger _endBlock;
         private readonly CancellationToken _cancellationToken;
         private readonly uint _maxRetries;
         private readonly bool _runContinuously;
-        private ulong? _maxBlockNumber;
+        private BigInteger? _maxBlockNumber;
 
-        private ulong _currentBlock;
+        private BigInteger _currentBlock;
         private uint _retryNumber;
 
         private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockEnumeration>();
 
         public BlockEnumeration(
-            Func<ulong, Task> processBlock,
+            Func<BigInteger, Task> processBlock,
             Func<uint, Task> waitForBlockAvailability,
             Func<uint, Task> pauseFollowingAnError,
-            Func<Task<ulong>> getMaxBlockNumber,
+            Func<Task<BigInteger>> getMaxBlockNumber,
             uint minimumBlockConfirmations,
             uint maxRetries,
             CancellationToken cancellationToken,
-            ulong startBlock,
-            ulong? endBlock = null
+            BigInteger startBlock,
+            BigInteger? endBlock = null
             )
         {
             _processBlock = processBlock;
@@ -44,7 +45,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             _maxRetries = maxRetries;
             _currentBlock = startBlock;
             _runContinuously = endBlock == null;
-            _endBlock = endBlock ?? long.MaxValue;
+            _endBlock = endBlock ?? ulong.MaxValue;
             _cancellationToken = cancellationToken;
         }
 

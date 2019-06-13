@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace Nethereum.BlockchainStore.Search
     {
         protected readonly List<ILogProcessor> LogProcessors;
         protected readonly List<IIndexer> _indexers;
-        protected readonly Func<ulong, ulong?, IBlockProgressService> BlockProgressServiceCallBack;
+        protected readonly Func<BigInteger, BigInteger?, IBlockProgressService> BlockProgressServiceCallBack;
         protected readonly IEnumerable<NewFilterInput> Filters;
         protected readonly IEventFunctionProcessor FunctionProcessor;
 
@@ -26,7 +27,7 @@ namespace Nethereum.BlockchainStore.Search
             IWeb3 web3, 
             ISearchService searchService, 
             IEventFunctionProcessor functionProcessor,
-            Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
+            Func<BigInteger, BigInteger?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2,
             IEnumerable<NewFilterInput> filters = null,
             uint minimumBlockConfirmations = 0)
@@ -69,7 +70,7 @@ namespace Nethereum.BlockchainStore.Search
             return CreateProcessor(functionHandlers, indexer);
         }
 
-        public virtual async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<LogBatchProcessedArgs> logBatchProcessedCallback = null)
+        public virtual async Task<BigInteger> ProcessAsync(BigInteger from, BigInteger? to = null, CancellationTokenSource ctx = null, Action<LogBatchProcessedArgs> logBatchProcessedCallback = null)
         {
             if(!LogProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
 
@@ -92,10 +93,10 @@ namespace Nethereum.BlockchainStore.Search
             
         }
 
-        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<LogBatchProcessedArgs> logBatchProcessedCallBack, LogsProcessor batchProcessorService)
+        private static async Task<BigInteger> ProcessRange(CancellationTokenSource ctx, Action<LogBatchProcessedArgs> logBatchProcessedCallBack, LogsProcessor batchProcessorService)
         {
             uint blockRangesProcessed = 0;
-            ulong blocksProcessed = 0;
+            BigInteger blocksProcessed = 0;
 
             BlockRange? lastBlockRangeProcessed;
             do
@@ -115,7 +116,7 @@ namespace Nethereum.BlockchainStore.Search
         }
 
 
-        protected virtual IBlockProgressService CreateProgressService(ulong from, ulong? to)
+        protected virtual IBlockProgressService CreateProgressService(BigInteger from, BigInteger? to)
         {
             if (BlockProgressServiceCallBack != null) return BlockProgressServiceCallBack.Invoke(from, to);
 

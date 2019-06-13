@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Numerics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -9,7 +10,7 @@ namespace Nethereum.BlockchainProcessing.Processing
     {
         public class BlockProcessingProgress
         {
-            public ulong? To { get; set; }
+            public BigInteger? To { get; set; }
         }
 
         private BlockProcessingProgress _progress;
@@ -26,12 +27,12 @@ namespace Nethereum.BlockchainProcessing.Processing
             Initialise();
         }
 
-        public Task<ulong?> GetLastBlockNumberProcessedAsync()
+        public Task<BigInteger?> GetLastBlockNumberProcessedAsync()
         {
             return Task.FromResult(_progress.To);
         }
 
-        public async Task UpsertProgressAsync(ulong blockNumber)
+        public async Task UpsertProgressAsync(BigInteger blockNumber)
         {
             _progress.To = blockNumber;
             await PersistAsync();

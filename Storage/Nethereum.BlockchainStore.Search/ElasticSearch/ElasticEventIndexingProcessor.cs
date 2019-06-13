@@ -6,6 +6,7 @@ using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.ElasticSearch
@@ -34,7 +35,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             IWeb3 web3, 
             IElasticSearchService searchService, 
             IEventFunctionProcessor functionProcessor, 
-            Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
+            Func<BigInteger, BigInteger?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2, 
             IEnumerable<NewFilterInput> filters = null, 
             uint minimumBlockConfirmations = 0) : 

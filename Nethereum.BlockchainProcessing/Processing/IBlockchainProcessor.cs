@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using Nethereum.Contracts;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing

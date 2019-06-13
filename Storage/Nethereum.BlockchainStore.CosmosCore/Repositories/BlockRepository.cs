@@ -7,6 +7,7 @@ using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
@@ -34,7 +35,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task<ulong?> GetMaxBlockNumberAsync()
+        public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
             var countQuery = await Client.CreateDocumentQuery<CosmosBlock>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName)).CountAsync();
@@ -44,7 +45,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 
             var sqlQuery = "SELECT VALUE MAX(b.BlockNumber) FROM Blocks b";
 
-            var query = Client.CreateDocumentQuery<ulong>(
+            var query = Client.CreateDocumentQuery<BigInteger>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName),
                 sqlQuery).AsDocumentQuery();
 

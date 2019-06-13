@@ -9,6 +9,7 @@ using Nethereum.Configuration;
 using Nethereum.RPC.Eth.Filters;
 using Nethereum.Web3;
 using Nethereum.JsonRpc.Client;
+using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {

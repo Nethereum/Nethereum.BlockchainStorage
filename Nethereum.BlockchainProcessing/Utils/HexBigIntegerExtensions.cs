@@ -1,4 +1,5 @@
 ﻿using Nethereum.Hex.HexTypes;
+using System.Numerics;
 
 namespace System
 {
@@ -10,6 +11,11 @@ namespace System
         }
 
         public static HexBigInteger ToHexBigInteger(this int val)
+        {
+            return new HexBigInteger(val);
+        }
+
+        public static HexBigInteger ToHexBigInteger(this BigInteger val)
         {
             return new HexBigInteger(val);
         }

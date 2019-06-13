@@ -10,6 +10,7 @@ using Nethereum.RPC.Eth.Services;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Contracts.Services;
 using Nethereum.Web3;
+using System.Numerics;
 
 namespace Nethereum.BlockchainProcessing.Processors
 {
@@ -21,7 +22,7 @@ namespace Nethereum.BlockchainProcessing.Processors
         protected ITransactionProcessor TransactionProcessor { get; }
 
         private readonly UniqueTransactionHashList _processedTransactions = new UniqueTransactionHashList();
-        private ulong _lastBlock;
+        private BigInteger _lastBlock;
         private readonly object _sync = new object();
 
         public BlockProcessor(
@@ -39,7 +40,7 @@ namespace Nethereum.BlockchainProcessing.Processors
 
         public bool ProcessTransactionsInParallel { get; set; } = true;
 
-        public virtual async Task ProcessBlockAsync(ulong blockNumber)
+        public virtual async Task ProcessBlockAsync(BigInteger blockNumber)
         {
             if (_lastBlock != blockNumber)
             {
@@ -66,10 +67,10 @@ namespace Nethereum.BlockchainProcessing.Processors
             }
         }
 
-        public virtual async Task<ulong> GetMaxBlockNumberAsync()
+        public virtual async Task<BigInteger> GetMaxBlockNumberAsync()
         {
             var blockNumber = await BlockProxy.Blocks.GetBlockNumber.SendRequestAsync().ConfigureAwait(false);
-            return blockNumber.ToUlong();
+            return blockNumber.Value;
         }
 
         protected virtual void ClearCacheOfProcessedTransactions()
