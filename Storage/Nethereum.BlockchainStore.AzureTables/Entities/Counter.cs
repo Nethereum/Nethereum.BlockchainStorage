@@ -16,6 +16,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             set => PartitionKey = value.ToPartitionKey();
         }
 
-        public BigInteger? Value { get; set; }
+        public string Value { get; set; }
     }
 }
