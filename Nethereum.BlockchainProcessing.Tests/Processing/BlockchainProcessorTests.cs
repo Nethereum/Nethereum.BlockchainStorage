@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.JsonRpc.Client;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -124,7 +125,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
 
                     MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(0))
-                        .Callback<ulong>((blkNum) => timesThrown++)
+                        .Callback<BigInteger>((blkNum) => timesThrown++)
                         .Throws(blockProcessingException);
 
                     for (uint retryNum = 0; retryNum < MaxRetries; retryNum++)
@@ -157,7 +158,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing
 
                     MockProcessingStrategy
                         .Setup(p => p.ProcessBlockAsync(1))
-                        .Callback<ulong>(blkNum => cancellationTokenSource.Cancel())
+                        .Callback<BigInteger>(blkNum => cancellationTokenSource.Cancel())
                         .Returns(Task.CompletedTask)
                         .Verifiable("ProcessBlockAsync should have been called for Block 1");
 

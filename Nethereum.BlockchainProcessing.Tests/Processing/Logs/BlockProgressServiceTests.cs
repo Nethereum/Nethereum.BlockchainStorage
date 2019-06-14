@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
@@ -30,11 +31,12 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 Service = new BlockProgressService(Web3Mock.Web3, null, ProgressRepo.Object, minimumBlockConfirmations: 6);
 
                 Web3Mock.BlockNumberMock.Setup(r => r.SendRequestAsync(null)).ReturnsAsync(20.ToHexBigInteger());
-                ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong?)null);
+                ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((BigInteger?)null);
 
                 var range = await Service.GetNextBlockRangeToProcessAsync(100);
 
-                Assert.Equal(new BlockRange(14, 14), range);
+                var expectedBlockRange = new BlockRange(14, 14);
+                Assert.Equal(expectedBlockRange, range.Value);
             }
 
 
@@ -46,18 +48,20 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 var range = await Service.GetNextBlockRangeToProcessAsync(100);
 
-                Assert.Equal(new BlockRange(10, 20), range);
+                var expectedBlockRange = new BlockRange(10, 20);
+                Assert.Equal(expectedBlockRange, range.Value);
             }
 
             [Fact]
             public async Task Returns_Next_Unprocessed_Block()
             {
                 Web3Mock.BlockNumberMock.Setup(r => r.SendRequestAsync(null)).ReturnsAsync(50.ToHexBigInteger());
-                ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((ulong) 5);
+                ProgressRepo.Setup(r => r.GetLastBlockNumberProcessedAsync()).ReturnsAsync((BigInteger) 5);
 
                 var range = await Service.GetNextBlockRangeToProcessAsync(100);
 
-                Assert.Equal(new BlockRange(6, 50), range);
+                var expectedBlockRange = new BlockRange(6, 50);
+                Assert.Equal(expectedBlockRange, range.Value);
             }
 
             /// <summary>

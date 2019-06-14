@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Nethereum.Geth" Version="3.2.0-CI-20190613-142714" />
-    <PackageReference Include="Nethereum.Web3" Version="3.2.0-CI-20190613-142714" />
+    <PackageReference Include="Nethereum.Web3" Version="3.2.0-CI-20190613-203709" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
   </ItemGroup>
   

@@ -60,7 +60,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 var processedRange = await Service.ProcessOnceAsync();
 
-                Assert.Equal(range, processedRange);
+                Assert.Equal(range, processedRange.Value);
 
                 MockProcessor.Verify();
                 MockProgressService.Verify();
@@ -100,7 +100,8 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
 
                 var processedRange = await Service.ProcessOnceAsync();
 
-                Assert.Equal(smallerRange, processedRange);
+                Assert.Equal(smallerRange, processedRange.Value);
+
                 Assert.Equal((ulong)5, Service.MaxNumberOfBlocksPerBatch);
 
                 MockProcessor.Verify();
@@ -201,7 +202,7 @@ namespace Nethereum.BlockchainProcessing.Tests.Processing.Logs
                 var blocksProcessed = await Service.ProcessContinuallyAsync(
                     cancellationSource.Token, shortCircuit);
 
-                Assert.Equal((ulong)20, blocksProcessed);
+                Assert.Equal(20, blocksProcessed);
                 Assert.Equal(3, waits.Count);
                 //wait strategy is sent an attempt count so it can adjust wait time accordingly 
                 Assert.True(waits.SequenceEqual(new uint[]{1,2,3}));
