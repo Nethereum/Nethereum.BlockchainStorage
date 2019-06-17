@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class BlockRangeLogsProcessor : IBlockchainProcessor
     {
-        private readonly BlockRangeLogsProcessorLogger _logger;
+        private readonly BlockRangeLogsProcessorInstrumentation _logger;
 
         public uint MaxRetries { get; set; } = 3;
 
@@ -71,7 +71,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 _filters.Add(new NewFilterInput());
             }
 
-            _logger = new BlockRangeLogsProcessorLogger(log);
+            _logger = new BlockRangeLogsProcessorInstrumentation(log);
         }
 
         public Task ProcessAsync(BlockRange range)

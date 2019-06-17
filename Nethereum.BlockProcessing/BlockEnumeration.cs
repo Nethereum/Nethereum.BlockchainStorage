@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         private BigInteger _currentBlock;
         private uint _retryNumber;
 
-        private readonly BlockEnumerationLogger _log;
+        private readonly BlockEnumerationInstrumentation _log;
 
         public BlockEnumeration(
             Func<BigInteger, Task> processBlock,
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             _endBlock = endBlock ?? ulong.MaxValue;
             _cancellationToken = cancellationToken;
 
-            _log = new BlockEnumerationLogger(log);
+            _log = new BlockEnumerationInstrumentation(log);
         }
 
         public async Task<bool> ExecuteAsync()

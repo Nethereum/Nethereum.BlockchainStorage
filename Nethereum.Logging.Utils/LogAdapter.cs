@@ -6,12 +6,15 @@ using mel = Microsoft.Extensions.Logging;
 
 namespace Nethereum.Logging
 {
-    public class CommonLoggingAdapter : ILog
+    /// <summary>
+    /// Transates from Microsoft.Extensions.Logging.ILogger to Common.Logging.ILog
+    /// </summary>
+    public class LogAdapter : ILog
     {
         readonly mel.ILogger _logger;
         readonly ILogPreformatter _preformatter;
 
-        public CommonLoggingAdapter(ILogger logger, ILogPreformatter preformatter = null)
+        public LogAdapter(ILogger logger, ILogPreformatter preformatter = null)
         {
             _preformatter = preformatter ?? new LogPreformatter();
             _logger = logger;
@@ -503,19 +506,10 @@ namespace Nethereum.Logging
             WriteCallback(mel.LogLevel.Critical, formatProvider, formatMessageCallback, exception);
         }
 
-        /// <summary>
-        /// Returns the global context for variables
-        /// </summary>
         public virtual IVariablesContext GlobalVariablesContext => LogVariablesContext.GlobalVariablesContext;
 
-        /// <summary>
-        /// Returns the thread-specific context for variables
-        /// </summary>
         public virtual IVariablesContext ThreadVariablesContext => LogVariablesContext.ThreadLocal.Value;
 
-        /// <summary>
-        /// Returns the thread-specific context for nested variables (for NDC, eg.)
-        /// </summary>
         public INestedVariablesContext NestedThreadVariablesContext { get; } = new NestedVariablesContext();
 
         protected void Write(mel.LogLevel level, object message)
@@ -525,8 +519,8 @@ namespace Nethereum.Logging
 
         protected void Write(mel.LogLevel level, Exception exception, object message)
         {
-            if (message is string)
-                _logger.Log(level, exception, "{Message:l}", message.ToString());
+            if (message is string msg)
+                _logger.Log(level, exception, "{Message:l}", msg);
             else
                 _logger.Log(level, exception, "{@Message}", message);
         }

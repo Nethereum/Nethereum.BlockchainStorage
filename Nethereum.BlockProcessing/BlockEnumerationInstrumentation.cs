@@ -5,9 +5,9 @@ using Nethereum.BlockchainProcessing.Common.Utils;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class BlockEnumerationLogger : BaseLogger
+    public class BlockEnumerationInstrumentation : InstrumentationBase
     {
-        public BlockEnumerationLogger(ILog logger) : base(logger)
+        public BlockEnumerationInstrumentation(ILog logger) : base(logger)
         {
         }
 

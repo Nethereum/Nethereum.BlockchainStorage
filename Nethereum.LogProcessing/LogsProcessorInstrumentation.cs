@@ -6,9 +6,9 @@ using Nethereum.BlockchainProcessing.Common.Utils;
 
 namespace Nethereum.LogProcessing
 {
-    public class LogsProcessorLogger: BaseLogger
+    public class LogsProcessorInstrumentation: InstrumentationBase
     {
-        public LogsProcessorLogger(ILog logger):base(logger)
+        public LogsProcessorInstrumentation(ILog logger):base(logger)
         {
         }
 

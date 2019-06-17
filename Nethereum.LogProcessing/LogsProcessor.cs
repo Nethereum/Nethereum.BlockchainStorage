@@ -15,7 +15,7 @@ namespace Nethereum.LogProcessing
         private readonly IBlockchainProcessor _processor;
         private readonly IBlockProgressService _progressService;
         private static readonly uint DefaultMaxNumberOfBlocksPerBatch = 100;
-        private readonly LogsProcessorLogger _log;
+        private readonly LogsProcessorInstrumentation _log;
 
         public IWaitStrategy WaitForBlockStrategy { get; set; } = new WaitStrategy();
 
@@ -39,7 +39,7 @@ namespace Nethereum.LogProcessing
         {
             _processor = processor;
             _progressService = progressService;
-            _log = new LogsProcessorLogger(log);
+            _log = new LogsProcessorInstrumentation(log);
 
             MaxNumberOfBlocksPerBatch = maxNumberOfBlocksPerBatch ?? DefaultMaxNumberOfBlocksPerBatch;
             BatchProcessedCallback = rangesProcessedCallback;

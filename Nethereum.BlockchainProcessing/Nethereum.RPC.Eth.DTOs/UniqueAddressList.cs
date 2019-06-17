@@ -8,9 +8,6 @@ namespace Nethereum.BlockchainProcessing.Nethereum.RPC.Eth.DTOs
     /// </summary>
     public class UniqueAddressList: HashSet<string>
     {
-        public UniqueAddressList():base(StringComparer.OrdinalIgnoreCase)
-        {
-                
-        }
+        public UniqueAddressList():base(StringComparer.OrdinalIgnoreCase){ }
     }
 }

@@ -4,9 +4,9 @@ using System.Numerics;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
-    public class BlockchainProcessorLogger : BaseLogger
+    public class BlockchainProcessorInstrumentation : InstrumentationBase
     {
-        public BlockchainProcessorLogger(ILog logger) : base(logger)
+        public BlockchainProcessorInstrumentation(ILog logger) : base(logger)
         {
         }
 

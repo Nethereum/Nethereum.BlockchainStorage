@@ -6,44 +6,16 @@ namespace Nethereum.Configuration
 {
     public static class ConfigurationUtils
     {
-        public static Exception CreateKeyNotFoundException(string key)
-        {
-            return new InvalidOperationException($"Value for configuration key '{key}' is empty - ensure it is set in appsettings.json OR appsettings.{{environment}}.json OR environment variables OR command line args OR user secrets");
-        }
-
-        private const string AspnetcoreEnvironment = "ASPNETCORE_ENVIRONMENT";
-
-        static string RecurseUntilFound(string directory, string fileToFind)
-        {
-            if (Directory.GetFiles(directory, fileToFind).Length > 0)
-            {
-                return directory;
-            }
-
-            var parent = Directory.GetParent(directory);
-            if (parent == null)
-                return null;
-
-            return RecurseUntilFound(parent.FullName, fileToFind);
-        }
-
-        static string FindAppSettingsDirectory(string appSettingsFileName)
-        {
-            var assemblyFilePath = Directory.GetCurrentDirectory();
-            var startingDirectory = Path.GetDirectoryName(assemblyFilePath);
-            return RecurseUntilFound(startingDirectory, appSettingsFileName);
-        }
-
-        private const string DEVELOPMENT = "development";
-
+        private const string DEVELOPMENT_ENVIRONMENT = "development";
+        private const string ASPNETCORE_ENVIRONMENT_KEY = "ASPNETCORE_ENVIRONMENT";
         public static void SetAsDevelopmentEnvironment()
         {
-            SetEnvironment(DEVELOPMENT);
+            SetEnvironment(DEVELOPMENT_ENVIRONMENT);
         }
 
         public static void SetEnvironment(string environment)
         {
-            Environment.SetEnvironmentVariable(AspnetcoreEnvironment, environment);
+            Environment.SetEnvironmentVariable(ASPNETCORE_ENVIRONMENT_KEY, environment);
         }
 
         public static IConfigurationRoot Build(string appSettingsFileName = "appsettings.json")
@@ -72,7 +44,7 @@ namespace Nethereum.Configuration
                 .AddCommandLine(args ?? new string[] { })
                 .Build();
 
-            var environment = environmentBuilder[AspnetcoreEnvironment] ?? string.Empty;
+            var environment = environmentBuilder[ASPNETCORE_ENVIRONMENT_KEY] ?? string.Empty;
 
             var baseJsonFile = "appsettings.json";
             var environmentJsonFile = $"appsettings.{environment}.json";
@@ -101,5 +73,34 @@ namespace Nethereum.Configuration
 
             return val;
         }
+
+        public static Exception CreateKeyNotFoundException(string key)
+        {
+            return new InvalidOperationException($"Value for configuration key '{key}' is empty - ensure it is set in appsettings.json OR appsettings.{{environment}}.json OR environment variables OR command line args OR user secrets");
+        }
+
+
+        private static string RecurseUntilFound(string directory, string fileToFind)
+        {
+            if (Directory.GetFiles(directory, fileToFind).Length > 0)
+            {
+                return directory;
+            }
+
+            var parent = Directory.GetParent(directory);
+            if (parent == null)
+                return null;
+
+            return RecurseUntilFound(parent.FullName, fileToFind);
+        }
+
+        private static string FindAppSettingsDirectory(string appSettingsFileName)
+        {
+            var assemblyFilePath = Directory.GetCurrentDirectory();
+            var startingDirectory = Path.GetDirectoryName(assemblyFilePath);
+            return RecurseUntilFound(startingDirectory, appSettingsFileName);
+        }
+
+
     }
 }

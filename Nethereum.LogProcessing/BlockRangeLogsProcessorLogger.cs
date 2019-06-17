@@ -1,18 +1,17 @@
-﻿using Nethereum.BlockchainProcessing.Common.Utils;
-using Common.Logging;
+﻿using Common.Logging;
+using Nethereum.BlockchainProcessing.Common.Utils;
 using Nethereum.Contracts;
-using System;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
-    public class BlockRangeLogsProcessorLogger : BaseLogger
+    public class BlockRangeLogsProcessorInstrumentation : InstrumentationBase
     {
-        public BlockRangeLogsProcessorLogger(ILog logger) : base(logger)
+        public BlockRangeLogsProcessorInstrumentation(ILog logger) : base(logger)
         {
         }
 

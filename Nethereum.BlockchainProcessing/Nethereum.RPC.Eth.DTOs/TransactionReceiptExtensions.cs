@@ -4,6 +4,8 @@ namespace Nethereum.RPC.Eth.DTOs
 {
     public static class TransactionReceiptExtensions
     {
+        private const bool TREAT_NULL_STATUS_AS_FAILURE = false;
+
         public static bool IsContractAddressEmptyOrEqual(this TransactionReceipt receipt, string contractAddress)
         {
             return receipt.ContractAddress.IsEmptyOrEqualsAddress(contractAddress);
@@ -14,14 +16,14 @@ namespace Nethereum.RPC.Eth.DTOs
             return receipt.ContractAddress.EqualsAddress(address);
         }
 
-        public static bool Succeeded(this TransactionReceipt receipt)
+        public static bool Succeeded(this TransactionReceipt receipt, bool treatNullStatusAsFailure = TREAT_NULL_STATUS_AS_FAILURE)
         {
-            return receipt.Status.Value == BigInteger.One;
+            return !receipt.Failed(treatNullStatusAsFailure);
         }
 
-        public static bool Failed(this TransactionReceipt receipt)
+        public static bool Failed(this TransactionReceipt receipt, bool treatNullStatusAsFailure = TREAT_NULL_STATUS_AS_FAILURE)
         {
-            return !receipt.Succeeded();
+            return receipt.HasErrors() ?? treatNullStatusAsFailure;
         }
 
         public static bool HasLogs(this TransactionReceipt receipt)

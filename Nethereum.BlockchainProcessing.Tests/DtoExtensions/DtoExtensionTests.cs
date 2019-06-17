@@ -264,15 +264,31 @@ namespace Nethereum.BlockchainProcessing.Tests.DtoExtensions
         }
 
         [Fact]
-        public void TransactionReceipt_Succeeded_When_Status_Equals_1_Returns_True()
+        public void TransactionReceipt_Succeeded_When_Status_Equals_1()
         {
             Assert.True(new TransactionReceipt{Status = new HexBigInteger(BigInteger.One)}.Succeeded());
         }
 
         [Fact]
-        public void TransactionReceipt_Failed_When_Status_Does_Not_Equal_1_Returns_False()
+        public void TransactionReceipt_Failed_When_Status_Is_Zero()
         {
-            Assert.True(new TransactionReceipt{Status = new HexBigInteger(0)}.Failed());
+            Assert.True(new TransactionReceipt{Status = new HexBigInteger(BigInteger.Zero)}.Failed());
+        }
+
+        [Fact]
+        public void TransactionReceipt_When_Status_Is_Null_Default_Is_To_Assume_Success()
+        {
+            Assert.True(new TransactionReceipt { Status = null }.Succeeded());
+            Assert.False(new TransactionReceipt { Status = null }.Failed());
+        }
+
+        [Fact]
+        public void TransactionReceipt_When_Status_Is_Null_Returns_Treat_As_Null_Flag()
+        {
+            Assert.True(new TransactionReceipt { Status = null }.Succeeded(treatNullStatusAsFailure: false));
+            Assert.False(new TransactionReceipt { Status = null }.Succeeded(treatNullStatusAsFailure: true));
+            Assert.False(new TransactionReceipt { Status = null }.Failed(treatNullStatusAsFailure: false));
+            Assert.True(new TransactionReceipt { Status = null }.Failed(treatNullStatusAsFailure: true));
         }
 
         [Fact]

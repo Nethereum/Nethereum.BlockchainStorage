@@ -10,14 +10,14 @@ namespace Nethereum.BlockchainProcessing.Processing
     public class BlockchainProcessor: IBlockchainProcessor
     {
         private readonly IBlockchainProcessingStrategy _strategy;
-        private readonly BlockchainProcessorLogger _log;
+        private readonly BlockchainProcessorInstrumentation _log;
 
         public BlockchainProcessor(
             IBlockchainProcessingStrategy strategy,
             ILog log = null)
         {
             this._strategy = strategy;
-            _log = new BlockchainProcessorLogger(log);
+            _log = new BlockchainProcessorInstrumentation(log);
         }
 
         /// <summary>
