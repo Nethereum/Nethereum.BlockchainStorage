@@ -510,7 +510,7 @@ namespace Nethereum.Logging
 
         public virtual IVariablesContext ThreadVariablesContext => LogVariablesContext.ThreadLocal.Value;
 
-        public virtual INestedVariablesContext NestedThreadVariablesContext { get; } = new NestedVariablesContext();
+        public virtual INestedVariablesContext NestedThreadVariablesContext => LogVariablesContext.NestedThreadVariablesContext.Value;
 
         protected void Write(ms.LogLevel level, object message)
         {

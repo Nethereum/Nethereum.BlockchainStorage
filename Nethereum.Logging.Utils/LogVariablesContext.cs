@@ -8,5 +8,8 @@ namespace Nethereum.Logging
 
         public static readonly ThreadLocal<ConcurrentVariableContext> ThreadLocal =
             new ThreadLocal<ConcurrentVariableContext>(() => new ConcurrentVariableContext());
+
+        public static readonly ThreadLocal<ConcurrentNestedVariablesContext> NestedThreadVariablesContext =
+            new ThreadLocal<ConcurrentNestedVariablesContext>(() => new ConcurrentNestedVariablesContext());
     }
 }

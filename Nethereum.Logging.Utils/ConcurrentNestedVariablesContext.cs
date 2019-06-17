@@ -4,9 +4,9 @@ using System.Collections.Concurrent;
 
 namespace Nethereum.Logging
 {
-    public class NestedVariablesContext : INestedVariablesContext
+    public class ConcurrentNestedVariablesContext : INestedVariablesContext
     {
-        ConcurrentStack<string> _stack = new ConcurrentStack<string>();
+        private readonly ConcurrentStack<string> _stack = new ConcurrentStack<string>();
 
         public bool HasItems => !_stack.IsEmpty;
 
@@ -24,11 +24,13 @@ namespace Nethereum.Logging
         public IDisposable Push(string text)
         {
             _stack.Push(text);
-            return new Disposable();
+            return Disposable.Dummy;
         }
 
         private class Disposable : IDisposable
         {
+            public readonly static Disposable Dummy = new Disposable();
+            
             public void Dispose() { }
         }
     }
