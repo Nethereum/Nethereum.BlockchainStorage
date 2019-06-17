@@ -5,7 +5,7 @@ namespace Nethereum.Logging
 {
     public static class LogHelpers
     {
-        public static mel.LogLevel ToMicrosoftExtensionsLogging(this cl.LogLevel logLevel)
+        public static mel.LogLevel ToMsLogLevel(this cl.LogLevel logLevel)
         {
 
             switch (logLevel)

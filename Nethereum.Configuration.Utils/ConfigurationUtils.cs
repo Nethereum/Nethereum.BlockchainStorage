@@ -8,7 +8,7 @@ namespace Nethereum.Configuration
     {
         private const string DEVELOPMENT_ENVIRONMENT = "development";
         private const string ASPNETCORE_ENVIRONMENT_KEY = "ASPNETCORE_ENVIRONMENT";
-        public static void SetAsDevelopmentEnvironment()
+        public static void SetEnvironmentAsDevelopment()
         {
             SetEnvironment(DEVELOPMENT_ENVIRONMENT);
         }

@@ -103,7 +103,7 @@ Solidity Contract Excerpt
         {
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
-            ConfigurationUtils.SetAsDevelopmentEnvironment();
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
 
             //use the command line to set your azure search api key
             //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"

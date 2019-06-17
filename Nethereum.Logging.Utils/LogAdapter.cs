@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using cl = Common.Logging;
-using mel = Microsoft.Extensions.Logging;
+using ms = Microsoft.Extensions.Logging;
 
 namespace Nethereum.Logging
 {
@@ -11,8 +11,8 @@ namespace Nethereum.Logging
     /// </summary>
     public class LogAdapter : ILog
     {
-        readonly mel.ILogger _logger;
-        readonly ILogPreformatter _preformatter;
+        private readonly ms.ILogger _logger;
+        private readonly ILogPreformatter _preformatter;
 
         public LogAdapter(ILogger logger, ILogPreformatter preformatter = null)
         {
@@ -20,26 +20,26 @@ namespace Nethereum.Logging
             _logger = logger;
         }
 
-        public bool IsDebugEnabled => _logger.IsEnabled(cl.LogLevel.Debug.ToMicrosoftExtensionsLogging());
+        public bool IsDebugEnabled => _logger.IsEnabled(cl.LogLevel.Debug.ToMsLogLevel());
 
-        public bool IsErrorEnabled => _logger.IsEnabled(cl.LogLevel.Error.ToMicrosoftExtensionsLogging());
+        public bool IsErrorEnabled => _logger.IsEnabled(cl.LogLevel.Error.ToMsLogLevel());
 
-        public bool IsFatalEnabled => _logger.IsEnabled(cl.LogLevel.Fatal.ToMicrosoftExtensionsLogging());
+        public bool IsFatalEnabled => _logger.IsEnabled(cl.LogLevel.Fatal.ToMsLogLevel());
 
-        public bool IsInfoEnabled => _logger.IsEnabled(cl.LogLevel.Info.ToMicrosoftExtensionsLogging());
+        public bool IsInfoEnabled => _logger.IsEnabled(cl.LogLevel.Info.ToMsLogLevel());
 
-        public bool IsTraceEnabled => _logger.IsEnabled(cl.LogLevel.Trace.ToMicrosoftExtensionsLogging());
+        public bool IsTraceEnabled => _logger.IsEnabled(cl.LogLevel.Trace.ToMsLogLevel());
 
-        public bool IsWarnEnabled => _logger.IsEnabled(cl.LogLevel.Warn.ToMicrosoftExtensionsLogging());
+        public bool IsWarnEnabled => _logger.IsEnabled(cl.LogLevel.Warn.ToMsLogLevel());
 
-        public virtual void Trace(object message) => Write(mel.LogLevel.Trace, message);
+        public virtual void Trace(object message) => Write(ms.LogLevel.Trace, message);
 
         public virtual void Trace(object message, Exception exception)
         {
             if (!IsTraceEnabled)
                 return;
 
-            Write(mel.LogLevel.Trace, exception, message);
+            Write(ms.LogLevel.Trace, exception, message);
         }
 
         public virtual void TraceFormat(IFormatProvider formatProvider, string format, params object[] args)
@@ -47,7 +47,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Trace, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Trace, formatProvider, format, args);
         }
 
         public virtual void TraceFormat(IFormatProvider formatProvider, string format, Exception exception, params object[] args)
@@ -55,7 +55,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Trace, exception, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Trace, exception, formatProvider, format, args);
         }
 
         public virtual void TraceFormat(string format, params object[] args)
@@ -63,7 +63,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Trace, format, args);
+            WriteFormat(ms.LogLevel.Trace, format, args);
         }
 
         public virtual void TraceFormat(string format, Exception exception, params object[] args)
@@ -71,7 +71,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Trace, exception, format, args);
+            WriteFormat(ms.LogLevel.Trace, exception, format, args);
         }
 
         public virtual void Trace(Action<FormatMessageHandler> formatMessageCallback)
@@ -79,7 +79,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Trace, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Trace, formatMessageCallback);
         }
 
         public virtual void Trace(Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -87,7 +87,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Trace, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Trace, formatMessageCallback, exception);
         }
 
         public virtual void Trace(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback)
@@ -95,7 +95,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Trace, formatProvider, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Trace, formatProvider, formatMessageCallback);
         }
 
         public virtual void Trace(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -103,7 +103,7 @@ namespace Nethereum.Logging
             if (!IsTraceEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Trace, formatProvider, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Trace, formatProvider, formatMessageCallback, exception);
         }
 
         public virtual void Debug(object message)
@@ -111,7 +111,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            Write(mel.LogLevel.Debug, message);
+            Write(ms.LogLevel.Debug, message);
         }
 
         public virtual void Debug(object message, Exception exception)
@@ -119,7 +119,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            Write(mel.LogLevel.Debug, exception, message);
+            Write(ms.LogLevel.Debug, exception, message);
         }
 
         public virtual void DebugFormat(IFormatProvider formatProvider, string format, params object[] args)
@@ -127,7 +127,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Debug, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Debug, formatProvider, format, args);
         }
 
         public virtual void DebugFormat(IFormatProvider formatProvider, string format, Exception exception, params object[] args)
@@ -135,7 +135,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Debug, exception, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Debug, exception, formatProvider, format, args);
         }
 
         public virtual void DebugFormat(string format, params object[] args)
@@ -143,7 +143,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Debug, format, args);
+            WriteFormat(ms.LogLevel.Debug, format, args);
         }
 
         public virtual void DebugFormat(string format, Exception exception, params object[] args)
@@ -151,7 +151,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Debug, exception, format, args);
+            WriteFormat(ms.LogLevel.Debug, exception, format, args);
         }
 
         public virtual void Debug(Action<FormatMessageHandler> formatMessageCallback)
@@ -159,7 +159,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Debug, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Debug, formatMessageCallback);
         }
 
         public virtual void Debug(Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -167,7 +167,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Debug, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Debug, formatMessageCallback, exception);
         }
 
         public virtual void Debug(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback)
@@ -175,7 +175,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Debug, formatProvider, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Debug, formatProvider, formatMessageCallback);
         }
 
         public virtual void Debug(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -183,7 +183,7 @@ namespace Nethereum.Logging
             if (!IsDebugEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Debug, formatProvider, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Debug, formatProvider, formatMessageCallback, exception);
         }
 
         public virtual void Info(object message)
@@ -191,7 +191,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            Write(mel.LogLevel.Information, message);
+            Write(ms.LogLevel.Information, message);
         }
 
         public virtual void Info(object message, Exception exception)
@@ -199,7 +199,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            Write(mel.LogLevel.Information, exception, message);
+            Write(ms.LogLevel.Information, exception, message);
         }
 
         public virtual void InfoFormat(IFormatProvider formatProvider, string format, params object[] args)
@@ -207,7 +207,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Information, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Information, formatProvider, format, args);
         }
 
         public virtual void InfoFormat(IFormatProvider formatProvider, string format, Exception exception, params object[] args)
@@ -215,7 +215,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Information, exception, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Information, exception, formatProvider, format, args);
         }
 
         public virtual void InfoFormat(string format, params object[] args)
@@ -223,7 +223,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Information, format, args);
+            WriteFormat(ms.LogLevel.Information, format, args);
         }
 
         public virtual void InfoFormat(string format, Exception exception, params object[] args)
@@ -231,7 +231,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Information, exception, format, args);
+            WriteFormat(ms.LogLevel.Information, exception, format, args);
         }
 
         public virtual void Info(Action<FormatMessageHandler> formatMessageCallback)
@@ -239,7 +239,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Information, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Information, formatMessageCallback);
         }
 
         public virtual void Info(Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -247,7 +247,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Information, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Information, formatMessageCallback, exception);
         }
 
         public virtual void Info(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback)
@@ -255,7 +255,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Information, formatProvider, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Information, formatProvider, formatMessageCallback);
         }
 
         public virtual void Info(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -263,7 +263,7 @@ namespace Nethereum.Logging
             if (!IsInfoEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Information, formatProvider, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Information, formatProvider, formatMessageCallback, exception);
         }
 
         public virtual void Warn(object message)
@@ -271,7 +271,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            Write(mel.LogLevel.Warning, message);
+            Write(ms.LogLevel.Warning, message);
         }
 
         public virtual void Warn(object message, Exception exception)
@@ -279,7 +279,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            Write(mel.LogLevel.Warning, exception, message);
+            Write(ms.LogLevel.Warning, exception, message);
         }
 
         public virtual void WarnFormat(IFormatProvider formatProvider, string format, params object[] args)
@@ -287,7 +287,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Warning, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Warning, formatProvider, format, args);
         }
 
         public virtual void WarnFormat(IFormatProvider formatProvider, string format, Exception exception, params object[] args)
@@ -295,7 +295,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Warning, exception, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Warning, exception, formatProvider, format, args);
         }
 
         public virtual void WarnFormat(string format, params object[] args)
@@ -303,7 +303,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Warning, format, args);
+            WriteFormat(ms.LogLevel.Warning, format, args);
         }
 
         public virtual void WarnFormat(string format, Exception exception, params object[] args)
@@ -311,7 +311,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Warning, exception, format, args);
+            WriteFormat(ms.LogLevel.Warning, exception, format, args);
         }
 
         public virtual void Warn(Action<FormatMessageHandler> formatMessageCallback)
@@ -319,7 +319,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Warning, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Warning, formatMessageCallback);
         }
 
         public virtual void Warn(Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -327,7 +327,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Warning, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Warning, formatMessageCallback, exception);
         }
 
         public virtual void Warn(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback)
@@ -335,7 +335,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Warning, formatProvider, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Warning, formatProvider, formatMessageCallback);
         }
 
         public virtual void Warn(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -343,7 +343,7 @@ namespace Nethereum.Logging
             if (!IsWarnEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Warning, formatProvider, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Warning, formatProvider, formatMessageCallback, exception);
         }
 
         public virtual void Error(object message)
@@ -351,7 +351,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            Write(mel.LogLevel.Error, message);
+            Write(ms.LogLevel.Error, message);
         }
 
         public virtual void Error(object message, Exception exception)
@@ -359,7 +359,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            Write(mel.LogLevel.Error, exception, message);
+            Write(ms.LogLevel.Error, exception, message);
         }
 
         public virtual void ErrorFormat(IFormatProvider formatProvider, string format, params object[] args)
@@ -367,7 +367,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Error, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Error, formatProvider, format, args);
         }
 
         public virtual void ErrorFormat(IFormatProvider formatProvider, string format, Exception exception, params object[] args)
@@ -375,7 +375,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Error, exception, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Error, exception, formatProvider, format, args);
         }
 
         public virtual void ErrorFormat(string format, params object[] args)
@@ -383,7 +383,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Error, format, args);
+            WriteFormat(ms.LogLevel.Error, format, args);
         }
 
         public virtual void ErrorFormat(string format, Exception exception, params object[] args)
@@ -391,7 +391,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Error, exception, format, args);
+            WriteFormat(ms.LogLevel.Error, exception, format, args);
         }
 
         public virtual void Error(Action<FormatMessageHandler> formatMessageCallback)
@@ -399,7 +399,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Error, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Error, formatMessageCallback);
         }
 
         public virtual void Error(Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -407,7 +407,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Error, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Error, formatMessageCallback, exception);
         }
 
         public virtual void Error(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback)
@@ -415,7 +415,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Error, formatProvider, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Error, formatProvider, formatMessageCallback);
         }
 
         public virtual void Error(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -423,7 +423,7 @@ namespace Nethereum.Logging
             if (!IsErrorEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Error, formatProvider, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Error, formatProvider, formatMessageCallback, exception);
         }
 
         public virtual void Fatal(object message)
@@ -431,7 +431,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            Write(mel.LogLevel.Critical, message);
+            Write(ms.LogLevel.Critical, message);
         }
 
         public virtual void Fatal(object message, Exception exception)
@@ -439,7 +439,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            Write(mel.LogLevel.Critical, exception, message);
+            Write(ms.LogLevel.Critical, exception, message);
         }
 
         public virtual void FatalFormat(IFormatProvider formatProvider, string format, params object[] args)
@@ -447,7 +447,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Critical, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Critical, formatProvider, format, args);
         }
 
         public virtual void FatalFormat(IFormatProvider formatProvider, string format, Exception exception, params object[] args)
@@ -455,7 +455,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Critical, exception, formatProvider, format, args);
+            WriteFormat(ms.LogLevel.Critical, exception, formatProvider, format, args);
         }
 
         public virtual void FatalFormat(string format, params object[] args)
@@ -463,7 +463,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Critical, format, args);
+            WriteFormat(ms.LogLevel.Critical, format, args);
         }
 
         public virtual void FatalFormat(string format, Exception exception, params object[] args)
@@ -471,7 +471,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteFormat(mel.LogLevel.Critical, exception, format, args);
+            WriteFormat(ms.LogLevel.Critical, exception, format, args);
         }
 
         public virtual void Fatal(Action<FormatMessageHandler> formatMessageCallback)
@@ -479,7 +479,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Critical, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Critical, formatMessageCallback);
         }
 
         public virtual void Fatal(Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -487,7 +487,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Critical, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Critical, formatMessageCallback, exception);
         }
 
         public virtual void Fatal(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback)
@@ -495,7 +495,7 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Critical, formatProvider, formatMessageCallback);
+            WriteCallback(ms.LogLevel.Critical, formatProvider, formatMessageCallback);
         }
 
         public virtual void Fatal(IFormatProvider formatProvider, Action<FormatMessageHandler> formatMessageCallback, Exception exception)
@@ -503,21 +503,21 @@ namespace Nethereum.Logging
             if (!IsFatalEnabled)
                 return;
 
-            WriteCallback(mel.LogLevel.Critical, formatProvider, formatMessageCallback, exception);
+            WriteCallback(ms.LogLevel.Critical, formatProvider, formatMessageCallback, exception);
         }
 
         public virtual IVariablesContext GlobalVariablesContext => LogVariablesContext.GlobalVariablesContext;
 
         public virtual IVariablesContext ThreadVariablesContext => LogVariablesContext.ThreadLocal.Value;
 
-        public INestedVariablesContext NestedThreadVariablesContext { get; } = new NestedVariablesContext();
+        public virtual INestedVariablesContext NestedThreadVariablesContext { get; } = new NestedVariablesContext();
 
-        protected void Write(mel.LogLevel level, object message)
+        protected void Write(ms.LogLevel level, object message)
         {
             Write(level, null, message);
         }
 
-        protected void Write(mel.LogLevel level, Exception exception, object message)
+        protected void Write(ms.LogLevel level, Exception exception, object message)
         {
             if (message is string msg)
                 _logger.Log(level, exception, "{Message:l}", msg);
@@ -525,13 +525,13 @@ namespace Nethereum.Logging
                 _logger.Log(level, exception, "{@Message}", message);
         }
 
-        protected void WriteCallback(mel.LogLevel level, Action<FormatMessageHandler> formatMessageCallback, Exception exception = null)
+        protected void WriteCallback(ms.LogLevel level, Action<FormatMessageHandler> formatMessageCallback, Exception exception = null)
         {
             WriteCallback(level, null, formatMessageCallback, exception);
         }
 
         protected void WriteCallback(
-            mel.LogLevel level,
+            ms.LogLevel level,
             IFormatProvider formatProvider,
             Action<FormatMessageHandler> formatMessageCallback,
             Exception exception = null)
@@ -539,7 +539,7 @@ namespace Nethereum.Logging
             formatMessageCallback(MakeFormatted(level, formatProvider, exception));
         }
 
-        protected FormatMessageHandler MakeFormatted(mel.LogLevel level, IFormatProvider formatProvider, Exception exception)
+        protected FormatMessageHandler MakeFormatted(ms.LogLevel level, IFormatProvider formatProvider, Exception exception)
         {
             var messageHandler = new FormatMessageHandler(
                 delegate (string message, object[] parameters)
@@ -557,22 +557,22 @@ namespace Nethereum.Logging
             return messageHandler;
         }
 
-        protected void WriteFormat(mel.LogLevel level, Exception exception, string message, object[] parameters)
+        protected void WriteFormat(ms.LogLevel level, Exception exception, string message, object[] parameters)
         {
             WriteFormat(level, exception, null, message, parameters);
         }
 
-        protected void WriteFormat(mel.LogLevel level, IFormatProvider formatProvider, string message, object[] parameters)
+        protected void WriteFormat(ms.LogLevel level, IFormatProvider formatProvider, string message, object[] parameters)
         {
             WriteFormat(level, null, formatProvider, message, parameters);
         }
 
-        protected void WriteFormat(mel.LogLevel level, string message, object[] parameters)
+        protected void WriteFormat(ms.LogLevel level, string message, object[] parameters)
         {
             WriteFormat(level, null, null, message, parameters);
         }
 
-        protected void WriteFormat(mel.LogLevel level, Exception exception, IFormatProvider formatProvider, string message, object[] parameters)
+        protected void WriteFormat(ms.LogLevel level, Exception exception, IFormatProvider formatProvider, string message, object[] parameters)
         {
             if (formatProvider == null)
             {

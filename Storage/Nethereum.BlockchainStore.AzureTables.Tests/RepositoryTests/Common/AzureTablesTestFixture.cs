@@ -12,7 +12,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
 
         public AzureTablesFixture()
         {
-            ConfigurationUtils.SetAsDevelopmentEnvironment();
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
             var appConfig = ConfigurationUtils.Build(CommandLineArgs, UserSecretsId);
             var connectionString = appConfig["AzureStorageConnectionString"];
             Factory = new CloudTableSetup(connectionString, "UnitTest");

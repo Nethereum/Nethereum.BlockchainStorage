@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Tests
 
         public CosmosFixture()
         {
-            ConfigurationUtils.SetAsDevelopmentEnvironment();
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
             var appConfig = ConfigurationUtils.Build(CommandLineArgs);
 
             appConfig.SetCosmosEndpointUri(CosmosEmulatorBaseUrl);
