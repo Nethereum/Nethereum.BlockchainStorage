@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Common.Logging;
+using System;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Nethereum.Configuration;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
+
     public class BlockEnumeration
     {
         private readonly Func<BigInteger, Task> _processBlock;
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainProcessing.Processing
         private BigInteger _currentBlock;
         private uint _retryNumber;
 
-        private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockEnumeration>();
+        private readonly BlockEnumerationLogger _log;
 
         public BlockEnumeration(
             Func<BigInteger, Task> processBlock,
@@ -34,7 +34,8 @@ namespace Nethereum.BlockchainProcessing.Processing
             uint maxRetries,
             CancellationToken cancellationToken,
             BigInteger startBlock,
-            BigInteger? endBlock = null
+            BigInteger? endBlock = null,
+            ILog log = null
             )
         {
             _processBlock = processBlock;
@@ -47,6 +48,8 @@ namespace Nethereum.BlockchainProcessing.Processing
             _runContinuously = endBlock == null;
             _endBlock = endBlock ?? ulong.MaxValue;
             _cancellationToken = cancellationToken;
+
+            _log = new BlockEnumerationLogger(log);
         }
 
         public async Task<bool> ExecuteAsync()
@@ -59,7 +62,7 @@ namespace Nethereum.BlockchainProcessing.Processing
 
                     await WaitForBlockConfirmations().ConfigureAwait(false);
 
-                    LogProcessBlockAttempt();
+                    _log.LogProcessBlockAttempt(_currentBlock, _retryNumber);
 
                     await _processBlock(_currentBlock).ConfigureAwait(false);
 
@@ -103,7 +106,7 @@ namespace Nethereum.BlockchainProcessing.Processing
             uint retryNumber = 0;
             while ((_maxBlockNumber - _currentBlock) < _minimumBlockConfirmations)
             {
-                _log.LogInformation($"Waiting for current block ({_currentBlock}) to be more than {_minimumBlockConfirmations} confirmations behind the max block on the chain ({_maxBlockNumber})");
+                _log.WaitingForBlockAvailability(_currentBlock, _minimumBlockConfirmations, _maxBlockNumber, retryNumber);
                 await _waitForBlockAvailability(retryNumber).ConfigureAwait(false);
                 retryNumber++;
                 await RefreshMaxBlockNumber().ConfigureAwait(false);
@@ -117,12 +120,12 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         private void LogBlockSkipped()
         {
-            _log?.LogWarning($"Skipping block {_currentBlock}");
+            _log.LogBlockSkipped(_currentBlock);
         }
 
         private async Task<bool> WaitForNextBlockAndRetry()
         {
-            _log?.LogInformation($"Waiting for block {_currentBlock}...");
+            _log.WaitingForBlock(_currentBlock);
             await _waitForBlockAvailability(_retryNumber).ConfigureAwait(false);
             _retryNumber++;
             return await ExecuteAsync().ConfigureAwait(false);
@@ -130,12 +133,12 @@ namespace Nethereum.BlockchainProcessing.Processing
 
         private void LogError(Exception exception)
         {
-            _log?.LogError($"Block: {_currentBlock}.  {exception.Message}", exception);
+            _log.Error(_currentBlock, exception);
         }
 
         private async Task<bool> PauseAndRetry()
         {
-            _log?.LogInformation($"Pausing before next process Attempt.  Block: {_currentBlock}, Attempt: {_retryNumber}.");
+            _log.PauseBeforeNextProcessingAttempt(_currentBlock, _retryNumber);
             await _pauseFollowingAnError(_retryNumber).ConfigureAwait(false);
             _retryNumber++;
             return await ExecuteAsync().ConfigureAwait(false);
@@ -150,12 +153,9 @@ namespace Nethereum.BlockchainProcessing.Processing
         {
             _retryNumber = 0;
             _currentBlock = _currentBlock + 1;
+            _log.BlockIncremented(_currentBlock);
         }
 
-        private void LogProcessBlockAttempt()
-        {
-            _log?.LogInformation($"Block Process Attempt.  Block: {_currentBlock}, Attempt: {_retryNumber}.");
-        }
     }
 
 }

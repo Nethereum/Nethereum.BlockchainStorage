@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Nethereum.Configuration;
+﻿using Common.Logging;
 using Nethereum.Contracts;
 using System.Numerics;
 using System.Threading;
@@ -7,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Processing
 {
+
     public class BlockchainProcessor: IBlockchainProcessor
     {
         private readonly IBlockchainProcessingStrategy _strategy;
-        private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockchainProcessor>();
+        private readonly BlockchainProcessorLogger _log;
 
         public BlockchainProcessor(
-            IBlockchainProcessingStrategy strategy)
+            IBlockchainProcessingStrategy strategy,
+            ILog log = null)
         {
             this._strategy = strategy;
+            _log = new BlockchainProcessorLogger(log);
         }
 
         /// <summary>
@@ -23,11 +25,11 @@ namespace Nethereum.BlockchainProcessing.Processing
         /// </summary>
         private async Task<BigInteger> GetStartingBlockNumber()
         {
-            _log.LogInformation("Begin GetStartingBlockNumber / _strategy.GetLastBlockProcessedAsync()");
+            _log.GettingLastBlockProcessed();
             var lastBlockProcessed = await _strategy.GetLastBlockProcessedAsync()
                 .ConfigureAwait(false);
 
-            _log.LogInformation($"GetLastBlockProcessedAsync: {lastBlockProcessed}");
+            _log.LastBlockProcessed(lastBlockProcessed);
 
             BigInteger startingBlock = lastBlockProcessed == null ? 0 : lastBlockProcessed.Value + 1;
 
@@ -52,13 +54,16 @@ namespace Nethereum.BlockchainProcessing.Processing
             startBlock = startBlock ?? await GetStartingBlockNumber();
 
             if (endBlock.HasValue && startBlock.Value > endBlock.Value)
+            {
+                _log.StartBlockExceedsEndBlock(startBlock.Value, endBlock.Value);
                 return false;
+            }
 
-            _log.LogInformation("Begin FillContractCacheAsync");
+            _log.BeginFillContractCacheAsync();
             await _strategy.FillContractCacheAsync().ConfigureAwait(false);
 
 
-            _log.LogInformation("Begin BlockEnumeration");
+            _log.BeginningBlockEnumeration();
             return await new BlockEnumeration(
                     (blkNumber) => _strategy.ProcessBlockAsync(blkNumber), 
                     (retryNum) => _strategy.WaitForNextBlock(retryNum),
@@ -68,7 +73,8 @@ namespace Nethereum.BlockchainProcessing.Processing
                     _strategy.MaxRetries,
                     cancellationToken,
                     startBlock.Value, 
-                    endBlock
+                    endBlock,
+                    _log.Logger
                     )
                 .ExecuteAsync().ConfigureAwait(false);
         }

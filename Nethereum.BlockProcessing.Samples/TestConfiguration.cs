@@ -19,7 +19,7 @@ namespace Nethereum.BlockProcessing.Samples
 
         public static IConfigurationRoot LoadConfig()
         {
-            ConfigurationUtils.SetEnvironment("development");
+            ConfigurationUtils.SetAsDevelopmentEnvironment();
 
             //use the command line to set your azure search api key
             //e.g. dotnet user-secrets set "AzureStorageConnectionString" "<put key here>"

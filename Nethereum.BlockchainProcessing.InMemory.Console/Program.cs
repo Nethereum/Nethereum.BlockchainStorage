@@ -1,7 +1,9 @@
-﻿using Nethereum.BlockchainProcessing.Handlers;
+﻿using Microsoft.Extensions.Logging;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
 using Nethereum.Configuration;
+using Nethereum.Logging;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {
@@ -16,11 +18,14 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
             // A random contract on the Rinkeby network was chosen as an example
             // --Blockchain rinkeby --FromBlock   3146650
 
-            System.Console.WriteLine("CLI args: " + string.Join(" ", args));
-            var appConfig = ConfigurationUtils.Build(args).AddConsoleLogging();
+            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+
+            log.Info("CLI args: " + string.Join(" ", args));
+            var appConfig = ConfigurationUtils.Build(args);
+
             var targetBlockchain = BlockchainSourceConfigurationFactory.Get(appConfig);
 
-            System.Console.WriteLine($"Target Node/Name (URL): {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
+            log.Info($"Target Node/Name (URL): {targetBlockchain.Name}, {targetBlockchain.BlockchainUrl}");
             
             //only process transactions that created or called our contract
             var filters = new ContractSpecificFilterBuilder(ContractAddress).Filters;
@@ -56,14 +61,14 @@ namespace Nethereum.BlockchainProcessing.InMemory.Console
                 MinimumBlockConfirmations = 6 //wait for 6 block confirmations before processing block
             };
 
-            var blockchainProcessor = new BlockchainProcessor(strategy);
+            var blockchainProcessor = new BlockchainProcessor(strategy, log: log);
 
             blockchainProcessor.ExecuteAsync
                 (targetBlockchain.FromBlock, targetBlockchain.ToBlock)
                 .GetAwaiter().GetResult();
 
-            System.Console.WriteLine($"Contracts Created: {transactionRouter.ContractsCreated}");
-            System.Console.WriteLine($"Transactions Handled: {transactionRouter.TransactionsHandled}");
+            log.Info($"Contracts Created: {transactionRouter.ContractsCreated}");
+            log.Info($"Transactions Handled: {transactionRouter.TransactionsHandled}");
 
             System.Console.ReadLine();
         }

@@ -13,6 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Nethereum.Configuration.Utils\Nethereum.Configuration.Utils.csproj" />
+    <ProjectReference Include="..\..\Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.SqlServer\Nethereum.BlockchainStore.EFCore.SqlServer.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
   </ItemGroup>

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.MongoDb\Nethereum.BlockchainStore.MongoDb.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+﻿using Common.Logging;
+using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
@@ -99,6 +100,8 @@ namespace Nethereum.LogProcessing
         public List<NewFilterInput> Filters { get; private set; } = new List<NewFilterInput>();
         public IEthApiContractService Eth { get; set; }
 
+        public ILog Log { get; set;}
+
         public ILogsProcessorBuilder Set(Action<ILogsProcessorBuilder> configAction)
         {
             configAction(this);
@@ -126,6 +129,12 @@ namespace Nethereum.LogProcessing
         public ILogsProcessorBuilder SetBlockProgressRepository(IBlockProgressRepository blockProgressRepository)
         {
             BlockProgressRepository = blockProgressRepository;
+            return this;
+        }
+
+        public ILogsProcessorBuilder SetLog(ILog log)
+        {
+            Log = log;
             return this;
         }
 
@@ -291,8 +300,8 @@ namespace Nethereum.LogProcessing
 
             BlockProgressRepository = BlockProgressRepository ?? new InMemoryBlockchainProgressRepository(lastBlockProcessed);
             var progressService = new BlockProgressService(Eth.Blocks, MinimumBlockNumber, BlockProgressRepository, MinimumBlockConfirmations);
-            var processor = new BlockRangeLogsProcessor(Eth.Filters.GetLogs, Processors, Filters?.ToArray());
-            var batchProcessorService = new LogsProcessor(processor, progressService, BlocksPerBatch, BatchProcessedCallback, FatalErrorCallback);
+            var processor = new BlockRangeLogsProcessor(Eth.Filters.GetLogs, Processors, Filters?.ToArray(), Log);
+            var batchProcessorService = new LogsProcessor(processor, progressService, BlocksPerBatch, BatchProcessedCallback, FatalErrorCallback, Log);
 
             batchProcessorService.OnDisposing += disposeHandler;
 

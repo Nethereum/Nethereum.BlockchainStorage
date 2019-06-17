@@ -1,21 +1,20 @@
-﻿using System;
+﻿using Common.Logging;
+using Nethereum.Contracts;
+using Nethereum.JsonRpc.Client;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.RPC.Eth.Filters;
+using Nethereum.Web3;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Nethereum.Configuration;
-using Nethereum.RPC.Eth.Filters;
-using Nethereum.Web3;
-using Nethereum.JsonRpc.Client;
-using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public class BlockRangeLogsProcessor : IBlockchainProcessor
     {
-        private readonly ILogger _log = ApplicationLogging.CreateLogger<BlockRangeLogsProcessor>();
+        private readonly BlockRangeLogsProcessorLogger _logger;
 
         public uint MaxRetries { get; set; } = 3;
 
@@ -27,35 +26,40 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public BlockRangeLogsProcessor(
             IWeb3 web3,
-            IEnumerable<ILogProcessor> logProcessors) : this(web3.Eth.Filters.GetLogs, logProcessors, filter: null)
+            IEnumerable<ILogProcessor> logProcessors,
+            ILog log = null) : this(web3.Eth.Filters.GetLogs, logProcessors, filter: null, log: log)
         {
         }
 
         public BlockRangeLogsProcessor(
             IWeb3 web3,
             IEnumerable<ILogProcessor> logProcessors,
-            NewFilterInput filter) : this(web3.Eth.Filters.GetLogs, logProcessors, filter)
+            NewFilterInput filter,
+            ILog log = null) : this(web3.Eth.Filters.GetLogs, logProcessors, filter, log)
         {
         }
 
         public BlockRangeLogsProcessor(
             IWeb3 web3,
             IEnumerable<ILogProcessor> logProcessors,
-            IEnumerable<NewFilterInput> filters) : this(web3.Eth.Filters.GetLogs, logProcessors, filters)
+            IEnumerable<NewFilterInput> filters,
+            ILog log = null) : this(web3.Eth.Filters.GetLogs, logProcessors, filters, log)
         {
         }
 
         public BlockRangeLogsProcessor(
             IEthGetLogs eventLogProxy, 
             IEnumerable<ILogProcessor> logProcessors, 
-            NewFilterInput filter):this(eventLogProxy, logProcessors, filter == null ? null : new NewFilterInput[]{filter})
+            NewFilterInput filter,
+            ILog log = null) :this(eventLogProxy, logProcessors, filter == null ? null : new NewFilterInput[]{filter}, log)
         {
         }
 
         public BlockRangeLogsProcessor(
             IEthGetLogs eventLogProxy, 
             IEnumerable<ILogProcessor> logProcessors, 
-            IEnumerable<NewFilterInput> filters = null)
+            IEnumerable<NewFilterInput> filters = null,
+            ILog log = null)
         {
             _eventLogProxy = eventLogProxy ?? throw new ArgumentNullException(nameof(eventLogProxy));
             _logProcessors = logProcessors ?? throw new ArgumentNullException(nameof(logProcessors));
@@ -66,6 +70,8 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             {
                 _filters.Add(new NewFilterInput());
             }
+
+            _logger = new BlockRangeLogsProcessorLogger(log);
         }
 
         public Task ProcessAsync(BlockRange range)
@@ -75,42 +81,62 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 
         public async Task ProcessAsync(BlockRange range, CancellationToken cancellationToken)
         {
-            _log.LogInformation($"Beginning ProcessAsync. from: {range.From}, to: {range.To}.");
-            _log.LogInformation("Retrieving logs");
+            _logger.ProcessingRange(range);
+
             var distinctLogs = await RetrieveLogsAsync(range, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (!distinctLogs.Any()) return;
-            if (cancellationToken.IsCancellationRequested) return;
+            if (!distinctLogs.Any())
+            {
+                _logger.NoLogsToProcess(range);
+                return;
+            }
 
-            _log.LogInformation("Allocating logs to processors");
+            if (cancellationToken.IsCancellationRequested) 
+            {
+                _logger.CancellationRequested();
+                return;
+            }
+
             var queues = Allocate(distinctLogs);
 
-            _log.LogInformation("Processing logs");
             await ProcessQueuesAsync(queues, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        private static async Task ProcessQueuesAsync(
+        private async Task ProcessQueuesAsync(
             Dictionary<ILogProcessor, IEnumerable<FilterLog>> processorWorkQueue, 
             CancellationToken cancellationToken)
         {
             foreach (ILogProcessor processor in processorWorkQueue.Keys)
             {
-                if (cancellationToken.IsCancellationRequested) return;
+                if (cancellationToken.IsCancellationRequested) 
+                {
+                    _logger.CancellationRequested();
+                    return; 
+                }
 
                 var logsToProcess = processorWorkQueue[processor].ToArray();
+
+                _logger.ProcessingLogs(processor, logsToProcess);
+
                 await processor.ProcessLogsAsync(logsToProcess).ConfigureAwait(false);
             }
         }
 
         private Dictionary<ILogProcessor, IEnumerable<FilterLog>> Allocate(FilterLog[] logs)
         {
-            return _logProcessors
+            _logger.AllocatingLogs(logs, _logProcessors);
+
+            var queues = _logProcessors
                 .ToDictionary(
                     (processor) => processor, //key
                     (processor) => logs.Where(processor.IsLogForEvent) // matching logs
                 );
+
+            _logger.LogsAllocated(queues);
+
+            return queues;
         }
 
         private async Task<FilterLog[]> RetrieveLogsAsync(
@@ -123,6 +149,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
                 FilterLog[] logsMatchingFilter = await RetrieveLogsAsync(range, filter)
                     .ConfigureAwait(false);
 
+                _logger.MergingLogs(logs, logsMatchingFilter);
                 logs.Merge(logsMatchingFilter);
 
                 if (cancellationToken.IsCancellationRequested) return logs.Values.Sort();
@@ -138,30 +165,30 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             {
                 filter.SetBlockRange(range);
 
-                _log.LogInformation($"RetrieveLogsAsync - getting logs. RetryNumber:{retryNumber}, from:{range.From}, to:{range.To}.");
+                _logger.RetrievingLogs(filter, range, retryNumber);
 
                 return await _eventLogProxy.SendRequestAsync(filter).ConfigureAwait(false);
             }
             catch (RpcResponseException rpcResponseEx) when (rpcResponseEx.TooManyRecords())
             {
+                _logger.TooManyRecords(range, rpcResponseEx);
                 throw rpcResponseEx.TooManyRecordsException();
             }
             catch (Exception ex)
             {
-                _log.LogError("Get Logs Error", ex);
+                _logger.RetrievalError(range, ex);
 
                 retryNumber++;
                 if (retryNumber < MaxRetries)
                 {
-                    _log.LogInformation("Pausing before retry get logs");
+                    _logger.PausingBeforeRetry(range, retryNumber);
                     await RetryWaitStrategy.Apply(retryNumber).ConfigureAwait(false);
 
-                    _log.LogInformation("Retrying get logs");
                     return await RetrieveLogsAsync(range, filter, retryNumber)
                         .ConfigureAwait(false);
                 }
 
-                _log.LogError("MaxRetries exceeded when getting logs, throwing exception.", ex);
+                _logger.MaxRetriesExceededSoThrowing(MaxRetries, ex);
 
                 throw;
             }

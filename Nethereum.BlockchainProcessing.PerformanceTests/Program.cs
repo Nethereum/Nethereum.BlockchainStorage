@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Common.Logging;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Configuration;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Services;
 using Nethereum.Hex.HexTypes;
+using Nethereum.Logging;
 using Nethereum.LogProcessing;
 using System;
 using System.Collections.Generic;
@@ -18,19 +19,20 @@ using System.Threading.Tasks;
 namespace Nethereum.BlockchainProcessing.PerformanceTests
 {
 
-
     class Program
     {
-        private static readonly ILogger _log = ApplicationLogging.CreateLogger<Program>();
+        private static readonly ILog Log = ApplicationLogging
+            .CreateConsoleLogger<Program>()
+            .ToILog();
 
         static async Task Main(string[] args)
         {
             try
             {
-                Config.LogOutputToConsole();
-                _log.LogInformation("Starting");
 
-                var test = new WritingTransfersToTheConsole(numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 1000);
+                Log.Info("Starting");
+
+                var test = new WritingTransfersToTheConsole(Log, numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 1000);
                 //var test = new WritingTransfersToTheAzureStorage(
                 //    Config.AzureConnectionString, 
                 //    "perfTest", 
@@ -42,7 +44,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             }
             catch(Exception ex)
             {
-                _log.LogError(ex.ToString());
+                Log.Error(ex.ToString());
             }
 
             Console.ReadLine();
@@ -53,10 +55,6 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
     {
         static IConfigurationRoot _config;
 
-        public static void LogOutputToConsole()
-        {
-            Configuration.AddConsoleLogging();
-        }
 
         public static IConfigurationRoot Configuration
         {
@@ -64,7 +62,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             {
                 if(_config == null)
                 {
-                    ConfigurationUtils.SetEnvironment("development");
+                    ConfigurationUtils.SetAsDevelopmentEnvironment();
 
                     //use the command line to set your azure search api key
                     //e.g. dotnet user-secrets set "AzureStorageConnectionString" "<put key here>"
@@ -77,6 +75,8 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
         public static string AzureConnectionString => Configuration["AzureStorageConnectionString"];
     }
+
+    
 
     public abstract class PerfTest
     {
@@ -119,7 +119,8 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
                 .Filter<TransferEventDto>()
                 .StoreInAzureTable(azureConnectionString, tablePrefix, (Predicate<EventLog<TransferEventDto>>)((tfr) => TransferCallback(tfr)))
                 .OnBatchProcessed((args) => Output(args.LastRangeProcessed))
-                .SetBlocksPerBatch(maxBlocksPerBatch);
+                .SetBlocksPerBatch(maxBlocksPerBatch)
+                .SetLog(_log.ToILog());
 
             ethApiContractService = _builder.Eth;
 
@@ -170,7 +171,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         private ILogsProcessorBuilder _builder;
         private IEthApiContractService ethApiContractService;
 
-        public WritingTransfersToTheConsole(uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
+        public WritingTransfersToTheConsole(ILog log, uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
         {
             cancellationTokenSource = new CancellationTokenSource(maxDuration);
             _builder = new LogsProcessorBuilder("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
@@ -180,9 +181,11 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
                 {
                     HandleBatchProcessed(args.LastRangeProcessed);
                 })
-                .SetBlocksPerBatch(maxBlocksPerBatch);
+                .SetBlocksPerBatch(maxBlocksPerBatch)
+                .SetLog(log);
 
             ethApiContractService = _builder.Eth;
+            Log = log;
             NumberOfBlocksToProcess = numberOfBlocksToProcess;
         }
 
@@ -196,6 +199,7 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             }
         }
 
+        public ILog Log { get; }
         public uint NumberOfBlocksToProcess { get; }
 
         public override async Task ConfigureAsync()

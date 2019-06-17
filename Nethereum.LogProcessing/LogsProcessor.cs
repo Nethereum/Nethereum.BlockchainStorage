@@ -1,21 +1,21 @@
-﻿using System;
-using System.Threading;
-using Microsoft.Extensions.Logging;
-using Nethereum.Configuration;
-using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Processing;
+﻿using Common.Logging;
 using Nethereum.BlockchainProcessing;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.Contracts;
+using System;
 using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Nethereum.LogProcessing
 {
+
     public class LogsProcessor : ILogsProcessor
     {
         private readonly IBlockchainProcessor _processor;
-        private readonly ILogger _logger = ApplicationLogging.CreateLogger<LogsProcessor>();
         private readonly IBlockProgressService _progressService;
         private static readonly uint DefaultMaxNumberOfBlocksPerBatch = 100;
+        private readonly LogsProcessorLogger _log;
 
         public IWaitStrategy WaitForBlockStrategy { get; set; } = new WaitStrategy();
 
@@ -34,10 +34,12 @@ namespace Nethereum.LogProcessing
             IBlockProgressService progressService,
             uint? maxNumberOfBlocksPerBatch = null,
             Action<LogBatchProcessedArgs> rangesProcessedCallback = null,
-            Action<Exception> fatalErrorCallback = null)
+            Action<Exception> fatalErrorCallback = null,
+            ILog log = null)
         {
             _processor = processor;
             _progressService = progressService;
+            _log = new LogsProcessorLogger(log);
 
             MaxNumberOfBlocksPerBatch = maxNumberOfBlocksPerBatch ?? DefaultMaxNumberOfBlocksPerBatch;
             BatchProcessedCallback = rangesProcessedCallback;
@@ -53,7 +55,7 @@ namespace Nethereum.LogProcessing
         {
             try
             {
-                _logger.LogInformation("Getting block number range to process");
+                _log.RetrievingBlockNumberRange();
 
                 var nullableRange = await _progressService
                     .GetNextBlockRangeToProcessAsync(MaxNumberOfBlocksPerBatch)
@@ -61,17 +63,17 @@ namespace Nethereum.LogProcessing
 
                 if (nullableRange == null)
                 {
-                    _logger.LogInformation("No block range to process - the most recent block may already have been processed");
+                    _log.NoBlocksToProcess();
                     return null;
                 }
 
                 var range = nullableRange.Value;
 
-                _logger.LogInformation($"Processing Block Range. from: {range.From} to {range.To}");
+                _log.ProcessingBlockRange(range);
                 await _processor.ProcessAsync(range, cancellationToken)
                     .ConfigureAwait(false);
 
-                _logger.LogInformation($"Updating current process progress to: {range.To}");
+                _log.UpdatingBlockProgress(range);
                 await _progressService.SaveLastBlockProcessedAsync(range.To)
                     .ConfigureAwait(false);
 
@@ -79,13 +81,13 @@ namespace Nethereum.LogProcessing
             }
             catch (TooManyRecordsException ex)
             {
-                _logger.LogWarning($"Too many results error. : {ex.Message}");
+                _log.TooManyRecords(ex);
 
                 if (MaxNumberOfBlocksPerBatch > 1 && EnableAutoBatchResizing) // try again with a smaller batch size
                 {
                     uint newBatchLimit = MaxNumberOfBlocksPerBatch / 2;
 
-                    _logger.LogWarning($"Resetting _maxNumberOfBlocksPerBatch. Old Value:{MaxNumberOfBlocksPerBatch}, New Value: {newBatchLimit}");
+                    _log.ChangingBlocksPerBatch(MaxNumberOfBlocksPerBatch, newBatchLimit);
 
                     MaxNumberOfBlocksPerBatch = newBatchLimit;
 
@@ -178,7 +180,7 @@ namespace Nethereum.LogProcessing
                             if (t.IsFaulted)
                             {
                                 var baseEx = t.Exception.GetBaseException();
-                                _logger.LogError(baseEx, baseEx.Message);
+                                _log.FatalError(baseEx);
                                 FatalErrorCallback?.Invoke(baseEx);
                             }
                         },
@@ -187,7 +189,7 @@ namespace Nethereum.LogProcessing
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{nameof(LogsProcessor)}.ProcessContinuallyInBackgroundAsync threw an initialisation error");
+                _log.FatalError(ex);
                 FatalErrorCallback?.Invoke(ex);
                 throw;
             }

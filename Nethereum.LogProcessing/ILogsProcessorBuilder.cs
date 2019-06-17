@@ -1,4 +1,5 @@
-﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+﻿using Common.Logging;
+using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
@@ -24,6 +25,8 @@ namespace Nethereum.LogProcessing
         uint? MinimumBlockConfirmations { get; set; }
         BigInteger? MinimumBlockNumber { get; set; }
         List<ILogProcessor> Processors { get; }
+
+        ILog Log { get; set;}
 
         ILogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack);
         ILogsProcessorBuilder Add(EventSubscription eventSubscription);
@@ -53,6 +56,8 @@ namespace Nethereum.LogProcessing
         ILogsProcessorBuilder SetBlocksPerBatch(uint blocksPerBatch);
         ILogsProcessorBuilder SetMinimumBlockConfirmations(uint minBlockConfirmations);
         ILogsProcessorBuilder SetMinimumBlockNumber(BigInteger minimumBlockNumber);
+
+        ILogsProcessorBuilder SetLog(ILog log);
         ILogsProcessorBuilder UseBlockProgressRepository(IBlockProgressRepository repo);
         ILogsProcessorBuilder UseJsonFileForBlockProgress(string jsonFilePath, bool deleteExistingFile = false);
     }

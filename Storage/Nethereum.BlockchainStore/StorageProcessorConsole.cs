@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Processing;
+﻿using Common.Logging;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Geth;
 using Nethereum.Web3;
@@ -14,7 +15,8 @@ namespace Nethereum.BlockchainStore.Processing
             IBlockchainStoreRepositoryFactory repositoryFactory, 
             BlockchainSourceConfiguration configuration,
             FilterContainer filterContainer = null,
-            bool useGeth = false)
+            bool useGeth = false,
+            ILog log = null)
         {
             IWeb3 web3 = 
                 useGeth 
@@ -38,7 +40,7 @@ namespace Nethereum.BlockchainStore.Processing
                     MinimumBlockConfirmations = configuration.MinimumBlockConfirmations ?? 0
                 };
                 
-                var blockchainProcessor = new BlockchainProcessor(storageProcessingStrategy);
+                var blockchainProcessor = new BlockchainProcessor(storageProcessingStrategy, log);
 
                 var stopWatch = Stopwatch.StartNew();
 
