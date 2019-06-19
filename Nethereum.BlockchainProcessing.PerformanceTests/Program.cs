@@ -13,6 +13,9 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             .CreateConsoleLogger<Program>()
             .ToILog();
 
+        public const string MAIN_NET = "https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c";
+        public const string RINKEBY = "https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c";
+
         static async Task Main(string[] args)
         {
             try
@@ -20,7 +23,12 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
 
                 Log.Info("Starting");
 
-                var test = new WritingTransfersToTheConsole(Log, numberOfBlocksToProcess: 171_000, maxDuration: TimeSpan.FromHours(2), maxBlocksPerBatch: 1000);
+                var test = new WritingTransfersToTheConsole(
+                    MAIN_NET, Log, 
+                    numberOfBlocksToProcess: 1000, 
+                    maxDuration: TimeSpan.FromHours(2), 
+                    maxBlocksPerBatch: 100);
+
                 //var test = new WritingTransfersToTheAzureStorage(
                 //    Config.AzureConnectionString, 
                 //    "perfTest", 

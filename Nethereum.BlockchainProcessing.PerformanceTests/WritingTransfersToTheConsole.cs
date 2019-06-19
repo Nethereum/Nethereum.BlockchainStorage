@@ -6,6 +6,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.LogProcessing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,10 +25,10 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
         private ILogsProcessorBuilder _builder;
         private IEthApiContractService ethApiContractService;
 
-        public WritingTransfersToTheConsole(ILog log, uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
+        public WritingTransfersToTheConsole(string url, ILog log, uint numberOfBlocksToProcess, TimeSpan maxDuration, uint maxBlocksPerBatch)
         {
             cancellationTokenSource = new CancellationTokenSource(maxDuration);
-            _builder = new LogsProcessorBuilder<TransferEventDto>("https://rinkeby.infura.io/v3/7238211010344719ad14a89db874158c")
+            _builder = new LogsProcessorBuilder<TransferEventDto>(url)
                 .OnEvents((events) => Output(events))
                 .OnBatchProcessed((args) =>
                 {
@@ -71,6 +72,12 @@ namespace Nethereum.BlockchainProcessing.PerformanceTests
             events = events ?? Array.Empty<EventLog<TransferEventDto>>();
 
             _log.LogInformation(DateTime.Now.ToLongTimeString());
+
+            if (events.Any())
+            {
+                _log.LogInformation($"EVENTS FOUND: {events.Count()}");
+            }
+
             foreach(var e in events)
             {
                 _log.LogInformation($"\tBlock: {e.Log.BlockNumber.Value}, Hash: {e.Log.TransactionHash}, Index: {e.Log.LogIndex.Value}, From: {e.Event.From}, To: {e.Event.To}, Value: {e.Event.Value}");
