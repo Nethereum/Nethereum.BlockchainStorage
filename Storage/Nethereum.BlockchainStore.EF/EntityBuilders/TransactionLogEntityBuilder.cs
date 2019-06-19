@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             ToTable("TransactionLogs");
             HasKey(m => m.RowIndex);
 
-            Property(m => m.TransactionHash).IsRequired();
+            Property(m => m.TransactionHash).IsHash().IsRequired();
 
             Property(m => m.Address).IsAddress();
             Property(m => m.EventHash).IsHash();
