@@ -131,7 +131,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{11C1908F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.Logging.Utils", "Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj", "{45420D74-75F4-447E-BF92-1CE7DF2341DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainProcessing.Common.Tests", "Nethereum.BlockchainProcessing.Common.Tests\Nethereum.BlockchainProcessing.Common.Tests.csproj", "{78DE93D3-C017-4F02-880C-BC4F9055C3F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Common.Tests", "Nethereum.BlockchainProcessing.Common.Tests\Nethereum.BlockchainProcessing.Common.Tests.csproj", "{78DE93D3-C017-4F02-880C-BC4F9055C3F0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.LogProcessing.Tests", "Nethereum.LogProcessing.Tests\Nethereum.LogProcessing.Tests.csproj", "{1F9D33CE-EBD0-4B28-865E-F244822C54C7}"
 EndProject
@@ -146,6 +146,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockProcessing.InMemory.Console", "Nethereum.BlockProcessing.InMemory.Console\Nethereum.BlockProcessing.InMemory.Console.csproj", "{3410F797-D672-4414-8DD6-72736DAE2B74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.LogsProcessing.PerformanceTests", "Nethereum.LogsProcessing.PerformanceTests\Nethereum.LogsProcessing.PerformanceTests.csproj", "{DEE0030B-4574-4043-8024-A012AA24ACE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EFCore.Sqlite.Tests", "Storage\Nethereum.BlockchainStore.EFCore.Sqlite.Tests\Nethereum.BlockchainStore.EFCore.Sqlite.Tests.csproj", "{F3732FD0-99FE-45DE-ACE4-7C34810FE1B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -329,6 +331,10 @@ Global
 		{DEE0030B-4574-4043-8024-A012AA24ACE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEE0030B-4574-4043-8024-A012AA24ACE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEE0030B-4574-4043-8024-A012AA24ACE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3732FD0-99FE-45DE-ACE4-7C34810FE1B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3732FD0-99FE-45DE-ACE4-7C34810FE1B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3732FD0-99FE-45DE-ACE4-7C34810FE1B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3732FD0-99FE-45DE-ACE4-7C34810FE1B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -395,6 +401,7 @@ Global
 		{80F98309-0180-41AA-800D-DE0A82D748A7} = {73803299-0F80-40A1-8726-74795351E475}
 		{3410F797-D672-4414-8DD6-72736DAE2B74} = {73803299-0F80-40A1-8726-74795351E475}
 		{DEE0030B-4574-4043-8024-A012AA24ACE7} = {9ED190C5-B88B-4458-91AD-F1BC88C08F70}
+		{F3732FD0-99FE-45DE-ACE4-7C34810FE1B6} = {995D4B83-BDE8-4A7B-A183-7739D91B1368}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8BDA708-C821-4538-93BC-8FC3DCC98B7B}
