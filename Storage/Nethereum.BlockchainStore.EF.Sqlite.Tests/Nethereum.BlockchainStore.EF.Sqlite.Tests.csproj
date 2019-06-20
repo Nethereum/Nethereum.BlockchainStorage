@@ -4,6 +4,7 @@
     <Authors>Dave Whiffin</Authors>
     <TargetFramework>net461</TargetFramework>
     <Description>Store Ethereum blockchain data in Sqlite using Entity Framework.</Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>    
   </PropertyGroup>
 
   <ItemGroup>
