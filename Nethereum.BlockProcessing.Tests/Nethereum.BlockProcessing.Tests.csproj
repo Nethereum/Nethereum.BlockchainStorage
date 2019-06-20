@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainProcessing.Common.Tests\Nethereum.BlockchainProcessing.Common.Tests.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.Common.csproj" />
     <ProjectReference Include="..\Nethereum.BlockProcessing\Nethereum.BlockProcessing.csproj" />
   </ItemGroup>
 

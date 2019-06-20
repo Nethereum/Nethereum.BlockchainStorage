@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.Common.csproj" />
     <ProjectReference Include="..\Nethereum.BlockProcessing\Nethereum.BlockProcessing.csproj" />
     <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Configuration.Utils.csproj" />
     <ProjectReference Include="..\Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj" />

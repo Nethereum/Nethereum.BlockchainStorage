@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28721.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Common", "Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.Common.csproj", "{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Common", "Nethereum.BlockchainProcessing.Common\Nethereum.BlockchainProcessing.Common.csproj", "{3D6FBCF1-6B29-4184-B47A-8F99A4AD1FDD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A7C2B9B7-E71D-45D7-B9D9-3852BD66DF52}"
 	ProjectSection(SolutionItems) = preProject
