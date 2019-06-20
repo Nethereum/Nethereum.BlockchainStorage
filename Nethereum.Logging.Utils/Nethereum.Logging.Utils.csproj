@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Common.Logging" Version="3.4.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="2.2.0" />
