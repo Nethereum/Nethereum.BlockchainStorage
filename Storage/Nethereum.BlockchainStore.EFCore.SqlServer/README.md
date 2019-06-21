@@ -1,5 +1,7 @@
 ﻿#  Blockchain Storage SQL Server (EF Core)
 
+[Common Configuration](../)
+
 This SQL server implementation uses Entity Framework Core.
 
 It allows the same database to be used for multiple blockchains / test nets.  

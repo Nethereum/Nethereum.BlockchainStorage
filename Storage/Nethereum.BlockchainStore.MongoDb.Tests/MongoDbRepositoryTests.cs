@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Tests
 
         public MongoDbFixture()
         {
-            ConfigurationUtils.SetEnvironment("development");
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
             var appConfig = ConfigurationUtils.Build(CommandLineArgs);
 
             appConfig.SetMongoDbConnectionString(MongoDbConnectionString);
