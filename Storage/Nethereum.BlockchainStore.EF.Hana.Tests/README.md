@@ -12,4 +12,13 @@ To build for HANA:
 The build should complete successfully.
 
 
+# Running Nethereum.BlockchainStore.EF.Hana.Tests
+
+1. A HANA 2.x system is required.
+2. Ensure that the schemas `dbo` and `DEMO` exist on the HANA system. (Edit `TestHanaContextFactory.cs` to write blockchain data to a schema other than `DEMO`, but `dbo` is always required for EF).
+3. Edit the `App.config` file to have the correct connection string.
+
+The tests should complete successfully.
+
+
 
