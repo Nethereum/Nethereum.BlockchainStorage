@@ -1,13 +1,9 @@
 ﻿using Nethereum.BlockchainStore.EF.EntityBuilders;
-using System;
-using System.Configuration;
 using System.Data.Entity;
-using System.Reflection;
-using Nethereum.BlockchainStore.Entities;
 //using Sap.Data.Hana; // Note: add this for access to the HANA data provider objects
 
 namespace Nethereum.BlockchainStore.EF.Hana
-{    
+{
     public class HanaBlockchainDbContext: BlockchainDbContextBase
     {
         public readonly string Schema;

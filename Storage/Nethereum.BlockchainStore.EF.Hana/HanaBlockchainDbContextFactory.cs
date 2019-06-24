@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Nethereum.BlockchainStore.Entities;
-
-namespace Nethereum.BlockchainStore.EF.Hana
+﻿namespace Nethereum.BlockchainStore.EF.Hana
 {
     public class HanaBlockchainDbContextFactory : IBlockchainDbContextFactory
     {        
