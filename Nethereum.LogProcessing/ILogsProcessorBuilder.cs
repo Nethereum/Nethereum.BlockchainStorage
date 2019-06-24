@@ -29,7 +29,6 @@ namespace Nethereum.LogProcessing
         ILog Log { get; set;}
 
         ILogsProcessorBuilder Add(Action<IEnumerable<FilterLog>> callBack);
-        ILogsProcessorBuilder Add(EventSubscription eventSubscription);
         ILogsProcessorBuilder Add(Func<IEnumerable<FilterLog>, Task> callBack);
 
         ILogsProcessorBuilder Add(Predicate<FilterLog> isItForMe, Action<IEnumerable<FilterLog>> action);
@@ -38,10 +37,7 @@ namespace Nethereum.LogProcessing
 
         ILogsProcessorBuilder Add(ILogProcessor processor);
         ILogsProcessorBuilder Add<TEventDto>(Action<IEnumerable<EventLog<TEventDto>>> callBack) where TEventDto : class, new();
-        ILogsProcessorBuilder Add<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new();
         ILogsProcessorBuilder Add<TEventDto>(Func<IEnumerable<EventLog<TEventDto>>, Task> callBack) where TEventDto : class, new();
-        ILogsProcessorBuilder AddToQueue(IQueue queue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null);
-        ILogsProcessorBuilder AddToQueue<TEventDto>(IQueue queue, Predicate<EventLog<TEventDto>> predicate = null, Func<EventLog<TEventDto>, object> mapper = null) where TEventDto : class, new();
         ILogsProcessor Build();
         ILogsProcessorBuilder Filter(NewFilterInput filter);
         ILogsProcessorBuilder Filter<TEventDto>() where TEventDto : class, IEventDTO, new();

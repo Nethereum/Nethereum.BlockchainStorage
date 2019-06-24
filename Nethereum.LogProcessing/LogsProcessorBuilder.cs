@@ -161,18 +161,6 @@ namespace Nethereum.LogProcessing
             return this;
         }
 
-        public ILogsProcessorBuilder Add(EventSubscription eventSubscription)
-        {
-            Processors.Add(eventSubscription);
-            return this;
-        }
-
-        public ILogsProcessorBuilder Add<TEventDto>(EventSubscription<TEventDto> eventSubscription) where TEventDto : class, new()
-        {
-            Processors.Add(eventSubscription);
-            return this;
-        }
-
         public ILogsProcessorBuilder Add(ILogProcessor processor)
         {
             Processors.Add(processor);
@@ -198,12 +186,6 @@ namespace Nethereum.LogProcessing
         public ILogsProcessorBuilder Add(Predicate<FilterLog> isItForMe, Func<IEnumerable<FilterLog>, Task> func)
         {
             Processors.Add(new FilterLogProcessor(isItForMe, func));
-            return this;
-        }
-
-        public ILogsProcessorBuilder AddToQueue(IQueue queue, Predicate<FilterLog> predicate = null, Func<FilterLog, object> mapper = null)
-        {
-            Processors.Add(new EventLogQueueProcessor(queue, predicate, mapper));
             return this;
         }
 

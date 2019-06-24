@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nethereum.LogProcessing.Dynamic\Nethereum.LogProcessing.Dynamic.csproj" />
     <ProjectReference Include="..\Nethereum.LogProcessing\Nethereum.LogProcessing.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
 using Nethereum.Contracts;
 using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
@@ -38,7 +39,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             string queueName,
             Predicate<EventLog<TEventDto>> predicate = null,
             Func<EventLog<TEventDto>, object> mapper = null)
-            where TEventDto : class, new()
+            where TEventDto : class, IEventDTO, new()
         {
             var queue = await queueFactory.GetOrCreateQueueAsync(queueName);
             eventLogProcessor.AddToQueue(queue, predicate, mapper);
@@ -51,7 +52,7 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
             string queueName,
             Predicate<EventLog<TEventDto>> predicate = null,
             Func<EventLog<TEventDto>, object> mapper = null)
-            where TEventDto : class, new()
+            where TEventDto : class, IEventDTO, new()
         {
             var factory = new AzureSubscriberQueueFactory(azureConnectionString);
             return await eventLogProcessor.AddToQueueAsync(factory, queueName, predicate, mapper);
