@@ -2,8 +2,8 @@
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.MongoDb.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
-using Nethereum.Configuration;
-using Nethereum.Logging;
+using Microsoft.Configuration.Utils;
+using Microsoft.Logging.Utils;
 
 namespace Nethereum.BlockchainStore.MongoDb.Console
 {

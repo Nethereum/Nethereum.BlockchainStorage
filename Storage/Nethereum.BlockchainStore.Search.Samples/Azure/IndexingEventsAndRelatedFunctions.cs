@@ -7,7 +7,7 @@ using Microsoft.Azure.Search.Models;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using Nethereum.Contracts;
 using Xunit;
 

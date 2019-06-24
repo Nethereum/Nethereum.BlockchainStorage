@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer
 {

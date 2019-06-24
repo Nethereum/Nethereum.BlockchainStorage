@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Nethereum.Logging
+namespace Microsoft.Logging.Utils
 {
     public class ConcurrentVariableContext : IVariablesContext
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace Nethereum.Logging
+namespace Microsoft.Logging.Utils
 {
     public class ConcurrentNestedVariablesContext : INestedVariablesContext
     {

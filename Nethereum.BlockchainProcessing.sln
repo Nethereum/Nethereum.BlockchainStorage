@@ -39,13 +39,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.Sqlite", "Storage\Nethereum.BlockchainStore.EF.Sqlite\Nethereum.BlockchainStore.EF.Sqlite.csproj", "{7BC335A6-2A18-42C3-9F30-37804541B8B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.Sqlite.Tests", "Storage\Nethereum.BlockchainStore.EF.Sqlite.Tests\Nethereum.BlockchainStore.EF.Sqlite.Tests.csproj", "{374D65D7-EF59-414D-9A9E-B743DD2683BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.Sqlite.Tests", "Storage\Nethereum.BlockchainStore.EF.Sqlite.Tests\Nethereum.BlockchainStore.EF.Sqlite.Tests.csproj", "{374D65D7-EF59-414D-9A9E-B743DD2683BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EFCore.SqlServer", "Storage\Nethereum.BlockchainStore.EFCore.SqlServer\Nethereum.BlockchainStore.EFCore.SqlServer.csproj", "{F0FE293B-E70A-4CB4-BEDF-B654FCD35E92}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.SqlServer", "Storage\Nethereum.BlockchainStore.EF.SqlServer\Nethereum.BlockchainStore.EF.SqlServer.csproj", "{C095585B-7CFB-4D92-B47B-68841974A6D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.EF.SqlServer.Tests", "Storage\Nethereum.BlockchainStore.EF.SqlServer.Tests\Nethereum.BlockchainStore.EF.SqlServer.Tests.csproj", "{9CEBB355-7B4B-4CC0-A572-69B886D928CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EF.SqlServer.Tests", "Storage\Nethereum.BlockchainStore.EF.SqlServer.Tests\Nethereum.BlockchainStore.EF.SqlServer.Tests.csproj", "{9CEBB355-7B4B-4CC0-A572-69B886D928CE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.EFCore", "Storage\Nethereum.BlockchainStore.EFCore\Nethereum.BlockchainStore.EFCore.csproj", "{B0546525-1769-4927-AE7E-0248EA24F58A}"
 EndProject
@@ -125,11 +125,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockProcessing.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.AzureTables.Tests", "Storage\Nethereum.BlockchainStore.AzureTables.Tests\Nethereum.BlockchainStore.AzureTables.Tests.csproj", "{46617AA0-5E25-460E-9420-5E66279779DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.Configuration.Utils", "Nethereum.Configuration.Utils\Nethereum.Configuration.Utils.csproj", "{B6DA534E-B9C4-499B-8D31-F5FBB3BBD73D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Configuration.Utils", "Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj", "{B6DA534E-B9C4-499B-8D31-F5FBB3BBD73D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{11C1908F-3417-4A0B-9D63-CD15EFFDA039}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.Logging.Utils", "Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj", "{45420D74-75F4-447E-BF92-1CE7DF2341DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Logging.Utils", "Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj", "{45420D74-75F4-447E-BF92-1CE7DF2341DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Common.Tests", "Nethereum.BlockchainProcessing.Common.Tests\Nethereum.BlockchainProcessing.Common.Tests.csproj", "{78DE93D3-C017-4F02-880C-BC4F9055C3F0}"
 EndProject

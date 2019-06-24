@@ -1,5 +1,5 @@
 ﻿using Common.Logging;
-using Nethereum.Logging;
+using Microsoft.Logging.Utils;
 
 namespace Microsoft.Extensions.Logging
 {

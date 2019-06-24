@@ -1,6 +1,6 @@
 ﻿using Common.Logging;
 using Microsoft.Extensions.Logging;
-using Nethereum.Logging;
+using Microsoft.Logging.Utils;
 using System;
 using System.Threading.Tasks;
 

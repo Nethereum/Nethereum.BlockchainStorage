@@ -4,7 +4,7 @@ using System;
 using cl = Common.Logging;
 using ms = Microsoft.Extensions.Logging;
 
-namespace Nethereum.Logging
+namespace Microsoft.Logging.Utils
 {
     /// <summary>
     /// Transates from Microsoft.Extensions.Logging.ILogger to Common.Logging.ILog

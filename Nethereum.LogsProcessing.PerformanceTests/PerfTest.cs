@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Nethereum.Logging;
+using Microsoft.Logging.Utils;
 using System.Diagnostics;
 using System.Threading.Tasks;
 

@@ -1,7 +1,7 @@
 ﻿using cl = Common.Logging;
 using mel = Microsoft.Extensions.Logging;
 
-namespace Nethereum.Logging
+namespace Microsoft.Logging.Utils
 {
     public static class LogHelpers
     {

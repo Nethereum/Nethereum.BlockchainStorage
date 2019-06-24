@@ -5,7 +5,7 @@ using Elasticsearch.Net.Aws;
 using Nest;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.ElasticSearch;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using Nethereum.Contracts;
 using System;
 using System.Numerics;

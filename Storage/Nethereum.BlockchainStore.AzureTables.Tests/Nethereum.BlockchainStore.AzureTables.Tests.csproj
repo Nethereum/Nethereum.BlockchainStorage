@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Nethereum.BlockchainProcessing.Common\Nethereum.BlockchainProcessing.Common.csproj" />
-    <ProjectReference Include="..\..\Nethereum.Configuration.Utils\Nethereum.Configuration.Utils.csproj" />
-    <ProjectReference Include="..\..\Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj" />
+    <ProjectReference Include="..\..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
+    <ProjectReference Include="..\..\Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />

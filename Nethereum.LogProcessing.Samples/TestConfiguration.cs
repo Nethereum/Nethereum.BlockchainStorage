@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;

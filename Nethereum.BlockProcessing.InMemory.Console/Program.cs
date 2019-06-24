@@ -2,8 +2,8 @@
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processors.Transactions;
-using Nethereum.Configuration;
-using Nethereum.Logging;
+using Microsoft.Configuration.Utils;
+using Microsoft.Logging.Utils;
 
 namespace Nethereum.BlockchainProcessing.InMemory.Console
 {

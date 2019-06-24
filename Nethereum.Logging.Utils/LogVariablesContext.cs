@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace Nethereum.Logging
+namespace Microsoft.Logging.Utils
 {
     public partial class LogVariablesContext
     {

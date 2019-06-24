@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Nethereum.Logging
+namespace Microsoft.Logging.Utils
 {
     public static class ApplicationLogging
     {

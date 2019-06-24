@@ -7,8 +7,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockProcessing\Nethereum.BlockProcessing.csproj" />
-    <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Configuration.Utils.csproj" />
-    <ProjectReference Include="..\Nethereum.Logging.Utils\Nethereum.Logging.Utils.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
+    <ProjectReference Include="..\Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj" />
   </ItemGroup>
 
 </Project>

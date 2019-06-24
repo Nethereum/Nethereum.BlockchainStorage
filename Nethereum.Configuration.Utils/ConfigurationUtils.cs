@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Nethereum.Configuration
+namespace Microsoft.Configuration.Utils
 {
     public static class ConfigurationUtils
     {

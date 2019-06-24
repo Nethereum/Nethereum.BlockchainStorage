@@ -2,8 +2,8 @@
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
-using Nethereum.Configuration;
-using Nethereum.Logging;
+using Microsoft.Configuration.Utils;
+using Microsoft.Logging.Utils;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Console
 {
