@@ -98,5 +98,14 @@ namespace Nethereum.BlockchainStore.Tests.Entities.Mapping
             var hexBigInt = new HexBigInteger(10);
             Assert.Equal(10, hexBigInt.ToLong());
         }
+
+        [Fact]
+        public void HexBigInteger_To_Long_Given_Value_Exceeding_Max_Returns_MaxLong()
+        {
+            var massiveNumber = new HexBigInteger("121526483101021574530");
+            Assert.Equal(long.MaxValue, massiveNumber.ToLong());
+        }
+
+
     }
 }
