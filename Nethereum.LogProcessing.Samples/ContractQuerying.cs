@@ -1,4 +1,6 @@
-﻿using Nethereum.BlockchainProcessing;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing;
+using Nethereum.Contracts;
 using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
@@ -32,6 +34,29 @@ namespace Nethereum.LogProcessing.Samples
             var decoded = await queryHelper.Query(contractAddress, StandardContractAbi, signature_name);
 
             Assert.Equal("JGX", decoded);  
+        }
+
+        [Function("name", "string")]
+        public class NameFunction: FunctionMessage
+        {}
+
+
+        [Fact]
+        public async Task DynamicContractQuerying_Name_Anomoly()
+        {
+            var abi = ABITypedRegistry.GetFunctionABI<NameFunction>();
+            var signature_name = abi.Sha3Signature;
+            var contractAddress = "0x2e71b2933b2b249752872a929e9816a770638282";
+
+            var web3 = new Web3.Web3(BlockchainUrl);
+
+            var contractHandler = web3.Eth.GetContractHandler(contractAddress);
+            var contractHandlerResult = await contractHandler.QueryAsync<NameFunction, string>();
+
+            var queryHelper = new ContractQueryHelper(web3);
+            var queryHelperResult = await queryHelper.Query(contractAddress, StandardContractAbi, signature_name);
+
+            Assert.Equal(string.Empty, queryHelperResult);
         }
 
         [Fact]
