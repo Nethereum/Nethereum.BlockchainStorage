@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainStore.Entities.Mapping
     {
         public static long ToLong(this HexBigInteger val)
         {
-            return (long) val.Value;
+            return val == null ? 0 : (long) val.Value;
         }
     }
 }

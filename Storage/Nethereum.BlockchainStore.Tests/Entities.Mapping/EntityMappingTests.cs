@@ -84,5 +84,19 @@ namespace Nethereum.BlockchainStore.Tests.Entities.Mapping
             Assert.Equal(sourceTransferEventLog.Event.Value, rehyrdratedTransferEventLog.Event.Value);
 
         }
+
+        [Fact]
+        public void HexBigInteger_To_Long_Given_Null_Returns_0()
+        {
+            var nullHexBigInt = (HexBigInteger)null;
+            Assert.Equal(0, nullHexBigInt.ToLong());
+        }
+
+        [Fact]
+        public void HexBigInteger_To_Long_Given_A_Value_Returns_Long()
+        {
+            var hexBigInt = new HexBigInteger(10);
+            Assert.Equal(10, hexBigInt.ToLong());
+        }
     }
 }

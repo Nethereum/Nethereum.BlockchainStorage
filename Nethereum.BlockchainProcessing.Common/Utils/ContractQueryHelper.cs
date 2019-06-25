@@ -2,6 +2,7 @@
 using Nethereum.ABI.Decoders;
 using Nethereum.Contracts;
 using Nethereum.Contracts.Services;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,30 +23,39 @@ namespace Nethereum.BlockchainProcessing
 
         public async Task<object> Query(string contractAddress, string contractABI, string functionSignature, object[] functionInputs = null)
         {
-            var contract = eth.GetContract(contractABI, contractAddress);
-            var functionAbi =  contract.ContractBuilder.ContractABI.Functions.FirstOrDefault(f => f.Sha3Signature == functionSignature);
-            var function = new Function(contract, new FunctionBuilder(contractAddress, functionAbi));
+            try 
+            { 
+                var contract = eth.GetContract(contractABI, contractAddress);
+                var functionAbi =  contract.ContractBuilder.ContractABI.Functions.FirstOrDefault(f => f.Sha3Signature == functionSignature);
+                var function = new Function(contract, new FunctionBuilder(contractAddress, functionAbi));
 
-            var callInput = functionInputs != null && functionAbi.InputParameters.Any() ? 
-                function.CreateCallInput(functionInputs) : 
-                function.CreateCallInput();
+                var callInput = functionInputs != null && functionAbi.InputParameters.Any() ? 
+                    function.CreateCallInput(functionInputs) : 
+                    function.CreateCallInput();
 
-            //var defaultResult = await function.CallDecodingToDefaultAsync(functionInputs); //returns null
-            var bytesResult = await function.CallRawAsync(callInput);
+                //var defaultResult = await function.CallDecodingToDefaultAsync(functionInputs); //returns null
 
-            var returnParameter = functionAbi.OutputParameters.FirstOrDefault();
+                var bytesResult = await function.CallRawAsync(callInput);
 
-            if(returnParameter == null) return null;
+                var returnParameter = functionAbi.OutputParameters.FirstOrDefault();
 
-            var abiType = returnParameter.ABIType;
+                if(returnParameter == null) return null;
 
-            if(abiType is StringType)
-            {
-                return new StringBytes32Decoder().Decode(bytesResult);
+                var abiType = returnParameter.ABIType;
+
+                if(abiType is StringType)
+                {
+                    return new StringBytes32Decoder().Decode(bytesResult);
+                }
+
+                var decoded = abiType.Decode(bytesResult, abiType.GetDefaultDecodingType());
+                return decoded;
             }
-
-            var decoded = abiType.Decode(bytesResult, abiType.GetDefaultDecodingType());
-            return decoded;
+            catch(Exception ex)
+            {
+                int y = 1;
+                throw;
+            }
         }
 
     }
