@@ -30,7 +30,7 @@ namespace Nethereum.BlockchainProcessing
                 function.CreateCallInput(functionInputs) : 
                 function.CreateCallInput();
 
-            var defaultResult = await function.CallDecodingToDefaultAsync(functionInputs); //returns null
+            //var defaultResult = await function.CallDecodingToDefaultAsync(functionInputs); //returns null
             var bytesResult = await function.CallRawAsync(callInput);
 
             var returnParameter = functionAbi.OutputParameters.FirstOrDefault();
