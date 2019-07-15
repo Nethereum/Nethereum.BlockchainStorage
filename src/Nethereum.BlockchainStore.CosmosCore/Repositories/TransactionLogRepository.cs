@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task UpsertAsync(Log log)
+        public async Task UpsertAsync(FilterLog log)
         {
             var transactionLog = new CosmosTransactionLog(); { };
             transactionLog.Map(log);

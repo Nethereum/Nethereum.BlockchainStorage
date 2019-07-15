@@ -1,23 +1,23 @@
-﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Handlers;
+﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.Contracts;
+using Nethereum.Web3;
 
 namespace Nethereum.BlockchainStore.Search
 {
     public class EventFunctionProcessor : IEventFunctionProcessor
     {
-        private readonly IBlockchainProxyService _blockchainProxyService;
+        private readonly IWeb3 _web3;
         private readonly Dictionary<Type, List<ITransactionHandler>> _eventToHandlerMapping;
 
         public EventFunctionProcessor(
-            IBlockchainProxyService blockchainProxyService)
+            IWeb3 web3)
         {
-            _blockchainProxyService = blockchainProxyService;
+            _web3 = web3;
             _eventToHandlerMapping = new Dictionary<Type, List<ITransactionHandler>>();
         }
 
@@ -53,11 +53,11 @@ namespace Nethereum.BlockchainStore.Search
 
         private async Task SendToHandler(List<ITransactionHandler> handlers, string transactionHash, Transaction transaction, Hex.HexTypes.HexBigInteger blockTimestamp)
         {
-            var receipt = await _blockchainProxyService.GetTransactionReceipt(transactionHash);
+            var receipt = await _web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transactionHash).ConfigureAwait(false);
 
             if (transaction.IsForContractCreation(receipt))
             {
-                var code = await _blockchainProxyService.GetCode(receipt.ContractAddress);
+                var code = await _web3.Eth.GetCode.SendRequestAsync(receipt.ContractAddress).ConfigureAwait(false);
                 var contractCreationFailure = (code == null) || (code == "0x");
                 var contactCreationTransaction = new ContractCreationTransaction(
                     receipt.ContractAddress,
@@ -115,7 +115,7 @@ namespace Nethereum.BlockchainStore.Search
 
             foreach (var blockNumber in logs.Select(l => (ulong)l.Log.BlockNumber.Value).Distinct())
             {
-                var blockWithTransactions = await _blockchainProxyService.GetBlockWithTransactionsAsync(blockNumber);
+                var blockWithTransactions = await _web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(blockNumber.ToHexBigInteger()).ConfigureAwait(false);
                 blockTransactions.Add(blockWithTransactions);
             }
 

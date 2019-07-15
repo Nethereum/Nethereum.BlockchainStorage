@@ -25,11 +25,13 @@ namespace Nethereum.BlockchainStore.Search
         public EventIndexProcessor(
             IEventIndexer<TEvent> indexer,
             IEventFunctionProcessor functionProcessor = null,
-            int logsPerIndexBatch = 1)
+            int logsPerIndexBatch = 1,
+            Predicate<EventLog<TEvent>> predicate = null)
         {
             Indexer = indexer;
             _functionProcessor = functionProcessor;
             _logsPerIndexBatch = logsPerIndexBatch;
+            Predicate = predicate ?? new Predicate<EventLog<TEvent>>((l) => true);
         }
 
         public void Dispose()
@@ -44,6 +46,7 @@ namespace Nethereum.BlockchainStore.Search
         public int Pending => _currentBatch.Count;
 
         public IEventIndexer<TEvent> Indexer { get; }
+        public Predicate<EventLog<TEvent>> Predicate { get; }
 
         public bool IsLogForEvent(FilterLog log)
         {
@@ -89,7 +92,7 @@ namespace Nethereum.BlockchainStore.Search
         {
             var decoded = TryDecode(eventLogs).ToArray();
 
-            foreach (var decodedLog in decoded)
+            foreach (var decodedLog in decoded.Where(d => Predicate(d)))
             {
                 _currentBatch.Enqueue(decodedLog);
             }

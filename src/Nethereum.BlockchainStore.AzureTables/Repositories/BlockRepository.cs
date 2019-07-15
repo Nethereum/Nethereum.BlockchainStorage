@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Entities;
@@ -15,7 +16,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
     {
         private bool _maxBlockInitialised = false;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
-        private Counter _maxBlockCounter = new Counter() {Name = "MaxBlockNumber", Value = 0};
+        private Counter _maxBlockCounter = new Counter() {Name = "MaxBlockNumber", Value = "0"};
         private readonly CloudTable _countersTable;
 
         public BlockRepository(CloudTable table, CloudTable countersTable) : base(table)
@@ -42,11 +43,11 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
 
         private async Task UpdateMaxBlockNumber(Block blockEntity)
         {
-            var blockNumber = long.Parse(blockEntity.BlockNumber);
+            var blockNumber = BigInteger.Parse(blockEntity.BlockNumber);
 
-            if (blockNumber > _maxBlockCounter.Value)
+            if (blockNumber > BigInteger.Parse(_maxBlockCounter.Value))
             {
-                _maxBlockCounter.Value = blockNumber;
+                _maxBlockCounter.Value = blockNumber.ToString();
                 await UpsertAsync(_maxBlockCounter, _countersTable).ConfigureAwait(false);
             }
         }
@@ -83,13 +84,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return blockOutput;
         }
 
-        public async Task<ulong> GetMaxBlockNumberAsync()
+        public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
             await _lock.WaitAsync();
             try
             {
                 await InitialiseMaxBlock();
-                return (ulong)_maxBlockCounter.Value;
+                return _maxBlockCounter.Value == null ? (BigInteger?)null : BigInteger.Parse(_maxBlockCounter.Value);
             }
             finally
             {

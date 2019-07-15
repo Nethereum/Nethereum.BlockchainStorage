@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using System.Numerics;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
@@ -15,6 +16,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             set => PartitionKey = value.ToPartitionKey();
         }
 
-        public long Value { get; set; } = 0;
+        public string Value { get; set; }
     }
 }

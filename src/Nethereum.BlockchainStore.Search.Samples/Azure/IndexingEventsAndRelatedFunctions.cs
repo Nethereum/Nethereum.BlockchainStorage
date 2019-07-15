@@ -7,7 +7,7 @@ using Microsoft.Azure.Search.Models;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using Nethereum.Contracts;
 using Xunit;
 
@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
         {
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
-            ConfigurationUtils.SetEnvironment("development");
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
 
             //use the command line to set your azure search api key
             //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"
@@ -107,7 +107,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                     });
 
                     //process the range
-                    await processor.ProcessAsync(3900007, 3900030);
+                    await processor.ProcessAsync(3900007, 3900009);
 
                     //allow time for azure indexing to finish
                     await Task.Delay(TimeSpan.FromSeconds(5));
@@ -119,9 +119,9 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                     long transferFromFunctionCount =
                         await processor.SearchService.CountDocumentsAsync(TransferFromFunctionIndexName);
 
-                    Assert.Equal(32, transferEventCount);
+                    Assert.Equal(16, transferEventCount);
                     Assert.Equal(1, transferFunctionCount);
-                    Assert.Equal(3, transferFromFunctionCount);
+                    Assert.Equal(1, transferFromFunctionCount);
                 }
                 finally
                 {
@@ -244,7 +244,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                         await processor.SearchService.CountDocumentsAsync(TransferFunctionIndexName);
 
                     Assert.Equal(19, transferEventCount);
-                    Assert.Equal(2, transferFunctionCount);
+                    Assert.Equal(1, transferFunctionCount);
                 }
                 finally
                 {

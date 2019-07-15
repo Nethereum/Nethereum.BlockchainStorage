@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
+  <PropertyGroup>
+    <Authors>Kevin Small</Authors>
+    <TargetFramework>net461</TargetFramework>
+    <Description>Store Ethereum blockchain data in SAP Hana using Entity Framework.</Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.111" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>    
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SQLite.CodeFirst" Version="1.5.2.28" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="System.Data.SQLite.EF6" Version="1.0.111" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.EF.Hana\Nethereum.BlockchainStore.EF.Hana.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
+  </ItemGroup>
+
+</Project>

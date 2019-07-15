@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return await FindAsync(t => t.TransactionHash == hash && t.LogIndex == idx).ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(Log log)
+        public async Task UpsertAsync(FilterLog log)
         {
             var transactionLog =  new TransactionLog();
 

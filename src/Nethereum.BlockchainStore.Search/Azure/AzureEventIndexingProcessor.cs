@@ -1,11 +1,12 @@
 ﻿using Microsoft.Azure.Search.Models;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.Azure
@@ -19,7 +20,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             uint maxBlocksPerBatch = 2, 
             IEnumerable<NewFilterInput> filters = null,
             uint minBlockConfirmations = 0)
-            :this(new BlockchainProxyService(blockchainUrl), 
+            :this(new Web3.Web3(blockchainUrl), 
                 new AzureSearchService(serviceName, searchApiKey), 
                 null,
                 null, 
@@ -30,14 +31,14 @@ namespace Nethereum.BlockchainStore.Search.Azure
         }
 
         public AzureEventIndexingProcessor(
-            IBlockchainProxyService blockchainProxyService, 
+            IWeb3 web3, 
             IAzureSearchService searchService, 
             IEventFunctionProcessor functionProcessor,
-            Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
+            Func<BigInteger, BigInteger?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2,
             IEnumerable<NewFilterInput> filters = null,
             uint minimumBlockConfirmations = 0):
-            base(blockchainProxyService, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations )
+            base(web3, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations )
         {
             AzureSearchService = searchService;
         }

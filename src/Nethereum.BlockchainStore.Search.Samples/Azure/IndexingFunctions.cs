@@ -1,14 +1,12 @@
-﻿using System;
-using System.Numerics;
-using System.Threading.Tasks;
-using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using Nethereum.Contracts;
-using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Numerics;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Samples.Azure
@@ -35,7 +33,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
         {
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
-            ConfigurationUtils.SetEnvironment("development");
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
 
             //use the command line to set your azure search api key
             //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"
@@ -62,9 +60,8 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                             new FunctionIndexTransactionHandler<TransferFunction>(azureFunctionMessageIndexer);
 
                         var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
-                        var blockchainProxy = new BlockchainProxyService(web3);
                         var handlers = new HandlerContainer {TransactionHandler = transferHandler};
-                        var blockProcessor = BlockProcessorFactory.Create(blockchainProxy, handlers);
+                        var blockProcessor = BlockProcessorFactory.Create(web3, handlers);
                         var processingStrategy = new ProcessingStrategy(blockProcessor);
                         var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 

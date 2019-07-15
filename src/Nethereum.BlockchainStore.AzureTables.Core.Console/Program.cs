@@ -1,7 +1,9 @@
-﻿using Nethereum.BlockchainProcessing.Processing;
+﻿using Microsoft.Extensions.Logging;
+using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.Processing;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
+using Microsoft.Logging.Utils;
 
 namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 {
@@ -11,9 +13,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 
         public static int Main(string[] args)
         {
+            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+
             var appConfig = ConfigurationUtils
-                .Build(args, userSecretsId: "Nethereum.BlockchainStore.AzureTables")
-                .AddConsoleLogging();
+                .Build(args, userSecretsId: "Nethereum.BlockchainStore.AzureTables");
 
             var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
 
@@ -23,7 +26,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Core.Console
                 throw ConfigurationUtils.CreateKeyNotFoundException(ConnectionStringKey);
 
             var repositoryFactory = new CloudTableSetup(connectionString, configuration.Name);
-            return StorageProcessorConsole.Execute(repositoryFactory, configuration).Result;
+            return StorageProcessorConsole.Execute(repositoryFactory, configuration, log: log).Result;
         }
     }
 }

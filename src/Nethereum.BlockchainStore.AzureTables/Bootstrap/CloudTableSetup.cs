@@ -1,4 +1,3 @@
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -8,75 +7,44 @@ using Nethereum.BlockchainStore.Repositories;
 
 namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 {
-    public class CloudTableSetup: IBlockchainStoreRepositoryFactory
+
+    public class CloudTableSetup: CloudTableSetupBase, IBlockchainStoreRepositoryFactory
     {
-        private readonly string prefix;
-        private readonly string connectionString;
-        private CloudStorageAccount cloudStorageAccount;
-
-        public CloudTableSetup(string connectionString, string prefix)
-        {
-            this.connectionString = connectionString;
-            this.prefix = prefix;
-        }
-
-        public CloudStorageAccount GetStorageAccount()
-        {
-            if (cloudStorageAccount == null)
-            {
-                cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
-                var tableServicePoint = ServicePointManager.FindServicePoint(cloudStorageAccount.TableEndpoint);
-                tableServicePoint.UseNagleAlgorithm = false;
-                tableServicePoint.ConnectionLimit = 1000;
-                ServicePointManager.DefaultConnectionLimit = 48;
-                ServicePointManager.Expect100Continue = false;
-                ServicePointManager.UseNagleAlgorithm = false;
-            }
-            return cloudStorageAccount;
-        }
+        public CloudTableSetup(string connectionString, string prefix):base(connectionString, prefix){ }
 
         public CloudTable GetTransactionsVmStackTable()
         {
-            return GetTable(prefix + "TransactionsVmStack");
+            return GetPrefixedTable("TransactionsVmStack");
         }
 
         public CloudTable GetTransactionsLogTable()
         {
-            return GetTable(prefix + "TransactionsLog");
+            return GetPrefixedTable("TransactionLogs");
         }
 
         public CloudTable GetTransactionsTable()
         {
-            return GetTable(prefix + "Transactions");
+            return GetPrefixedTable("Transactions");
         }
 
         public CloudTable GetAddressTransactionsTable()
         {
-            return GetTable(prefix + "AddressTransactions");
+            return GetPrefixedTable("AddressTransactions");
         }
 
         public CloudTable GetBlocksTable()
         {
-            return GetTable(prefix + "Blocks");
+            return GetPrefixedTable("Blocks");
         }
 
         public CloudTable GetContractsTable()
         {
-            return GetTable(prefix + "Contracts");
+            return GetPrefixedTable("Contracts");
         }
 
         public CloudTable GetCountersTable()
         {
-            return GetTable(prefix + "Counters");
-        }
-
-        public CloudTable GetTable(string name)
-        {
-            var storageAccount = GetStorageAccount();
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var table = tableClient.GetTableReference(name);
-            table.CreateIfNotExistsAsync().Wait();
-            return table;
+            return GetPrefixedTable("Counters");
         }
 
         public IAddressTransactionRepository CreateAddressTransactionRepository() => new AddressTransactionRepository(GetTransactionsLogTable());

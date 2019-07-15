@@ -4,19 +4,25 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Repositories.Handlers
 {
-    public class TransactionLogRepositoryHandler : ITransactionLogHandler
+    public class TransactionLogRepositoryHandler : ITransactionLogHandler, ILogHandler
     {
-        private readonly ITransactionLogRepository _transactionLogRepository;
-
         public TransactionLogRepositoryHandler(ITransactionLogRepository transactionLogRepository)
         {
-            _transactionLogRepository = transactionLogRepository;
+            TransactionLogRepository = transactionLogRepository;
         }
+
+        public ITransactionLogRepository TransactionLogRepository { get; }
 
         public async Task HandleAsync(TransactionLogWrapper txLog)
         {
-            await _transactionLogRepository.UpsertAsync(
-                txLog.Log);
+            await TransactionLogRepository.UpsertAsync(
+                txLog.Log).ConfigureAwait(false);
+        }
+
+        public async Task HandleAsync(FilterLog log)
+        {
+            await TransactionLogRepository.UpsertAsync(log).ConfigureAwait(false);
         }
     }
+
 }

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
     <Authors>Dave Whiffin</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,7 +15,6 @@
     <PackageReference Include="Elasticsearch.Net.Aws" Version="6.1.0" />
     <PackageReference Include="Microsoft.Azure.Search" Version="5.0.3" />
     <PackageReference Include="NEST" Version="6.5.0" />
-    <PackageReference Include="Nethereum.BlockchainProcessing" Version="3.1.2" />
   </ItemGroup>
 
 </Project>

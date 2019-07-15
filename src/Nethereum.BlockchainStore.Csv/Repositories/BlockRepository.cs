@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using CsvHelper.Configuration;
@@ -22,14 +23,15 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return await FindAsync(b => b.BlockNumber == blockNumber.Value.ToString());
         }
 
-        public async Task<ulong> GetMaxBlockNumberAsync()
+        public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
-            ulong maxBlock = 0;
+            BigInteger? maxBlock = null;
+
             await EnumerateAsync(e =>
             {
-                var blockNumber = ulong.Parse(e.BlockNumber);
+                var blockNumber = BigInteger.Parse(e.BlockNumber);
 
-                if (maxBlock < blockNumber)
+                if (maxBlock == null || maxBlock.Value < blockNumber)
                 {
                     maxBlock = blockNumber;
                 }

@@ -5,7 +5,7 @@ using Elasticsearch.Net.Aws;
 using Nest;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.ElasticSearch;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using Nethereum.Contracts;
 using System;
 using System.Numerics;
@@ -59,7 +59,7 @@ Solidity Contract Excerpt
 
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
-            ConfigurationUtils.SetEnvironment("development");
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
 
             //use the command line to set your azure search api key
             //e.g. dotnet user-secrets set "AWS_ACCESS_KEY_ID" "<put key here>"
@@ -77,7 +77,7 @@ Solidity Contract Excerpt
         /// However - it will work with any elastic search service
         /// Just configure the ElasticClient the way you need to
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Turned off to avoid AWS hosting costs")]
         public async Task StartHere()
         {
             ElasticClient elasticClient = CreateElasticClient();
@@ -108,7 +108,7 @@ Solidity Contract Excerpt
         /// <summary>
         /// Dictating exactly what you want stored in the index - using a custom mapper to translate to a search document
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Turned off to avoid AWS hosting costs")]
         public async Task StoringCustomSearchDocuments_UsingMapper()
         {
             ElasticClient elasticClient = CreateElasticClient();

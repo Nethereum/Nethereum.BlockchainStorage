@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
             entityBuilder.ToTable("TransactionLogs");
             entityBuilder.HasKey(m => m.RowIndex);
 
-            entityBuilder.Property(m => m.TransactionHash).IsRequired();
+            entityBuilder.Property(m => m.TransactionHash).IsHash().IsRequired();
 
             entityBuilder.Property(m => m.Address).IsAddress();
             entityBuilder.Property(m => m.EventHash).IsHash();

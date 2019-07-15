@@ -1,12 +1,13 @@
 ﻿using Nest;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
+using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
+using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
-using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainStore.Search.ElasticSearch
 {
@@ -20,7 +21,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             uint maxBlocksPerBatch = 2, 
             IEnumerable<NewFilterInput> filters = null,
             uint minBlockConfirmations = 0)
-            :this(new BlockchainProxyService(blockchainUrl), 
+            :this(new Web3.Web3(blockchainUrl), 
                 new ElasticSearchService(elasticClient), 
                 null,
                 null, 
@@ -31,14 +32,14 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
         }
 
         public ElasticEventIndexingProcessor(
-            IBlockchainProxyService blockchainProxyService, 
+            IWeb3 web3, 
             IElasticSearchService searchService, 
             IEventFunctionProcessor functionProcessor, 
-            Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
+            Func<BigInteger, BigInteger?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2, 
             IEnumerable<NewFilterInput> filters = null, 
             uint minimumBlockConfirmations = 0) : 
-            base(blockchainProxyService, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations)
+            base(web3, searchService, functionProcessor, blockProgressServiceCallBack, maxBlocksPerBatch, filters, minimumBlockConfirmations)
         {
             this._elasticSearchService = searchService;
         }

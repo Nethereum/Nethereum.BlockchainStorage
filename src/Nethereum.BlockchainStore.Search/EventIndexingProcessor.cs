@@ -1,13 +1,15 @@
-﻿using Nethereum.BlockchainProcessing.BlockchainProxy;
-using Nethereum.BlockchainProcessing.Handlers;
+﻿using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.Contracts;
+using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,32 +19,32 @@ namespace Nethereum.BlockchainStore.Search
     {
         protected readonly List<ILogProcessor> LogProcessors;
         protected readonly List<IIndexer> _indexers;
-        protected readonly Func<ulong, ulong?, IBlockProgressService> BlockProgressServiceCallBack;
+        protected readonly Func<BigInteger, BigInteger?, IBlockProgressService> BlockProgressServiceCallBack;
         protected readonly IEnumerable<NewFilterInput> Filters;
         protected readonly IEventFunctionProcessor FunctionProcessor;
 
         public EventIndexingProcessor(
-            IBlockchainProxyService blockchainProxyService, 
+            IWeb3 web3, 
             ISearchService searchService, 
             IEventFunctionProcessor functionProcessor,
-            Func<ulong, ulong?, IBlockProgressService> blockProgressServiceCallBack = null, 
+            Func<BigInteger, BigInteger?, IBlockProgressService> blockProgressServiceCallBack = null, 
             uint maxBlocksPerBatch = 2,
             IEnumerable<NewFilterInput> filters = null,
             uint minimumBlockConfirmations = 0)
         {
             SearchService = searchService;
-            BlockchainProxyService = blockchainProxyService;
+            Web3 = web3;
             MaxBlocksPerBatch = maxBlocksPerBatch;
             Filters = filters;
             MinimumBlockConfirmations = minimumBlockConfirmations;
             BlockProgressServiceCallBack = blockProgressServiceCallBack;
             LogProcessors = new List<ILogProcessor>();
             _indexers = new List<IIndexer>();
-            FunctionProcessor = functionProcessor ?? new EventFunctionProcessor(BlockchainProxyService);
+            FunctionProcessor = functionProcessor ?? new EventFunctionProcessor(Web3);
         }
 
         public ISearchService SearchService {get;}
-        public IBlockchainProxyService BlockchainProxyService { get; }
+        public IWeb3 Web3 { get; }
         public uint MaxBlocksPerBatch { get; }
         public uint MinimumBlockConfirmations { get; }
 
@@ -68,44 +70,44 @@ namespace Nethereum.BlockchainStore.Search
             return CreateProcessor(functionHandlers, indexer);
         }
 
-        public virtual async Task<ulong> ProcessAsync(ulong from, ulong? to = null, CancellationTokenSource ctx = null, Action<uint, BlockRange> rangeProcessedCallback = null)
+        public virtual async Task<BigInteger> ProcessAsync(BigInteger from, BigInteger? to = null, CancellationTokenSource ctx = null, Action<LogBatchProcessedArgs> logBatchProcessedCallback = null)
         {
             if(!LogProcessors.Any()) throw new InvalidOperationException("No events to capture - use AddEventAsync to add listeners for indexable events");
 
-            var logProcessor = new BlockchainLogProcessor(
-                BlockchainProxyService,
+            var logProcessor = new BlockRangeLogsProcessor(
+                Web3.Eth.Filters.GetLogs,
                 LogProcessors,
                 Filters);
 
             IBlockProgressService progressService = CreateProgressService(from, to);
 
-            var batchProcessorService = new BlockchainBatchProcessorService(
+            var batchProcessorService = new LogsProcessor(
                 logProcessor, progressService, maxNumberOfBlocksPerBatch: MaxBlocksPerBatch);
 
             if (to != null)
             {
-                return await ProcessRange(ctx, rangeProcessedCallback, batchProcessorService);
+                return await ProcessRange(ctx, logBatchProcessedCallback, batchProcessorService);
             }
 
-            return await batchProcessorService.ProcessContinuallyAsync(ctx?.Token ?? new CancellationToken(), rangeProcessedCallback);
+            return await batchProcessorService.ProcessContinuallyAsync(ctx?.Token ?? new CancellationToken(), logBatchProcessedCallback);
             
         }
 
-        private static async Task<ulong> ProcessRange(CancellationTokenSource ctx, Action<uint, BlockRange> rangeProcessedCallback, BlockchainBatchProcessorService batchProcessorService)
+        private static async Task<BigInteger> ProcessRange(CancellationTokenSource ctx, Action<LogBatchProcessedArgs> logBatchProcessedCallBack, LogsProcessor batchProcessorService)
         {
             uint blockRangesProcessed = 0;
-            ulong blocksProcessed = 0;
+            BigInteger blocksProcessed = 0;
 
             BlockRange? lastBlockRangeProcessed;
             do
             {
-                lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync(ctx?.Token ?? new CancellationToken());
+                lastBlockRangeProcessed = await batchProcessorService.ProcessOnceAsync(ctx?.Token ?? new CancellationToken());
 
                 if (lastBlockRangeProcessed != null)
                 {
                     blockRangesProcessed++;
                     blocksProcessed += lastBlockRangeProcessed.Value.BlockCount;
-                    rangeProcessedCallback?.Invoke(blockRangesProcessed, lastBlockRangeProcessed.Value);
+                    logBatchProcessedCallBack?.Invoke(new LogBatchProcessedArgs(blockRangesProcessed, lastBlockRangeProcessed.Value));
                 }
 
             } while (lastBlockRangeProcessed != null);
@@ -114,7 +116,7 @@ namespace Nethereum.BlockchainStore.Search
         }
 
 
-        protected virtual IBlockProgressService CreateProgressService(ulong from, ulong? to)
+        protected virtual IBlockProgressService CreateProgressService(BigInteger from, BigInteger? to)
         {
             if (BlockProgressServiceCallBack != null) return BlockProgressServiceCallBack.Invoke(from, to);
 
@@ -124,7 +126,7 @@ namespace Nethereum.BlockchainStore.Search
             IBlockProgressService progressService = null;
             if (to == null)
             {
-                progressService = new BlockProgressService(BlockchainProxyService, from, progressRepository, MinimumBlockConfirmations);
+                progressService = new BlockProgressService(Web3.Eth.Blocks, from, progressRepository, MinimumBlockConfirmations);
             }
             else
             {

@@ -80,18 +80,18 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public string IndexVal2 => _indexVal2;
         public string IndexVal3 => _indexVal3;
 
-        public static TransactionLog CreateTransactionLog(Log log)
+        public static TransactionLog CreateTransactionLog(FilterLog log)
         {
             var transactionLog = new TransactionLog(log.TransactionHash, (long)log.LogIndex.Value);
             transactionLog.InitLog(log);
             return transactionLog;
         }
 
-        public void InitLog(Log log)
+        public void InitLog(FilterLog log)
         {
             Address = log?.Address;
             Data = log?.Data;
-            Topic0 = log?.EventSignature;
+            Topic0 = log?.EventSignature();
 
             if(log?.Topics != null)
                 Topics = JArray.FromObject(log.Topics).ToString();

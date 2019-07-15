@@ -1,5 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processing.Logs;
+using Nethereum.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -173,7 +174,7 @@ namespace Nethereum.BlockchainStore.Search
 
         protected virtual void LoadIndexedTopics(Dictionary<string, SearchField> fieldDictionary)
         {
-            foreach (var topicField in MapTopicsToFields())
+            foreach (var topicField in MapIndexedTopicsToFields())
             {
                 if (!topicField.Ignore)
                 {
@@ -182,31 +183,16 @@ namespace Nethereum.BlockchainStore.Search
             }
         }
 
-        private SearchField[] MapTopicsToFields()
+        private SearchField[] MapIndexedTopicsToFields()
         {
-            var topics = new TopicFilterContainer<T>();
-            var fieldList = new List<SearchField>(3);
-
-            if (topics.Topic1 != TopicFilter.Empty)
-            {
-                fieldList.Add(MapTopicToField(topics.Topic1));
-            }
-            if (topics.Topic2 != TopicFilter.Empty)
-            {
-                fieldList.Add(MapTopicToField(topics.Topic2));
-            }
-            if (topics.Topic3 != TopicFilter.Empty)
-            {
-                fieldList.Add(MapTopicToField(topics.Topic3));
-            }
-
-            return fieldList.ToArray();
+            var indexedTopics = EventTopicUtils.GetIndexedTopics<T>();
+            return indexedTopics.Select(t => MapTopicToField(t.PropertyInfo)).ToArray();
         }
 
-        private SearchField MapTopicToField(TopicFilter topic)
+        private static SearchField MapTopicToField(PropertyInfo property)
         {
-            var field = topic.EventDtoProperty.GetCustomAttribute<SearchField>() ??
-                        new SearchField(topic.EventDtoProperty.Name)
+            var field = property.GetCustomAttribute<SearchField>() ??
+                        new SearchField(property.Name)
                         {
                             IsSearchable = true,
                             IsSortable = true,
@@ -215,12 +201,12 @@ namespace Nethereum.BlockchainStore.Search
                             IsSuggester = true
                         };
 
-            field.SourceProperty = topic.EventDtoProperty;
-            field.DataType = topic.EventDtoProperty.PropertyType;
+            field.SourceProperty = property;
+            field.DataType = property.PropertyType;
 
             if(string.IsNullOrEmpty(field.Name))
             {
-                field.Name = topic.EventDtoProperty.Name;
+                field.Name = property.Name;
             }
 
             return field;

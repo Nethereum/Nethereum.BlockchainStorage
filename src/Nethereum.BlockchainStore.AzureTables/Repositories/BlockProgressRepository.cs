@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
@@ -7,24 +8,25 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
     public class BlockProgressRepository : AzureTableRepository<Entities.Counter>, 
         Nethereum.BlockchainProcessing.Processing.IBlockProgressRepository
     {
-        private Entities.Counter _counter = new Entities.Counter{Name = "LastBlockProcessed", Value = -1};
+        private Entities.Counter _counter = new Entities.Counter{Name = "LastBlockProcessed", Value = null};
         private bool _maxBlockInitialised;
 
         public BlockProgressRepository(CloudTable countersTable) : base(countersTable)
         {
         }
 
-        public async Task<ulong?> GetLastBlockNumberProcessedAsync()
+        public async Task<BigInteger?> GetLastBlockNumberProcessedAsync()
         {
             await InitialiseMaxBlock();
-            if(_counter.Value < 0) return null;
-            return (ulong)_counter.Value;
+            if(_counter == null) return null;
+            if(_counter.Value == null) return null;
+            return BigInteger.Parse(_counter.Value);
         }
 
-        public async Task UpsertProgressAsync(ulong blockNumber)
+        public async Task UpsertProgressAsync(BigInteger blockNumber)
         {
             await InitialiseMaxBlock();
-            _counter.Value = (long)blockNumber;
+            _counter.Value = blockNumber.ToString();
             await UpsertAsync(_counter, Table).ConfigureAwait(false);
         }
 

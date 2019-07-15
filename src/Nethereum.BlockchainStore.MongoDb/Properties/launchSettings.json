@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Nethereum.BlockchainStore.MongoDb": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,9 +1,8 @@
 using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.BlockchainProxy;
 using Nethereum.BlockchainProcessing.Processing;
 using Nethereum.BlockchainProcessing.Processing.Logs;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Configuration;
+using Microsoft.Configuration.Utils;
 using Nethereum.Contracts;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Search.Models;
 using Xunit;
+using Nethereum.LogProcessing;
 
 namespace Nethereum.BlockchainStore.Search.Samples.Azure
 {
@@ -103,7 +103,7 @@ Solidity Contract Excerpt
         {
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
-            ConfigurationUtils.SetEnvironment("development");
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
 
             //use the command line to set your azure search api key
             //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"
@@ -227,10 +227,10 @@ Solidity Contract Excerpt
         {
             var web3 = new Web3.Web3(BlockchainUrl);
             var currentBlockNumber = (ulong)(await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync()).Value;
-            var startingBlock = currentBlockNumber - 10;
-            var maxBlock = currentBlockNumber + 1;
+            var startingBlock = currentBlockNumber - 9;
+            var maxBlock = currentBlockNumber;
 
-            const ulong expectedBlocks = 12;  // current block + 10 + 1
+            const ulong expectedBlocks = 10; 
 
             using (var processor =
                 new AzureEventIndexingProcessor(
@@ -243,16 +243,16 @@ Solidity Contract Excerpt
                     await processor.AddAsync<TransferEvent_ERC20>(AzureTransferIndexName);
 
                     var cancellationToken = new CancellationTokenSource();
-                    var shortCircuit = new Action<uint, BlockRange>((rangesProcessed, lastRange) =>
+                    var shortCircuit = new Action<LogBatchProcessedArgs>((args) =>
                     {
-                        if (lastRange.To >= maxBlock) // escape hatch!
+                        if (args.LastRangeProcessed.To.Value >= maxBlock) // escape hatch!
                         {
                             cancellationToken.Cancel();
                         }
                     });
 
                     var blocksProcessed = await processor.ProcessAsync(startingBlock,
-                        ctx: cancellationToken, rangeProcessedCallback: shortCircuit);
+                        ctx: cancellationToken, logBatchProcessedCallback: shortCircuit);
 
                     Assert.Equal(expectedBlocks, blocksProcessed);
                 }
@@ -271,7 +271,7 @@ Solidity Contract Excerpt
         [Fact]
         public async Task WithAFilter()
         {
-            var filter = new NewFilterInputBuilder<TransferEvent_ERC20>()
+            var filter = new FilterInputBuilder<TransferEvent_ERC20>()
                 .AddTopic(tfr => tfr.To, "0xdfa70b70b41d77a7cdd8b878f57521d47c064d8c")
                 .Build(contractAddress: "0x3678FbEFC663FC28336b93A1FA397B67ae42114d",
                     blockRange: new BlockRange(3860820, 3860820));
@@ -312,8 +312,8 @@ Solidity Contract Excerpt
         {
             TransferMetadata.CurrentChainUrl = BlockchainUrl;
 
-            var blockchainProxyService =
-                new BlockchainProxyService(BlockchainUrl);
+            var web3 =
+                new Web3.Web3(BlockchainUrl);
 
             using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
             {
@@ -328,8 +328,8 @@ Solidity Contract Excerpt
                             new EventIndexProcessor<TransferEvent_ERC20>(transferIndexer))
                         {
 
-                            var logProcessor = new BlockchainLogProcessor(
-                                blockchainProxyService,
+                            var logProcessor = new BlockRangeLogsProcessor(
+                                web3.Eth.Filters.GetLogs,
                                 new ILogProcessor[] {transferProcessor});
 
                             var progressRepository =
@@ -338,13 +338,13 @@ Solidity Contract Excerpt
                             var progressService = new StaticBlockRangeProgressService(
                                 3146684, 3146694, progressRepository);
 
-                            var batchProcessorService = new BlockchainBatchProcessorService(
+                            var batchProcessorService = new LogsProcessor(
                                 logProcessor, progressService, maxNumberOfBlocksPerBatch: 2);
 
                             BlockRange? lastBlockRangeProcessed;
                             do
                             {
-                                lastBlockRangeProcessed = await batchProcessorService.ProcessLatestBlocksAsync();
+                                lastBlockRangeProcessed = await batchProcessorService.ProcessOnceAsync();
                             } while (lastBlockRangeProcessed != null);
 
                             Assert.Equal(19, transferIndexer.Indexed);

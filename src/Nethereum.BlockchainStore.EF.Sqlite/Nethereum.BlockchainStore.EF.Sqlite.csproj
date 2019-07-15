@@ -1,15 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
-<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-	<Authors>Dave Whiffin</Authors>
+	  <Authors>Dave Whiffin</Authors>
     <Description>Store Ethereum blockchain data in Sqlite using Entity Framework (not core).</Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SQLite.CodeFirst" Version="1.5.1.25" />
+    <PackageReference Include="SQLite.CodeFirst" Version="1.5.2.28" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
-    <PackageReference Include="System.Data.SQLite.EF6" Version="1.0.109" />
+    <PackageReference Include="System.Data.SQLite.EF6" Version="1.0.111" />
   </ItemGroup>
 
   <ItemGroup>
