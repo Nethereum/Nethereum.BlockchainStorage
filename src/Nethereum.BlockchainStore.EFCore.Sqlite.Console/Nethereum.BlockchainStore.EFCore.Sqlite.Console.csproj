@@ -8,10 +8,11 @@
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.5.11" />
   </ItemGroup>
-  
+
   <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Console\Nethereum.BlockchainStore.Console.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.Sqlite\Nethereum.BlockchainStore.EFCore.Sqlite.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
   
   <ItemGroup>

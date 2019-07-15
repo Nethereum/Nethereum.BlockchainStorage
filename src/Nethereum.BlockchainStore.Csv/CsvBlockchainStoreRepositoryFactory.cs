@@ -1,11 +1,13 @@
-﻿using Nethereum.BlockchainStore.Csv.Repositories;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.ProgressRepositories;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.BlockchainStore.Csv.Repositories;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Nethereum.BlockchainStore.Csv
 {
-    public class CsvBlockchainStoreRepositoryFactory : IBlockchainStoreRepositoryFactory
+    public class CsvBlockchainStoreRepositoryFactory : IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
     {
         private readonly string _csvFolderPath;
 
@@ -19,34 +21,58 @@ namespace Nethereum.BlockchainStore.Csv
             }
         }
 
+        public IBlockProgressRepository CreateBlockProgressRepository()
+        {
+            return CreateRepository(() => new BlockProgressRepository(_csvFolderPath));
+        }
+
         public IAddressTransactionRepository CreateAddressTransactionRepository()
         {
-            return new AddressTransactionRepository(_csvFolderPath);
+            return CreateRepository(() => new AddressTransactionRepository(_csvFolderPath));
         }
 
         public IBlockRepository CreateBlockRepository()
         {
-            return new BlockRepository(_csvFolderPath);
+            return CreateRepository(() => new BlockRepository(_csvFolderPath));
         }
 
         public IContractRepository CreateContractRepository()
         {
-            return new ContractRepository(_csvFolderPath);
+            return CreateRepository(() => new ContractRepository(_csvFolderPath));
         }
 
         public ITransactionLogRepository CreateTransactionLogRepository()
         {
-            return new TransactionLogRepository(_csvFolderPath);
+            return CreateRepository(() => new TransactionLogRepository(_csvFolderPath));
         }
 
         public ITransactionRepository CreateTransactionRepository()
         {
-            return new TransactionRepository(_csvFolderPath);
+            return CreateRepository(() => new TransactionRepository(_csvFolderPath));
         }
 
         public ITransactionVMStackRepository CreateTransactionVmStackRepository()
         {
-            return new TransactionVMStackRepository(_csvFolderPath);
+            return CreateRepository(() => new TransactionVMStackRepository(_csvFolderPath));
+        }
+
+        private List<IDisposable> repositories = new List<IDisposable>();
+
+        protected T CreateRepository<T>(Func<T> createRepoAction) where T : IDisposable
+        {
+            var repo = createRepoAction();
+            repositories.Add(repo);
+            return repo;
+        }
+
+        public IEnumerable<IDisposable> GetDisposableRepositories()
+        {
+            return repositories;
+        }
+
+        public void DisposeRepositories()
+        {
+            foreach (var repo in GetDisposableRepositories()) repo.Dispose();
         }
     }
 }

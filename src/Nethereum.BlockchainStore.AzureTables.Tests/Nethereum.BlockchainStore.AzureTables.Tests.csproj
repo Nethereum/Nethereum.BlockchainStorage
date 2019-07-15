@@ -18,7 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
 
 </Project>

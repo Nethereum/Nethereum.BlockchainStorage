@@ -1,10 +1,10 @@
-﻿using System.Data.Entity.Migrations;
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.RPC.Eth.DTOs;
-using Newtonsoft.Json.Linq;
+using System.Data.Entity.Migrations;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
         {
         }
 
-        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, BigInteger idx)
         {
             using (var context = _contextFactory.CreateContext())
             {
@@ -22,22 +22,19 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task UpsertAsync(FilterLog log)
+        public async Task UpsertAsync(FilterLogVO log)
         {
             using (var context = _contextFactory.CreateContext())
             {
-                var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(log.TransactionHash, log.LogIndex.ToLong()).ConfigureAwait(false) 
+                var transactionLog = await context.TransactionLogs.FindByTransactionHashAndLogIndex(log.Log.TransactionHash, log.Log.LogIndex.ToLong()).ConfigureAwait(false)
                           ?? new TransactionLog();
 
-                transactionLog.Map(log);
-                transactionLog.UpdateRowDates();
+                transactionLog.MapToStorageEntityForUpsert(log);
 
                 context.TransactionLogs.AddOrUpdate(transactionLog);
 
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
-
-
     }
 }

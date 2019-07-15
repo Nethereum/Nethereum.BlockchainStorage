@@ -1,7 +1,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using Nethereum.Hex.HexTypes;
 using System.Numerics;
-using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
@@ -25,15 +25,15 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 
         public string Hash { get; set; } = string.Empty;
         public string ParentHash { get; set; } = string.Empty;
-        public long Nonce { get; set; } = 0;
+        public string Nonce { get; set; } = string.Empty;
         public string ExtraData { get; set; } = string.Empty;
-        public long Difficulty { get; set; } = 0;
-        public long TotalDifficulty { get; set; } = 0;
-        public long Size { get; set; } = 0;
+        public string Difficulty { get; set; } = string.Empty;
+        public string TotalDifficulty { get; set; } = string.Empty;
+        public string Size { get; set; } = string.Empty;
         public string Miner { get; set; } = string.Empty;
-        public long GasLimit { get; set; } = 0;
-        public long GasUsed { get; set; } = 0;
-        public long TimeStamp { get; set; } = 0;
+        public string GasLimit { get; set; } = string.Empty;
+        public string GasUsed { get; set; } = string.Empty;
+        public string TimeStamp { get; set; } = string.Empty;
         public long TransactionCount { get; set; } = 0;
 
         public void SetBlockNumber(HexBigInteger blockNumber)
@@ -43,32 +43,32 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 
         public void SetDifficulty(HexBigInteger difficulty)
         {
-            Difficulty = (long) difficulty.Value;
+            Difficulty = difficulty.Value.ToString();
         }
 
         public void SetTotalDifficulty(HexBigInteger totalDifficulty)
         {
-            TotalDifficulty = (long) totalDifficulty.Value;
+            TotalDifficulty = totalDifficulty.Value.ToString();
         }
 
         public void SetTimeStamp(HexBigInteger timeStamp)
         {
-            TimeStamp = (long) timeStamp.Value;
+            TimeStamp = timeStamp.Value.ToString();
         }
 
         public void SetGasUsed(HexBigInteger gasUsed)
         {
-            GasUsed = (long) gasUsed.Value;
+            GasUsed = gasUsed.Value.ToString();
         }
 
         public void SetGasLimit(HexBigInteger gasLimit)
         {
-            GasLimit = (long) gasLimit.Value;
+            GasLimit = gasLimit.Value.ToString();
         }
 
         public void SetSize(HexBigInteger size)
         {
-            Size = (long) size.Value;
+            Size = size.Value.ToString();
         }
 
         public BigInteger GetBlockNumber()

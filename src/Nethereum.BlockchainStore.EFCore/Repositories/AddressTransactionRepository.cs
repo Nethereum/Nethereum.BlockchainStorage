@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
 {
@@ -21,38 +21,28 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             }
         }
 
-        public async Task UpsertAsync(
-            RPC.Eth.DTOs.Transaction transaction, 
-            TransactionReceipt receipt, 
-            bool failedCreatingContract, 
-            HexBigInteger blockTimestamp, 
-            string address, 
-            string error = null, 
-            bool hasVmStack = false, 
-            string newContractAddress = null)
+        private static async Task<AddressTransaction> FindOrCreate(RPC.Eth.DTOs.Transaction transaction, string address, BlockchainDbContextBase context)
         {
+            return await context.AddressTransactions
+                       .FindByBlockNumberAndHashAndAddressAsync(transaction.BlockNumber, transaction.TransactionHash, address).ConfigureAwait(false)  ??
+                   new AddressTransaction();
+        }
 
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string address, string error = null, string newContractAddress = null)
+        {
             using (var context = _contextFactory.CreateContext())
             {
-                var tx = await FindOrCreate(transaction, address, context).ConfigureAwait(false);
+                var tx = await FindOrCreate(transactionReceiptVO.Transaction, address, context).ConfigureAwait(false);
 
-                tx.Map(transaction, address);
-                tx.UpdateRowDates();
+                tx.MapToStorageEntityForUpsert(transactionReceiptVO, address);
 
                 if (tx.IsNew())
                     context.AddressTransactions.Add(tx);
                 else
                     context.AddressTransactions.Update(tx);
 
-                await context.SaveChangesAsync().ConfigureAwait(false) ;
+                await context.SaveChangesAsync().ConfigureAwait(false);
             }
-        }
-
-        private static async Task<BlockchainStore.Entities.AddressTransaction> FindOrCreate(RPC.Eth.DTOs.Transaction transaction, string address, BlockchainDbContextBase context)
-        {
-            return await context.AddressTransactions
-                       .FindByBlockNumberAndHashAndAddressAsync(transaction.BlockNumber, transaction.TransactionHash, address).ConfigureAwait(false)  ??
-                   new BlockchainStore.Entities.AddressTransaction();
         }
     }
 }

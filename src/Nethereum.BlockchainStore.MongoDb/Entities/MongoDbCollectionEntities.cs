@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
 
 namespace Nethereum.BlockchainStore.MongoDb.Entities
 {
@@ -25,6 +25,17 @@ namespace Nethereum.BlockchainStore.MongoDb.Entities
         public string Id
         {
             get => _id ?? $"{BlockNumber}{Hash}{Address}";
+            set => _id = value;
+        }
+    }
+
+    public class MongoDbBlockProgress : BlockProgress, IMongoDbEntity
+    {
+        private string _id;
+
+        public string Id
+        {
+            get => _id ?? LastBlockProcessed;
             set => _id = value;
         }
     }

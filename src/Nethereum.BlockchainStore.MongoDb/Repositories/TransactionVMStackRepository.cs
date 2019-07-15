@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Driver;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.MongoDb.Repositories
 {
@@ -33,9 +33,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
 
         public async Task UpsertAsync(string transactionHash, string address, JObject stackTrace)
         {
-            var transactionVmStack = new MongoDbTransactionVmStack();
-            transactionVmStack.Map(transactionHash, address, stackTrace);
-            transactionVmStack.UpdateRowDates();
+            var transactionVmStack = stackTrace.MapToStorageEntityForUpsert<MongoDbTransactionVmStack>(transactionHash, address);
             await UpsertDocumentAsync(transactionVmStack);
         }
     }

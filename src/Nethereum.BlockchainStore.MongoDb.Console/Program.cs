@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.Processing;
+﻿using Nethereum.BlockchainStore.Console;
 using Nethereum.BlockchainStore.MongoDb.Bootstrap;
-using Nethereum.BlockchainStore.Processing;
-using Microsoft.Configuration.Utils;
-using Microsoft.Logging.Utils;
+using System.Threading;
 
 namespace Nethereum.BlockchainStore.MongoDb.Console
 {
@@ -11,14 +8,15 @@ namespace Nethereum.BlockchainStore.MongoDb.Console
     {
         static int Main(string[] args)
         {
-            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+            var storageProcessorConsole = new StorageProcessorConsole<MongoDbRepositoryFactory>(
+                args,
+                "Nethereum.BlockchainStore.MongoDb.UserSecrets",
+                config => MongoDbRepositoryFactory.Create(config)
+                );
 
-            var appConfig = ConfigurationUtils
-                .Build(args, userSecretsId: "Nethereum.BlockchainStore.MongoDb.UserSecrets");
-
-            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
-            var repositoryFactory = MongoDbRepositoryFactory.Create(appConfig);
-            return StorageProcessorConsole.Execute(repositoryFactory, configuration, log: log).Result;
+            return storageProcessorConsole.ExecuteAsync(
+                new CancellationToken())
+                .Result;
         }
     }
 }

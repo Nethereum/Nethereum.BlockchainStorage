@@ -1,5 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Nethereum.BlockchainStore.EF.EntityBuilders
 {
@@ -28,6 +28,14 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             Property(b => b.ReceiptHash).IsHash();
             Property(b => b.Error).IsUnlimitedText();
             Property(b => b.NewContractAddress).IsAddress();
+
+            Property(b => b.TimeStamp).IsBigInteger();
+            Property(b => b.TransactionIndex).IsBigInteger();
+            Property(b => b.Gas).IsBigInteger();
+            Property(b => b.GasPrice).IsBigInteger();
+            Property(b => b.GasUsed).IsBigInteger();
+            Property(b => b.Nonce).IsBigInteger();
+            Property(b => b.CumulativeGasUsed).IsBigInteger();
         }
     }
 }

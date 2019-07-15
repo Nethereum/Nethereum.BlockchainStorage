@@ -3,6 +3,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockProcessing.ValueObjects;
 using Xunit;
 using Xunit.Sdk;
 

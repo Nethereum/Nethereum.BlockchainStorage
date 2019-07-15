@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 
 namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
 {

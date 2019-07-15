@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockProcessing.ValueObjects;
 using Nethereum.Contracts;
 using Nethereum.Web3;
+using Nethereum.Hex.HexTypes;
 
 namespace Nethereum.BlockchainStore.Search
 {

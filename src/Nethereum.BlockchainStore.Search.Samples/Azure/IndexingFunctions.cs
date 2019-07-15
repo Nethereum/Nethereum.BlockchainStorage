@@ -62,7 +62,7 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                         var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
                         var handlers = new HandlerContainer {TransactionHandler = transferHandler};
                         var blockProcessor = BlockProcessorFactory.Create(web3, handlers);
-                        var processingStrategy = new ProcessingStrategy(blockProcessor);
+                        var processingStrategy = new BlockchainProcessingStrategy(blockProcessor);
                         var blockchainProcessor = new BlockchainProcessor(processingStrategy);
 
                         var blockRange = new BlockRange(3146684, 3146694);

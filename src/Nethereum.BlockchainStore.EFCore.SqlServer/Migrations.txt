@@ -11,3 +11,7 @@ navigate to Nethereum.BlockchainStore.SqlServer
 dotnet ef migrations remove -f
 dotnet ef migrations add Migration1
 dotnet ef database update
+
+Batch File Info
+GenerateDbCreationScripts.bat - with core 3.0 Pre Release
+dotnet tool install -g dotnet-ef --version 3.0.0-preview4.19216.3

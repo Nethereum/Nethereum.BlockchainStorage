@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests

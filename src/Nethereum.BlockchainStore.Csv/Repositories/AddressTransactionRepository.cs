@@ -1,14 +1,14 @@
-﻿using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Repositories;
+﻿using CsvHelper.Configuration;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using CsvHelper.Configuration;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
-    public class AddressTransactionRepository : CsvRepositoryBase<Entities.AddressTransaction>, IAddressTransactionRepository
+    public class AddressTransactionRepository : CsvRepositoryBase<AddressTransaction>, IAddressTransactionRepository
     {
         public AddressTransactionRepository(string csvFolderpath) : base(csvFolderpath, "AddressTransactions")
         {
@@ -23,14 +23,10 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
                 .ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string address, string error = null, string newContractAddress = null)
         {
-            AddressTransaction tx = new AddressTransaction();
-
-            tx.Map(transaction, address);
-            tx.UpdateRowDates();
-
-            await Write(tx);
+            var txEntity = transactionReceiptVO.MapToStorageEntityForUpsert(address);
+            await Write(txEntity);
         }
 
         protected override ClassMap<AddressTransaction> CreateClassMap()
@@ -39,7 +35,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         }
     }
 
-    public class AddressTransactionMap : ClassMap<Entities.AddressTransaction>
+    public class AddressTransactionMap : ClassMap<AddressTransaction>
     {
         public static AddressTransactionMap Instance = new AddressTransactionMap();
 

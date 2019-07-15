@@ -3,6 +3,7 @@ using Nethereum.BlockchainProcessing.Handlers;
 using Nethereum.Contracts;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nethereum.BlockProcessing.ValueObjects;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests

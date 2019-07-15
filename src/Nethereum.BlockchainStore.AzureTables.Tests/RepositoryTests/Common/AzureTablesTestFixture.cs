@@ -15,10 +15,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
             ConfigurationUtils.SetEnvironmentAsDevelopment();
             var appConfig = ConfigurationUtils.Build(CommandLineArgs, UserSecretsId);
             var connectionString = appConfig["AzureStorageConnectionString"];
-            Factory = new CloudTableSetup(connectionString, "UnitTest");
+            Factory = new AzureTablesRepositoryFactory(connectionString, "UnitTest");
         }
 
-        public CloudTableSetup Factory { get; }
+        public AzureTablesRepositoryFactory Factory { get; }
 
         public void Dispose()
         {

@@ -2,6 +2,6 @@
 {
     public enum MongoDbCollectionName
     {
-        Blocks, Contracts, Transactions, TransactionLogs, TransactionVMStacks, AddressTransactions
+        Blocks, Contracts, Transactions, TransactionLogs, TransactionVMStacks, AddressTransactions, BlockProgress
     }
 }

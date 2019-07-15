@@ -1,11 +1,11 @@
-﻿using System.Numerics;
-using System.Threading.Tasks;
-using MongoDB.Driver;
-using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.MongoDb.Repositories
 {
@@ -15,18 +15,18 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
         {
         }
 
-        public async Task<BlockchainStore.Entities.IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber)
+        public async Task<IBlockView> FindByBlockNumberAsync(HexBigInteger blockNumber)
         {
             var filter = CreateDocumentFilter(
                 new MongoDbBlock() {Id = blockNumber.Value.ToString()});
 
-            var response = await Collection.Find(filter).SingleOrDefaultAsync();
+            var response = await Collection.Find(filter).SingleOrDefaultAsync().ConfigureAwait(false);
             return response;
         }
 
         public async Task<BigInteger?> GetMaxBlockNumberAsync()
         {
-            var count = await Collection.CountDocumentsAsync(FilterDefinition<MongoDbBlock>.Empty);
+            var count = await Collection.CountDocumentsAsync(FilterDefinition<MongoDbBlock>.Empty).ConfigureAwait(false);
 
             if (count == 0)
             {
@@ -35,17 +35,15 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
 
             var max = await Collection.Find(FilterDefinition<MongoDbBlock>.Empty).Limit(1)
                 .Sort(new SortDefinitionBuilder<MongoDbBlock>().Descending(block => block.BlockNumber))
-                .Project(block => block.BlockNumber).SingleOrDefaultAsync();
+                .Project(block => block.BlockNumber).SingleOrDefaultAsync().ConfigureAwait(false);
 
             return BigInteger.Parse(max);
         }
 
-        public async Task UpsertBlockAsync(Block source)
+        public async Task UpsertBlockAsync(RPC.Eth.DTOs.Block source)
         {
-            var block = new MongoDbBlock { };
-            block.Map(source);
-            block.UpdateRowDates();
-            await UpsertDocumentAsync(block);
+            var block = source.MapToStorageEntityForUpsert<MongoDbBlock>();
+            await UpsertDocumentAsync(block).ConfigureAwait(false);
         }
     }
 }

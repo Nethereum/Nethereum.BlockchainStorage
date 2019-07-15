@@ -1,12 +1,11 @@
-﻿using System.Net;
+﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -52,9 +51,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 
         public async Task UpsertAsync(string transactionHash, string address, JObject stackTrace)
         {
-            var transactionVmStack = new CosmosTransactionVmStack();
-            transactionVmStack.Map(transactionHash, address, stackTrace);
-            transactionVmStack.UpdateRowDates();
+            var transactionVmStack = stackTrace.MapToStorageEntityForUpsert<CosmosTransactionVmStack>(transactionHash, address);
             await UpsertDocumentAsync(transactionVmStack);
         }
     }

@@ -1,7 +1,7 @@
-﻿using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-using Nethereum.RPC.Eth.DTOs;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
@@ -47,14 +47,16 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                     ]
                 }}").ToObject<FilterLog>();
 
-            await _repo.UpsertAsync(log);
+            var filterLogVO = new FilterLogVO(transaction: null, receipt: null, log);
+
+            await _repo.UpsertAsync(filterLogVO);
 
             var storedLog = await _repo.FindByTransactionHashAndLogIndexAsync(transactionHash, logIndex);
 
             Assert.NotNull(storedLog);
 
             Assert.Equal(transactionHash, storedLog.TransactionHash);
-            Assert.Equal(logIndex, storedLog.LogIndex);
+            Assert.Equal(logIndex.ToString(), storedLog.LogIndex);
             Assert.Equal(address, storedLog.Address);
             Assert.Equal(data, storedLog.Data);
             Assert.Equal(topic0, storedLog.EventHash);

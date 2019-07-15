@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainStore.Processing;
-using Microsoft.Configuration.Utils;
-using Microsoft.Logging.Utils;
+﻿using Nethereum.BlockchainStore.Console;
+using System.Threading;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer.Console
 {
@@ -10,15 +7,15 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Console
     {
         public static int Main(string[] args)
         {
-            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+            var storageProcessorConsole = new StorageProcessorConsole<BlockchainStoreRepositoryFactory>(
+                args,
+                "Nethereum.BlockchainStorage.EFCore.SqlServer",
+                config => new BlockchainStoreRepositoryFactory(SqlServerCoreBlockchainDbContextFactory.Create(config))
+                );
 
-            var appConfig = ConfigurationUtils
-                .Build(args, userSecretsId: "Nethereum.BlockchainStorage.EFCore.SqlServer");
-
-            var blockchainConfig = BlockchainSourceConfigurationFactory.Get(appConfig);
-            var dbContextFactory = SqlServerCoreBlockchainDbContextFactory.Create(appConfig);
-            var repositoryFactory = new BlockchainStoreRepositoryFactory(dbContextFactory);
-            return StorageProcessorConsole.Execute(repositoryFactory, blockchainConfig, log: log).Result;
+            return storageProcessorConsole.ExecuteAsync(
+                new CancellationToken())
+                .Result;
         }
     }
 }

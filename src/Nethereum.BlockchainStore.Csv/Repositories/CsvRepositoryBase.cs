@@ -1,6 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using Nethereum.Util;
 using System;
 using System.Collections.Generic;

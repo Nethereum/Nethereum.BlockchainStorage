@@ -26,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.EF.Hana\Nethereum.BlockchainStore.EF.Hana.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
   </ItemGroup>
 
 </Project>

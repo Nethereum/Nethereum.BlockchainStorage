@@ -1,10 +1,10 @@
 ﻿using CsvHelper.Configuration;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.RPC.Eth.DTOs;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
@@ -14,18 +14,14 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         {
         }
 
-        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, BigInteger idx)
         {
-            return await FindAsync(t => t.TransactionHash == hash && t.LogIndex == idx).ConfigureAwait(false);
+            return await FindAsync(t => t.TransactionHash == hash && t.LogIndex == idx.ToString()).ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(FilterLog log)
+        public async Task UpsertAsync(FilterLogVO log)
         {
-            var transactionLog =  new TransactionLog();
-
-            transactionLog.Map(log);
-            transactionLog.UpdateRowDates();
-
+            var transactionLog = log.MapToStorageEntityForUpsert();
             await Write(transactionLog).ConfigureAwait(false);
         }
 

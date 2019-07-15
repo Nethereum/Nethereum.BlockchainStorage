@@ -1,7 +1,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using System.Collections.Generic;
 using System.Linq;
-using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
@@ -61,7 +61,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
                 Creator = transactionSource.From,
                 TransactionHash = transactionSource.TransactionHash
             };
-            contract.InitCode(code);
+            if(code != null) 
+            { 
+                contract.InitCode(code);
+            }
             return contract;
         }
 

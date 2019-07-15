@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using System;
 using System.Reflection;
 

@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockProcessing.ValueObjects;
 
 namespace Nethereum.BlockchainStore.Search
 {

@@ -1,8 +1,9 @@
-using System;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
+using System.Numerics;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
@@ -21,7 +22,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public TransactionLog(string hash, long logIndex)
         {
             TransactionHash = hash;
-            LogIndex = logIndex;
+            LogIndex = logIndex.ToString();
+        }
+
+        public TransactionLog(string hash, BigInteger logIndex)
+        {
+            TransactionHash = hash;
+            LogIndex = logIndex.ToString();
         }
 
         public string TransactionHash
@@ -30,10 +37,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             set => PartitionKey = value.ToPartitionKey();
         }
 
-        public long LogIndex
+        public string LogIndex
         {
-            get => long.Parse(RowKey);
-            set => RowKey = value.ToString().ToRowKey();
+            get => RowKey;
+            set => RowKey = value.ToRowKey();
         } 
 
         public string Address { get; set; } = string.Empty;

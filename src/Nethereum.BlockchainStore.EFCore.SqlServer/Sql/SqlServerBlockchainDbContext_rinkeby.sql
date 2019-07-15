@@ -25,22 +25,32 @@ CREATE TABLE [rinkeby].[AddressTransactions] (
 
 GO
 
+CREATE TABLE [rinkeby].[BlockProgress] (
+    [RowIndex] int NOT NULL IDENTITY,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
+    [LastBlockProcessed] nvarchar(43) NOT NULL,
+    CONSTRAINT [PK_BlockProgress] PRIMARY KEY ([RowIndex])
+);
+
+GO
+
 CREATE TABLE [rinkeby].[Blocks] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
-    [BlockNumber] nvarchar(43) NOT NULL,
+    [BlockNumber] nvarchar(100) NOT NULL,
     [Hash] nvarchar(67) NOT NULL,
     [ParentHash] nvarchar(67) NOT NULL,
-    [Nonce] bigint NOT NULL,
+    [Nonce] nvarchar(100) NULL,
     [ExtraData] nvarchar(max) NULL,
-    [Difficulty] bigint NOT NULL,
-    [TotalDifficulty] bigint NOT NULL,
-    [Size] bigint NOT NULL,
+    [Difficulty] nvarchar(100) NULL,
+    [TotalDifficulty] nvarchar(100) NULL,
+    [Size] nvarchar(100) NULL,
     [Miner] nvarchar(43) NULL,
-    [GasLimit] bigint NOT NULL,
-    [GasUsed] bigint NOT NULL,
-    [Timestamp] bigint NOT NULL,
+    [GasLimit] nvarchar(100) NULL,
+    [GasUsed] nvarchar(100) NULL,
+    [Timestamp] nvarchar(100) NULL,
     [TransactionCount] bigint NOT NULL,
     CONSTRAINT [PK_Blocks] PRIMARY KEY ([RowIndex])
 );
@@ -66,8 +76,8 @@ CREATE TABLE [rinkeby].[TransactionLogs] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
-    [TransactionHash] nvarchar(450) NOT NULL,
-    [LogIndex] bigint NOT NULL,
+    [TransactionHash] nvarchar(67) NOT NULL,
+    [LogIndex] nvarchar(100) NULL,
     [Address] nvarchar(43) NULL,
     [EventHash] nvarchar(67) NULL,
     [IndexVal1] nvarchar(67) NULL,
@@ -99,18 +109,18 @@ CREATE TABLE [rinkeby].[Transactions] (
     [BlockNumber] nvarchar(100) NOT NULL,
     [Hash] nvarchar(67) NOT NULL,
     [AddressFrom] nvarchar(43) NULL,
-    [TimeStamp] bigint NOT NULL,
-    [TransactionIndex] bigint NOT NULL,
+    [TimeStamp] nvarchar(100) NULL,
+    [TransactionIndex] nvarchar(100) NULL,
     [Value] nvarchar(100) NULL,
     [AddressTo] nvarchar(43) NULL,
-    [Gas] bigint NOT NULL,
-    [GasPrice] bigint NOT NULL,
+    [Gas] nvarchar(100) NULL,
+    [GasPrice] nvarchar(100) NULL,
     [Input] nvarchar(max) NULL,
-    [Nonce] bigint NOT NULL,
+    [Nonce] nvarchar(100) NULL,
     [Failed] bit NOT NULL,
     [ReceiptHash] nvarchar(67) NULL,
-    [GasUsed] bigint NOT NULL,
-    [CumulativeGasUsed] bigint NOT NULL,
+    [GasUsed] nvarchar(100) NULL,
+    [CumulativeGasUsed] nvarchar(100) NULL,
     [HasLog] bit NOT NULL,
     [Error] nvarchar(max) NULL,
     [HasVmStack] bit NOT NULL,
@@ -133,6 +143,10 @@ CREATE UNIQUE INDEX [IX_AddressTransactions_BlockNumber_Hash_Address] ON [rinkeb
 
 GO
 
+CREATE INDEX [IX_BlockProgress_LastBlockProcessed] ON [rinkeby].[BlockProgress] ([LastBlockProcessed]);
+
+GO
+
 CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [rinkeby].[Blocks] ([BlockNumber], [Hash]);
 
 GO
@@ -141,7 +155,7 @@ CREATE INDEX [IX_Contracts_Address] ON [rinkeby].[Contracts] ([Address]);
 
 GO
 
-CREATE INDEX [IX_Contracts_Name] ON [rinkeby].[Contracts] ([Name]);
+CREATE UNIQUE INDEX [IX_Contracts_Name] ON [rinkeby].[Contracts] ([Name]) WHERE [Name] IS NOT NULL;
 
 GO
 
@@ -165,7 +179,7 @@ CREATE INDEX [IX_TransactionLogs_IndexVal3] ON [rinkeby].[TransactionLogs] ([Ind
 
 GO
 
-CREATE UNIQUE INDEX [IX_TransactionLogs_TransactionHash_LogIndex] ON [rinkeby].[TransactionLogs] ([TransactionHash], [LogIndex]);
+CREATE UNIQUE INDEX [IX_TransactionLogs_TransactionHash_LogIndex] ON [rinkeby].[TransactionLogs] ([TransactionHash], [LogIndex]) WHERE [LogIndex] IS NOT NULL;
 
 GO
 
@@ -198,7 +212,7 @@ CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [rinkeby].[Transaction
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20181010105740_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20190712142955_InitialCreate', N'2.1.1-rtm-30846');
 
 GO
 

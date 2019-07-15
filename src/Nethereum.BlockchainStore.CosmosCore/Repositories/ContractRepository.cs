@@ -1,12 +1,12 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Concurrent;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
@@ -60,7 +60,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             var uri = CreateDocumentUri(contractAddress);
             try
             {
-                var response = await Client.ReadDocumentAsync<CosmosContract>(uri);
+                var response = await Client.ReadDocumentAsync<CosmosContract>(uri).ConfigureAwait(false);
                 return response.Document;
             }
             catch (DocumentClientException dEx)
@@ -77,12 +77,10 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             return _cachedContracts.ContainsKey(contractAddress);
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction)
+        public async Task UpsertAsync(ContractCreationVO contractCreation)
         {
-            var contract = new CosmosContract { };
-            contract.Map(contractAddress, code, transaction);
-            contract.UpdateRowDates();
-            await UpsertDocumentAsync(contract);
+            var contract = contractCreation.MapToStorageEntityForUpsert<CosmosContract>();
+            await UpsertDocumentAsync(contract).ConfigureAwait(false);
 
             _cachedContracts.AddOrUpdate(contract.Address, contract,
                 (s, existingContract) => contract);

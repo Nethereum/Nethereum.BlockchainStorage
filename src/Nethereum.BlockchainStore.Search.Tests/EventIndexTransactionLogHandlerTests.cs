@@ -6,6 +6,7 @@ using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Nethereum.BlockProcessing.ValueObjects;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
@@ -33,8 +34,8 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
             var handler = new EventIndexTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2);
 
-            var transactionLog1 = new Mock<TransactionLogWrapper>();
-            var transactionLog2 = new Mock<TransactionLogWrapper>();
+            var transactionLog1 = new Mock<LogWithReceiptAndTransaction>();
+            var transactionLog2 = new Mock<LogWithReceiptAndTransaction>();
 
             transactionLog1.Setup(t => t.IsForEvent<TransferEvent>()).Returns(true);
             transactionLog2.Setup(t => t.IsForEvent<TransferEvent>()).Returns(true);
@@ -64,7 +65,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 new EventIndexTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 2))
             {
 
-                var transactionLog1 = new Mock<TransactionLogWrapper>();
+                var transactionLog1 = new Mock<LogWithReceiptAndTransaction>();
                 transactionLog1.Setup(t => t.IsForEvent<TransferEvent>()).Returns(true);
 
                 var eventLog1 = new EventLog<TransferEvent>(new TransferEvent(), new FilterLog());
@@ -86,7 +87,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             var handler =
                 new EventIndexTransactionLogHandler<TransferEvent>(indexer.Object, logsPerIndexBatch: 1);
 
-            var logForAnotherEvent = new Mock<TransactionLogWrapper>();
+            var logForAnotherEvent = new Mock<LogWithReceiptAndTransaction>();
             logForAnotherEvent.Setup(t => t.IsForEvent<TransferEvent>()).Returns(false);
 
             await handler.HandleAsync(logForAnotherEvent.Object);

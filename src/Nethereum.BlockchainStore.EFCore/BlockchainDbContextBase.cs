@@ -1,6 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using Nethereum.BlockchainStore.EFCore.EntityBuilders;
 
 namespace Nethereum.BlockchainStore.EFCore
@@ -9,6 +8,7 @@ namespace Nethereum.BlockchainStore.EFCore
     {
         public string ColumnTypeForUnlimitedText { get; protected set; } = "nvarchar(max)";
 
+        public DbSet<BlockProgress> BlockProgress { get; set; }
         public DbSet<Block> Blocks { get; set; }
         public DbSet<AddressTransaction> AddressTransactions { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
@@ -18,6 +18,7 @@ namespace Nethereum.BlockchainStore.EFCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new BlockProgressEntityBuilder() { ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText });
             modelBuilder.ApplyConfiguration(new BlockEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
             modelBuilder.ApplyConfiguration(new ContractEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});
             modelBuilder.ApplyConfiguration(new TransactionEntityBuilder(){ColumnTypeForUnlimitedText = ColumnTypeForUnlimitedText});

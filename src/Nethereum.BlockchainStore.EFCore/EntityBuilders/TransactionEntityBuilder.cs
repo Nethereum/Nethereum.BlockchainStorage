@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 
 namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
 {
@@ -27,6 +27,14 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
             entityBuilder.Property(b => b.ReceiptHash).IsHash();
             entityBuilder.Property(b => b.Error).IsUnlimitedText(ColumnTypeForUnlimitedText);
             entityBuilder.Property(b => b.NewContractAddress).IsAddress();
+
+            entityBuilder.Property(b => b.TimeStamp).IsBigInteger();
+            entityBuilder.Property(b => b.TransactionIndex).IsBigInteger();
+            entityBuilder.Property(b => b.Gas).IsBigInteger();
+            entityBuilder.Property(b => b.GasPrice).IsBigInteger();
+            entityBuilder.Property(b => b.GasUsed).IsBigInteger();
+            entityBuilder.Property(b => b.Nonce).IsBigInteger();
+            entityBuilder.Property(b => b.CumulativeGasUsed).IsBigInteger();
         }
     }
 }

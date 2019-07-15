@@ -1,5 +1,4 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using System.Numerics;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {

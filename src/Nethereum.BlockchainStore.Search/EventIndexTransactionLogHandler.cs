@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nethereum.BlockProcessing.ValueObjects;
 
 namespace Nethereum.BlockchainStore.Search
 {
@@ -30,13 +31,13 @@ namespace Nethereum.BlockchainStore.Search
 
         public int Pending => _currentBatch.Count;
 
-        public async Task HandleAsync(TransactionLogWrapper transactionLog)
+        public async Task HandleAsync(LogWithReceiptAndTransaction filterLogWithReceiptAndTransactionLog)
         {
             try
             {
-                if(!transactionLog.IsForEvent<TEvent>()) return;
+                if(!filterLogWithReceiptAndTransactionLog.IsForEvent<TEvent>()) return;
 
-                var eventValues = transactionLog.Decode<TEvent>();
+                var eventValues = filterLogWithReceiptAndTransactionLog.Decode<TEvent>();
                 if (eventValues == null)
                 {
                     return;

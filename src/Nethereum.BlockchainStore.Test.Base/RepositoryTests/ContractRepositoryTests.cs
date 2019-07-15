@@ -1,4 +1,5 @@
-﻿using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -29,10 +30,16 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                 TransactionHash = "0xcb00b69d2594a3583309f332ada97d0df48bae00170e36a4f7bbdad7783fc7e5"
             };
 
+            var block = new Block { };
+            var receipt = new TransactionReceipt { ContractAddress = contractAddress };
+            var transactionReceiptVO = new TransactionReceiptVO(block, transaction, receipt, false);
+
+            var contractCreationVO = new ContractCreationVO(transactionReceiptVO, code, false);
+
             Assert.False(await _repo.ExistsAsync(contractAddress));
             Assert.False(_repo.IsCached(contractAddress));
 
-            await _repo.UpsertAsync(contractAddress, code, transaction);
+            await _repo.UpsertAsync(contractCreationVO);
 
             Assert.True(await _repo.ExistsAsync(contractAddress));
             Assert.True(_repo.IsCached(contractAddress));

@@ -1,9 +1,9 @@
-﻿using System.Data.Entity.Migrations;
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Newtonsoft.Json.Linq;
+using System.Data.Entity.Migrations;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
@@ -53,8 +53,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
                                  .FindByTransactionHashAync(transactionHash).ConfigureAwait(false)  ??
                              new TransactionVmStack();
 
-                record.Map(transactionHash, address, stackTrace);
-                record.UpdateRowDates();
+                record.MapToStorageEntityForUpsert(stackTrace, transactionHash, address);
 
                 context.TransactionVmStacks.AddOrUpdate(record);
 

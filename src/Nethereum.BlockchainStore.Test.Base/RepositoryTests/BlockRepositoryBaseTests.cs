@@ -1,9 +1,9 @@
-﻿using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Repositories;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
@@ -47,17 +47,17 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             Assert.NotNull(storedBlock);
 
             Assert.Equal(source.Number.Value.ToString(), storedBlock.BlockNumber);
-            Assert.Equal(source.Difficulty.ToLong(), storedBlock.Difficulty);
-            Assert.Equal(source.GasLimit.ToLong(), storedBlock.GasLimit);
-            Assert.Equal(source.GasUsed.ToLong(), storedBlock.GasUsed);
-            Assert.Equal(source.Size.ToLong(), storedBlock.Size);
-            Assert.Equal(source.Timestamp.ToLong(), storedBlock.TimeStamp);
-            Assert.Equal(source.TotalDifficulty.ToLong(), storedBlock.TotalDifficulty);
+            Assert.Equal(source.Difficulty.Value.ToString(), storedBlock.Difficulty);
+            Assert.Equal(source.GasLimit.Value.ToString(), storedBlock.GasLimit);
+            Assert.Equal(source.GasUsed.Value.ToString(), storedBlock.GasUsed);
+            Assert.Equal(source.Size.Value.ToString(), storedBlock.Size);
+            Assert.Equal(source.Timestamp.Value.ToString(), storedBlock.TimeStamp);
+            Assert.Equal(source.TotalDifficulty.Value.ToString(), storedBlock.TotalDifficulty);
             Assert.Equal(source.ExtraData, storedBlock.ExtraData);
             Assert.Equal(source.BlockHash, storedBlock.Hash);
             Assert.Equal(source.ParentHash, storedBlock.ParentHash);
             Assert.Equal(source.Miner, storedBlock.Miner);
-            Assert.Equal(new HexBigInteger(source.Nonce).ToLong(), storedBlock.Nonce);
+            Assert.Equal(new HexBigInteger(source.Nonce).Value.ToString(), storedBlock.Nonce);
             Assert.Equal(source.TransactionHashes.Length, storedBlock.TransactionCount);
         }
     }

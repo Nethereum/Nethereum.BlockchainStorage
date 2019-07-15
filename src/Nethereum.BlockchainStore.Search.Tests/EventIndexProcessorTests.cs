@@ -36,8 +36,8 @@ namespace Nethereum.BlockchainStore.Search.Tests
             var transferLog = new FilterLog {Topics = new object[]{ TransferEvent.Signature() }};
             var irrelevantLog = new FilterLog {Topics = new object[]{ "SignatureForAnotherEvent" }};
 
-            Assert.True(processor.IsLogForEvent(transferLog));
-            Assert.False(processor.IsLogForEvent(irrelevantLog));
+            Assert.True(await processor.IsLogForMeAsync(transferLog));
+            Assert.False(await processor.IsLogForMeAsync(irrelevantLog));
         }
 
         [Fact]

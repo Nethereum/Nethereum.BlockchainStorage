@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Driver;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Nethereum.BlockchainStore.MongoDb.Repositories
 {
@@ -14,20 +15,18 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
         {
         }
 
-        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, BigInteger idx)
         {
-            var filter = CreateDocumentFilter(new MongoDbTransactionLog {TransactionHash = hash, LogIndex = idx});
+            var filter = CreateDocumentFilter(new MongoDbTransactionLog {TransactionHash = hash, LogIndex = idx.ToString()});
 
-            var response = await Collection.Find(filter).SingleOrDefaultAsync();
+            var response = await Collection.Find(filter).SingleOrDefaultAsync().ConfigureAwait(false);
             return response;
         }
 
-        public async Task UpsertAsync(FilterLog log)
+        public async Task UpsertAsync(FilterLogVO log)
         {
-            var transactionLog = new MongoDbTransactionLog();
-            transactionLog.Map(log);
-            transactionLog.UpdateRowDates();
-            await UpsertDocumentAsync(transactionLog);
+            var transactionLog = log.MapToStorageEntityForUpsert<MongoDbTransactionLog>();
+            await UpsertDocumentAsync(transactionLog).ConfigureAwait(false);
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
+using Nethereum.BlockchainProcessing.ProgressRepositories;
 using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
     public class BlockProgressRepository : AzureTableRepository<Entities.Counter>, 
-        Nethereum.BlockchainProcessing.Processing.IBlockProgressRepository
+        IBlockProgressRepository
     {
         private Entities.Counter _counter = new Entities.Counter{Name = "LastBlockProcessed", Value = null};
         private bool _maxBlockInitialised;
@@ -35,7 +35,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             if (!_maxBlockInitialised)
             {
                 var operation = TableOperation.Retrieve<Entities.Counter>(_counter.Name, "");
-                var results = await Table.ExecuteAsync(operation);
+                var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
 
                 _counter = results.Result as Entities.Counter ?? _counter;
                 _maxBlockInitialised = true;

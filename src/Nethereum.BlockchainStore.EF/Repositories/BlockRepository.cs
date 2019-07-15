@@ -1,14 +1,9 @@
-﻿using System.Data.Entity;
-using System.Data.Entity.Migrations;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
-using Block = Nethereum.BlockchainStore.Entities.Block;
+using System.Data.Entity.Migrations;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
@@ -26,24 +21,13 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task<BigInteger?> GetMaxBlockNumberAsync()
-        {
-            using (var context = _contextFactory.CreateContext())
-            {
-                var max = await context.Blocks.MaxAsync(b => b.BlockNumber).ConfigureAwait(false);
-                return string.IsNullOrEmpty(max) ? (BigInteger?)null : BigInteger.Parse(max);
-            }
-        }
-
         public async Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source)
         {
             using (var context = _contextFactory.CreateContext())
             {
                 var block = await context.Blocks.FindByBlockNumberAsync(source.Number).ConfigureAwait(false) ?? new Block();
 
-                block.Map(source);
-                block.UpdateRowDates();
-
+                block.MapToStorageEntityForUpsert(source);
                 context.Blocks.AddOrUpdate(block);
 
                 await context.SaveChangesAsync().ConfigureAwait(false) ;

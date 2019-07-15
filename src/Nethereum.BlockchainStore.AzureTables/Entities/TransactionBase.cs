@@ -7,25 +7,22 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
     public abstract class TransactionBase : TableEntity
     {
-        private static readonly long minusOne = (long) -1;
-        private static readonly long zero = (long) 0;
-
         public string BlockHash { get; set; } = string.Empty;
         public abstract string Hash { get; set; }
         public string AddressFrom { get; set; } = string.Empty;
-        public long TimeStamp { get; set; } = minusOne;
-        public long TransactionIndex { get; set; } = zero;
+        public string TimeStamp { get; set; } = string.Empty;
+        public string TransactionIndex { get; set; } = string.Empty;
         public string Value { get; set; } = string.Empty;
         public abstract string AddressTo { get; set; }
         public abstract string BlockNumber { get; set; }
-        public long Gas { get; set; } = zero;
-        public long GasPrice { get; set; } = zero;
+        public string Gas { get; set; } = string.Empty;
+        public string GasPrice { get; set; } = string.Empty;
         public string Input { get; set; } = string.Empty;
-        public long Nonce { get; set; } = zero;
+        public string Nonce { get; set; } = string.Empty;
         public bool Failed { get; set; } = false;
         public string ReceiptHash { get; set; } = string.Empty;
-        public long GasUsed { get; set; } = zero;
-        public long CumulativeGasUsed{ get; set; } = zero;
+        public string GasUsed { get; set; } = string.Empty;
+        public string CumulativeGasUsed { get; set; } = string.Empty;
         public bool HasLog { get; set; } = false;
         public string Error{ get; set; } = string.Empty;
         public bool HasVmStack{ get; set; } = false;
@@ -45,7 +42,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             transaction.BlockHash = transactionSource.BlockHash;
             transaction.Hash = transactionSource.TransactionHash;
             transaction.AddressFrom = transactionSource.From;
-            transaction.TransactionIndex = (long) transactionReceipt.TransactionIndex.Value;
+            transaction.TransactionIndex = transactionReceipt.TransactionIndex.Value.ToString();
             transaction.SetValue(transactionSource.Value);
             transaction.AddressTo = transactionSource.To ?? string.Empty;
             transaction.NewContractAddress = newContractAddress ?? string.Empty;
@@ -53,7 +50,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             transaction.SetGas(transactionSource.Gas);
             transaction.SetGasPrice(transactionSource.GasPrice);
             transaction.Input = transactionSource.Input.RestrictToAzureTableStorageLimit(valIfTooLong: string.Empty);
-            transaction.Nonce = (long) transactionSource.Nonce.Value;
+            transaction.Nonce = transactionSource.Nonce.Value.ToString();
             transaction.Failed = failed;
             transaction.SetGasUsed(transactionReceipt.GasUsed);
             transaction.SetCumulativeGasUsed(transactionReceipt.CumulativeGasUsed);
@@ -72,27 +69,27 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
 
         public void SetTimeStamp(HexBigInteger timeStamp)
         {
-            TimeStamp = (long) timeStamp.Value;
+            TimeStamp = timeStamp.Value.ToString();
         }
 
         public void SetGas(HexBigInteger gas)
         {
-            Gas = (long) gas.Value;
+            Gas = gas.Value.ToString();
         }
 
         public void SetGasUsed(HexBigInteger gasUsed)
         {
-            GasUsed = (long) gasUsed.Value;
+            GasUsed = gasUsed.Value.ToString();
         }
 
         public void SetCumulativeGasUsed(HexBigInteger cumulativeGasUsed)
         {
-            CumulativeGasUsed = (long) cumulativeGasUsed.Value;
+            CumulativeGasUsed = cumulativeGasUsed.Value.ToString();
         }
 
         public void SetGasPrice(HexBigInteger gasPrice)
         {
-            GasPrice = (long) gasPrice.Value;
+            GasPrice = gasPrice.Value.ToString();
         }
 
         public void SetValue(HexBigInteger value)

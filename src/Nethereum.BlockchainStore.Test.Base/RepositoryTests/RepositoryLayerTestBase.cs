@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Nethereum.BlockchainProcessing.Storage.Repositories;
+using System;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Repositories;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests

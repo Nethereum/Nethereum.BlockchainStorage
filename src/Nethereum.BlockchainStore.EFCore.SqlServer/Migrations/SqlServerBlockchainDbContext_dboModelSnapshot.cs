@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.AddressTransaction", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.AddressTransaction", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.ToTable("AddressTransactions");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.Block", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.Block", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
@@ -62,15 +62,18 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
                     b.Property<string>("BlockNumber")
                         .IsRequired()
-                        .HasMaxLength(43);
+                        .HasMaxLength(100);
 
-                    b.Property<long>("Difficulty");
+                    b.Property<string>("Difficulty")
+                        .HasMaxLength(100);
 
                     b.Property<string>("ExtraData");
 
-                    b.Property<long>("GasLimit");
+                    b.Property<string>("GasLimit")
+                        .HasMaxLength(100);
 
-                    b.Property<long>("GasUsed");
+                    b.Property<string>("GasUsed")
+                        .HasMaxLength(100);
 
                     b.Property<string>("Hash")
                         .IsRequired()
@@ -79,7 +82,8 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.Property<string>("Miner")
                         .HasMaxLength(43);
 
-                    b.Property<long>("Nonce");
+                    b.Property<string>("Nonce")
+                        .HasMaxLength(100);
 
                     b.Property<string>("ParentHash")
                         .IsRequired()
@@ -89,11 +93,14 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
                     b.Property<DateTime?>("RowUpdated");
 
-                    b.Property<long>("Size");
+                    b.Property<string>("Size")
+                        .HasMaxLength(100);
 
-                    b.Property<long>("Timestamp");
+                    b.Property<string>("Timestamp")
+                        .HasMaxLength(100);
 
-                    b.Property<long>("TotalDifficulty");
+                    b.Property<string>("TotalDifficulty")
+                        .HasMaxLength(100);
 
                     b.Property<long>("TransactionCount");
 
@@ -105,7 +112,28 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.ToTable("Blocks");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.Contract", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.BlockProgress", b =>
+                {
+                    b.Property<int>("RowIndex")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("LastBlockProcessed")
+                        .IsRequired()
+                        .HasMaxLength(43);
+
+                    b.Property<DateTime?>("RowCreated");
+
+                    b.Property<DateTime?>("RowUpdated");
+
+                    b.HasKey("RowIndex");
+
+                    b.HasIndex("LastBlockProcessed");
+
+                    b.ToTable("BlockProgress");
+                });
+
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.Contract", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
@@ -137,12 +165,14 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
                     b.HasIndex("Address");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("Contracts");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.Transaction", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.Transaction", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
@@ -161,7 +191,8 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                         .IsRequired()
                         .HasMaxLength(100);
 
-                    b.Property<long>("CumulativeGasUsed");
+                    b.Property<string>("CumulativeGasUsed")
+                        .HasMaxLength(100);
 
                     b.Property<string>("Error")
                         .HasColumnType("nvarchar(max)");
@@ -170,11 +201,14 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
                     b.Property<bool>("FailedCreateContract");
 
-                    b.Property<long>("Gas");
+                    b.Property<string>("Gas")
+                        .HasMaxLength(100);
 
-                    b.Property<long>("GasPrice");
+                    b.Property<string>("GasPrice")
+                        .HasMaxLength(100);
 
-                    b.Property<long>("GasUsed");
+                    b.Property<string>("GasUsed")
+                        .HasMaxLength(100);
 
                     b.Property<bool>("HasLog");
 
@@ -190,7 +224,8 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.Property<string>("NewContractAddress")
                         .HasMaxLength(43);
 
-                    b.Property<long>("Nonce");
+                    b.Property<string>("Nonce")
+                        .HasMaxLength(100);
 
                     b.Property<string>("ReceiptHash")
                         .HasMaxLength(67);
@@ -199,9 +234,11 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
 
                     b.Property<DateTime?>("RowUpdated");
 
-                    b.Property<long>("TimeStamp");
+                    b.Property<string>("TimeStamp")
+                        .HasMaxLength(100);
 
-                    b.Property<long>("TransactionIndex");
+                    b.Property<string>("TransactionIndex")
+                        .HasMaxLength(100);
 
                     b.Property<string>("Value")
                         .HasMaxLength(100);
@@ -222,7 +259,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.TransactionLog", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.TransactionLog", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
@@ -246,14 +283,16 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.Property<string>("IndexVal3")
                         .HasMaxLength(67);
 
-                    b.Property<long>("LogIndex");
+                    b.Property<string>("LogIndex")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime?>("RowCreated");
 
                     b.Property<DateTime?>("RowUpdated");
 
                     b.Property<string>("TransactionHash")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(67);
 
                     b.HasKey("RowIndex");
 
@@ -268,12 +307,13 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations
                     b.HasIndex("IndexVal3");
 
                     b.HasIndex("TransactionHash", "LogIndex")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[LogIndex] IS NOT NULL");
 
                     b.ToTable("TransactionLogs");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainStore.Entities.TransactionVmStack", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.TransactionVmStack", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()

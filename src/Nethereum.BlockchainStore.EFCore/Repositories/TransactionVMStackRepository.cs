@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
 {
@@ -51,9 +51,7 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
                                  .FindByTransactionHashAync(transactionHash).ConfigureAwait(false)  ??
                              new TransactionVmStack();
 
-                record.Map(transactionHash, address, stackTrace);
-
-                record.UpdateRowDates();
+                record.MapToStorageEntityForUpsert(stackTrace, transactionHash, address);
 
                 if (record.IsNew())
                     context.TransactionVmStacks.Add(record);
@@ -62,13 +60,6 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
 
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
-        }
-
-        private void MapValues(string transactionHash, string address, JObject stackTrace, TransactionVmStack transactionVmStack)
-        {
-            transactionVmStack.TransactionHash = transactionHash;
-            transactionVmStack.Address = address;
-            transactionVmStack.StructLogs = ((JArray) stackTrace["structLogs"]).ToString();
         }
 
     }

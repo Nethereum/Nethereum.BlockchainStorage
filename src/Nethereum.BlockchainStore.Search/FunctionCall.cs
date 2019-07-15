@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.Handlers;
+using Nethereum.BlockProcessing.ValueObjects;
 using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainStore.Search

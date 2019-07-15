@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.Processing;
+﻿using Nethereum.BlockchainStore.Console;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
-using Nethereum.BlockchainStore.Processing;
-using Microsoft.Configuration.Utils;
-using Microsoft.Logging.Utils;
+using System.Threading;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Console
 {
@@ -11,14 +8,15 @@ namespace Nethereum.BlockchainStore.CosmosCore.Console
     {
         static int Main(string[] args)
         {
-            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+            var storageProcessorConsole = new StorageProcessorConsole<CosmosRepositoryFactory>(
+                args,
+                "Nethereum.BlockchainStore.CosmosCore.UserSecrets",
+                config => CosmosRepositoryFactory.Create(config)
+                );
 
-            var appConfig = ConfigurationUtils
-                .Build(args, userSecretsId: "Nethereum.BlockchainStore.CosmosCore.UserSecrets");
-
-            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
-            var repositoryFactory = CosmosRepositoryFactory.Create(appConfig);
-            return StorageProcessorConsole.Execute(repositoryFactory, configuration, log: log).Result;
+            return storageProcessorConsole.ExecuteAsync(
+                new CancellationToken())
+                .Result;
         }
     }
 }

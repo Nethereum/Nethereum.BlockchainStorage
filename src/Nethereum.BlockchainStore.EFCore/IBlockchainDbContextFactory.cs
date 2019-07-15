@@ -1,6 +1,5 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
-using Nethereum.BlockchainStore.EFCore;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace Nethereum.BlockchainStore.EFCore
 {

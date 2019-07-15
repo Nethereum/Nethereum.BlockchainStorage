@@ -1,12 +1,12 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -16,12 +16,12 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, long idx)
+        public async Task<ITransactionLogView> FindByTransactionHashAndLogIndexAsync(string hash, BigInteger idx)
         {
-            var uri = CreateDocumentUri(new CosmosTransactionLog{TransactionHash = hash, LogIndex = idx});
+            var uri = CreateDocumentUri(new CosmosTransactionLog{TransactionHash = hash, LogIndex = idx.ToString()});
             try
             {
-                var response = await Client.ReadDocumentAsync<CosmosTransactionLog>(uri);
+                var response = await Client.ReadDocumentAsync<CosmosTransactionLog>(uri).ConfigureAwait(false);
                 return response.Document;
             }
             catch (DocumentClientException dEx)
@@ -33,12 +33,10 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task UpsertAsync(FilterLog log)
+        public async Task UpsertAsync(FilterLogVO log)
         {
-            var transactionLog = new CosmosTransactionLog(); { };
-            transactionLog.Map(log);
-            transactionLog.UpdateRowDates();
-            await UpsertDocumentAsync(transactionLog);
+            var transactionLog = log.MapToStorageEntityForUpsert<CosmosTransactionLog>();
+            await UpsertDocumentAsync(transactionLog).ConfigureAwait(false);
         }
     }
 }

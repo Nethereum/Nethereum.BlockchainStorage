@@ -1,8 +1,8 @@
-﻿using Nethereum.BlockchainStore.EF.EntityBuilders;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainStore.EF.EntityBuilders;
 using System;
 using System.Data.Entity;
 using System.Reflection;
-using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.EF.SqlServer
 {

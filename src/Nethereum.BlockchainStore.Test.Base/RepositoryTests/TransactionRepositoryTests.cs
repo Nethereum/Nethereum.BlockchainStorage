@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
@@ -47,7 +47,8 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             var failure = false;
 
             var upsertTasks = from item in transactions
-                select _repo.UpsertAsync(item.Item1, item.Item2, failure, blockTimestamp, hasVmStack, error);
+                select _repo.UpsertAsync(new TransactionReceiptVO(
+                    block: new RPC.Eth.DTOs.Block { Timestamp = blockTimestamp}, transaction: item.Item1, transactionReceipt: item.Item2, hasError: failure, error: error, hasVmStack: hasVmStack));
 
             await Task.WhenAll(upsertTasks);
 
@@ -72,7 +73,10 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             var hasVmStack = false;
             var failure = false;
 
-            await _repo.UpsertAsync(transaction, receipt, failure, blockTimestamp, hasVmStack, error);
+            var transactionReceiptVO = new TransactionReceiptVO(
+                    block: new RPC.Eth.DTOs.Block { Timestamp = blockTimestamp }, transaction: transaction, transactionReceipt: receipt, hasError: failure, error: error, hasVmStack: hasVmStack);
+
+            await _repo.UpsertAsync(transactionReceiptVO);
             var storedTransaction = await _repo.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
 
             Assert.NotNull(storedTransaction);
@@ -91,8 +95,13 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             var hasVmStack = false;
             var code = "";
             var failure = false;
+            receipt.ContractAddress = newContractAddress;
 
-            await _repo.UpsertAsync(newContractAddress, code, transaction, receipt, failure, blockTimestamp);
+            var transactionReceiptVO = new TransactionReceiptVO(
+                block: new RPC.Eth.DTOs.Block { Timestamp = blockTimestamp }, transaction: transaction, transactionReceipt: receipt, hasError: failure, error: error, hasVmStack: hasVmStack);
+
+
+            await _repo.UpsertAsync(transactionReceiptVO, code, failure);
 
             var storedTransaction = await _repo.FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash);
 
@@ -112,20 +121,20 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             Assert.Equal(transaction.BlockHash, storedTransaction.BlockHash);
             Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);
             Assert.Equal(transaction.From, storedTransaction.AddressFrom);
-            Assert.Equal((long)transaction.TransactionIndex.Value, storedTransaction.TransactionIndex);
+            Assert.Equal(transaction.TransactionIndex.Value.ToString(), storedTransaction.TransactionIndex);
             Assert.Equal(transaction.Value.Value.ToString(), storedTransaction.Value);
             Assert.Equal(transaction.To, storedTransaction.AddressTo);
             Assert.Equal(newContractAddress ?? string.Empty, storedTransaction.NewContractAddress ?? string.Empty);
             Assert.Equal(transaction.BlockNumber.Value.ToString(), storedTransaction.BlockNumber);
-            Assert.Equal((long)transaction.Gas.Value, storedTransaction.Gas);
-            Assert.Equal((long)transaction.GasPrice.Value, storedTransaction.GasPrice);
+            Assert.Equal(transaction.Gas.Value.ToString(), storedTransaction.Gas);
+            Assert.Equal(transaction.GasPrice.Value.ToString(), storedTransaction.GasPrice);
             Assert.Equal(transaction.Input, storedTransaction.Input);
-            Assert.Equal((long)transaction.Nonce.Value, storedTransaction.Nonce);
+            Assert.Equal(transaction.Nonce.Value.ToString(), storedTransaction.Nonce);
             Assert.False(storedTransaction.Failed);
-            Assert.Equal((long)receipt.GasUsed.Value, storedTransaction.GasUsed);
-            Assert.Equal((long)receipt.CumulativeGasUsed.Value, storedTransaction.CumulativeGasUsed);
+            Assert.Equal(receipt.GasUsed.Value.ToString(), storedTransaction.GasUsed);
+            Assert.Equal(receipt.CumulativeGasUsed.Value.ToString(), storedTransaction.CumulativeGasUsed);
             Assert.False(storedTransaction.HasLog);
-            Assert.Equal((long)blockTimestamp.Value, storedTransaction.TimeStamp);
+            Assert.Equal(blockTimestamp.Value.ToString(), storedTransaction.TimeStamp);
             Assert.Equal(hasVmStack, storedTransaction.HasVmStack);
 
             if(error == null)

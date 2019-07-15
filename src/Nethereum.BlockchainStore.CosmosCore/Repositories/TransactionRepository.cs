@@ -1,12 +1,12 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Repositories
 {
@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public async Task<BlockchainStore.Entities.ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        public async Task<ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
         {
             var uri = CreateDocumentUri(new CosmosTransaction(){Hash = hash, BlockNumber = blockNumber.Value.ToString()});
             try
@@ -33,37 +33,16 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string code, bool failedCreatingContract)
         {
-            var tx = new CosmosTransaction();
-            tx.Map(transaction);
-            tx.Map(transactionReceipt);
-
-            tx.NewContractAddress = contractAddress;
-            tx.Failed = false;
-            tx.TimeStamp = (long)blockTimestamp.Value;
-            tx.Error = string.Empty;
-            tx.HasVmStack = false;
-
-            tx.UpdateRowDates();
-
-            await UpsertDocumentAsync(tx);
+            var tx = transactionReceiptVO.MapToStorageEntityForUpsert<CosmosTransaction>(code, failedCreatingContract);
+            await UpsertDocumentAsync(tx).ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt receipt, bool failed, HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO)
         {
-            var tx = new CosmosTransaction();
-            tx.Map(transaction);
-            tx.Map(receipt);
-
-            tx.Failed = failed;
-            tx.TimeStamp = (long)timeStamp.Value;
-            tx.Error = error ?? string.Empty;
-            tx.HasVmStack = hasVmStack;
-
-            tx.UpdateRowDates();
-
-            await UpsertDocumentAsync(tx);
+            var tx = transactionReceiptVO.MapToStorageEntityForUpsert<CosmosTransaction>();
+            await UpsertDocumentAsync(tx).ConfigureAwait(false);
         }
     }
 }

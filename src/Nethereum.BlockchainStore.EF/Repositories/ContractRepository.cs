@@ -1,11 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.RPC.Eth.DTOs;
+using System.Collections.Concurrent;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
-using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.EF.Repositories
 {
@@ -47,29 +47,28 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, Transaction transaction)
-        {
-            using (var context = _contextFactory.CreateContext())
-            {
-                var contract = await context.Contracts.FindByContractAddressAsync(contractAddress).ConfigureAwait(false)  ?? new Contract();
-
-                contract.Map(contractAddress, code, transaction);
-                contract.UpdateRowDates();
-
-                context.Contracts.AddOrUpdate(contract);
-
-                await context.SaveChangesAsync().ConfigureAwait(false) ;
-
-                _cachedContracts.AddOrUpdate(contract.Address, contract,
-                    (s, existingContract) => contract);
-            }
-        }
-
         public async Task<IContractView> FindByAddressAsync(string contractAddress)
         {
             using (var context = _contextFactory.CreateContext())
             {
                 return await context.Contracts.FindByContractAddressAsync(contractAddress).ConfigureAwait(false);
+            }
+        }
+
+        public async Task UpsertAsync(ContractCreationVO contractCreation)
+        {
+            using (var context = _contextFactory.CreateContext())
+            {
+                var contract = await context.Contracts.FindByContractAddressAsync(contractCreation.ContractAddress).ConfigureAwait(false) ?? new Contract();
+
+                contract.MapToStorageEntityForUpsert(contractCreation);
+
+                context.Contracts.AddOrUpdate(contract);
+
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                _cachedContracts.AddOrUpdate(contract.Address, contract,
+                    (s, existingContract) => contract);
             }
         }
     }

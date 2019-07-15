@@ -18,8 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore\Nethereum.BlockchainStore.EFCore.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore.Entities\Nethereum.BlockchainStore.Entities.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
 
 </Project>

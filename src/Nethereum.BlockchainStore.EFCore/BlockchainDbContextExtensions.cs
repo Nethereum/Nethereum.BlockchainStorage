@@ -1,9 +1,8 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using Nethereum.Hex.HexTypes;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.EFCore
 {
@@ -37,10 +36,10 @@ namespace Nethereum.BlockchainStore.EFCore
                 .SingleOrDefaultAsync(c => c.Address == contractAddress);
         }
 
-        public static async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(this DbSet<TransactionLog> transactionLogs, string transactionHash, long logIndex)
+        public static async Task<TransactionLog> FindByTransactionHashAndLogIndexAsync(this DbSet<TransactionLog> transactionLogs, string transactionHash, BigInteger logIndex)
         {
             return await transactionLogs
-                .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.LogIndex == logIndex);
+                .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.LogIndex == logIndex.ToString());
         }
 
         public static async Task<TransactionVmStack> FindByTransactionHashAync(

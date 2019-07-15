@@ -1,6 +1,5 @@
 ﻿using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.Contracts;
-using Nethereum.LogProcessing;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 
@@ -8,14 +7,15 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
 {
     public static class LogsProcessingExtensions
     {
+        /*
         public static ILogsProcessorBuilder UseAzureTableStorageForBlockProgress(
             this ILogsProcessorBuilder processorBuilder, string azureConnectionString, string tableNamePrefix)
         {
-            return processorBuilder.UseAzureTableStorageForBlockProgress(new CloudTableSetup(azureConnectionString, tableNamePrefix));
+            return processorBuilder.UseAzureTableStorageForBlockProgress(new BlockProgressCloudTableSetup(azureConnectionString, tableNamePrefix));
         }
 
         public static ILogsProcessorBuilder UseAzureTableStorageForBlockProgress(
-            this ILogsProcessorBuilder processor, CloudTableSetup cloudTableSetup)
+            this ILogsProcessorBuilder processor, BlockProgressCloudTableSetup cloudTableSetup)
         {
             processor.BlockProgressRepository = cloudTableSetup.CreateBlockProgressRepository();
 
@@ -23,9 +23,9 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         public static ILogsProcessorBuilder StoreInAzureTable<TEventDto>(this ILogsProcessorBuilder processorBuilder, string azureConnectionString, string tablePrefix, Predicate<EventLog<TEventDto>> predicate = null)
-            where TEventDto : class, new() => StoreInAzureTable<TEventDto>(processorBuilder, new CloudTableSetup(azureConnectionString, tablePrefix), predicate);
+            where TEventDto : class, new() => StoreInAzureTable<TEventDto>(processorBuilder, new BlockProcessingCloudTableSetup(azureConnectionString, tablePrefix), predicate);
 
-        public static ILogsProcessorBuilder StoreInAzureTable<TEventDto>(this ILogsProcessorBuilder processorBuilder, CloudTableSetup cloudTableSetup, Predicate<EventLog<TEventDto>> predicate = null)
+        public static ILogsProcessorBuilder StoreInAzureTable<TEventDto>(this ILogsProcessorBuilder processorBuilder, BlockProcessingCloudTableSetup cloudTableSetup, Predicate<EventLog<TEventDto>> predicate = null)
             where TEventDto : class, new()
         {
             var transactionLogRepository = cloudTableSetup.CreateTransactionLogRepository();
@@ -35,14 +35,16 @@ namespace Nethereum.BlockchainProcessing.Processing.Logs
         }
 
         public static ILogsProcessorBuilder StoreInAzureTable(this ILogsProcessorBuilder processorBuilder, string azureConnectionString, string tablePrefix, Predicate<FilterLog> predicate = null)
-            => StoreInAzureTable(processorBuilder, new CloudTableSetup(azureConnectionString, tablePrefix), predicate);
+            => StoreInAzureTable(processorBuilder, new BlockProcessingCloudTableSetup(azureConnectionString, tablePrefix), predicate);
 
-        public static ILogsProcessorBuilder StoreInAzureTable(this ILogsProcessorBuilder eventLogProcessor, CloudTableSetup cloudTableSetup, Predicate<FilterLog> predicate = null)
+        public static ILogsProcessorBuilder StoreInAzureTable(this ILogsProcessorBuilder eventLogProcessor, BlockProcessingCloudTableSetup cloudTableSetup, Predicate<FilterLog> predicate = null)
         {
             var transactionLogRepository = cloudTableSetup.CreateTransactionLogRepository();
             var processor = new TransactionLogProcessor(transactionLogRepository, predicate);
             eventLogProcessor.Add(processor);
             return eventLogProcessor;
         }
+
+    */
     }
 }

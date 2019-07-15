@@ -48,9 +48,9 @@ namespace Nethereum.BlockchainStore.Search
         public IEventIndexer<TEvent> Indexer { get; }
         public Predicate<EventLog<TEvent>> Predicate { get; }
 
-        public bool IsLogForEvent(FilterLog log)
+        public Task<bool> IsLogForMeAsync(FilterLog log)
         {
-            return log.IsLogForEvent<TEvent>();
+            return Task.FromResult(log.IsLogForEvent<TEvent>());
         }
 
         public async Task ProcessLogsAsync(params FilterLog[] eventLogs)

@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Driver;
-using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.MongoDb.Repositories
 {
@@ -14,46 +15,25 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
         {
         }
 
-        public async Task<BlockchainStore.Entities.ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
+        public async Task<ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
         {
             var filter = CreateDocumentFilter(new MongoDbTransaction()
                 {Hash = hash, BlockNumber = blockNumber.Value.ToString()});
 
-            var response = await Collection.Find(filter).SingleOrDefaultAsync();
+            var response = await Collection.Find(filter).SingleOrDefaultAsync().ConfigureAwait(false);
             return response;
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string code, bool failedCreatingContract)
         {
-            var tx = new MongoDbTransaction();
-            tx.Map(transaction);
-            tx.Map(transactionReceipt);
-
-            tx.NewContractAddress = contractAddress;
-            tx.Failed = false;
-            tx.TimeStamp = (long) blockTimestamp.Value;
-            tx.Error = string.Empty;
-            tx.HasVmStack = false;
-
-            tx.UpdateRowDates();
-
-            await UpsertDocumentAsync(tx);
+            var tx = transactionReceiptVO.MapToStorageEntityForUpsert<MongoDbTransaction>(code, failedCreatingContract);
+            await UpsertDocumentAsync(tx).ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt receipt, bool failed, HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO)
         {
-            var tx = new MongoDbTransaction();
-            tx.Map(transaction);
-            tx.Map(receipt);
-
-            tx.Failed = failed;
-            tx.TimeStamp = (long) timeStamp.Value;
-            tx.Error = error ?? string.Empty;
-            tx.HasVmStack = hasVmStack;
-
-            tx.UpdateRowDates();
-
-            await UpsertDocumentAsync(tx);
+            var tx = transactionReceiptVO.MapToStorageEntityForUpsert<MongoDbTransaction>();
+            await UpsertDocumentAsync(tx).ConfigureAwait(false);
         }
     }
 }

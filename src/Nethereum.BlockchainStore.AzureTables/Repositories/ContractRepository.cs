@@ -1,11 +1,11 @@
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nethereum.BlockchainStore.Entities;
 using Contract = Nethereum.BlockchainStore.AzureTables.Entities.Contract;
-using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
@@ -35,10 +35,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return contract != null;
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, Transaction transaction)
+        public async Task UpsertAsync(ContractCreationVO contractCreation)
         {
-            var contract = Contract.CreateContract(contractAddress, code,
-                transaction);
+            var contract = Contract.CreateContract(contractCreation.ContractAddress, contractCreation.Code,
+                contractCreation.Transaction);
 
             await UpsertAsync(contract).ConfigureAwait(false);
 
@@ -88,5 +88,6 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         {
             return CachedContracts.ContainsKey(contractAddress);
         }
+
     }
 }

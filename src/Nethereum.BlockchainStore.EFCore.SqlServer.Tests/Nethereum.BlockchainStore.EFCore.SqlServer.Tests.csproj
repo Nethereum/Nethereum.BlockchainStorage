@@ -19,11 +19,8 @@
   </ItemGroup>  
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.Sqlite\Nethereum.BlockchainStore.EFCore.Sqlite.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.SqlServer\Nethereum.BlockchainStore.EFCore.SqlServer.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore.Entities.Mapping\Nethereum.BlockchainStore.Entities.Mapping.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj" />
   </ItemGroup>  
 
   <ItemGroup>

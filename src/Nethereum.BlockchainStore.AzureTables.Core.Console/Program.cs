@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.Processing;
+﻿using Microsoft.Configuration.Utils;
+using Microsoft.Extensions.Configuration;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
-using Nethereum.BlockchainStore.Processing;
-using Microsoft.Configuration.Utils;
-using Microsoft.Logging.Utils;
+using Nethereum.BlockchainStore.Console;
+using System.Threading;
 
 namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 {
@@ -13,20 +12,28 @@ namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 
         public static int Main(string[] args)
         {
-            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+            var storageProcessorConsole = new StorageProcessorConsole<AzureTablesRepositoryFactory>(
+                args,
+                "Nethereum.BlockchainStore.AzureTables",
+                CreateRepositoryFactory
+            );
 
-            var appConfig = ConfigurationUtils
-                .Build(args, userSecretsId: "Nethereum.BlockchainStore.AzureTables");
+            return storageProcessorConsole.ExecuteAsync(
+                new CancellationToken())
+                .Result;
 
-            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
+        }
 
-            var connectionString = appConfig[ConnectionStringKey];
+        private static AzureTablesRepositoryFactory CreateRepositoryFactory(IConfigurationRoot config)
+        {
+            var connectionString = config[ConnectionStringKey];
 
             if (string.IsNullOrEmpty(connectionString))
                 throw ConfigurationUtils.CreateKeyNotFoundException(ConnectionStringKey);
 
-            var repositoryFactory = new CloudTableSetup(connectionString, configuration.Name);
-            return StorageProcessorConsole.Execute(repositoryFactory, configuration, log: log).Result;
+            var tablePrefix = config["DbSchema"] ?? string.Empty;
+
+            return new AzureTablesRepositoryFactory(connectionString, tablePrefix);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nethereum.BlockchainStore.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 
 namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
 {
@@ -13,6 +13,7 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
 
             entityBuilder.Property(m => m.TransactionHash).IsHash().IsRequired();
 
+            entityBuilder.Property(m => m.LogIndex).IsBigInteger();
             entityBuilder.Property(m => m.Address).IsAddress();
             entityBuilder.Property(m => m.EventHash).IsHash();
             entityBuilder.Property(m => m.IndexVal1).IsHash();

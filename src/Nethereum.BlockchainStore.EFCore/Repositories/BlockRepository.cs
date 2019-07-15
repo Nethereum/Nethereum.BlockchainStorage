@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
 using System.Numerics;
 using System.Threading.Tasks;
-using Block = Nethereum.BlockchainStore.Entities.Block;
 
 namespace Nethereum.BlockchainStore.EFCore.Repositories
 {
@@ -38,9 +37,7 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             {
                 var block = await context.Blocks.FindByBlockNumberAsync(source.Number).ConfigureAwait(false) ?? new Block();
 
-                block.Map(source);
-
-                block.UpdateRowDates();
+                block.MapToStorageEntityForUpsert(source);
 
                 if (block.IsNew())
                     context.Blocks.Add(block);

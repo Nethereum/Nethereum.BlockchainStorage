@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using Nethereum.BlockchainStore.EFCore;
-using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.EFCore.SqlServer
 {

@@ -1,6 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using System.Numerics;
@@ -37,7 +37,7 @@ namespace Nethereum.BlockchainStore.Tests.Entities.Mapping
 
             public string IndexVal3 { get; set; }
 
-            public long LogIndex { get; set; }
+            public string LogIndex { get; set; }
 
             public string TransactionHash { get; set; }
         }
@@ -64,7 +64,7 @@ namespace Nethereum.BlockchainStore.Tests.Entities.Mapping
             var transactionFromRepo = new TransactionLogView
             {
                 TransactionHash = sourceTransferEventLog.Log.TransactionHash,
-                LogIndex = (long)sourceTransferEventLog.Log.LogIndex.Value,
+                LogIndex = sourceTransferEventLog.Log.LogIndex.Value.ToString(),
                 Address = sourceTransferEventLog.Log.Address,
                 Data = sourceTransferEventLog.Log.Data,
                 EventHash = (string)sourceTransferEventLog.Log.Topics[0],

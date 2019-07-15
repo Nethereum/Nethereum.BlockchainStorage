@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Driver;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
+﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.MongoDb.Repositories
 {
@@ -23,16 +23,15 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
                     Address = address, Hash = transactionHash, BlockNumber = blockNumber.Value.ToString()
                 });
 
-            var response = await Collection.Find(filter).SingleOrDefaultAsync();
+            var response = await Collection.Find(filter).SingleOrDefaultAsync().ConfigureAwait(false);
             return response;
         }
 
-        public async Task UpsertAsync(RPC.Eth.DTOs.Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp, string address, string error = null, bool hasVmStack = false, string newContractAddress = null)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string address, string error = null, string newContractAddress = null)
         {
-            var tx = new MongoDbAddressTransaction();
-            tx.Map(transaction, address);
+            var tx = transactionReceiptVO.MapToStorageEntityForUpsert<MongoDbAddressTransaction>(address);
             tx.UpdateRowDates();
-            await UpsertDocumentAsync(tx);
+            await UpsertDocumentAsync(tx).ConfigureAwait(false);
         }
     }
 }

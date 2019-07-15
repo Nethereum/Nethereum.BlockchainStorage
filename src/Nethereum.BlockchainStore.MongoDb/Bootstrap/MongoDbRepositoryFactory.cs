@@ -1,15 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.ProgressRepositories;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.IndexBuilders;
 using Nethereum.BlockchainStore.MongoDb.Repositories;
-using Nethereum.BlockchainStore.Repositories;
+using System;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.MongoDb.Bootstrap
 {
-    public class MongoDbRepositoryFactory : IBlockchainStoreRepositoryFactory
+    public class MongoDbRepositoryFactory : IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
     {
         public static MongoDbRepositoryFactory Create(IConfigurationRoot config, bool deleteAllExistingCollections = false)
         {
@@ -65,6 +66,9 @@ namespace Nethereum.BlockchainStore.MongoDb.Bootstrap
                     case MongoDbCollectionName.AddressTransactions:
                         builder = new AddressTransactionIndexBuilder(db);
                         break;
+                    case MongoDbCollectionName.BlockProgress:
+                        builder = new BlockProgressIndexBuilder(db);
+                        break;
                     case MongoDbCollectionName.Blocks:
                         builder = new BlockIndexBuilder(db);
                         break;
@@ -102,5 +106,6 @@ namespace Nethereum.BlockchainStore.MongoDb.Bootstrap
         public ITransactionLogRepository CreateTransactionLogRepository() => new TransactionLogRepository(_client, _databaseName);
         public ITransactionRepository CreateTransactionRepository() => new TransactionRepository(_client, _databaseName);
         public ITransactionVMStackRepository CreateTransactionVmStackRepository() => new TransactionVMStackRepository(_client, _databaseName);
+        public IBlockProgressRepository CreateBlockProgressRepository() => new BlockProgressRepository(_client, _databaseName);
     }
 }

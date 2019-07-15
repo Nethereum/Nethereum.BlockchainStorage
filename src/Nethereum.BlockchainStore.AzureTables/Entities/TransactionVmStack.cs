@@ -1,8 +1,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainProcessing.Storage.Entities;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using Nethereum.BlockchainStore.Entities;
-using System;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {

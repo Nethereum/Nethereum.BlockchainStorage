@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using CsvHelper.Configuration;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using CsvHelper.Configuration;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
@@ -40,7 +37,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         }
     }
 
-    public class TransactionVMStackMap : ClassMap<Entities.TransactionVmStack>
+    public class TransactionVMStackMap : ClassMap<TransactionVmStack>
     {
         public static TransactionVMStackMap Instance = new TransactionVMStackMap();
 

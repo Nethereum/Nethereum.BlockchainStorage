@@ -1,5 +1,5 @@
-﻿using Nethereum.BlockchainStore.EFCore.SqlServer;
-using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainStore.EFCore.SqlServer;
 
 namespace Nethereum.BlockchainStore.EFCore.Tests.SqlServer
 {

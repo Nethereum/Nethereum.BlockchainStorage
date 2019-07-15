@@ -1,14 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using CsvHelper.Configuration;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+﻿using CsvHelper.Configuration;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
-using Block = Nethereum.BlockchainStore.Entities.Block;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {
@@ -23,28 +18,9 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return await FindAsync(b => b.BlockNumber == blockNumber.Value.ToString());
         }
 
-        public async Task<BigInteger?> GetMaxBlockNumberAsync()
-        {
-            BigInteger? maxBlock = null;
-
-            await EnumerateAsync(e =>
-            {
-                var blockNumber = BigInteger.Parse(e.BlockNumber);
-
-                if (maxBlock == null || maxBlock.Value < blockNumber)
-                {
-                    maxBlock = blockNumber;
-                }
-            });
-
-            return maxBlock;
-        }
-
         public async Task UpsertBlockAsync(Nethereum.RPC.Eth.DTOs.Block source)
         {
-            var block = new Block();
-            block.Map(source);
-            block.UpdateRowDates();
+            var block = source.MapToStorageEntityForUpsert();
             await Write(block).ConfigureAwait(false);
         }
 

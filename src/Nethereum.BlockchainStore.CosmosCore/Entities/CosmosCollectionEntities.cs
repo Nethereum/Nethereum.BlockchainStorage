@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
 using Newtonsoft.Json;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Entities
@@ -28,6 +28,18 @@ namespace Nethereum.BlockchainStore.CosmosCore.Entities
         public string Id
         {
             get => _id ?? $"{BlockNumber}{Hash}{Address}";
+            set => _id = value;
+        }
+    }
+
+    public class CosmosBlockProgress : BlockProgress, ICosmosEntity
+    {
+        private string _id;
+
+        [JsonProperty(PropertyName = "id")]
+        public string Id
+        {
+            get => _id ?? LastBlockProcessed;
             set => _id = value;
         }
     }

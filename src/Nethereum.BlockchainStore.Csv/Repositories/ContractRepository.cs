@@ -1,7 +1,8 @@
 ﻿using CsvHelper.Configuration;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Entities.Mapping;
-using Nethereum.BlockchainStore.Repositories;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.RPC.Eth.DTOs;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -46,12 +47,9 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return CachedContracts.ContainsKey(contractAddress);
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, RPC.Eth.DTOs.Transaction transaction)
+        public async Task UpsertAsync(ContractCreationVO contractCreation)
         {
-            var contract = new Contract();
-
-            contract.Map(contractAddress, code, transaction);
-            contract.UpdateRowDates();
+            var contract = contractCreation.MapToStorageEntityForUpsert();
 
             await Write(contract).ConfigureAwait(false);
 

@@ -1,5 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Nethereum.BlockchainStore.EF.EntityBuilders
 {
@@ -12,6 +12,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
 
             Property(m => m.TransactionHash).IsHash().IsRequired();
 
+            Property(m => m.LogIndex).IsBigInteger();
             Property(m => m.Address).IsAddress();
             Property(m => m.EventHash).IsHash();
             Property(m => m.IndexVal1).IsHash();

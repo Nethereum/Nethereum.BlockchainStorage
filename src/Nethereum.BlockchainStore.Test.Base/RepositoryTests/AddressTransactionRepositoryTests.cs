@@ -1,5 +1,5 @@
-﻿using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Repositories;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
@@ -36,7 +36,9 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             var hasVmStack = false;
             var failure = false;
 
-            await _repo.UpsertAsync(transaction, receipt, failure, blockTimestamp, address, error, hasVmStack, null);
+            var vo = new TransactionReceiptVO(new RPC.Eth.DTOs.Block { Timestamp = blockTimestamp }, transaction, receipt, failure, error, hasVmStack);
+
+            await _repo.UpsertAsync(vo, address, error, null);
             var storedTransaction = await _repo.FindAsync(address, transaction.BlockNumber, transaction.TransactionHash);
 
             Assert.NotNull(storedTransaction);

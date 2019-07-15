@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Console\Nethereum.BlockchainStore.Console.csproj" />
   </ItemGroup>
 
 </Project>

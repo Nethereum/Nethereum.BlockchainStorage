@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Nethereum.BlockchainProcessing.Processing;
-using Nethereum.BlockchainStore.Processing;
-using Microsoft.Configuration.Utils;
-using Microsoft.Logging.Utils;
+﻿using Nethereum.BlockchainStore.Console;
+using System.Threading;
 
 namespace Nethereum.BlockchainStore.Csv.Console
 {
@@ -10,15 +7,16 @@ namespace Nethereum.BlockchainStore.Csv.Console
     {
         static int Main(string[] args)
         {
-            var log = ApplicationLogging.CreateConsoleLogger<Program>().ToILog();
+            var storageProcessorConsole = new StorageProcessorConsole<CsvBlockchainStoreRepositoryFactory>(
+                args, 
+                "Nethereum.BlockchainStore.Csv.UserSecrets",
+                config => new CsvBlockchainStoreRepositoryFactory(config["CsvOutputPath"]),
+                repoFactory => repoFactory.DisposeRepositories()
+                );
 
-            var appConfig = ConfigurationUtils
-                .Build(args, userSecretsId: "Nethereum.BlockchainStore.Csv.UserSecrets");
-
-            var configuration = BlockchainSourceConfigurationFactory.Get(appConfig);
-            var outputPath = appConfig["CsvOutputPath"];
-            var repositoryFactory = new CsvBlockchainStoreRepositoryFactory(outputPath);
-            return StorageProcessorConsole.Execute(repositoryFactory, configuration, log: log).Result;
+            return storageProcessorConsole.ExecuteAsync( 
+                new CancellationToken())
+                .Result;
         }
     }
 }

@@ -1,11 +1,10 @@
-using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.AzureTables.Entities;
-using Nethereum.BlockchainStore.Entities;
-using Nethereum.BlockchainStore.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Transaction = Nethereum.RPC.Eth.DTOs.Transaction;
+using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
@@ -22,26 +21,22 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return results.Result as Entities.Transaction;
         }
 
-        public async Task UpsertAsync(string contractAddress, string code, Transaction transaction, TransactionReceipt transactionReceipt, bool failedCreatingContract, HexBigInteger blockTimestamp)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string code, bool failedCreatingContract)
         {
             var transactionEntity = Entities.Transaction.CreateTransaction(
-                transaction, transactionReceipt,
-                failedCreatingContract, blockTimestamp, contractAddress);
+                transactionReceiptVO.Transaction, transactionReceiptVO.TransactionReceipt,
+                failedCreatingContract, transactionReceiptVO.BlockTimestamp, transactionReceiptVO.TransactionReceipt.ContractAddress);
 
             await UpsertAsync(transactionEntity).ConfigureAwait(false);
         }
 
-        public async Task UpsertAsync(Transaction transaction,
-          TransactionReceipt transactionReceipt,
-            bool failed,
-            HexBigInteger timeStamp, bool hasVmStack = false, string error = null)
+        public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO)
         {
-            var transactionEntity = Entities.Transaction.CreateTransaction(transaction,
-                transactionReceipt,
-                failed, timeStamp, hasVmStack, error);
+            var transactionEntity = Entities.Transaction.CreateTransaction(transactionReceiptVO.Transaction,
+                transactionReceiptVO.TransactionReceipt,
+                transactionReceiptVO.HasError, transactionReceiptVO.BlockTimestamp, transactionReceiptVO.HasVmStack, transactionReceiptVO.Error);
 
             await UpsertAsync(transactionEntity).ConfigureAwait(false);
         }
-       
     }
 }

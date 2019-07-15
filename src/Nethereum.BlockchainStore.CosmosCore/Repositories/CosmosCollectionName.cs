@@ -2,6 +2,6 @@
 {
     public enum CosmosCollectionName
     {
-        Blocks, Contracts, Transactions, TransactionLogs, TransactionVMStacks, AddressTransactions
+        Blocks, Contracts, Transactions, TransactionLogs, TransactionVMStacks, AddressTransactions, BlockProgress
     }
 }

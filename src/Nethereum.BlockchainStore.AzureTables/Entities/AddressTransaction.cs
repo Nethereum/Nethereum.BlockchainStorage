@@ -1,7 +1,6 @@
-﻿using Nethereum.Hex.HexTypes;
+﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using System.Net;
-using Nethereum.BlockchainStore.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Entities
 {
