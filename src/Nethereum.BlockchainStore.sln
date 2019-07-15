@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2047
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore", "Nethereum.BlockchainStore\Nethereum.BlockchainStore.csproj", "{63EE26BD-D2AF-465D-A2C3-749B57C34493}"
 EndProject
@@ -64,7 +64,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Tests", "Nethereum.BlockchainStore.Tests\Nethereum.BlockchainStore.Tests.csproj", "{963D66C5-D451-4537-A758-68CF1F3527F6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{FA5D6456-9263-4931-B9AA-F756E0939AC6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FA5D6456-9263-4931-B9AA-F756E0939AC6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adaptors", "Adaptors", "{CA6612E6-1EBA-4A5F-83A3-DE18A030B03A}"
 EndProject
@@ -90,7 +90,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Search.Tests", "Nethereum.BlockchainStore.Search.Tests\Nethereum.BlockchainStore.Search.Tests.csproj", "{656AF237-5BFA-40F1-9C2F-5FF3917A9EB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Search.Samples", "Nethereum.BlockchainStore.Search.Samples\Nethereum.BlockchainStore.Search.Samples.csproj", "{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Search.Samples", "Nethereum.BlockchainStore.Search.Samples\Nethereum.BlockchainStore.Search.Samples.csproj", "{B9F537DD-D7FD-4CCC-9E7D-2D13403C8515}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
