@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing.Common\Nethereum.BlockchainProcessing.Common.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainProcessing.Queue.Azure\Nethereum.BlockchainProcessing.Queue.Azure.csproj" />
     <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
     <ProjectReference Include="..\Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj" />

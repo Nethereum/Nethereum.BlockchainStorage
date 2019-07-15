@@ -7,8 +7,4 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Nethereum.BlockchainProcessing.Common\Nethereum.BlockchainProcessing.Common.csproj" />
-  </ItemGroup>
-
 </Project>

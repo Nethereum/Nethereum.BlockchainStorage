@@ -1,0 +1,13 @@
+<Project>
+ <PropertyGroup>
+   <PackageTags>Netherum;Ethereum;Blockchain;Blockchain Processing</PackageTags>
+   <PackageIconUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/logos/logo64x64.png</PackageIconUrl>
+   <PackageProjectUrl>https://nethereum.com</PackageProjectUrl>
+   <PackageLicenseUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/LICENSE.md</PackageLicenseUrl>
+   <RepositoryType>git</RepositoryType>
+   <RepositoryUrl>https://github.com/Nethereum/Nethereum</RepositoryUrl>
+   <Description>Core Nethereum blockchain processing library to retrieve blockchain data, filter it, invoke custom handlers and invoke lower level processors</Description>
+   <Version>3.1.2</Version>
+   <Authors>Dave Whiffin, Juan Blanco</Authors> 
+</PropertyGroup>
+</Project>

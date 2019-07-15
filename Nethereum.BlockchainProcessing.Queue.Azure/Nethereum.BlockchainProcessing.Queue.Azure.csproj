@@ -8,9 +8,4 @@
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Nethereum.LogProcessing.Dynamic\Nethereum.LogProcessing.Dynamic.csproj" />
-    <ProjectReference Include="..\Nethereum.LogProcessing\Nethereum.LogProcessing.csproj" />
-  </ItemGroup>
-
 </Project>
