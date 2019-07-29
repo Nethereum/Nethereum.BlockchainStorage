@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;

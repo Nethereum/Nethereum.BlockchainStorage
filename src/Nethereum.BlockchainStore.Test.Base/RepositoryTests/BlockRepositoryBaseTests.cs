@@ -1,5 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;

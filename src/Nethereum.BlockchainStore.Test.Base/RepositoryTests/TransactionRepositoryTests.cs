@@ -1,5 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Newtonsoft.Json.Linq;
@@ -116,7 +116,15 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
             return Utils.CreateBlockTimestamp();
         }
 
-        protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, ITransactionView storedTransaction)
+        protected static void EnsureCorrectStoredValues(
+            Transaction transaction, 
+            TransactionReceipt receipt, 
+            HexBigInteger blockTimestamp, 
+            string address, 
+            string error, 
+            string newContractAddress, 
+            bool hasVmStack, 
+            ITransactionView storedTransaction)
         {
             Assert.Equal(transaction.BlockHash, storedTransaction.BlockHash);
             Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);

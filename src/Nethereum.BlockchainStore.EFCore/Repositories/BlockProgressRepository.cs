@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using System.Numerics;
 using System.Threading.Tasks;
 

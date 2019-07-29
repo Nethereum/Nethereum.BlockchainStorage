@@ -1,5 +1,5 @@
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using System.Collections.Generic;
 using System.Linq;
 

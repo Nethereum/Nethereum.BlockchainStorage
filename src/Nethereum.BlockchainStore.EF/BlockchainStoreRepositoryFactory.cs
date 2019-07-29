@@ -1,5 +1,5 @@
-﻿using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
+using Nethereum.BlockchainProcessing.ProgressRepositories;
 using Nethereum.BlockchainStore.EF.Repositories;
 
 namespace Nethereum.BlockchainStore.EF

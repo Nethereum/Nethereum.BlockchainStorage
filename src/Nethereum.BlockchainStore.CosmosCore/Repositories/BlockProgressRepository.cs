@@ -1,7 +1,7 @@
 ﻿using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
 using System.Linq;
 using System.Numerics;

@@ -5,18 +5,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Logging.Utils;
 using Nethereum.BlockchainProcessing;
 using Nethereum.BlockchainProcessing.BlockProcessing;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.RPC.Eth.Blocks;
-using Nethereum.Utils;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Console
 {
-   
+
     public class StorageProcessorConsole<TRepositoryFactory> 
         where TRepositoryFactory : IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
     {
@@ -80,21 +78,23 @@ namespace Nethereum.BlockchainStore.Console
         {
             var web3 = new Web3.Web3(TargetConfiguration.BlockchainUrl);
 
-            var storageSteps = new StorageBlockProcessingSteps(repoFactory);
-            storageSteps.BlockStep.AddProcessorHandler((b) => { log.Info($"Processing block {b.Number.Value}, Tx Count: {b.Transactions.Length}"); return Task.CompletedTask; });
-            storageSteps.TransactionReceiptStep.AddProcessorHandler((tx) => { log.Info($"\tTransaction: Index: {tx.Transaction.TransactionIndex}, Hash: {tx.TransactionHash}"); return Task.CompletedTask; });
-            storageSteps.FilterLogStep.AddProcessorHandler((l) => { log.Info($"\t\tLog: Index: {l.LogIndex}"); return Task.CompletedTask; });
+            var steps = new BlockProcessingSteps();
+            steps.BlockStep.AddProcessorHandler((b) => { log.Info($"Processing block {b.Number.Value}, Tx Count: {b.Transactions.Length}"); return Task.CompletedTask; });
+            steps.TransactionReceiptStep.AddProcessorHandler((tx) => { log.Info($"\tTransaction: Index: {tx.Transaction.TransactionIndex}, Hash: {tx.TransactionHash}"); return Task.CompletedTask; });
+            steps.FilterLogStep.AddProcessorHandler((l) => { log.Info($"\t\tLog: Index: {l.LogIndex}"); return Task.CompletedTask; });
 
-            var orchestrator = new BlockCrawlOrchestrator(web3.Eth, new [] { storageSteps });
+            var orchestrator = new BlockCrawlOrchestrator(web3.Eth, steps);
             orchestrator.ContractCreatedCrawlerStep.RetrieveCode = true;
 
-            var lastConfirmedBlockService = new LastConfirmedBlockNumberService(
-                web3.Eth.Blocks.GetBlockNumber,
-                new WaitStrategy(),
-                minimumBlockConfirmations: TargetConfiguration.MinimumBlockConfirmations ?? LastConfirmedBlockNumberService.DEFAULT_BLOCK_CONFIRMATIONS,
-                log: log);
+            var lastConfirmedBlockNumberService = new LastConfirmedBlockNumberService(
+                web3.Eth.Blocks.GetBlockNumber, 
+                TargetConfiguration.MinimumBlockConfirmations ?? LastConfirmedBlockNumberService.DEFAULT_BLOCK_CONFIRMATIONS, 
+                log);
 
-            var processor = new BlockchainProcessor(orchestrator, repoFactory.CreateBlockProgressRepository(), lastConfirmedBlockService, log);
+            IBlockProgressRepository progressRepo = repoFactory.CreateBlockProgressRepository();
+
+            var processor = new BlockchainProcessor(orchestrator, progressRepo, lastConfirmedBlockNumberService, log);
+
             return processor;
         }
     }

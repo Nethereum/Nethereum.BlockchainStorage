@@ -1,11 +1,11 @@
 ﻿using CsvHelper.Configuration;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using Tx = Nethereum.BlockchainProcessing.Storage.Entities.Transaction;
+using Tx = Nethereum.BlockchainProcessing.BlockStorage.Entities.Transaction;
 
 namespace Nethereum.BlockchainStore.Csv.Repositories
 {

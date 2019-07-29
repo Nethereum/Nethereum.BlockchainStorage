@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Nethereum.BlockchainStore.AzureTables.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
@@ -53,7 +53,15 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
             return Test.Base.RepositoryTests.Utils.CreateBlockTimestamp();
         }
 
-        protected static void EnsureCorrectStoredValues(Transaction transaction, TransactionReceipt receipt, HexBigInteger blockTimestamp, string address, string error, string newContractAddress, bool hasVmStack, ITransactionView storedTransaction)
+        protected static void EnsureCorrectStoredValues(
+            Transaction transaction, 
+            TransactionReceipt receipt, 
+            HexBigInteger blockTimestamp, 
+            string address, 
+            string error, 
+            string newContractAddress, 
+            bool hasVmStack, 
+            ITransactionView storedTransaction)
         {
             Assert.Equal(transaction.BlockHash, storedTransaction.BlockHash);
             Assert.Equal(transaction.TransactionHash, storedTransaction.Hash);

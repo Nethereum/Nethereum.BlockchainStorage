@@ -1,14 +1,15 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.AzureTables.Repositories;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Bootstrap
 {
 
-    public class AzureTablesRepositoryFactory : CloudTableSetupBase, IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
+    public class AzureTablesRepositoryFactory : 
+        CloudTableSetupBase, IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
     {
         public AzureTablesRepositoryFactory (string connectionString, string prefix):base(connectionString, prefix){ }
 

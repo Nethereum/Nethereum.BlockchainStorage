@@ -1,6 +1,6 @@
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainStore.AzureTables.Entities;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
@@ -8,7 +8,8 @@ using TransactionVmStack = Nethereum.BlockchainStore.AzureTables.Entities.Transa
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class TransactionVMStackRepository : AzureTableRepository<TransactionVmStack>, ITransactionVMStackRepository
+    public class TransactionVMStackRepository : 
+        AzureTableRepository<TransactionVmStack>, ITransactionVMStackRepository
     {
         public TransactionVMStackRepository(CloudTable table) : base(table)
         {

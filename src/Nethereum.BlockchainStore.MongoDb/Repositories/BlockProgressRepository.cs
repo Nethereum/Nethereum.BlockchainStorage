@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
 using Nethereum.BlockchainStore.MongoDb.Entities;
 using System.Numerics;
 using System.Threading.Tasks;

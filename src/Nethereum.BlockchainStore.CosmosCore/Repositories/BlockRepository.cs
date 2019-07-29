@@ -1,8 +1,8 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
 using Nethereum.Hex.HexTypes;
 using System.Threading.Tasks;

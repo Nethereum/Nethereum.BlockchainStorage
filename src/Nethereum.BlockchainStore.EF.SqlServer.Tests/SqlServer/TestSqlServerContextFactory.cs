@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Nethereum.BlockchainStore.EF.SqlServer;
 
 namespace Nethereum.BlockchainStore.EF.Tests.SqlServer

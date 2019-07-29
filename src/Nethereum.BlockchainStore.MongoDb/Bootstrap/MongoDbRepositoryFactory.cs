@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
 using Nethereum.BlockchainStore.MongoDb.IndexBuilders;
 using Nethereum.BlockchainStore.MongoDb.Repositories;
 using System;

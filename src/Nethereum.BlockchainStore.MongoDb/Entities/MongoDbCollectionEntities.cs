@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 
 namespace Nethereum.BlockchainStore.MongoDb.Entities
 {

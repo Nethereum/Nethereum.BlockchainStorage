@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Nethereum.Hex.HexTypes;
 using System.Numerics;
 using System.Threading.Tasks;

@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Newtonsoft.Json;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Entities

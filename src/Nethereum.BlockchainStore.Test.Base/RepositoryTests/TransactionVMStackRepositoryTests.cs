@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Repositories;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Xunit;

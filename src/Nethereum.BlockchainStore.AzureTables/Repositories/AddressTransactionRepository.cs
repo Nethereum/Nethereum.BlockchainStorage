@@ -1,15 +1,16 @@
 using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.BlockchainStore.AzureTables.Entities;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
-using AddressTransaction = Nethereum.BlockchainStore.AzureTables.Entities.AddressTransaction;
+using AzureEntities = Nethereum.BlockchainStore.AzureTables.Entities;
 
 namespace Nethereum.BlockchainStore.AzureTables.Repositories
 {
-    public class AddressTransactionRepository : AzureTableRepository<AddressTransaction>,  IAddressTransactionRepository
+    public class AddressTransactionRepository : 
+        AzureTableRepository<AzureEntities.AddressTransaction>,  IAddressTransactionRepository
     {
         public AddressTransactionRepository(CloudTable cloudTable):base(cloudTable){}
 
@@ -23,18 +24,18 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             return await FindAddressTransactionAsync(address, blockNumber, transactionHash);
         }
 
-        private async Task<AddressTransaction> FindAddressTransactionAsync(string address, HexBigInteger blockNumber, string transactionHash)
+        private async Task<AzureEntities.AddressTransaction> FindAddressTransactionAsync(string address, HexBigInteger blockNumber, string transactionHash)
         {
             var partitionKey = address.ToPartitionKey();
-            var rowKey = AddressTransaction.CreateRowKey(blockNumber, transactionHash);
-            var operation = TableOperation.Retrieve<AddressTransaction>(partitionKey, rowKey);
+            var rowKey = AzureEntities.AddressTransaction.CreateRowKey(blockNumber, transactionHash);
+            var operation = TableOperation.Retrieve<AzureEntities.AddressTransaction>(partitionKey, rowKey);
             var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
-            return results.Result as AddressTransaction;
+            return results.Result as AzureEntities.AddressTransaction;
         }
 
         public async Task UpsertAsync(TransactionReceiptVO transactionReceiptVO, string address, string error = null, string newContractAddress = null)
         {
-            var entity = AddressTransaction.CreateAddressTransaction(transactionReceiptVO.Transaction,
+            var entity = AzureEntities.AddressTransaction.CreateAddressTransaction(transactionReceiptVO.Transaction,
                 transactionReceiptVO.TransactionReceipt,
                 transactionReceiptVO.HasError, transactionReceiptVO.BlockTimestamp, address, error, transactionReceiptVO.HasVmStack, newContractAddress);
 

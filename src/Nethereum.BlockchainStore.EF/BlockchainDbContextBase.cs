@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Nethereum.BlockchainStore.EF.EntityBuilders;
 using System.Data.Entity;
 using BlockEntityBuilder = Nethereum.BlockchainStore.EF.EntityBuilders.BlockEntityBuilder;

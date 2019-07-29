@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Nethereum.BlockchainProcessing.Storage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

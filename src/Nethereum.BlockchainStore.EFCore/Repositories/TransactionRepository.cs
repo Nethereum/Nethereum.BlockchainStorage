@@ -1,6 +1,6 @@
-﻿using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
-using Nethereum.BlockchainProcessing.Storage.Repositories;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System.Threading.Tasks;
@@ -11,11 +11,11 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
     {
         public TransactionRepository(IBlockchainDbContextFactory contextFactory) : base(contextFactory){}
 
-        private static async Task<BlockchainProcessing.Storage.Entities.Transaction> FindOrCreate(Nethereum.RPC.Eth.DTOs.Transaction transaction, BlockchainDbContextBase context)
+        private static async Task<BlockchainProcessing.BlockStorage.Entities.Transaction> FindOrCreate(Nethereum.RPC.Eth.DTOs.Transaction transaction, BlockchainDbContextBase context)
         {
             return await context.Transactions
                          .FindByBlockNumberAndHashAsync(transaction.BlockNumber, transaction.TransactionHash).ConfigureAwait(false)  ??
-                     new BlockchainProcessing.Storage.Entities.Transaction();
+                     new BlockchainProcessing.BlockStorage.Entities.Transaction();
         }
 
         public async Task<ITransactionView> FindByBlockNumberAndHashAsync(HexBigInteger blockNumber, string hash)
