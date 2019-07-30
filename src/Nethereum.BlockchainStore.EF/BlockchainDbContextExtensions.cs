@@ -42,8 +42,10 @@ namespace Nethereum.BlockchainStore.EF
 
         public static async Task<TransactionLog> FindByTransactionHashAndLogIndex(this IQueryable<TransactionLog> transactionLogs, string transactionHash, BigInteger logIndex)
         {
+            var logIndexString = logIndex.ToString();
+
             return await transactionLogs
-                .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.LogIndex == logIndex.ToString());
+                .SingleOrDefaultAsync(t => t.TransactionHash == transactionHash && t.LogIndex == logIndexString);
         }
 
         public static async Task<TransactionVmStack> FindByTransactionHashAync(
