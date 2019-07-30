@@ -1,6 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.Storage.Entities;
-using Nethereum.BlockchainProcessing.Storage.Entities.Mapping;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using System.Numerics;
@@ -61,7 +61,7 @@ namespace Nethereum.BlockchainStore.Tests.Entities.Mapping
 
             var sourceTransferEventLog = sourceLog.DecodeEvent<TransferEventDto>();
 
-            var transactionFromRepo = new TransactionLogView
+            var logFromRepo = new TransactionLogView
             {
                 TransactionHash = sourceTransferEventLog.Log.TransactionHash,
                 LogIndex = sourceTransferEventLog.Log.LogIndex.Value.ToString(),
@@ -72,7 +72,7 @@ namespace Nethereum.BlockchainStore.Tests.Entities.Mapping
                 IndexVal2 = (string)sourceTransferEventLog.Log.Topics[2]
             };
 
-            var rehydratedFilterLog = transactionFromRepo.ToFilterLog();
+            var rehydratedFilterLog = logFromRepo.ToFilterLog();
             var rehyrdratedTransferEventLog = rehydratedFilterLog.DecodeEvent<TransferEventDto>();
             
             Assert.Equal(sourceTransferEventLog.Log.TransactionHash, rehyrdratedTransferEventLog.Log.TransactionHash);
