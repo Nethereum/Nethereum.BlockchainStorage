@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainProcessing.Queue
             IQueue destinationQueue, 
             Func<FilterLog, Task<bool>> criteria,
             Func<FilterLog, object> mapper = null) :
-                base((filterLog) => destinationQueue.AddMessageAsync(mapper?.Invoke(filterLog) ?? filterLog)) 
+                base((filterLog) => destinationQueue.AddMessageAsync(mapper?.Invoke(filterLog) ?? filterLog), criteria) 
         { }
 
         public EventLogQueueProcessor(
