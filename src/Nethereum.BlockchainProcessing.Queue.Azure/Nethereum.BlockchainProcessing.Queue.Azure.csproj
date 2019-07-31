@@ -9,9 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\nethereum\src\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
-    <ProjectReference Include="..\Nethereum.LogProcessing.Dynamic\Nethereum.LogProcessing.Dynamic.csproj" />
-    <ProjectReference Include="..\Nethereum.LogProcessing\Nethereum.LogProcessing.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainProcessing.Queue\Nethereum.BlockchainProcessing.Queue.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,8 +16,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\nethereum\src\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
-  </ItemGroup>
-
 </Project>

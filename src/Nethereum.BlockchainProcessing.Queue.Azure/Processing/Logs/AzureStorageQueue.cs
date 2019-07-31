@@ -1,13 +1,12 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
-using Nethereum.BlockchainProcessing.Processing.Logs.Handling;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 {
-    public class AzureQueue : IQueue
+    public class AzureStorageQueue : IQueue
     {
-        public AzureQueue(CloudQueue cloudQueue)
+        public AzureStorageQueue(CloudQueue cloudQueue)
         {
             CloudQueue = cloudQueue;
         }

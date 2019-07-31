@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\nethereum\src\Nethereum.BlockchainProcessing\Nethereum.BlockchainProcessing.csproj" />
-    <ProjectReference Include="..\..\..\nethereum\src\Nethereum.Web3\Nethereum.Web3.csproj" />
     <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
     <ProjectReference Include="..\Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nethereum.Web3" Version="3.4.0" />
   </ItemGroup>
 
 </Project>
