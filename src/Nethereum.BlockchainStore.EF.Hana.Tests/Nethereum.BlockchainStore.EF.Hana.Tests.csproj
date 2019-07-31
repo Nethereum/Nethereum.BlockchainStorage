@@ -28,4 +28,10 @@
     <ProjectReference Include="..\Nethereum.BlockchainStore.Test.Base\Nethereum.BlockchainStore.Test.Base.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="App.config.EXAMPLE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
