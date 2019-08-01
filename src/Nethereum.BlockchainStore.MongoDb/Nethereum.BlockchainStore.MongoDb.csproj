@@ -2,6 +2,7 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>RJ MajorDutch, $(DefaultAuthors)</Authors>
     <UserSecretsId>Nethereum.BlockchainStore.MongoDb.UserSecrets</UserSecretsId>
     <Description>Store Ethereum block chain data in MongoDB.</Description>
   </PropertyGroup>
@@ -16,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
 
 </Project>

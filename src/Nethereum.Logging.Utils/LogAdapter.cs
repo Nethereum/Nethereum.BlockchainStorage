@@ -1,10 +1,10 @@
-﻿using Common.Logging;
+﻿using System;
+using Common.Logging;
 using Microsoft.Extensions.Logging;
-using System;
 using cl = Common.Logging;
 using ms = Microsoft.Extensions.Logging;
 
-namespace Microsoft.Logging.Utils
+namespace Nethereum.Microsoft.Logging.Utils
 {
     /// <summary>
     /// Transates from Microsoft.Extensions.Logging.ILogger to Common.Logging.ILog
@@ -14,7 +14,7 @@ namespace Microsoft.Logging.Utils
         private readonly ms.ILogger _logger;
         private readonly ILogPreformatter _preformatter;
 
-        public LogAdapter(ILogger logger, ILogPreformatter preformatter = null)
+        public LogAdapter(ms.ILogger logger, ILogPreformatter preformatter = null)
         {
             _preformatter = preformatter ?? new LogPreformatter();
             _logger = logger;

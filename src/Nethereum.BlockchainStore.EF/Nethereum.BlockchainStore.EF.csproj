@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
-	<Authors>Dave Whiffin</Authors>
+    <Authors> Dave Whiffin, $(DefaultAuthors)</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Store Ethereum blockchain data using Entity Framework (not EF core).  This package only contains the base components.  Use the other DB specific packages available for Sqlite, SqlServer etc.</Description>
   </PropertyGroup>

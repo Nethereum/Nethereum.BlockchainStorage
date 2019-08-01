@@ -1,8 +1,8 @@
-﻿using Microsoft.Configuration.Utils;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Nethereum.BlockchainStore.AzureTables.Bootstrap;
 using Nethereum.BlockchainStore.Console;
 using System.Threading;
+using Nethereum.Microsoft.Configuration.Utils;
 
 namespace Nethereum.BlockchainStore.AzureTables.Core.Console
 {

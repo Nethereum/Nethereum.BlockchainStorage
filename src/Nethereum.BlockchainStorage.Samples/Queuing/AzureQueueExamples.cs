@@ -1,5 +1,4 @@
-﻿using Microsoft.Configuration.Utils;
-using Nethereum.ABI.FunctionEncoding.Attributes;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processor;
 using Nethereum.BlockchainProcessing.Queue;
 using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
@@ -8,6 +7,7 @@ using System;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Nethereum.Microsoft.Configuration.Utils;
 using Xunit;
 
 namespace Nethereum.BlockchainStorage.Samples.Queuing

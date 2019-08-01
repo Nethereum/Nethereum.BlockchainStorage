@@ -12,7 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.Console\Nethereum.BlockchainStore.Console.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.EFCore.Sqlite\Nethereum.BlockchainStore.EFCore.Sqlite.csproj" />
-    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
   
   <ItemGroup>

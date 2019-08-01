@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http;
 using Nethereum.BlockchainStore.CosmosCore.Bootstrap;
 using Nethereum.BlockchainStore.Test.Base.RepositoryTests;
-using Microsoft.Configuration.Utils;
+using Nethereum.Microsoft.Configuration.Utils;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.CosmosCore.Tests

@@ -1,7 +1,7 @@
 using System;
 using Nethereum.BlockchainStore.MongoDb.Bootstrap;
 using Nethereum.BlockchainStore.Test.Base.RepositoryTests;
-using Microsoft.Configuration.Utils;
+using Nethereum.Microsoft.Configuration.Utils;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.MongoDb.Tests

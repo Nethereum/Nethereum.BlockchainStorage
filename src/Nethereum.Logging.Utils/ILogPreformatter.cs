@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Logging.Utils
+﻿namespace Nethereum.Microsoft.Logging.Utils
 {
     public interface ILogPreformatter
     {

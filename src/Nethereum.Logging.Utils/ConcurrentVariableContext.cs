@@ -1,8 +1,8 @@
-﻿using Common.Logging;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Common.Logging;
 
-namespace Microsoft.Logging.Utils
+namespace Nethereum.Microsoft.Logging.Utils
 {
     public class ConcurrentVariableContext : IVariablesContext
     {
