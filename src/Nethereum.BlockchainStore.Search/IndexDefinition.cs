@@ -1,6 +1,4 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.Processing.Logs;
-using Nethereum.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

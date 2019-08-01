@@ -1,13 +1,11 @@
-﻿using System;
-using Nethereum.Contracts;
-using System.Collections.Generic;
+﻿using Nethereum.Contracts;
+using System;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public interface IFunctionIndexer<TFunctionMessage> : IIndexer, IDisposable where TFunctionMessage : FunctionMessage, new()
+    public interface IFunctionIndexer<TFunction> : IIndexer, IDisposable where TFunction : FunctionMessage, new()
     {
-        Task IndexAsync(FunctionCall<TFunctionMessage> functionMessage);
-        Task IndexAsync(IEnumerable<FunctionCall<TFunctionMessage>> functionMessages);
+        Task IndexAsync(FunctionCall<TFunction> functionCall);
     }
 }

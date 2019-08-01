@@ -7,16 +7,15 @@ using Microsoft.Rest.TransientFaultHandling;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public abstract class AzureIndexBase: IAzureIndex
+    public abstract class AzureIndexerBase<TSource, TSearchDocument> : IndexerBase<TSource, TSearchDocument>, IAzureIndex where TSearchDocument : class
     {
         protected readonly Index Index;
         protected readonly ISearchIndexClient IndexClient;
 
-        public int Indexed { get; protected set; }
-
         public string Name => Index.Name;
 
-        protected AzureIndexBase(Index index, ISearchIndexClient indexClient)
+        protected AzureIndexerBase(Index index, ISearchIndexClient indexClient, Func<TSource, TSearchDocument> mapper, int logsPerIndexBatch = 1)
+            :base(mapper, logsPerIndexBatch)
         {
             Index = index;
             IndexClient = indexClient;
@@ -50,9 +49,12 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 .SearchAsync<Dictionary<string, object>>(text, sp);
         }
 
-        public virtual Task<long> DocumentCountAsync() => IndexClient.Documents.CountAsync();
+        public override Task<long> DocumentCountAsync() => IndexClient.Documents.CountAsync();
 
-        protected virtual async Task BatchUpdateAsync<T>(IEnumerable<T> uploadOrMerge, IEnumerable<T> upload = null, IEnumerable<T> delete = null) where T : class
+        protected override Task SendBatchAsync(IEnumerable<TSearchDocument> docs) => ExecuteBatch(docs);
+
+        protected virtual async Task ExecuteBatch<T>(IEnumerable<T> uploadOrMerge, IEnumerable<T> upload = null, IEnumerable<T> delete = null) 
+            where T: class
         {
             var actions = new List<IndexAction<T>>();
 
@@ -91,9 +93,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
             await retryPolicy.ExecuteAsync(async () => await IndexClient.Documents.IndexAsync(batch));
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
-            IndexClient?.Dispose();
+            base.Dispose();
+            //IndexClient?.Dispose();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         public const string SuggesterName = "sg";
 
-        public static object ToAzureDocument<TFunctionMessage>(
+        public static Dictionary<string, object> ToAzureDocument<TFunctionMessage>(
             this FunctionCall<TFunctionMessage> transactionAndFunction,
             FunctionIndexDefinition<TFunctionMessage> indexDefinition)
             where TFunctionMessage : FunctionMessage, new()
@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return dictionary;
         }
 
-        public static object ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
+        public static Dictionary<string, object> ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
         {
             var dictionary = new Dictionary<string, object>();
             foreach (var field in indexDefinition.Fields)
@@ -54,12 +54,17 @@ namespace Nethereum.BlockchainStore.Search.Azure
         {
             var index = new Index
             {
-                Name = searchIndex.IndexName.ToLower().Replace(".", "_"), 
+                Name = searchIndex.IndexName.ToAzureIndexName(), 
                 Fields = searchIndex.Fields.ToAzureFields(), 
                 Suggesters = searchIndex.Fields.ToAzureSuggesters()
             };
 
             return index;
+        }
+
+        public static string ToAzureIndexName(this string indexName)
+        {
+            return indexName.ToLower().Replace(".", "_");
         }
 
         public static Suggester[] ToAzureSuggesters(this IEnumerable<SearchField> fields)

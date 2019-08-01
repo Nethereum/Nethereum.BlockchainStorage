@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elasticsearch.Net.Aws" Version="6.1.0" />
+    <PackageReference Include="NEST" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj" />
+  </ItemGroup>  
+
+</Project>

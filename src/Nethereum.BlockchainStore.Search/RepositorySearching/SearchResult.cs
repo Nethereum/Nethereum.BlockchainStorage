@@ -1,4 +1,4 @@
-﻿using Nethereum.BlockchainStore.Entities;
+﻿using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 
 namespace Nethereum.BlockchainStore.Search.RepositorySearching
 {

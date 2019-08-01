@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.BlockProcessing.ValueObjects;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests
@@ -187,8 +185,10 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 .Where(f => f.IsPresetSearchField()).ToArray());
         }
 
-        private static TransactionWithReceipt CreateDummyTransaction()
+        private static TransactionReceiptVO CreateDummyTransaction()
         {
+            var block = new Block { Number = new HexBigInteger(1) };
+
             var tx =  new Transaction
             {
                 Value = new HexBigInteger(1000),
@@ -204,8 +204,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 TransactionIndex = new HexBigInteger(1)
             };
 
-            return new TransactionWithReceipt(tx, new TransactionReceipt(), false,
-                new HexBigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
+            return new TransactionReceiptVO(block, tx, new TransactionReceipt(), false);
         }
 
         [Fact]

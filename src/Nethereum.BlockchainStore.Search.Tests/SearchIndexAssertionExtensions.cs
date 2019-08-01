@@ -2,8 +2,6 @@
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using System;
-using Nethereum.BlockchainProcessing.Handlers;
-using Nethereum.BlockProcessing.ValueObjects;
 using Xunit;
 using Xunit.Sdk;
 
@@ -26,7 +24,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
         public FunctionCall<T> FunctionCall { get; }
         
 
-        public TransactionContext(IndexDefinition index, T dto, TransactionWithReceipt tx)
+        public TransactionContext(IndexDefinition index, T dto, TransactionReceiptVO tx)
             :base(index)
         {
             FunctionCall = new FunctionCall<T>(tx, dto);
@@ -60,7 +58,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
     public static class SearchIndexAssertionExtensions
     {
 
-        public static TransactionContext<T> Assertions<T>(this IndexDefinition index, T dto, TransactionWithReceipt tx) where T : FunctionMessage, new()
+        public static TransactionContext<T> Assertions<T>(this IndexDefinition index, T dto, TransactionReceiptVO tx) where T : FunctionMessage, new()
         {
             return new TransactionContext<T>(index, dto, tx);
         }

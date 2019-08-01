@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
-using Microsoft.Azure.Search.Models;
+﻿using Microsoft.Azure.Search.Models;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Text;
 using Xunit;
 
 namespace Nethereum.BlockchainStore.Search.Tests.Azure

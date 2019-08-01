@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <UserSecretsId>Nethereum.BlockchainStore.Search.Samples</UserSecretsId>
   </PropertyGroup>
@@ -13,11 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Nethereum.BlockchainProcessing.Common\Nethereum.BlockchainProcessing.Common.csproj" />
-    <ProjectReference Include="..\..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
-    <ProjectReference Include="..\..\Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj" />
-    <ProjectReference Include="..\..\Nethereum.LogProcessing\Nethereum.LogProcessing.csproj" />
-    <ProjectReference Include="..\Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Search.Azure\Nethereum.BlockchainStore.Search.Azure.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
 
 </Project>
