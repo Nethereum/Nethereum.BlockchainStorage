@@ -1,7 +1,7 @@
 ﻿using Common.Logging;
-using Microsoft.Logging.Utils;
+using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Extensions.Logging
+namespace Nethereum.Microsoft.Logging.Utils
 {
     public static class LoggingExtensions
     {

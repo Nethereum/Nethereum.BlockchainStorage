@@ -1,8 +1,6 @@
 ﻿using Common.Logging;
-using Microsoft.Configuration.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Logging.Utils;
 using Nethereum.BlockchainProcessing;
 using Nethereum.BlockchainProcessing.BlockProcessing;
 using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
@@ -11,6 +9,8 @@ using Nethereum.RPC.Eth.Blocks;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Nethereum.Microsoft.Configuration.Utils;
+using Nethereum.Microsoft.Logging.Utils;
 
 namespace Nethereum.BlockchainStore.Console
 {

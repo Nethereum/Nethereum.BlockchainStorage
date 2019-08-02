@@ -1,13 +1,27 @@
 <Project>
  <PropertyGroup>
-   <PackageTags>Netherum;Ethereum;Blockchain;Blockchain Processing</PackageTags>
+   <DefaultAuthors>Nethereum team;Nethereum contributors;Juan Blanco</DefaultAuthors>
+   <PackageTags>Netherum;Ethereum;Blockchain;Crypto 2.0</PackageTags>
    <PackageIconUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/logos/logo64x64.png</PackageIconUrl>
    <PackageProjectUrl>https://nethereum.com</PackageProjectUrl>
-   <PackageLicenseUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/LICENSE.md</PackageLicenseUrl>
    <RepositoryType>git</RepositoryType>
    <RepositoryUrl>https://github.com/Nethereum/Nethereum</RepositoryUrl>
-   <Description>Core Nethereum blockchain processing library to retrieve blockchain data, filter it, invoke custom handlers and invoke lower level processors</Description>
-   <Version>3.1.2</Version>
-   <Authors>Dave Whiffin, Juan Blanco</Authors> 
+   <Copyright>Nethereum.com (Juan Blanco) 2015-2019</Copyright>
+   <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+   <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+   <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+   <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+   <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+   <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+   <Version>3.4.0</Version>
+ </PropertyGroup>
+ 
+<PropertyGroup>
+  <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 </PropertyGroup>
+<ItemGroup>
+  <None Include="..\..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+</ItemGroup>
+
 </Project>
+

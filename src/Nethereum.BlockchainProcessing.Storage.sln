@@ -97,9 +97,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlServer", "SqlServer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{F8B2FF2F-D5A6-4D6A-B6F7-9EBC51FF302E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Configuration.Utils", "Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj", "{870CCEA7-CFAE-42EB-8129-68E3234F51ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.Microsoft.Configuration.Utils", "Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj", "{870CCEA7-CFAE-42EB-8129-68E3234F51ED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Logging.Utils", "Nethereum.Logging.Utils\Microsoft.Logging.Utils.csproj", "{3A13C4D3-865A-4D9E-9325-045410FCF3CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.Microsoft.Logging.Utils", "Nethereum.Logging.Utils\Nethereum.Microsoft.Logging.Utils.csproj", "{3A13C4D3-865A-4D9E-9325-045410FCF3CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Console", "Nethereum.BlockchainStore.Console\Nethereum.BlockchainStore.Console.csproj", "{8C20B3E6-27CD-4D9E-AD67-E784C9378630}"
 EndProject
@@ -115,7 +115,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcess
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A150E121-5770-4C83-82B0-309DAAFAC490}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStorage.Samples", "Nethereum.BlockchainStorage.Samples\Nethereum.BlockchainStorage.Samples.csproj", "{59F572BE-463B-495B-98A8-59B3B526E860}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStorage.Samples", "Nethereum.BlockchainStorage.Samples\Nethereum.BlockchainStorage.Samples.csproj", "{59F572BE-463B-495B-98A8-59B3B526E860}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nethereum.BlockchainStore.Search.Azure", "Nethereum.BlockchainStore.Search.Azure\Nethereum.BlockchainStore.Search.Azure.csproj", "{E76EE0FE-3206-4960-9749-5D83BDFCD4AE}"
 EndProject

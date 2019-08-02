@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Configuration.Utils
+namespace Nethereum.Microsoft.Configuration.Utils
 {
     public static class ConfigurationUtils
     {

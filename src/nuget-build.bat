@@ -2,9 +2,9 @@ rem packing code generators
 del /S *.*.nupkg
 del /S *.*.snupkg
 
-cd Nethereum.BlockchainStore.Search
-CALL :restorepack
-cd ..
+rem cd Nethereum.BlockchainStore.Search
+rem CALL :restorepack
+rem cd ..
 
 cd Nethereum.BlockchainStore.AzureTables
 CALL :restorepack
@@ -34,18 +34,6 @@ cd Nethereum.BlockchainStore.EFCore.SqlServer
 CALL :restorepack
 cd ..
 
-cd Nethereum.BlockchainStore
-CALL :restorepack
-cd ..
-
-cd Nethereum.BlockchainStore.Entities
-CALL :restorepack
-cd ..
-
-cd Nethereum.BlockchainStore.Entities.Mapping
-CALL :restorepack
-cd ..
-
 cd Nethereum.BlockchainStore.EF
 CALL :restorepack
 cd ..
@@ -55,6 +43,18 @@ CALL :restorepack
 cd ..
 
 cd Nethereum.BlockchainStore.MongoDb
+CALL :restorepack
+cd ..
+
+cd Nethereum.BlockchainStore.EF.Hana
+CALL :restorepack
+cd ..
+
+cd Nethereum.Configuration.Utils
+CALL :restorepack
+cd ..
+
+cd Nethereum.Logging.Utils
 CALL :restorepack
 cd ..
 

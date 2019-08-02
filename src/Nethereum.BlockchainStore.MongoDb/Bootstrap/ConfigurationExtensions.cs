@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Configuration.Utils;
+using Nethereum.Microsoft.Configuration.Utils;
 
 namespace Nethereum.BlockchainStore.MongoDb.Bootstrap
 {
