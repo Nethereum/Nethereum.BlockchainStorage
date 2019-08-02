@@ -1,12 +1,9 @@
-using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
-using Microsoft.Configuration.Utils;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
+using Nethereum.Microsoft.Configuration.Utils;
+using Nethereum.Util;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +12,7 @@ using Xunit;
 namespace Nethereum.BlockchainStore.Search.Samples.Azure
 {
     [Collection("Nethereum.BlockchainStore.Search.Samples.Azure")]
-    public class IndexingTransferEvents
+    public class IndexingLogs
     {
         /*
 Solidity Contract Excerpt
@@ -97,7 +94,7 @@ Solidity Contract Excerpt
         private const string BlockchainUrl = TestConfiguration.BlockchainUrls.Infura.Rinkeby;
         private readonly string _azureSearchApiKey;
 
-        public IndexingTransferEvents()
+        public IndexingLogs()
         {
             //user secrets are only for development
             //if not in development the key will be retrieved from environmental variables or command line args
@@ -115,40 +112,96 @@ Solidity Contract Excerpt
         /// Indexing events in the most simple way
         /// </summary>
         [Fact]
-        public async Task IndexingOneEvent()
+        public async Task OneEvent()
         {
-            var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey);
-            var indexDefinition = new EventIndexDefinition<TransferEvent_ERC20>();
-            Microsoft.Azure.Search.Models.Index index = null; 
+            const string INDEX_NAME = "transfer-logs";
 
-            try
-            {
-                index = await azureSearchService.CreateIndexAsync(indexDefinition.ToAzureIndex());
-                using(var indexClient = azureSearchService.GetOrCreateIndexClient(index.Name))
-                { 
-                    using(var azureIndexer = new AzureEventIndexer<TransferEvent_ERC20>(index, indexClient, indexDefinition, logsPerIndexBatch: 10))
-                    { 
-                        var searchIndexProcessor = new SearchIndexProcessor<TransferEvent_ERC20>(azureIndexer);
-
-                        var web3 = new Web3.Web3(BlockchainUrl);
-                        var blockchainProcessor = web3.Processing.Logs.CreateProcessor(searchIndexProcessor);
-                        var cancellationTokenSource = new CancellationTokenSource();
-
-                        await blockchainProcessor.ExecuteAsync(3146694, cancellationTokenSource.Token, 3146684);
-                    }
+            //surround with "using" so that anything in a buffer is sent on dispose
+            using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
+            { 
+                try
+                {
+                    var index = await azureSearchService.CreateIndexForEventAsync<TransferEvent_ERC20>(INDEX_NAME);
+                    var searchIndexProcessor = azureSearchService.CreateProcessorForEvent<TransferEvent_ERC20>(index, logsPerIndexBatch: 1);
+                    var web3 = new Web3.Web3(BlockchainUrl);
+                    var blockchainProcessor = web3.Processing.Logs.CreateProcessor(searchIndexProcessor);
+                    var cancellationTokenSource = new CancellationTokenSource();
+                    await blockchainProcessor.ExecuteAsync(3146694, cancellationTokenSource.Token, 3146684);
 
                     await Task.Delay(5000); // allow time to index
-                    Assert.Equal(19, await indexClient.Documents.CountAsync());
+                    Assert.Equal(19, await azureSearchService.CountDocumentsAsync(INDEX_NAME));
+                    
                 }
-            }
-            finally
-            {
-                if(index != null) 
-                { 
-                    await azureSearchService.DeleteIndexAsync(index.Name);
+                finally
+                {
+                    await azureSearchService.DeleteIndexAsync(INDEX_NAME);
                 }
             }
         }
+
+        [Fact]
+        public async Task FilterLogs()
+        {
+            const string INDEX_NAME = "filter-logs";
+
+            //surround with "using" so that anything in a buffer is sent on dispose
+            using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
+            { 
+                try
+                {
+                    // create an index - if an existing index is required: azureSearchService.GetIndexAsync()
+                    var index = await azureSearchService.CreateIndexForFilterLogAsync(INDEX_NAME);
+
+                    var searchIndexProcessor = azureSearchService.CreateProcessorForFilterLog(index, logsPerIndexBatch: 1);
+                    var web3 = new Web3.Web3(BlockchainUrl);
+                    var blockchainProcessor = web3.Processing.Logs.CreateProcessor(searchIndexProcessor);
+                    var cancellationTokenSource = new CancellationTokenSource();
+                    await blockchainProcessor.ExecuteAsync(3146685, cancellationTokenSource.Token, 3146684);
+                        
+                    await Task.Delay(5000); // allow time to index
+                    Assert.Equal(25, await azureSearchService.CountDocumentsAsync(INDEX_NAME));
+                }
+                finally
+                {
+                    await azureSearchService.DeleteIndexAsync(INDEX_NAME);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task FilterLogsWithCriteria()
+        {
+            const string INDEX_NAME = "filter-logs-with-criteria";
+
+            //surround with "using" so that anything in a buffer is sent on dispose
+            using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
+            {
+                try
+                {
+                    // create an index - if an existing index is required: azureSearchService.GetIndexAsync()
+                    var index = await azureSearchService.CreateIndexForFilterLogAsync(INDEX_NAME);
+
+                    var searchIndexProcessor = azureSearchService.CreateProcessorForFilterLog(
+                        index,
+                        log => AddressUtil.Current.AreAddressesTheSame(log.Address, "0x9edcb9a9c4d34b5d6a082c86cb4f117a1394f831"),
+                        logsPerIndexBatch: 1);
+
+                    var web3 = new Web3.Web3(BlockchainUrl);
+                    var blockchainProcessor = web3.Processing.Logs.CreateProcessor(searchIndexProcessor);
+                    var cancellationTokenSource = new CancellationTokenSource();
+                    await blockchainProcessor.ExecuteAsync(3146685, cancellationTokenSource.Token, 3146684);
+
+                    await Task.Delay(5000); // allow time to index
+                    Assert.Equal(2, await azureSearchService.CountDocumentsAsync(INDEX_NAME));
+                }
+                finally
+                {
+                    await azureSearchService.DeleteIndexAsync(INDEX_NAME);
+                }
+            }
+        }
+
+        //0x9edcb9a9c4d34b5d6a082c86cb4f117a1394f831
 
         ///// <summary>
         ///// Dictating exactly what you want stored in the index - using a mapping func to translate from the event
@@ -516,7 +569,7 @@ Solidity Contract Excerpt
         //    return index;
         //}
 
-    
+
         //private static string CreateJsonFileToHoldProgress()
         //{
         //    var progressFileNameAndPath = Path.Combine(Path.GetTempPath(), "BlockProcess.json");

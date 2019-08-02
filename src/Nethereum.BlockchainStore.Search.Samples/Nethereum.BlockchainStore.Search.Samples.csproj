@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.Search.Azure\Nethereum.BlockchainStore.Search.Azure.csproj" />
-    <ProjectReference Include="..\Nethereum.Configuration.Utils\Microsoft.Configuration.Utils.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
 
 </Project>

@@ -34,7 +34,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var indexClient = _azureSearchService.GetOrCreateIndexClient(index.Name);
 
             var indexer = new AzureFilterLogIndexer(index, indexClient);
-            var processor = new SearchIndexProcessor(indexer);
+            var processor = new FilterLogProcessor(indexer);
 
             var filterLog = new FilterLog();
 
