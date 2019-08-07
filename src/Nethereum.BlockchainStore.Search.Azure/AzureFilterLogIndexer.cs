@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
+
     // filter log with mapping
     public class AzureFilterLogIndexer<TSearchDocument>
     : AzureIndexerBase<FilterLog, TSearchDocument>, IIndexer<FilterLog>
@@ -34,7 +35,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             int logsPerIndexBatch = 1) : base(
                 index,
                 indexClient,
-                (filterLog) => FilterLogSearchIndex.Map(filterLog),
+                (filterLog) => FilterLogIndexUtil.Map(filterLog),
                 logsPerIndexBatch)
         {
 

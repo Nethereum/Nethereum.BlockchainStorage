@@ -27,7 +27,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public async Task FilterLogIndexing()
         {
             //create the index
-            var index = FilterLogSearchIndex.Create("my-logs");
+            var index = FilterLogIndexUtil.Create("my-logs");
             await _azureSearchService.CreateIndexAsync(index);
 
             //get the index client

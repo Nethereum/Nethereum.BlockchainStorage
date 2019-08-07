@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public const string SuggesterName = "sg";
 
         public static Dictionary<string, object> ToAzureDocument<TFunctionMessage>(
-            this FunctionCall<TFunctionMessage> transactionAndFunction,
+            this TransactionForFunctionVO<TFunctionMessage> transactionAndFunction,
             FunctionIndexDefinition<TFunctionMessage> indexDefinition)
             where TFunctionMessage : FunctionMessage, new()
         {

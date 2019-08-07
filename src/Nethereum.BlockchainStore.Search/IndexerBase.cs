@@ -30,7 +30,13 @@ namespace Nethereum.BlockchainStore.Search
             return CurrentBatch.Count >= _logsPerIndexBatch;
         }
 
-        public int Pending => CurrentBatch.Count;
+        public int PendingDocumentCount => CurrentBatch.Count;
+
+        public async Task IndexPendingDocumentsAsync()
+        {
+            if(CurrentBatch.IsEmpty) return;
+            await LockAndSend().ConfigureAwait(false);
+        }
 
         public int Indexed {get; private set; }
 
@@ -38,10 +44,7 @@ namespace Nethereum.BlockchainStore.Search
 
         public virtual void Dispose()
         {
-            if(!CurrentBatch.IsEmpty)
-            {
-                LockAndSend().Wait();
-            }
+            IndexPendingDocumentsAsync().Wait();
         }
 
         public abstract Task<long> DocumentCountAsync();

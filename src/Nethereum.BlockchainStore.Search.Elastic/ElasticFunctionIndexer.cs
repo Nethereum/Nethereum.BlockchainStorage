@@ -18,9 +18,9 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             this._mapper = mapper;
         }
 
-        public Task IndexAsync(FunctionCall<TFunctionMessage> functionMessage) => IndexAsync(new[] {functionMessage});
+        public Task IndexAsync(TransactionForFunctionVO<TFunctionMessage> functionMessage) => IndexAsync(new[] {functionMessage});
 
-        public async Task IndexAsync(IEnumerable<FunctionCall<TFunctionMessage>> functionMessages)
+        public async Task IndexAsync(IEnumerable<TransactionForFunctionVO<TFunctionMessage>> functionMessages)
         {
             var documents = functionMessages.Select(functionCall => _mapper.Map(functionCall)).ToArray();
             await BulkIndexAsync(documents);
@@ -38,10 +38,10 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             _searchIndexDefinition = searchIndexDefinition;
         }
 
-        public Task IndexAsync(FunctionCall<TFunctionMessage> functionMessage) => IndexAsync(new[] {functionMessage});
+        public Task IndexAsync(TransactionForFunctionVO<TFunctionMessage> functionMessage) => IndexAsync(new[] {functionMessage});
 
 
-        public async Task IndexAsync(IEnumerable<FunctionCall<TFunctionMessage>> functionMessages)
+        public async Task IndexAsync(IEnumerable<TransactionForFunctionVO<TFunctionMessage>> functionMessages)
         {
             var documents = functionMessages.Select(functionCall => functionCall.ToGenericElasticSearchDoc(_searchIndexDefinition)).ToArray();
             await BulkIndexAsync(documents);

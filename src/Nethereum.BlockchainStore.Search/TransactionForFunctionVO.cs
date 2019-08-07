@@ -3,9 +3,9 @@ using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public struct FunctionCall<TDto> where TDto : FunctionMessage, new()
+    public class TransactionForFunctionVO<TDto> where TDto : FunctionMessage, new()
     {
-        public FunctionCall(TransactionReceiptVO tx, TDto dto)
+        public TransactionForFunctionVO(TransactionReceiptVO tx, TDto dto)
         {
             Tx = tx;
             Dto = dto;

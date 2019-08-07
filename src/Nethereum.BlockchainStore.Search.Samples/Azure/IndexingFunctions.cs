@@ -1,86 +1,88 @@
-﻿//using Nethereum.ABI.FunctionEncoding.Attributes;
-//using Nethereum.BlockchainProcessing.Handlers;
-//using Nethereum.BlockchainProcessing.Processing;
-//using Nethereum.BlockchainStore.Search.Azure;
-//using Microsoft.Configuration.Utils;
-//using Nethereum.Contracts;
-//using System;
-//using System.Numerics;
-//using System.Threading.Tasks;
-//using Xunit;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainStore.Search.Azure;
+using Nethereum.Contracts;
+using Nethereum.Microsoft.Configuration.Utils;
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Util;
+using System;
+using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
-//namespace Nethereum.BlockchainStore.Search.Samples.Azure
-//{
-//    [Collection("Nethereum.BlockchainStore.Search.Samples.Azure")]
-//    public class IndexingFunctions
-//    {
-//        [Function("transfer", "bool")]
-//        public class TransferFunction: FunctionMessage
-//        {
-//            [Parameter("address", "_to", 1)]
-//            public string To {get; set;}
-//            [Parameter("uint256", "_value", 2)]
-//            public BigInteger Value {get; set;}
-//        }
+namespace Nethereum.BlockchainStore.Search.Samples.Azure
+{
+    [Collection("Nethereum.BlockchainStore.Search.Samples.Azure")]
+    public class IndexingFunctions
+    {
+        private const string BlockchainUrl = TestConfiguration.BlockchainUrls.Infura.Rinkeby;
 
-//        public const string ApiKeyName = "AzureSearchApiKey";
-//        public const string AzureSearchServiceName = "blockchainsearch";
-//        public const string AzureTransferIndexName = "transferfunction";
+        [Function("transfer", "bool")]
+        public class TransferFunction : FunctionMessage
+        {
+            [Parameter("address", "_to", 1)]
+            public string To { get; set; }
+            [Parameter("uint256", "_value", 2)]
+            public BigInteger Value { get; set; }
+        }
 
-//        private readonly string _azureSearchApiKey;
+        public const string ApiKeyName = "AzureSearchApiKey";
+        public const string AzureSearchServiceName = "blockchainsearch";
+        public const string AzureTransferIndexName = "transferfunction";
 
-//        public IndexingFunctions()
-//        {
-//            //user secrets are only for development
-//            //if not in development the key will be retrieved from environmental variables or command line args
-//            ConfigurationUtils.SetEnvironmentAsDevelopment();
+        private readonly string _azureSearchApiKey;
 
-//            //use the command line to set your azure search api key
-//            //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"
-//            var appConfig = ConfigurationUtils
-//                .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainStore.Search.Samples");
+        public IndexingFunctions()
+        {
+            //user secrets are only for development
+            //if not in development the key will be retrieved from environmental variables or command line args
+            ConfigurationUtils.SetEnvironmentAsDevelopment();
 
-//            _azureSearchApiKey = appConfig[ApiKeyName];
-//        }
+            //use the command line to set your azure search api key
+            //e.g. dotnet user-secrets set "AzureSearchApiKey" "<put key here>"
+            var appConfig = ConfigurationUtils
+                .Build(Array.Empty<string>(), userSecretsId: "Nethereum.BlockchainStore.Search.Samples");
 
-//        [Fact]
-//        public async Task IndexingTransferFunctions()
-//        {
-//            using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
-//            {
-//                await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
+            _azureSearchApiKey = appConfig[ApiKeyName];
+        }
 
-//                try
-//                {
-//                    using (var azureFunctionMessageIndexer =
-//                        await azureSearchService.CreateFunctionIndexer<TransferFunction>(
-//                            indexName: AzureTransferIndexName))
-//                    {
-//                        var transferHandler =
-//                            new FunctionIndexTransactionHandler<TransferFunction>(azureFunctionMessageIndexer);
+        [Fact]
+        public async Task IndexingTransferFunctions()
+        {
+            const string INDEX_NAME = "transfer-functions";
 
-//                        var web3 = new Web3.Web3(TestConfiguration.BlockchainUrls.Infura.Rinkeby);
-//                        var handlers = new HandlerContainer {TransactionHandler = transferHandler};
-//                        var blockProcessor = BlockProcessorFactory.Create(web3, handlers);
-//                        var processingStrategy = new BlockchainProcessingStrategy(blockProcessor);
-//                        var blockchainProcessor = new BlockchainProcessor(processingStrategy);
+            //surround with "using" so that anything in a buffer is sent on dispose
+            using (var azureSearchService = new AzureSearchService(AzureSearchServiceName, _azureSearchApiKey))
+            {
+                try
+                {
+                    //setup
+                    var index = await azureSearchService.CreateIndexForFunctionAsync<TransferFunction>(INDEX_NAME);
 
-//                        var blockRange = new BlockRange(3146684, 3146694);
-//                        await blockchainProcessor.ProcessAsync(blockRange);
+                    var searchIndexProcessor = azureSearchService.CreateFunctionMessageProcessor<TransferFunction>(index, documentsPerBatch: 1);
+                    var web3 = new Web3.Web3(BlockchainUrl);
 
-//                        await Task.Delay(TimeSpan.FromSeconds(5));
+                    var blockchainProcessor = web3.Processing.Blocks.CreateBlockProcessor((steps) => {
+                        steps.TransactionStep.SetMatchCriteria(tx => tx.Transaction.IsFrom("0xf47a8bb5c9ff814d39509591281ae31c0c7c2f38"));
+                        steps.TransactionReceiptStep.AddProcessorHandler(searchIndexProcessor);
+                    });
 
-//                        //ensure we have written the expected docs to the index
-//                        Assert.Equal(3, await azureFunctionMessageIndexer.DocumentCountAsync());
-//                    }
-//                }
-//                finally
-//                {
-//                    await azureSearchService.DeleteIndexAsync(AzureTransferIndexName);
-//                }
-//            }
+                    var cancellationTokenSource = new CancellationTokenSource();
 
+                    //execute
+                    await blockchainProcessor.ExecuteAsync(3146689, cancellationTokenSource.Token, 3146689);
 
-//        }
-//    }
-//}
+                    //assert
+                    await Task.Delay(5000); // allow time to index
+                    Assert.Equal(1, await azureSearchService.CountDocumentsAsync(INDEX_NAME));
+
+                }
+                finally
+                {
+                    await azureSearchService.DeleteIndexAsync(INDEX_NAME);
+                }
+            }
+
+        }
+    }
+}

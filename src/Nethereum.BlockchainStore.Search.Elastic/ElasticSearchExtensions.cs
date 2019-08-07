@@ -45,7 +45,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
         }
 
         public static GenericElasticSearchDocument ToGenericElasticSearchDoc<TFunctionMessage>(
-            this FunctionCall<TFunctionMessage> functionCall, 
+            this TransactionForFunctionVO<TFunctionMessage> functionCall, 
             FunctionIndexDefinition<TFunctionMessage> indexDefinition) where TFunctionMessage : FunctionMessage, new()
         {
             var dictionary = new GenericElasticSearchDocument();

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Azure.Search;
+using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.BlockchainProcessing.Processor;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
@@ -9,140 +11,146 @@ using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class AzureSearchService : IAzureSearchService
+    public class AzureSearchService : IAzureSearchService, IDisposable
     {
         private readonly SearchServiceClient _client;
-        private readonly ConcurrentDictionary<string, Index> _azureIndexes;
+        private readonly ConcurrentDictionary<string, Index> _indexes;
         private readonly Dictionary<string, ISearchIndexClient> _clients;
-
         private readonly List<IDisposable> _indexers;
 
         public AzureSearchService(string serviceName, string searchApiKey)
         {
             _client = new SearchServiceClient(serviceName, new SearchCredentials(searchApiKey));
-            _azureIndexes = new ConcurrentDictionary<string, Index>();
+            _indexes = new ConcurrentDictionary<string, Index>();
             _clients = new Dictionary<string, ISearchIndexClient>();
             _indexers = new List<IDisposable>();
         }
 
-        public FilterLogProcessor CreateProcessorForFilterLog(Index index, int logsPerIndexBatch = 1)
+        public ProcessorHandler<TSource> CreateProcessor<TSource, TSearchDocument>(
+            Index index, Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
+                where TSource : class, new() where TSearchDocument : class
         {
-            var azureIndexer = CreateFilterLogIndexer(index, logsPerIndexBatch);
+            var azureIndexer = CreateIndexer(index, mapper, documentsPerBatch);
+            return new ProcessorHandler<TSource>((x) => azureIndexer.IndexAsync(x));
+        }
+
+        public ProcessorHandler<TSource> CreateProcessor<TSource, TSearchDocument>(
+            Index index, Func<TSource, bool> criteria, Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
+                where TSource : class, new() where TSearchDocument : class
+        {
+            var azureIndexer = CreateIndexer(index, mapper, documentsPerBatch);
+            return new ProcessorHandler<TSource>((x) => azureIndexer.IndexAsync(x), criteria);
+        }
+
+        public ProcessorHandler<TSource> CreateProcessor<TSource, TSearchDocument>(
+            Index index, Func<TSource, Task<bool>> asyncCriteria, Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
+                where TSource : class, new() where TSearchDocument : class
+        {
+            var azureIndexer = CreateIndexer(index, mapper, documentsPerBatch);
+            return new ProcessorHandler<TSource>((x) => azureIndexer.IndexAsync(x), asyncCriteria);
+        }
+
+        public FilterLogProcessor CreateLogProcessor(Index index, int documentsPerBatch = 1)
+        {
+            var azureIndexer = CreateFilterLogIndexer(index, documentsPerBatch);
             return new FilterLogProcessor(azureIndexer);
         }
 
-        public FilterLogProcessor CreateProcessorForFilterLog<TSearchDocument>(Index index, Func<FilterLog, TSearchDocument> mapper, int logsPerIndexBatch = 1) where TSearchDocument : class
+        public FilterLogProcessor CreateLogProcessor(
+            Index index, Func<FilterLog, Task<bool>> asyncCriteria, int documentsPerBatch = 1)
         {
-            var azureIndexer = CreateFilterLogIndexer(index, mapper, logsPerIndexBatch);
+            var azureIndexer = CreateFilterLogIndexer(index, documentsPerBatch);
+            return new FilterLogProcessor(azureIndexer, asyncCriteria);
+        }
+
+        public FilterLogProcessor CreateLogProcessor(
+            Index index, Func<FilterLog, bool> criteria, int documentsPerBatch = 1)
+        {
+            var azureIndexer = CreateFilterLogIndexer(index, documentsPerBatch);
+            return new FilterLogProcessor(azureIndexer, criteria);
+        }
+
+        public FilterLogProcessor CreateLogProcessor<TSearchDocument>(
+            Index index, Func<FilterLog, TSearchDocument> mapper, int documentsPerBatch = 1)
+                where TSearchDocument : class
+        {
+            var azureIndexer = CreateFilterLogIndexer(index, mapper, documentsPerBatch);
             return new FilterLogProcessor(azureIndexer);
         }
 
-        public FilterLogProcessor CreateProcessorForFilterLog<TSearchDocument>(Index index, Func<FilterLog, TSearchDocument> mapper, Func<FilterLog, Task<bool>> asyncCriteria, int logsPerIndexBatch = 1) where TSearchDocument : class
+        public FilterLogProcessor CreateLogProcessor<TSearchDocument>(
+            Index index, Func<FilterLog, TSearchDocument> mapper, Func<FilterLog, Task<bool>> asyncCriteria, int documentsPerBatch = 1)
+                where TSearchDocument : class
         {
-            var azureIndexer = CreateFilterLogIndexer(index, mapper, logsPerIndexBatch);
+            var azureIndexer = CreateFilterLogIndexer(index, mapper, documentsPerBatch);
             return new FilterLogProcessor(azureIndexer, asyncCriteria);
         }
 
-        public FilterLogProcessor CreateProcessorForFilterLog<TSearchDocument>(Index index, Func<FilterLog, TSearchDocument> mapper, Func<FilterLog, bool> criteria, int logsPerIndexBatch = 1) where TSearchDocument : class
+        public FilterLogProcessor CreateLogProcessor<TSearchDocument>(
+            Index index, Func<FilterLog, TSearchDocument> mapper, Func<FilterLog, bool> criteria, int documentsPerBatch = 1)
+                where TSearchDocument : class
         {
-            var azureIndexer = CreateFilterLogIndexer(index, mapper, logsPerIndexBatch);
+            var azureIndexer = CreateFilterLogIndexer(index, mapper, documentsPerBatch);
             return new FilterLogProcessor(azureIndexer, criteria);
         }
 
-        public FilterLogProcessor CreateProcessorForFilterLog(Index index, Func<FilterLog, Task<bool>> asyncCriteria, int logsPerIndexBatch = 1)
+        public EventLogProcessor<TEventDTO> CreateLogProcessor<TEventDTO>(
+            Index index, int documentsPerBatch = 1)
+                where TEventDTO : class, IEventDTO, new()
         {
-            var azureIndexer = CreateFilterLogIndexer(index, logsPerIndexBatch);
-            return new FilterLogProcessor(azureIndexer, asyncCriteria);
+            var azureIndexer = CreateEventIndexer<TEventDTO>(index, documentsPerBatch);
+            return new EventLogProcessor<TEventDTO>(azureIndexer);
         }
 
-        public FilterLogProcessor CreateProcessorForFilterLog(Index index, Func<FilterLog, bool> criteria, int logsPerIndexBatch = 1)
+        public EventLogProcessor<TEventDTO> CreateLogProcessor<TEventDTO>(
+            Index index, Func<EventLog<TEventDTO>, Task<bool>> asyncCriteria, int documentsPerBatch = 1)
+                where TEventDTO : class, IEventDTO, new()
         {
-            var azureIndexer = CreateFilterLogIndexer(index, logsPerIndexBatch);
-            return new FilterLogProcessor(azureIndexer, criteria);
+            var azureIndexer = CreateEventIndexer<TEventDTO>(index, documentsPerBatch);
+            return new EventLogProcessor<TEventDTO>(azureIndexer, asyncCriteria);
         }
 
-        public EventProcessor<TEventDTO> CreateProcessorForEvent<TEventDTO>(Index index, int logsPerIndexBatch = 1) where TEventDTO : class, new()
+        public EventLogProcessor<TEventDTO> CreateLogProcessor<TEventDTO>(
+            Index index, Func<EventLog<TEventDTO>, bool> criteria, int documentsPerBatch = 1)
+                where TEventDTO : class, IEventDTO, new()
         {
-            var azureIndexer = CreateEventIndexer<TEventDTO>(index, logsPerIndexBatch);
-            return new EventProcessor<TEventDTO>(azureIndexer);
+            var azureIndexer = CreateEventIndexer<TEventDTO>(index, documentsPerBatch);
+            return new EventLogProcessor<TEventDTO>(azureIndexer, criteria);
         }
 
-        public EventProcessor<TEventDTO> CreateProcessorForEvent<TEventDTO>(Index index, Func<EventLog<TEventDTO>, Task<bool>> asyncCriteria, int logsPerIndexBatch = 1) where TEventDTO : class, new()
+
+        public EventLogProcessor<TEventDTO> CreateLogProcessor<TEventDTO, TSearchDocument>(
+            Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int documentsPerBatch = 1)
+                where TEventDTO : class, IEventDTO, new() where TSearchDocument : class
         {
-            var azureIndexer = CreateEventIndexer<TEventDTO>(index, logsPerIndexBatch);
-            return new EventProcessor<TEventDTO>(azureIndexer, asyncCriteria);
+            var azureIndexer = CreateEventIndexer(index, mapper, documentsPerBatch);
+            return new EventLogProcessor<TEventDTO>(azureIndexer);
         }
 
-        public EventProcessor<TEventDTO> CreateProcessorForEvent<TEventDTO>(Index index, Func<EventLog<TEventDTO>, bool> criteria, int logsPerIndexBatch = 1) where TEventDTO : class, new()
+        public EventLogProcessor<TEventDTO> CreateLogProcessor<TEventDTO, TSearchDocument>(
+            Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, Func<EventLog<TEventDTO>, Task<bool>> asyncCriteria, int documentsPerBatch = 1)
+                where TEventDTO : class, IEventDTO, new() where TSearchDocument : class
         {
-            var azureIndexer = CreateEventIndexer<TEventDTO>(index, logsPerIndexBatch);
-            return new EventProcessor<TEventDTO>(azureIndexer, criteria);
+            var azureIndexer = CreateEventIndexer(index, mapper, documentsPerBatch);
+            return new EventLogProcessor<TEventDTO>(azureIndexer, asyncCriteria);
         }
 
-        public EventProcessor<TEventDTO> CreateProcessorForEvent<TEventDTO, TSearchDocument>(Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int logsPerIndexBatch = 1) 
-            where TEventDTO : class, new() where TSearchDocument : class
+        public EventLogProcessor<TEventDTO> CreateLogProcessor<TEventDTO, TSearchDocument>(
+            Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, Func<EventLog<TEventDTO>, bool> criteria, int documentsPerBatch = 1)
+                where TEventDTO : class, IEventDTO, new() where TSearchDocument : class
         {
-            var azureIndexer = CreateEventIndexer(index, mapper, logsPerIndexBatch);
-            return new EventProcessor<TEventDTO>(azureIndexer);
-        }
-
-        public EventProcessor<TEventDTO> CreateProcessorForEvent<TEventDTO, TSearchDocument>(Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, Func<EventLog<TEventDTO>, Task<bool>> asyncCriteria, int logsPerIndexBatch = 1) 
-            where TEventDTO : class, new() where TSearchDocument : class
-        {
-            var azureIndexer = CreateEventIndexer(index, mapper, logsPerIndexBatch);
-            return new EventProcessor<TEventDTO>(azureIndexer, asyncCriteria);
-        }
-
-        public EventProcessor<TEventDTO> CreateProcessorForEvent<TEventDTO, TSearchDocument>(Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, Func<EventLog<TEventDTO>, bool> criteria, int logsPerIndexBatch = 1) 
-            where TEventDTO : class, new() where TSearchDocument : class
-        {
-            var azureIndexer = CreateEventIndexer(index, mapper, logsPerIndexBatch);
-            return new EventProcessor<TEventDTO>(azureIndexer, criteria);
-        }
-
-        private AzureFilterLogIndexer CreateFilterLogIndexer(Index index, int logsPerIndexBatch)
-        {
-            var indexClient = GetOrCreateIndexClient(index.Name);
-            var azureIndexer = new AzureFilterLogIndexer(index, indexClient, logsPerIndexBatch: logsPerIndexBatch);
-            _indexers.Add(azureIndexer);
-            return azureIndexer;
-        }
-
-        private AzureFilterLogIndexer<TSearchDocument> CreateFilterLogIndexer<TSearchDocument>(Index index, Func<FilterLog, TSearchDocument> mapper, int logsPerIndexBatch) where TSearchDocument : class
-        {
-            var indexClient = GetOrCreateIndexClient(index.Name);
-            var azureIndexer = new AzureFilterLogIndexer<TSearchDocument>(index, indexClient, mapper, logsPerIndexBatch: logsPerIndexBatch);
-            _indexers.Add(azureIndexer);
-            return azureIndexer;
-        }
-
-        private AzureEventIndexer<TEventDTO> CreateEventIndexer<TEventDTO>(Index index, int logsPerIndexBatch) where TEventDTO : class, new()
-        {
-            var indexClient = GetOrCreateIndexClient(index.Name);
-            var indexDefinition = new EventIndexDefinition<TEventDTO>(index.Name);
-            var azureIndexer = new AzureEventIndexer<TEventDTO>(index, indexClient, indexDefinition, logsPerIndexBatch: logsPerIndexBatch);
-            _indexers.Add(azureIndexer);
-            return azureIndexer;
-        }
-
-        private AzureEventIndexer<TEventDTO, TSearchDocument> CreateEventIndexer<TEventDTO, TSearchDocument>(Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int logsPerIndexBatch) where TEventDTO : class, new()
-            where TSearchDocument : class
-        {
-            var indexClient = GetOrCreateIndexClient(index.Name);
-            var azureIndexer = new AzureEventIndexer<TEventDTO, TSearchDocument>(index, indexClient, mapper, logsPerIndexBatch: logsPerIndexBatch);
-            _indexers.Add(azureIndexer);
-            return azureIndexer;
+            var azureIndexer = CreateEventIndexer(index, mapper, documentsPerBatch);
+            return new EventLogProcessor<TEventDTO>(azureIndexer, criteria);
         }
 
         public async Task DeleteIndexAsync(string indexName)
         {
-
-            if (await _client.Indexes.ExistsAsync(indexName))
+            if (await _client.Indexes.ExistsAsync(indexName).ConfigureAwait(false))
             {
-                await _client.Indexes.DeleteAsync(indexName);
+                await _client.Indexes.DeleteAsync(indexName).ConfigureAwait(false);
             }
 
-            _azureIndexes.TryRemove(indexName, out _);
+            _indexes.TryRemove(indexName, out _);
         }
 
         public void Dispose()
@@ -152,7 +160,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 client.Dispose();
             }
 
-            foreach(var indexer in _indexers)
+            foreach (var indexer in _indexers)
             {
                 indexer.Dispose();
             }
@@ -164,7 +172,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         {
             using (var client = _client.Indexes.GetClient(indexName))
             {
-                return await client.Documents.CountAsync();
+                return await client.Documents.CountAsync().ConfigureAwait(false);
             }
         }
 
@@ -180,31 +188,29 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return client;
         }
 
-        public async Task<bool> IndexExistsAsync(string indexName)
-        {
-            return await _client.Indexes.ExistsAsync(indexName).ConfigureAwait(false);
-        }
+        public Task<bool> IndexExistsAsync(string indexName)
+            => _client.Indexes.ExistsAsync(indexName);
 
-        public Task<Index> CreateIndexAsync(IndexDefinition indexDefinition) 
+        public Task<Index> CreateIndexAsync(IndexDefinition indexDefinition)
             => CreateIndexAsync(indexDefinition.ToAzureIndex());
 
         public Task<Index> CreateIndexForFilterLogAsync(string indexName)
-            => CreateIndexAsync(FilterLogSearchIndex.Create(indexName));
+            => CreateIndexAsync(FilterLogIndexUtil.Create(indexName));
 
-        public Task<Index> CreateIndexForEventAsync<TEventDTO>(string indexName = null) 
+        public Task<Index> CreateIndexForEventAsync<TEventDTO>(string indexName = null)
             where TEventDTO : class
             => CreateIndexAsync(new EventIndexDefinition<TEventDTO>(indexName));
 
         public async Task<Index> CreateIndexAsync(Index index)
         {
             index = await _client.Indexes.CreateAsync(index).ConfigureAwait(false);
-            _azureIndexes.TryAdd(index.Name, index);
+            _indexes.TryAdd(index.Name, index);
             return index;
         }
 
         public async Task<Index> GetIndexAsync(string indexName)
         {
-            if (_azureIndexes.TryGetValue(indexName, out var index))
+            if (_indexes.TryGetValue(indexName, out var index))
             {
                 return index;
             }
@@ -213,74 +219,191 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
             if (index != null)
             {
-                _azureIndexes.TryAdd(indexName, index);
+                _indexes.TryAdd(indexName, index);
             }
 
             return index;
         }
 
-        //public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent>(string indexName = null, bool addPresetEventLogFields = true) where TEvent : class
-        //{
-        //    return await CreateEventIndexer(new EventIndexDefinition<TEvent>(indexName, addPresetEventLogFields));
-        //}
+        public Task<Index> CreateIndexForFunctionAsync<TFunctionMessage>(string indexName = null)
+            where TFunctionMessage : FunctionMessage
+            => CreateIndexAsync(new FunctionIndexDefinition<TFunctionMessage>(indexName));
 
-        //public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent>(EventIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
-        //{
-        //    var azureIndex = await GetOrCreateAzureIndex(searchIndexDefinition);
-        //    return new AzureEventIndexer<TEvent>(searchIndexDefinition, azureIndex, GetOrCreateIndexClient(azureIndex.Name));
-        //}
+        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(Index index, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+        {
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            return new TransactionReceiptVOProcessor(azureIndexer);
+        }
 
-        //public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(Index index,
-        //    IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper)
-        //    where TEvent : class
-        //    where TSearchDocument : class, new()
-        //{
-        //    index = await GetOrCreateAzureIndex(index);
-        //    IEventIndexer<TEvent> indexer = new AzureEventIndexer<TEvent, TSearchDocument>(index, GetOrCreateIndexClient(index.Name), mapper);
-        //    return indexer;
-        //}
+        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(
+            Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+        {
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            return new TransactionReceiptVOProcessor(azureIndexer, asyncCriteria);
+        }
 
-        //public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(Index index, Func<EventLog<TEvent>, TSearchDocument> mappingFunc)
-        //    where TEvent : class
-        //    where TSearchDocument : class, new()
-        //{
-        //    index = await GetOrCreateAzureIndex(index);
-        //    var mapper = new EventToSearchDocumentMapper<TEvent, TSearchDocument>(mappingFunc);
-        //    IEventIndexer<TEvent> indexer = new AzureEventIndexer<TEvent, TSearchDocument>(index, GetOrCreateIndexClient(index.Name), mapper);
-        //    return indexer;
-        //}
+        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(
+            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+        {
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            return new TransactionReceiptVOProcessor(azureIndexer, criteria);
+        }
 
-        //public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(string indexName = null,bool addPresetEventLogFields = true) 
-        //    where TFunctionMessage : FunctionMessage, new()
-        //{
-        //    return await CreateFunctionIndexer(new FunctionIndexDefinition<TFunctionMessage>(indexName, addPresetEventLogFields));
-        //}
+        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor<TSearchDocument>(
+            Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch = 1) 
+            where TSearchDocument : class
+        {
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            return new TransactionReceiptVOProcessor(azureIndexer, asyncCriteria);
+        }
 
-        //public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(
-        //    FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition) 
-        //    where TFunctionMessage : FunctionMessage, new()
-        //{
-        //    var azureIndex = await GetOrCreateAzureIndex(searchIndexDefinition);
-        //    return new AzureFunctionIndexer<TFunctionMessage>(searchIndexDefinition, azureIndex, GetOrCreateIndexClient(azureIndex.Name));
-        //}
+        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor<TSearchDocument>(
+            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+            where TSearchDocument : class
+        {
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            return new TransactionReceiptVOProcessor(azureIndexer, criteria);
+        }
 
-        //public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(Index index, IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> mapper)
-        //    where TFunctionMessage : FunctionMessage, new()
-        //    where TSearchDocument : class, new()
-        //{
-        //    index = await GetOrCreateAzureIndex(index);
-        //    return new AzureFunctionIndexer<TFunctionMessage, TSearchDocument>(index, GetOrCreateIndexClient(index.Name),  mapper);
-        //}
+        public FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage>(
+            Index index, int documentsPerBatch = 1)
+                where TFunctionMessage : FunctionMessage, new()
+        {
+            var azureIndexer = CreateFunctionMessageIndexer<TFunctionMessage>(index, documentsPerBatch);
+            return new FunctionMessageProcessor<TFunctionMessage>(azureIndexer);
+        }
 
-        //public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(Index index, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mapperFunc)
-        //    where TFunctionMessage : FunctionMessage, new()
-        //    where TSearchDocument : class, new()
-        //{
-        //    index = await GetOrCreateAzureIndex(index);
-        //    var mapper = new FunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument>(mapperFunc);
-        //    return new AzureFunctionIndexer<TFunctionMessage, TSearchDocument>(index, GetOrCreateIndexClient(index.Name),  mapper);
-        //}
+        public FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage>(
+            Index index, Func<TransactionForFunctionVO<TFunctionMessage>, Task<bool>> asyncCriteria, int documentsPerBatch = 1)
+                where TFunctionMessage : FunctionMessage, new()
+        {
+            var azureIndexer = CreateFunctionMessageIndexer<TFunctionMessage>(index, documentsPerBatch);
+            return new FunctionMessageProcessor<TFunctionMessage>(azureIndexer, asyncCriteria);
+        }
 
+        public FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage>(
+            Index index, Func<TransactionForFunctionVO<TFunctionMessage>, bool> criteria, int documentsPerBatch = 1)
+                where TFunctionMessage : FunctionMessage, new()
+        {
+            var azureIndexer = CreateFunctionMessageIndexer<TFunctionMessage>(index, documentsPerBatch);
+            return new FunctionMessageProcessor<TFunctionMessage>(azureIndexer, criteria);
+        }
+
+        public FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage, TSearchDocument>(
+            Index index, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, int documentsPerBatch = 1)
+                where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class
+        {
+            var azureIndexer = CreateFunctionMessageIndexer(index, mapper, documentsPerBatch);
+            return new FunctionMessageProcessor<TFunctionMessage>(azureIndexer);
+        }
+
+        public FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage, TSearchDocument>(
+            Index index, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, Func<TransactionForFunctionVO<TFunctionMessage>, Task<bool>> asyncCriteria, int documentsPerBatch = 1)
+                where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class
+        {
+            var azureIndexer = CreateFunctionMessageIndexer(index, mapper, documentsPerBatch);
+            return new FunctionMessageProcessor<TFunctionMessage>(azureIndexer, asyncCriteria);
+        }
+
+        public FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage, TSearchDocument>(
+            Index index, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, Func<TransactionForFunctionVO<TFunctionMessage>, bool> criteria, int documentsPerBatch = 1)
+                where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class
+        {
+            var azureIndexer = CreateFunctionMessageIndexer(index, mapper, documentsPerBatch);
+            return new FunctionMessageProcessor<TFunctionMessage>(azureIndexer, criteria);
+        }
+
+        private AzureIndexer<TEventDTO, TSearchDocument> CreateIndexer<TEventDTO, TSearchDocument>(
+            Index index, Func<TEventDTO, TSearchDocument> mapper, int documentsPerBatch)
+                where TEventDTO : class, new()
+                where TSearchDocument : class
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureIndexer<TEventDTO, TSearchDocument>(index, indexClient, mapper, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureFilterLogIndexer CreateFilterLogIndexer(Index index, int documentsPerBatch)
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureFilterLogIndexer(index, indexClient, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureFilterLogIndexer<TSearchDocument> CreateFilterLogIndexer<TSearchDocument>(
+            Index index, Func<FilterLog, TSearchDocument> mapper, int documentsPerBatch)
+                where TSearchDocument : class
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureFilterLogIndexer<TSearchDocument>(index, indexClient, mapper, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureEventIndexer<TEventDTO> CreateEventIndexer<TEventDTO>(
+            Index index, int documentsPerBatch)
+                where TEventDTO : class, IEventDTO, new()
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var indexDefinition = new EventIndexDefinition<TEventDTO>(index.Name);
+            var azureIndexer = new AzureEventIndexer<TEventDTO>(index, indexClient, indexDefinition, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+
+        private AzureEventIndexer<TEventDTO, TSearchDocument> CreateEventIndexer<TEventDTO, TSearchDocument>(
+            Index index, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int documentsPerBatch)
+                where TEventDTO : class, IEventDTO, new()
+                where TSearchDocument : class
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureEventIndexer<TEventDTO, TSearchDocument>(index, indexClient, mapper, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureTransactionReceiptVOIndexer CreateTransactionReceiptVOIndexer(
+            Index index, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch)
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureTransactionReceiptVOIndexer(index, indexClient, mapper, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureTransactionReceiptVOIndexer<TSearchDocument> CreateTransactionReceiptVOIndexer<TSearchDocument>(
+            Index index, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch) where TSearchDocument : class
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureTransactionReceiptVOIndexer<TSearchDocument>(index, indexClient, mapper, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureFunctionIndexer<TFunctionMessage> CreateFunctionMessageIndexer<TFunctionMessage>(
+            Index index, int documentsPerBatch)
+                where TFunctionMessage : FunctionMessage, new()
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var indexDefinition = new FunctionIndexDefinition<TFunctionMessage>(index.Name);
+            var azureIndexer = new AzureFunctionIndexer<TFunctionMessage>(index, indexClient, indexDefinition, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
+
+        private AzureFunctionIndexer<TFunctionMessage, TSearchDocument> CreateFunctionMessageIndexer<TFunctionMessage, TSearchDocument>(
+            Index index, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, int documentsPerBatch)
+                where TFunctionMessage : FunctionMessage, new()
+                where TSearchDocument : class
+        {
+            var indexClient = GetOrCreateIndexClient(index.Name);
+            var azureIndexer = new AzureFunctionIndexer<TFunctionMessage, TSearchDocument>(index, indexClient, mapper, documentsPerBatch);
+            _indexers.Add(azureIndexer);
+            return azureIndexer;
+        }
 
     }
 }

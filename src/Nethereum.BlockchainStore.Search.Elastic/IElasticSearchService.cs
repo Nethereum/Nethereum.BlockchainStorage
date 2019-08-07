@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class, IHasId, new();
 
         Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(
-            string indexName, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mapperFunc)
+            string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapperFunc)
             where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class, IHasId, new();
     }
 }

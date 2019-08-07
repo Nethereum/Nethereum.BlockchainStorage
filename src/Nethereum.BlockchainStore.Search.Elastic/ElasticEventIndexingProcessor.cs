@@ -69,7 +69,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
         }
 
         public async Task<FunctionIndexTransactionHandler<TFunctionMessage>> CreateFunctionHandlerAsync<TFunctionMessage, TSearchDocument>(
-            string indexName, Func<FunctionCall<TFunctionMessage>, TSearchDocument> mappingFunc)
+            string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mappingFunc)
             where TFunctionMessage : FunctionMessage, new()
             where TSearchDocument : class, IHasId, new()
         {

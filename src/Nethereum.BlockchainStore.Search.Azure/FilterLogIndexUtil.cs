@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public class FilterLogSearchIndex
+    public class FilterLogIndexUtil
     {
         public static Index Create(string name)
         {

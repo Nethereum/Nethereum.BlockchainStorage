@@ -21,13 +21,13 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
     public class TransactionContext<T> : Context where T : FunctionMessage, new()
     {
-        public FunctionCall<T> FunctionCall { get; }
+        public TransactionForFunctionVO<T> FunctionCall { get; }
         
 
         public TransactionContext(IndexDefinition index, T dto, TransactionReceiptVO tx)
             :base(index)
         {
-            FunctionCall = new FunctionCall<T>(tx, dto);
+            FunctionCall = new TransactionForFunctionVO<T>(tx, dto);
             Index = index;
         }
 
