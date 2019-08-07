@@ -181,7 +181,7 @@ namespace Nethereum.BlockchainStore.Search
             }
         }
 
-        private SearchField[] MapIndexedTopicsToFields()
+        private static SearchField[] MapIndexedTopicsToFields()
         {
             var indexedTopics = PropertiesExtractor.GetIndexedTopics<T>();
             return indexedTopics.Select(t => MapTopicToField(t.PropertyInfo)).ToArray();

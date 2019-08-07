@@ -15,17 +15,17 @@ namespace Nethereum.BlockchainStore.Search.Azure
             {
                 Name = name.ToAzureIndexName(),
                 Fields = new []{
-                    new Field{Name = "key", Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = false, IsRetrievable = true, IsKey = true, IsSearchable = false, IsSortable = false },
-                    new Field{Name = "removed", Type = typeof(bool).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
-                    new Field{Name = "type", Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
-                    new Field{Name = "log_index", Type = typeof(HexBigInteger).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
-                    new Field{Name = "transaction_hash", Type = typeof(string).ToAzureDataType(), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = false },
-                    new Field{Name = "transaction_index", Type = typeof(HexBigInteger).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
-                    new Field{Name = "block_hash", Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = false, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = false },
-                    new Field{Name = "block_number", Type = typeof(HexBigInteger).ToAzureDataType(), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = true },
-                    new Field{Name = "address", Type = typeof(string).ToAzureDataType(), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = true },
-                    new Field{Name = "data", Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = false, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = false },
-                    new Field{Name = "topics", Type = DataType.Collection(typeof(string).ToAzureDataType()), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = false }
+                    new Field{Name = PresetSearchFieldName.log_key.ToString(), Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = false, IsRetrievable = true, IsKey = true, IsSearchable = false, IsSortable = false },
+                    new Field{Name = PresetSearchFieldName.log_removed.ToString(), Type = typeof(bool).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
+                    new Field{Name = PresetSearchFieldName.log_type.ToString(), Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
+                    new Field{Name = PresetSearchFieldName.log_log_index.ToString(), Type = typeof(HexBigInteger).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
+                    new Field{Name = PresetSearchFieldName.log_transaction_hash.ToString(), Type = typeof(string).ToAzureDataType(), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = false },
+                    new Field{Name = PresetSearchFieldName.log_transaction_index.ToString(), Type = typeof(HexBigInteger).ToAzureDataType(), IsFacetable = false, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = true },
+                    new Field{Name = PresetSearchFieldName.log_block_hash.ToString(), Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = false, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = false },
+                    new Field{Name = PresetSearchFieldName.log_block_number.ToString(), Type = typeof(HexBigInteger).ToAzureDataType(), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = true },
+                    new Field{Name = PresetSearchFieldName.log_address.ToString(), Type = typeof(string).ToAzureDataType(), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = true },
+                    new Field{Name = PresetSearchFieldName.log_data.ToString(), Type = typeof(string).ToAzureDataType(), IsFacetable = false, IsFilterable = false, IsRetrievable = true, IsKey = false, IsSearchable = false, IsSortable = false },
+                    new Field{Name = PresetSearchFieldName.log_topics.ToString(), Type = DataType.Collection(typeof(string).ToAzureDataType()), IsFacetable = true, IsFilterable = true, IsRetrievable = true, IsKey = false, IsSearchable = true, IsSortable = false }
                 }
             };
 
@@ -35,17 +35,17 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public static Dictionary<string, object> Map(FilterLog filterLog)
         {
             var dictionary = new Dictionary<string, object>();
-            dictionary.Add("key", filterLog.Key().ToAzureFieldValue());
-            dictionary.Add("removed", filterLog.Removed.ToAzureFieldValue());
-            dictionary.Add("type", filterLog.Type.ToAzureFieldValue());
-            dictionary.Add("log_index", filterLog.LogIndex.ToAzureFieldValue());
-            dictionary.Add("transaction_hash", filterLog.TransactionHash.ToAzureFieldValue());
-            dictionary.Add("transaction_index", filterLog.TransactionIndex.ToAzureFieldValue());
-            dictionary.Add("block_hash", filterLog.BlockHash.ToAzureFieldValue());
-            dictionary.Add("block_number", filterLog.BlockNumber.ToAzureFieldValue());
-            dictionary.Add("address", filterLog.Address.ToAzureFieldValue());
-            dictionary.Add("data", filterLog.Data.ToAzureFieldValue());
-            dictionary.Add("topics", filterLog.Topics?.Where(t => t != null).Select(t => t.ToAzureFieldValue()).ToArray());
+            dictionary.Add(PresetSearchFieldName.log_key.ToString(), filterLog.Key().ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_removed.ToString(), filterLog.Removed.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_type.ToString(), filterLog.Type.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_log_index.ToString(), filterLog.LogIndex.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_transaction_hash.ToString(), filterLog.TransactionHash.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_transaction_index.ToString(), filterLog.TransactionIndex.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_block_hash.ToString(), filterLog.BlockHash.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_block_number.ToString(), filterLog.BlockNumber.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_address.ToString(), filterLog.Address.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_data.ToString(), filterLog.Data.ToAzureFieldValue());
+            dictionary.Add(PresetSearchFieldName.log_topics.ToString(), filterLog.Topics?.Where(t => t != null).Select(t => t.ToAzureFieldValue()).ToArray());
 
             return dictionary;
         }

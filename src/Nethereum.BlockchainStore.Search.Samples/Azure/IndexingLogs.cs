@@ -3,7 +3,6 @@ using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
 using Nethereum.Microsoft.Configuration.Utils;
-using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Util;
 using System;
 using System.Collections.Generic;

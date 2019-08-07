@@ -11,6 +11,8 @@
         log_block_hash,
         log_block_number,
         log_address,
+        log_data,
+        log_topics,
 
         tx_uid,
         tx_hash,

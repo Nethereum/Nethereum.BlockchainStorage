@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <UserSecretsId>Nethereum.BlockchainStore.Search.Tests</UserSecretsId>
     <IsPackable>false</IsPackable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.Search.Azure\Nethereum.BlockchainStore.Search.Azure.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj" />
+    <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
 
 </Project>
