@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.Search
 
         protected override void LoadGenericBlockchainFields()
         {
-            this.AddGenericBlockchainFields(FieldDictionary);
+            PresetSearchFields.AddPresetTransactionFields(FieldDictionary);
         }
     }
 }

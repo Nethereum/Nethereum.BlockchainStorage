@@ -97,6 +97,8 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public void MapsFilterLogIntoDictionary()
         {
             var sourceLog = TestData.Contracts.StandardContract.SampleTransferLog();
+            sourceLog.Type = "x"; //often null - so we're giving it a value to test mapping
+
             var mapped = FilterLogIndexUtil.Map(sourceLog);
             
             Assert.Equal(sourceLog.Key(), mapped[PresetSearchFieldName.log_key.ToString()]);

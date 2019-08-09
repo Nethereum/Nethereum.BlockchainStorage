@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         }
 
         [Fact]
-        public async Task UsesMappingFunctionToMapSourceToSearchDocument()
+        public async Task MapsSourceToSearchDocument()
         {
             var index = new Index(); //for proper use, this index should have been prepopulated
             var mockSearchIndexClient = new SearchIndexClientMock<SearchDocument>();

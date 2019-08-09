@@ -97,7 +97,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
             var eventLog = new EventLog<DepositedEventDTO>(depositedEventDto, filterLog);
 
             Assert.Equal("Deposited", searchIndex.IndexName);
-            Assert.Equal(16, searchIndex.Fields.Length);
+            Assert.Equal(18, searchIndex.Fields.Length);
 
             searchIndex
                 .Assertions(eventLog)
@@ -148,15 +148,15 @@ namespace Nethereum.BlockchainStore.Search.Tests
                     f => f.ReturnsValue(filterLog.Type))
                 .HasField(PresetSearchFieldName.log_log_index,
                     f => f.IsHexBigInteger(),
-                    f => f.HasFlags(),
+                    f => f.HasFlags(isFilterable: true),
                     f => f.ReturnsValue(filterLog.LogIndex))
                 .HasField(PresetSearchFieldName.log_transaction_hash,
                     f => f.IsString(),
-                    f => f.HasFlags(isSearchable: true),
+                    f => f.HasFlags(isSearchable: true, isFilterable: true, isFacetable: true),
                     f => f.ReturnsValue(filterLog.TransactionHash))
                 .HasField(PresetSearchFieldName.log_transaction_index,
                     f => f.IsHexBigInteger(),
-                    f => f.HasFlags(),
+                    f => f.HasFlags(isFilterable: true),
                     f => f.ReturnsValue(filterLog.TransactionIndex))
                 .HasField(PresetSearchFieldName.log_block_hash,
                     f => f.IsString(),
@@ -164,12 +164,16 @@ namespace Nethereum.BlockchainStore.Search.Tests
                     f => f.ReturnsValue(filterLog.BlockHash))
                 .HasField(PresetSearchFieldName.log_block_number,
                     f => f.IsHexBigInteger(),
-                    f => f.HasFlags(isFilterable: true, isSearchable: true, isSortable: true),
+                    f => f.HasFlags(isFilterable: true, isSearchable: true, isSortable: true, isFacetable: true),
                     f => f.ReturnsValue(filterLog.BlockNumber))
                 .HasField(PresetSearchFieldName.log_address,
                     f => f.IsString(),
-                    f => f.HasFlags(isFilterable: true, isSearchable: true, isSortable: true),
-                    f => f.ReturnsValue(filterLog.Address));
+                    f => f.HasFlags(isFilterable: true, isSearchable: true, isSortable: true, isFacetable: true),
+                    f => f.ReturnsValue(filterLog.Address))
+                .HasField(PresetSearchFieldName.log_topics,
+                    f => f.IsString(),
+                    f => f.HasFlags(isFilterable: true, isSearchable: true, isFacetable: true),
+                    f => f.ReturnsValue(filterLog.Topics));
         }
 
         [SearchIndex(Name = "IndexA")]

@@ -10,13 +10,22 @@ using System.Text;
 
 namespace Nethereum.BlockchainStore.Search.Azure
 {
-    public static class AzureEventSearchExtensions
+    public static class AzureSearchExtensions
     {
         public const string SuggesterName = "sg";
 
-        public static Dictionary<string, object> ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
+        public static Dictionary<string, object> ToAzureDocument(
+            this FilterLog log,
+            SearchField[] searchFields)
         {
-            return CreateFieldWithValueDictionary(log, indexDefinition, (field) => field.GetValue(log));
+            return CreateFieldWithValueDictionary(log, searchFields, (field) => field.GetFilterLogValue(log));
+        }
+
+        public static Dictionary<string, object> ToAzureDocument<TEvent>(
+            this EventLog<TEvent> log, 
+            EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
+        {
+            return CreateFieldWithValueDictionary(log, indexDefinition.Fields, (field) => field.GetEventLogValue(log));
         }
 
         public static Dictionary<string, object> ToAzureDocument<TFunctionMessage>(
@@ -24,20 +33,20 @@ namespace Nethereum.BlockchainStore.Search.Azure
             FunctionIndexDefinition<TFunctionMessage> indexDefinition)
             where TFunctionMessage : FunctionMessage, new()
         {
-            return CreateFieldWithValueDictionary(transactionAndFunction, indexDefinition, (field) => field.GetValue(transactionAndFunction));
+            return CreateFieldWithValueDictionary(transactionAndFunction, indexDefinition.Fields, (field) => field.GetTransactionForFunctionValue(transactionAndFunction));
         }
 
         public static Dictionary<string, object> ToAzureDocument(
             this TransactionReceiptVO transactionReceiptVO,
             TransactionReceiptVOIndexDefinition indexDefinition)
         {
-            return CreateFieldWithValueDictionary(transactionReceiptVO, indexDefinition, (field) => field.GetValue(transactionReceiptVO));
+            return CreateFieldWithValueDictionary(transactionReceiptVO, indexDefinition.Fields, (field) => field.GetTransactionReceiptValue(transactionReceiptVO));
         }
 
-        private static Dictionary<string, object> CreateFieldWithValueDictionary<T>(T source, IndexDefinition indexDefinition, Func<SearchField, object> getValue)
+        private static Dictionary<string, object> CreateFieldWithValueDictionary<T>(T source, SearchField[] searchFields, Func<SearchField, object> getValue)
         {
             var dictionary = new Dictionary<string, object>();
-            foreach (var field in indexDefinition.Fields)
+            foreach (var field in searchFields)
             {
                 var azureField = field.ToAzureField();
 

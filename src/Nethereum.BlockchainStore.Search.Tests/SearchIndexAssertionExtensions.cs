@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
         public override object GetValue(SearchField field)
         {
-            return field.GetValue(FunctionCall);
+            return field.GetTransactionForFunctionValue(FunctionCall);
         }
     }
 
@@ -50,7 +50,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
 
         public override object GetValue(SearchField field)
         {
-            return field.GetValue(EventLog);
+            return field.GetEventLogValue(EventLog);
         }
     }
 

@@ -4,10 +4,11 @@ using Nethereum.Hex.HexTypes;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using TransferEvent = Nethereum.BlockchainStore.Search.Tests.TestData.Contracts.StandardContract.TransferEvent;
 
 namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
-    public class AzureFilterLogIndexerWithMapperTests
+    public class AzureEventIndexerWithMapperTests
     {
         public class SearchDocument
         {
@@ -22,22 +23,22 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         }
 
         [Fact]
-        public async Task UsesMappingFunctionToMapLogToSearchDocument()
+        public async Task MapsEventDtoToSearchDocument()
         {
             var index = new Index(); //for proper use, this index should have been prepopulated
             var mockSearchIndexClient = new SearchIndexClientMock<SearchDocument>();
 
-            var indexer = new AzureFilterLogIndexer<SearchDocument>(
-                index, mockSearchIndexClient.SearchIndexClient, (tfr) => new SearchDocument(tfr.TransactionHash, tfr.LogIndex));
+            var indexer = new AzureEventIndexer<TransferEvent, SearchDocument>(
+                index, mockSearchIndexClient.SearchIndexClient, (tfr) => new SearchDocument(tfr.Log.TransactionHash, tfr.Log.LogIndex));
 
-            var log = TestData.Contracts.StandardContract.SampleTransferLog();
+            var eventLog = TestData.Contracts.StandardContract.SampleTransferEventLog();
 
-            await indexer.IndexAsync(log);
+            await indexer.IndexAsync(eventLog);
 
             Assert.Single(mockSearchIndexClient.IndexedBatches);
             var firstIndexAction = mockSearchIndexClient.IndexedBatches[0].Actions.First();
-            Assert.Equal(log.TransactionHash, firstIndexAction.Document.TransactionHash);
-            Assert.Equal(log.LogIndex.Value.ToString(), firstIndexAction.Document.LogIndex);
+            Assert.Equal(eventLog.Log.TransactionHash, firstIndexAction.Document.TransactionHash);
+            Assert.Equal(eventLog.Log.LogIndex.Value.ToString(), firstIndexAction.Document.LogIndex);
         } 
     }
 }

@@ -17,7 +17,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
     public class AzureFilterLogIndexerTests
     {
         [Fact]
-        public async Task MapsSourceFilterLogToDictionaryAddingStandardFields()
+        public async Task MapsFilterLogToDictionary()
         {
             var searchIndexClientMock = new SearchIndexClientMock<Dictionary<string, object>>();
 

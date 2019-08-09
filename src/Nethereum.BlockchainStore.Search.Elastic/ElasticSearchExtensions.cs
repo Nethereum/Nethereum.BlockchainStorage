@@ -31,14 +31,14 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             var dictionary = new GenericElasticSearchDocument();
             foreach (var field in indexDefinition.Fields)
             {
-                var val = field.GetValue(log)?.ToElasticSearchFieldValue();
+                var val = field.GetEventLogValue(log)?.ToElasticSearchFieldValue();
                 if (val != null)
                 {
                     dictionary.Add(field.Name.ToElasticName(), val);
                 }
             }
 
-            var id = indexDefinition.KeyField().GetValue(log);
+            var id = indexDefinition.KeyField().GetEventLogValue(log);
             dictionary.SetId(id.ToString());
 
             return dictionary;
@@ -51,14 +51,14 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             var dictionary = new GenericElasticSearchDocument();
             foreach (var field in indexDefinition.Fields)
             {
-                var val = field.GetValue(functionCall)?.ToElasticSearchFieldValue();
+                var val = field.GetTransactionForFunctionValue(functionCall)?.ToElasticSearchFieldValue();
                 if (val != null)
                 {
                     dictionary.Add(field.Name.ToElasticName(), val);
                 }
             }
 
-            var id = indexDefinition.KeyField().GetValue(functionCall);
+            var id = indexDefinition.KeyField().GetTransactionForFunctionValue(functionCall);
             dictionary.SetId(id.ToString());
 
             return dictionary;

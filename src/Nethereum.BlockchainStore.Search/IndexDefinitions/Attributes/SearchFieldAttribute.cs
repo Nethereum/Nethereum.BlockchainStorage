@@ -95,24 +95,21 @@ namespace Nethereum.BlockchainStore.Search
             return childVal;
         }
 
-        public object GetValue<TFunction>(TransactionForFunctionVO<TFunction> functionCall) where TFunction : FunctionMessage, new()
+        public object GetTransactionForFunctionValue<TFunction>(TransactionForFunctionVO<TFunction> functionCall) where TFunction : FunctionMessage, new()
         {
             if (TxValueCallback != null) return TxValueCallback.Invoke(functionCall.Transaction);
             return GetValue(functionCall.FunctionMessage);
         }
 
-        public object GetValue(TransactionReceiptVO transactionReceiptVO)
-        {
-            if (TxValueCallback != null) return TxValueCallback.Invoke(transactionReceiptVO);
-            return null;
-        }
-
-        public object GetValue<TEvent>(EventLog<TEvent> e)
+        public object GetEventLogValue<TEvent>(EventLog<TEvent> e)
         {
             if (LogValueCallback != null) return LogValueCallback.Invoke(e.Log);
-
             return GetValue(e.Event);
         }
-        
+
+        public object GetTransactionReceiptValue(TransactionReceiptVO transactionReceiptVO) => TxValueCallback?.Invoke(transactionReceiptVO);
+
+        public object GetFilterLogValue(FilterLog filterLog) => LogValueCallback?.Invoke(filterLog);
+
     }
 }

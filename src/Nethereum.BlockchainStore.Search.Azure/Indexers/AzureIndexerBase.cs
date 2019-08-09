@@ -31,7 +31,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
             return await IndexClient
                 .Documents
-                .SuggestAsync<Dictionary<string, object>>(searchText, AzureEventSearchExtensions.SuggesterName, sp);
+                .SuggestAsync<Dictionary<string, object>>(searchText, AzureSearchExtensions.SuggesterName, sp);
         }
 
         public virtual async Task<DocumentSearchResult<Dictionary<string, object>>> SearchAsync(string text, IList<string> facets = null)

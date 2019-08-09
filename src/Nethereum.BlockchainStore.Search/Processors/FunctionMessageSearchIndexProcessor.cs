@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class FunctionMessageProcessor<TFunctionMessage> : TransactionReceiptVOProcessorHandler<TFunctionMessage> 
+    public class FunctionMessageSearchIndexProcessor<TFunctionMessage> : TransactionReceiptVOProcessorHandler<TFunctionMessage> 
         where TFunctionMessage : FunctionMessage, new()
     {
-        public FunctionMessageProcessor(
+        public FunctionMessageSearchIndexProcessor(
             IIndexer<TransactionForFunctionVO<TFunctionMessage>> indexer) :
                 base((functionCall) => indexer.IndexAsync(functionCall))
         {
             Indexer = indexer;
         }
 
-        public FunctionMessageProcessor(
+        public FunctionMessageSearchIndexProcessor(
             IIndexer<TransactionForFunctionVO<TFunctionMessage>> indexer,
             Func<TransactionForFunctionVO<TFunctionMessage>, Task<bool>> criteria) :
                 base((functionCall) => indexer.IndexAsync(functionCall), criteria)
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.Search
             Indexer = indexer;
         }
 
-        public FunctionMessageProcessor(
+        public FunctionMessageSearchIndexProcessor(
             IIndexer<TransactionForFunctionVO<TFunctionMessage>> indexer,
             Func<TransactionForFunctionVO<TFunctionMessage>, bool> criteria) :
                 base((functionCall) => indexer.IndexAsync(functionCall), criteria)

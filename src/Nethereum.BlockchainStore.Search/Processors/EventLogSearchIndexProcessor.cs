@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class EventLogProcessor<TEventDTO> : EventLogProcessorHandler<TEventDTO> where TEventDTO : class, IEventDTO, new()
+    public class EventLogSearchIndexProcessor<TEventDTO> : EventLogProcessorHandler<TEventDTO> where TEventDTO : class, IEventDTO, new()
     {
-        public EventLogProcessor(
+        public EventLogSearchIndexProcessor(
             IIndexer<EventLog<TEventDTO>> eventIndexer) :
                 base((eventLog) => eventIndexer.IndexAsync(eventLog))
         {
             EventIndexer = eventIndexer;
         }
 
-        public EventLogProcessor(
+        public EventLogSearchIndexProcessor(
             IIndexer<EventLog<TEventDTO>> eventIndexer,
             Func<EventLog<TEventDTO>, Task<bool>> eventCriteria) :
                 base((eventLog) => eventIndexer.IndexAsync(eventLog), eventCriteria)
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.Search
             EventIndexer = eventIndexer;
         }
 
-        public EventLogProcessor(
+        public EventLogSearchIndexProcessor(
             IIndexer<EventLog<TEventDTO>> eventIndexer,
             Func<EventLog<TEventDTO>, bool> eventCriteria) :
                 base((eventLog) => eventIndexer.IndexAsync(eventLog), eventCriteria)
