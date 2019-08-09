@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using System.Reflection;
 using Nethereum.Hex.HexTypes;
+using Nethereum.Contracts;
 
 namespace Nethereum.BlockchainStore.Search
 {
@@ -18,15 +19,17 @@ namespace Nethereum.BlockchainStore.Search
             IndexName = indexName ?? searchable?.Name ?? eventAttribute?.Name ?? eventType.Name;
         }
 
-        protected override void LoadGenericBlockchainFields(Dictionary<string, SearchField> fields)
+        protected override void LoadGenericBlockchainFields()
         {
+            var fields = FieldDictionary;
+
             AddField(fields, PresetSearchFieldName.log_key, f =>
             {
                 f.DataType = typeof(string);
                 f.IsKey = true;
                 f.IsSortable = true;
                 f.LogValueCallback = (filter) =>
-                    $"{filter.BlockNumber.Value}_{filter.TransactionIndex.Value}_{filter.LogIndex.Value}";
+                    $"{filter.Key()}";
             });
 
             AddField(fields, PresetSearchFieldName.log_removed, f =>

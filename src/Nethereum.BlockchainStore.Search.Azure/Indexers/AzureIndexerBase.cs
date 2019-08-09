@@ -14,8 +14,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public string Name => Index.Name;
 
-        protected AzureIndexerBase(Index index, ISearchIndexClient indexClient, Func<TSource, TSearchDocument> mapper, int logsPerIndexBatch = 1)
-            :base(mapper, logsPerIndexBatch)
+        protected AzureIndexerBase(Index index, ISearchIndexClient indexClient, Func<TSource, TSearchDocument> mapper, int documentsPerIndexBatch = 1)
+            :base(mapper, documentsPerIndexBatch)
         {
             Index = index;
             IndexClient = indexClient;

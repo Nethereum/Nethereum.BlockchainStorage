@@ -12,11 +12,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
             Index index,
             ISearchIndexClient indexClient,
             Func<TSource, TSearchDocument> mapper,
-            int logsPerIndexBatch = 1) : base(
+            int documentsPerIndexBatch = 1) : base(
                 index,
                 indexClient,
                 mapper,
-                logsPerIndexBatch)
+                documentsPerIndexBatch)
         {
 
         }

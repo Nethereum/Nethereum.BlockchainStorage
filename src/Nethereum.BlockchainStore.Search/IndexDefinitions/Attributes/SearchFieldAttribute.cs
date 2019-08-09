@@ -97,8 +97,14 @@ namespace Nethereum.BlockchainStore.Search
 
         public object GetValue<TFunction>(TransactionForFunctionVO<TFunction> functionCall) where TFunction : FunctionMessage, new()
         {
-            if (TxValueCallback != null) return TxValueCallback.Invoke(functionCall.Tx);
-            return GetValue(functionCall.Dto);
+            if (TxValueCallback != null) return TxValueCallback.Invoke(functionCall.Transaction);
+            return GetValue(functionCall.FunctionMessage);
+        }
+
+        public object GetValue(TransactionReceiptVO transactionReceiptVO)
+        {
+            if (TxValueCallback != null) return TxValueCallback.Invoke(transactionReceiptVO);
+            return null;
         }
 
         public object GetValue<TEvent>(EventLog<TEvent> e)

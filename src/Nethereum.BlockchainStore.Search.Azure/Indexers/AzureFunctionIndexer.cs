@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             Index index, 
             ISearchIndexClient indexClient, 
             Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper,
-            int logsPerIndexBatch = 1) : base(index, indexClient, mapper, logsPerIndexBatch)
+            int documentsPerIndexBatch = 1) : base(index, indexClient, mapper, documentsPerIndexBatch)
         {
         }
     }
@@ -29,9 +29,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
             Index index,
             ISearchIndexClient indexClient,
             FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition,
-            int logsPerIndexBatch = 1
+            int documentsPerIndexBatch = 1
             )
-            :base(index, indexClient, (f) => f.ToAzureDocument(searchIndexDefinition), logsPerIndexBatch)
+            :base(index, indexClient, (f) => f.ToAzureDocument(searchIndexDefinition), documentsPerIndexBatch)
         {
 
         }

@@ -14,9 +14,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
             Index index,
             ISearchIndexClient indexClient,
             Func<TransactionReceiptVO, TSearchDocument> mapper,
-            int logsPerIndexBatch = 1
+            int documentsPerIndexBatch = 1
             )
-            : base(index, indexClient, (tx) => mapper(tx), logsPerIndexBatch)
+            : base(index, indexClient, (tx) => mapper(tx), documentsPerIndexBatch)
         {
 
         }

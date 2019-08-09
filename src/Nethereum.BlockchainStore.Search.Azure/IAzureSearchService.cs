@@ -49,20 +49,20 @@ namespace Nethereum.BlockchainStore.Search.Azure
         FilterLogProcessor CreateLogProcessor<TSearchDocument>(Index index, Func<FilterLog, TSearchDocument> mapper, Func<FilterLog, bool> criteria, int documentsPerBatch = 1) where TSearchDocument : class;
         FilterLogProcessor CreateLogProcessor<TSearchDocument>(Index index, Func<FilterLog, TSearchDocument> mapper, Func<FilterLog, Task<bool>> asyncCriteria, int documentsPerBatch = 1) where TSearchDocument : class;
 
-        TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(Index index, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int logsPerIndexBatch = 1);
+        TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(Index index, TransactionReceiptVOIndexDefinition indexDefinition, int logsPerIndexBatch = 1);
 
         TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(
-            Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int logsPerIndexBatch = 1);
+            Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, TransactionReceiptVOIndexDefinition indexDefinition, int logsPerIndexBatch = 1);
 
         TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(
-            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int logsPerIndexBatch = 1);
+            Index index, Func<TransactionReceiptVO, bool> criteria, TransactionReceiptVOIndexDefinition indexDefinition, int logsPerIndexBatch = 1);
 
         TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor<TSearchDocument>(
             Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, Func<TransactionReceiptVO, TSearchDocument> mapper, int logsPerIndexBatch = 1)
             where TSearchDocument : class;
 
         TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor<TSearchDocument>(
-            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int logsPerIndexBatch = 1)
+            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, TSearchDocument> mapper, int logsPerIndexBatch = 1)
             where TSearchDocument : class;
 
         FunctionMessageProcessor<TFunctionMessage> CreateFunctionMessageProcessor<TFunctionMessage>(

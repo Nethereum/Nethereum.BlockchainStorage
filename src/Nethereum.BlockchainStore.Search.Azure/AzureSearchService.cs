@@ -229,23 +229,23 @@ namespace Nethereum.BlockchainStore.Search.Azure
             where TFunctionMessage : FunctionMessage
             => CreateIndexAsync(new FunctionIndexDefinition<TFunctionMessage>(indexName));
 
-        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(Index index, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+        public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(Index index, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch = 1)
         {
-            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, indexDefinition, documentsPerBatch);
             return new TransactionReceiptVOProcessor(azureIndexer);
         }
 
         public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(
-            Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+            Index index, Func<TransactionReceiptVO, Task<bool>> asyncCriteria, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch = 1)
         {
-            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, indexDefinition, documentsPerBatch);
             return new TransactionReceiptVOProcessor(azureIndexer, asyncCriteria);
         }
 
         public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor(
-            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+            Index index, Func<TransactionReceiptVO, bool> criteria, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch = 1)
         {
-            var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
+            var azureIndexer = CreateTransactionReceiptVOIndexer(index, indexDefinition, documentsPerBatch);
             return new TransactionReceiptVOProcessor(azureIndexer, criteria);
         }
 
@@ -258,7 +258,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         }
 
         public TransactionReceiptVOProcessor CreateTransactionReceiptVOProcessor<TSearchDocument>(
-            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch = 1)
+            Index index, Func<TransactionReceiptVO, bool> criteria, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch = 1)
             where TSearchDocument : class
         {
             var azureIndexer = CreateTransactionReceiptVOIndexer(index, mapper, documentsPerBatch);
@@ -366,10 +366,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
         }
 
         private AzureTransactionReceiptVOIndexer CreateTransactionReceiptVOIndexer(
-            Index index, Func<TransactionReceiptVO, Dictionary<string, object>> mapper, int documentsPerBatch)
+            Index index, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch)
         {
             var indexClient = GetOrCreateIndexClient(index.Name);
-            var azureIndexer = new AzureTransactionReceiptVOIndexer(index, indexClient, mapper, documentsPerBatch);
+            var azureIndexer = new AzureTransactionReceiptVOIndexer(index, indexClient, indexDefinition, documentsPerBatch);
             _indexers.Add(azureIndexer);
             return azureIndexer;
         }

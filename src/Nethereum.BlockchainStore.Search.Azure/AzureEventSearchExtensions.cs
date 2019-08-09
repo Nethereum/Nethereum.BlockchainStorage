@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Search.Models;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,34 +14,34 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         public const string SuggesterName = "sg";
 
+        public static Dictionary<string, object> ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
+        {
+            return CreateFieldWithValueDictionary(log, indexDefinition, (field) => field.GetValue(log));
+        }
+
         public static Dictionary<string, object> ToAzureDocument<TFunctionMessage>(
             this TransactionForFunctionVO<TFunctionMessage> transactionAndFunction,
             FunctionIndexDefinition<TFunctionMessage> indexDefinition)
             where TFunctionMessage : FunctionMessage, new()
         {
-            var dictionary = new Dictionary<string, object>();
-            foreach (var field in indexDefinition.Fields)
-            {
-                var azureField = field.ToAzureField();
-
-                var val = field.GetValue(transactionAndFunction)?.ToAzureFieldValue();
-                if (val != null)
-                {
-                    dictionary.Add(azureField.Name, val);
-                }
-            }
-
-            return dictionary;
+            return CreateFieldWithValueDictionary(transactionAndFunction, indexDefinition, (field) => field.GetValue(transactionAndFunction));
         }
 
-        public static Dictionary<string, object> ToAzureDocument<TEvent>(this EventLog<TEvent> log, EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
+        public static Dictionary<string, object> ToAzureDocument(
+            this TransactionReceiptVO transactionReceiptVO,
+            TransactionReceiptVOIndexDefinition indexDefinition)
+        {
+            return CreateFieldWithValueDictionary(transactionReceiptVO, indexDefinition, (field) => field.GetValue(transactionReceiptVO));
+        }
+
+        private static Dictionary<string, object> CreateFieldWithValueDictionary<T>(T source, IndexDefinition indexDefinition, Func<SearchField, object> getValue)
         {
             var dictionary = new Dictionary<string, object>();
             foreach (var field in indexDefinition.Fields)
             {
                 var azureField = field.ToAzureField();
 
-                var val = field.GetValue(log)?.ToAzureFieldValue();
+                var val = getValue.Invoke(field)?.ToAzureFieldValue();
                 if (val != null)
                 {
                     dictionary.Add(azureField.Name, val);
@@ -49,7 +50,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
             return dictionary;
         }
-        
+
         public static Index ToAzureIndex(this IndexDefinition searchIndex)
         {
             var index = new Index

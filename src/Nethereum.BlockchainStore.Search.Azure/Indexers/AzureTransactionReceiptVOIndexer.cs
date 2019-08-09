@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Nethereum.RPC.Eth.DTOs;
-using System;
 using System.Collections.Generic;
 
 namespace Nethereum.BlockchainStore.Search.Azure
@@ -14,10 +13,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public AzureTransactionReceiptVOIndexer(
             Index index,
             ISearchIndexClient indexClient,
-            Func<TransactionReceiptVO, Dictionary<string, object>> mapper,
-            int logsPerIndexBatch = 1
+            TransactionReceiptVOIndexDefinition indexDefinition,
+            int documentsPerIndexBatch = 1
             )
-            : base(index, indexClient, (tx) => mapper(tx), logsPerIndexBatch)
+            : base(index, indexClient, (tx) => tx.ToAzureDocument(indexDefinition), documentsPerIndexBatch)
         {
 
         }

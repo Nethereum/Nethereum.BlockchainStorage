@@ -137,7 +137,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
                 .HasField(PresetSearchFieldName.log_key,
                     f => f.IsString(),
                     f => f.HasFlags(isKey: true, isSortable: true),
-                    f => f.ReturnsValue("101_3_9"))
+                    f => f.ReturnsValue(filterLog.Key()))
                 .HasField(PresetSearchFieldName.log_removed,
                     f => f.DataType<bool>(),
                     f => f.HasFlags(isFilterable: true, isSortable: true),

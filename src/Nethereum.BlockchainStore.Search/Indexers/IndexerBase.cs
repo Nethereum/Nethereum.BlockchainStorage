@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,25 +8,28 @@ namespace Nethereum.BlockchainStore.Search
 {
     public abstract class IndexerBase<TSource, TSearchDocument> where TSearchDocument : class
     {
-        private readonly int _logsPerIndexBatch;
+        private readonly int _documentsPerIndexBatch;
         private readonly Func<TSource, TSearchDocument> mapper;
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1);
 
-        protected IndexerBase(Func<TSource, TSearchDocument> mapper, int logsPerIndexBatch = 1)
+        protected IndexerBase(Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
         {
-            _logsPerIndexBatch = logsPerIndexBatch;
+            _documentsPerIndexBatch = documentsPerBatch;
             this.mapper = mapper;
         }
 
         protected void AddToBatch(TSource eventLog)
         {
             var searchDoc = mapper.Invoke(eventLog);
+
+            if(searchDoc == null) return;
+
             CurrentBatch.Enqueue(searchDoc);
         }
 
         protected bool IsReadyToSend()
         {
-            return CurrentBatch.Count >= _logsPerIndexBatch;
+            return CurrentBatch.Count >= _documentsPerIndexBatch;
         }
 
         public int PendingDocumentCount => CurrentBatch.Count;
@@ -49,9 +51,9 @@ namespace Nethereum.BlockchainStore.Search
 
         public abstract Task<long> DocumentCountAsync();
 
-        public virtual async Task IndexAsync(TSource log)
+        public virtual async Task IndexAsync(TSource source)
         {
-            AddToBatch(log);
+            AddToBatch(source);
             if (IsReadyToSend())
             {
                 await LockAndSend().ConfigureAwait(false);

@@ -6,39 +6,143 @@ using System.Reflection;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class IndexDefinition<T> : IndexDefinition where T : class
+    public class IndexDefinition
     {
+        protected Dictionary<string, SearchField> FieldDictionary { get;}
+
         public IndexDefinition(string indexName = null, bool addStandardBlockchainFields = true)
         {
-            var eventType = typeof(T);
-            var searchable = eventType.GetCustomAttribute<SearchIndex>();
+            IndexName = indexName;
+            FieldDictionary = new Dictionary<string, SearchField>();
 
-            IndexName = indexName ?? searchable?.Name ?? eventType.Name;
+            if (addStandardBlockchainFields) LoadGenericBlockchainFields();
 
-            LoadFields(addStandardBlockchainFields);
+            LoadFieldDictionary();
+            LoadFields();
         }
 
-        protected static void AddField(Dictionary<string, SearchField> fieldDictionary,
-            PresetSearchFieldName name, Action<SearchField> fieldConfigurationAction)
+        protected virtual void LoadFieldDictionary() { }
+
+        protected virtual void LoadFields()
+        {
+            Fields = FieldDictionary.Values.ToArray();
+        }
+
+        public SearchField[] Fields { get; set; } = Array.Empty<SearchField>();
+        public string IndexName { get; protected set; }
+
+        protected IndexDefinition(){}
+
+        protected virtual void LoadGenericBlockchainFields() { }
+
+        public IndexDefinition(string indexName){ IndexName = indexName; }
+
+        public static void AddField(Dictionary<string, SearchField> fieldDictionary, PresetSearchFieldName name, Action<SearchField> fieldConfigurationAction)
         {
             var searchField = new SearchField(name);
             fieldConfigurationAction(searchField);
             fieldDictionary.Add(searchField.Name, searchField);
         }
 
-        protected void LoadFields(bool addStandardBlockchainFields)
+        public static void AddField(
+            Dictionary<string, SearchField> fieldDictionary,
+            PropertyInfo property,
+            ParameterAttribute parameter = null,
+            List<PropertyInfo> parentProperties = null,
+            string prefix = null,
+            bool isCollection = false)
         {
-            var fieldDictionary = new Dictionary<string, SearchField>();
+            var searchFieldAttribute =
+                property.GetCustomAttribute<SearchField>() ??
+                new SearchField();
 
-            if (addStandardBlockchainFields)
+            if (searchFieldAttribute.Ignore)
             {
-                LoadGenericBlockchainFields(fieldDictionary);
+                return;
             }
 
-            LoadIndexedTopics(fieldDictionary);
-            LoadFields(fieldDictionary, typeof(T));
+            if (searchFieldAttribute.IsKey)
+            {
+                foreach (var field in fieldDictionary.Values)
+                {
+                    field.IsKey = false;
+                }
+            }
 
-            Fields = fieldDictionary.Values.ToArray();
+            if (parentProperties == null)
+            {
+                parentProperties = new List<PropertyInfo>();
+            }
+
+            searchFieldAttribute.ParentProperties.AddRange(parentProperties);
+
+            searchFieldAttribute.SourceProperty = property;
+            searchFieldAttribute.DataType = property.PropertyType;
+            searchFieldAttribute.IsCollection = isCollection || property.PropertyType.IsArrayOrListOfT();
+
+            if (string.IsNullOrEmpty(searchFieldAttribute.Name))
+            {
+                searchFieldAttribute.Name = prefix == null ? property.Name : $"{prefix}.{property.Name}";
+            }
+
+            if (parameter?.IsTuple() ?? false)
+            {
+                var structProperties = GetChildProperties(property.PropertyType);
+
+                parentProperties.Add(property);
+
+                foreach (var structProperty in structProperties)
+                {
+                    AddField(fieldDictionary, structProperty.Item1, structProperty.Item2, parentProperties, searchFieldAttribute.Name);
+                }
+            }
+            else if (parameter?.IsTupleArray() ?? false)
+            {
+                Type structType = property.GetItemTypeFromArrayOrListOfT();
+
+                if (structType == null) return;
+
+                var structProperties = GetChildProperties(structType);
+
+                parentProperties.Add(property);
+
+                foreach (var structProperty in structProperties)
+                {
+                    AddField(fieldDictionary, structProperty.Item1, structProperty.Item2, parentProperties, searchFieldAttribute.Name, isCollection: true);
+                }
+            }
+            else
+            {
+                fieldDictionary[searchFieldAttribute.Name] = searchFieldAttribute;
+            }
+        }
+
+        private static Tuple<PropertyInfo, ParameterAttribute>[] GetChildProperties(Type type)
+        {
+            return type
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Select(p => new Tuple<PropertyInfo, ParameterAttribute>(p, p.GetCustomAttribute<ParameterAttribute>()))
+                .OrderBy(p => p.Item2?.Order)
+                .ToArray();
+        }
+
+
+    }
+
+    public class IndexDefinition<T> : IndexDefinition where T : class
+    {
+        public IndexDefinition(string indexName = null, bool addStandardBlockchainFields = true):base(indexName, addStandardBlockchainFields)
+        {
+            var eventType = typeof(T);
+            var searchable = eventType.GetCustomAttribute<SearchIndex>();
+
+            IndexName = indexName ?? searchable?.Name ?? eventType.Name;
+        }
+
+        protected override void LoadFieldDictionary()
+        {
+            LoadIndexedTopics(FieldDictionary);
+            LoadFields(FieldDictionary, typeof(T));
         }
 
         protected virtual void LoadFields(
@@ -86,89 +190,6 @@ namespace Nethereum.BlockchainStore.Search
 
         }
 
-        protected virtual void LoadGenericBlockchainFields(Dictionary<string, SearchField> fields){}
-
-        private void AddField(
-            Dictionary<string, SearchField> fieldDictionary, 
-            PropertyInfo property, 
-            ParameterAttribute parameter = null, 
-            List<PropertyInfo> parentProperties = null,  
-            string prefix = null, 
-            bool isCollection = false)
-        {
-            var searchFieldAttribute =
-                property.GetCustomAttribute<SearchField>() ??
-                new SearchField();
-
-            if (searchFieldAttribute.Ignore)
-            {
-                return;
-            }
-
-            if (searchFieldAttribute.IsKey)
-            {
-                foreach (var field in fieldDictionary.Values)
-                {
-                    field.IsKey = false;
-                }
-            }
-
-            if (parentProperties == null)
-            {
-                parentProperties = new List<PropertyInfo>();
-            }
-
-            searchFieldAttribute.ParentProperties.AddRange(parentProperties);
-
-            searchFieldAttribute.SourceProperty = property;
-            searchFieldAttribute.DataType = property.PropertyType;
-            searchFieldAttribute.IsCollection = isCollection || property.PropertyType.IsArrayOrListOfT();
-            
-            if (string.IsNullOrEmpty(searchFieldAttribute.Name))
-            {
-                searchFieldAttribute.Name = prefix == null ? property.Name : $"{prefix}.{property.Name}";
-            }
-
-            if (parameter?.IsTuple() ?? false)
-            {
-                var structProperties = GetChildProperties(property.PropertyType);
-
-                parentProperties.Add(property);
-
-                foreach (var structProperty in structProperties)
-                {
-                    AddField(fieldDictionary, structProperty.Item1, structProperty.Item2, parentProperties, searchFieldAttribute.Name);
-                }
-            }
-            else if (parameter?.IsTupleArray() ?? false)
-            {
-                Type structType = property.GetItemTypeFromArrayOrListOfT();
-
-                if (structType == null) return;
-
-                var structProperties = GetChildProperties(structType);
-
-                parentProperties.Add(property);
-
-                foreach (var structProperty in structProperties)
-                {
-                    AddField(fieldDictionary, structProperty.Item1, structProperty.Item2, parentProperties, searchFieldAttribute.Name, isCollection: true);
-                }
-            }
-            else
-            {
-                fieldDictionary[searchFieldAttribute.Name] = searchFieldAttribute;
-            }
-        }
-
-        private static Tuple<PropertyInfo, ParameterAttribute>[] GetChildProperties(Type type)
-        {
-            return type
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Select(p => new Tuple<PropertyInfo, ParameterAttribute>(p, p.GetCustomAttribute<ParameterAttribute>()))
-                .OrderBy(p => p.Item2?.Order)
-                .ToArray();
-        }
 
         protected virtual void LoadIndexedTopics(Dictionary<string, SearchField> fieldDictionary)
         {
@@ -211,18 +232,4 @@ namespace Nethereum.BlockchainStore.Search
         }
     }
 
-    public class IndexDefinition
-    {
-        public SearchField[] Fields { get; set; } = Array.Empty<SearchField>();
-        public string IndexName { get; protected set; }
-
-        protected IndexDefinition()
-        {
-        }
-
-        public IndexDefinition(string indexName)
-        {
-            IndexName = indexName;
-        }
-    }
 }
