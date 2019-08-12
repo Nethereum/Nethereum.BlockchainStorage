@@ -1,34 +1,61 @@
 ﻿using System;
 using Nethereum.Contracts;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using Nest;
 using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace Nethereum.BlockchainStore.Search.ElasticSearch
 {
-    public class GenericElasticSearchDocument: Dictionary<string, object>, IHasId
-    {
-        private string _id = null;
-
-        public string GetId() => _id;
-
-        public string SetId(string id) => this._id = id;
-    }
-
-    public interface IHasId
-    {
-        string GetId();
-    }
 
     public static class ElasticSearchExtensions
     {
-        public static GenericElasticSearchDocument ToGenericElasticSearchDoc<TEvent>(
+        public static GenericSearchDocument ToGenericElasticSearchDoc(
+            this TransactionReceiptVO transactionReceiptVO,
+            TransactionReceiptVOIndexDefinition indexDefinition)
+        {
+            var dictionary = new GenericSearchDocument();
+            foreach (var field in indexDefinition.Fields)
+            {
+                var val = field.GetTransactionReceiptValue(transactionReceiptVO)?.ToElasticSearchFieldValue();
+                if (val != null)
+                {
+                    dictionary.Add(field.Name.ToElasticName(), val);
+                }
+            }
+
+            var id = transactionReceiptVO.TransactionHash;
+            dictionary.SetId(id.ToString());
+
+            return dictionary;
+        }
+
+        public static GenericSearchDocument ToGenericElasticSearchDoc(
+            this FilterLog log,
+            SearchField[] searchFields)
+        {
+            var dictionary = new GenericSearchDocument();
+            foreach (var field in searchFields)
+            {
+                var val = field.GetFilterLogValue(log)?.ToElasticSearchFieldValue();
+                if (val != null)
+                {
+                    dictionary.Add(field.Name.ToElasticName(), val);
+                }
+            }
+
+            var id = log.Key();
+            dictionary.SetId(id.ToString());
+
+            return dictionary;
+        }
+
+        public static GenericSearchDocument ToGenericElasticSearchDoc<TEvent>(
             this EventLog<TEvent> log, 
             EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
         {
-            var dictionary = new GenericElasticSearchDocument();
+            var dictionary = new GenericSearchDocument();
             foreach (var field in indexDefinition.Fields)
             {
                 var val = field.GetEventLogValue(log)?.ToElasticSearchFieldValue();
@@ -44,11 +71,11 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             return dictionary;
         }
 
-        public static GenericElasticSearchDocument ToGenericElasticSearchDoc<TFunctionMessage>(
+        public static GenericSearchDocument ToGenericElasticSearchDoc<TFunctionMessage>(
             this TransactionForFunctionVO<TFunctionMessage> functionCall, 
             FunctionIndexDefinition<TFunctionMessage> indexDefinition) where TFunctionMessage : FunctionMessage, new()
         {
-            var dictionary = new GenericElasticSearchDocument();
+            var dictionary = new GenericSearchDocument();
             foreach (var field in indexDefinition.Fields)
             {
                 var val = field.GetTransactionForFunctionValue(functionCall)?.ToElasticSearchFieldValue();

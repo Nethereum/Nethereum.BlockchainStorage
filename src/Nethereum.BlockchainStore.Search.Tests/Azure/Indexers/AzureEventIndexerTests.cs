@@ -11,11 +11,11 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
     public class AzureEventIndexerTests
     {
         [Fact]
-        public async Task MapsEventDtoToDictionary()
+        public async Task MapsEventDtoToGenericSearchDocument()
         {
             var indexDefinition = new EventIndexDefinition<TransferEvent>();
             var index = indexDefinition.ToAzureIndex();
-            var mockSearchIndexClient = new SearchIndexClientMock<Dictionary<string, object>>();
+            var mockSearchIndexClient = new SearchIndexClientMock<GenericSearchDocument>();
 
             var indexer = new AzureEventIndexer<TransferEvent>(
                 mockSearchIndexClient.SearchIndexClient, indexDefinition);

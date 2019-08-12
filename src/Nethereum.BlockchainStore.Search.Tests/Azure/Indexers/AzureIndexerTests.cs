@@ -14,8 +14,12 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         {
         }
 
-        public class SearchDocument
+        public class SearchDocument : IHasId
         {
+            public string GetId()
+            {
+                return GetHashCode().ToString();
+            }
         }
 
         [Fact]

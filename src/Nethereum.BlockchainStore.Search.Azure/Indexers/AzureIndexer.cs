@@ -6,7 +6,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 {
     public class AzureIndexer<TSource, TSearchDocument>
     : AzureIndexerBase<TSource, TSearchDocument>, IIndexer<TSource>
-        where TSource : class where TSearchDocument : class
+        where TSource : class where TSearchDocument : class, IHasId
     {
         public AzureIndexer(
             ISearchIndexClient indexClient,

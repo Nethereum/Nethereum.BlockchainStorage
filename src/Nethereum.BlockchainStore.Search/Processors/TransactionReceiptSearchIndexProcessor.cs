@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public class TransactionReceiptSearchIndexProcessor : ProcessorHandler<TransactionReceiptVO>
+    public class TransactionReceiptSearchIndexProcessorHandler : ProcessorHandler<TransactionReceiptVO>
     {
-        public TransactionReceiptSearchIndexProcessor(
+        public TransactionReceiptSearchIndexProcessorHandler(
             IIndexer<TransactionReceiptVO> indexer) :
         base((eventLog) => indexer.IndexAsync(eventLog))
         {
             Indexer = indexer;
         }
 
-        public TransactionReceiptSearchIndexProcessor(
+        public TransactionReceiptSearchIndexProcessorHandler(
             IIndexer<TransactionReceiptVO> indexer,
             Func<TransactionReceiptVO, Task<bool>> asyncCriteria) :
                 base((eventLog) => indexer.IndexAsync(eventLog), asyncCriteria)
@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.Search
             Indexer = indexer;
         }
 
-        public TransactionReceiptSearchIndexProcessor(
+        public TransactionReceiptSearchIndexProcessorHandler(
             IIndexer<TransactionReceiptVO> eventIndexer,
             Func<TransactionReceiptVO, bool> criteria) :
                 base((eventLog) => eventIndexer.IndexAsync(eventLog), criteria)

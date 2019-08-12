@@ -12,7 +12,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
     public class AzureFunctionIndexerWithMappingTests
     {
-        public class SearchDocument 
+        public class SearchDocument : IHasId
         {
             public SearchDocument(TransactionForFunctionVO<TransferFunction> transactionForFunctionVO)
             {
@@ -24,6 +24,11 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             public string TransactionHash { get;}
             public string To { get;}
             public string Value { get;}
+
+            public string GetId()
+            {
+                return TransactionHash;
+            }
         }
 
         [Fact]

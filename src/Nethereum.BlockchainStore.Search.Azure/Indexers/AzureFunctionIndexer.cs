@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using Nethereum.Contracts;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 {
     public class AzureFunctionIndexer<TFunctionMessage, TSearchDocument> : AzureIndexerBase<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument>,
         IIndexer<TransactionForFunctionVO<TFunctionMessage>> where TFunctionMessage : FunctionMessage, new()
-        where TSearchDocument : class
+        where TSearchDocument : class, IHasId
     {
 
         public AzureFunctionIndexer(
@@ -20,7 +19,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     }
 
     public class AzureFunctionIndexer<TFunctionMessage> : 
-        AzureIndexerBase<TransactionForFunctionVO<TFunctionMessage>, Dictionary<string, object>>,
+        AzureIndexerBase<TransactionForFunctionVO<TFunctionMessage>, GenericSearchDocument>,
         IIndexer<TransactionForFunctionVO<TFunctionMessage>> where TFunctionMessage : FunctionMessage, new()
     {
 

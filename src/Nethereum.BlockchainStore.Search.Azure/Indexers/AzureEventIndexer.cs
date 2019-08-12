@@ -9,7 +9,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     // event with mapper
     public class AzureEventIndexer<TEvent, TSearchDocument>
     : AzureIndexerBase<EventLog<TEvent>, TSearchDocument>, IIndexer<EventLog<TEvent>>
-        where TEvent : class where TSearchDocument : class
+        where TEvent : class where TSearchDocument : class, IHasId
     {
         public AzureEventIndexer(
             ISearchIndexClient indexClient,
@@ -20,7 +20,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
     //event with implicit mapping to default search doc (dictionary<string, object>)
     public class AzureEventIndexer<TEvent>
-    : AzureIndexerBase<EventLog<TEvent>, Dictionary<string, object>>, IIndexer<EventLog<TEvent>>
+    : AzureIndexerBase<EventLog<TEvent>, GenericSearchDocument>, IIndexer<EventLog<TEvent>>
         where TEvent : class
     {
         public AzureEventIndexer(

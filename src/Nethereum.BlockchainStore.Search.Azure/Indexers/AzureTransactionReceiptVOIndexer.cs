@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Nethereum.BlockchainStore.Search.Azure
 {
     public class AzureTransactionReceiptVOIndexer :
-        AzureIndexerBase<TransactionReceiptVO, Dictionary<string, object>>,
+        AzureIndexerBase<TransactionReceiptVO, GenericSearchDocument>,
         IIndexer<TransactionReceiptVO>
     {
 

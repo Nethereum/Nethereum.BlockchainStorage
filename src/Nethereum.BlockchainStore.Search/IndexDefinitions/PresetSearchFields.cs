@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 
@@ -6,6 +7,11 @@ namespace Nethereum.BlockchainStore.Search
 {
     public static class PresetSearchFields
     {
+        public static SearchField[] LogFields =
+            CreatePresetFilterLogFields()
+            .Values
+            .ToArray();
+
         public static Dictionary<string, SearchField> CreatePresetFilterLogFields()
         {
             var fields = new Dictionary<string, SearchField>();

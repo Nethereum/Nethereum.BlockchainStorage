@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     // filter log with mapping
     public class AzureFilterLogIndexer<TSearchDocument>
     : AzureIndexerBase<FilterLog, TSearchDocument>, IIndexer<FilterLog>
-        where TSearchDocument : class
+        where TSearchDocument : class, IHasId
     {
         public AzureFilterLogIndexer(
             ISearchIndexClient indexClient,
@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     }
 
     public class AzureFilterLogIndexer
-    : AzureIndexerBase<FilterLog, Dictionary<string, object>>, IIndexer<FilterLog>
+    : AzureIndexerBase<FilterLog, GenericSearchDocument>, IIndexer<FilterLog>
     {
         public AzureFilterLogIndexer(
             ISearchIndexClient indexClient,

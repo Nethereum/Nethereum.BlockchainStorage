@@ -16,13 +16,20 @@ namespace Nethereum.BlockchainStore.Search.Azure
         private readonly ConcurrentDictionary<string, Index> _indexes;
         private readonly Dictionary<string, ISearchIndexClient> _clients;
         private readonly List<IDisposable> _indexers;
+        private readonly bool createdSearchServiceClient;
 
-        public AzureSearchService(string serviceName, string searchApiKey)
+        public AzureSearchService(SearchServiceClient searchServiceClient)
         {
-            _client = new SearchServiceClient(serviceName, new SearchCredentials(searchApiKey));
+            _client = searchServiceClient;
             _indexes = new ConcurrentDictionary<string, Index>();
             _clients = new Dictionary<string, ISearchIndexClient>();
             _indexers = new List<IDisposable>();
+        }
+
+        public AzureSearchService(string serviceName, string searchApiKey):
+            this(new SearchServiceClient(serviceName, new SearchCredentials(searchApiKey)))
+        {
+            createdSearchServiceClient = true;
         }
 
         public async Task<long> CountDocumentsAsync(string indexName)
@@ -98,7 +105,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public IIndexer<TSource> CreateIndexer<TSource, TSearchDocument>(
             string indexName, Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
                 where TSource : class, new()
-                where TSearchDocument : class
+                where TSearchDocument : class, IHasId
         {
             var indexClient = GetOrCreateIndexClient(indexName);
             var azureIndexer = new AzureIndexer<TSource, TSearchDocument>(indexClient, mapper, documentsPerBatch);
@@ -116,7 +123,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public IIndexer<FilterLog> CreateIndexerForLog<TSearchDocument>(
             string indexName, Func<FilterLog, TSearchDocument> mapper, int documentsPerBatch = 1)
-                where TSearchDocument : class
+                where TSearchDocument : class, IHasId
         {
             var indexClient = GetOrCreateIndexClient(indexName);
             var azureIndexer = new AzureFilterLogIndexer<TSearchDocument>(indexClient, mapper, documentsPerBatch);
@@ -138,7 +145,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public IIndexer<EventLog<TEventDTO>> CreateIndexerForEventLog<TEventDTO, TSearchDocument>(
             string indexName, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int documentsPerBatch = 1)
                 where TEventDTO : class, IEventDTO, new()
-                where TSearchDocument : class
+                where TSearchDocument : class, IHasId
         {
             var indexClient = GetOrCreateIndexClient(indexName);
             var azureIndexer = new AzureEventIndexer<TEventDTO, TSearchDocument>(indexClient, mapper, documentsPerBatch);
@@ -156,7 +163,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
         }
 
         public IIndexer<TransactionReceiptVO> CreateIndexerForTransactionReceiptVO<TSearchDocument>(
-            string indexName, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch = 1) where TSearchDocument : class
+            string indexName, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch = 1) 
+                where TSearchDocument : class, IHasId
         {
             var indexClient = GetOrCreateIndexClient(indexName);
             var azureIndexer = new AzureTransactionReceiptVOIndexer<TSearchDocument>(indexClient, mapper, documentsPerBatch);
@@ -178,7 +186,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public IIndexer<TransactionForFunctionVO<TFunctionMessage>> CreateIndexerForFunctionMessage<TFunctionMessage, TSearchDocument>(
             string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, int documentsPerBatch = 1)
                 where TFunctionMessage : FunctionMessage, new()
-                where TSearchDocument : class
+                where TSearchDocument : class, IHasId
         {
             var indexClient = GetOrCreateIndexClient(indexName);
             var azureIndexer = new AzureFunctionIndexer<TFunctionMessage, TSearchDocument>(indexClient, mapper, documentsPerBatch);
@@ -198,7 +206,10 @@ namespace Nethereum.BlockchainStore.Search.Azure
                 indexer.Dispose();
             }
 
-            ((IDisposable)_client)?.Dispose();
+            if(createdSearchServiceClient)
+            { 
+                _client?.Dispose();
+            }
         }
 
         public IAzureIndexSearcher CreateIndexSearcher(Index index)

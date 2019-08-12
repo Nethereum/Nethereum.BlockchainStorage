@@ -1,7 +1,5 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.BlockchainProcessing;
 using Nethereum.BlockchainProcessing.Processor;
-using Nethereum.BlockchainProcessing.Services;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using System;
@@ -9,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
-    public static class SearchServiceExtensions
+    public static class IndexerExtensions
     {
         public static ProcessorHandler<TSource> CreateProcessorHandler<TSource>(
             this IIndexer<TSource> indexer)
@@ -37,26 +35,26 @@ namespace Nethereum.BlockchainStore.Search
         public static ProcessorHandler<FilterLog> CreateProcessorHandler(
             this IIndexer<FilterLog> indexer)
         {
-            return new FilterLogSearchIndexProcessor(indexer);
+            return new FilterLogSearchIndexProcessorHandler(indexer);
         }
 
         public static ProcessorHandler<FilterLog> CreateProcessorHandler(
             this IIndexer<FilterLog> indexer, Func<FilterLog, bool> criteria)
         {
-            return new FilterLogSearchIndexProcessor(indexer, criteria);
+            return new FilterLogSearchIndexProcessorHandler(indexer, criteria);
         }
 
         public static ProcessorHandler<FilterLog> CreateProcessorHandler(
             this IIndexer<FilterLog> indexer, Func<FilterLog, Task<bool>> asyncCriteria)
         {
-            return new FilterLogSearchIndexProcessor(indexer, asyncCriteria);
+            return new FilterLogSearchIndexProcessorHandler(indexer, asyncCriteria);
         }
 
         public static ProcessorHandler<FilterLog> CreateProcessorHandler<TEventDTO>(
             this IIndexer<EventLog<TEventDTO>> indexer)
                 where TEventDTO : class, IEventDTO, new()
         {
-            return new EventLogSearchIndexProcessor<TEventDTO>(indexer);
+            return new EventLogSearchIndexProcessorHandler<TEventDTO>(indexer);
         }
 
         public static ProcessorHandler<FilterLog> CreateProcessorHandler<TEventDTO>(
@@ -64,7 +62,7 @@ namespace Nethereum.BlockchainStore.Search
             Func<EventLog<TEventDTO>, bool> criteria)
                 where TEventDTO : class, IEventDTO, new()
         {
-            return new EventLogSearchIndexProcessor<TEventDTO>(indexer, criteria);
+            return new EventLogSearchIndexProcessorHandler<TEventDTO>(indexer, criteria);
         }
 
         public static ProcessorHandler<FilterLog> CreateProcessorHandler<TEventDTO>(
@@ -72,34 +70,34 @@ namespace Nethereum.BlockchainStore.Search
             Func<EventLog<TEventDTO>, Task<bool>> asyncCriteria)
                 where TEventDTO : class, IEventDTO, new()
         {
-            return new EventLogSearchIndexProcessor<TEventDTO>(indexer, asyncCriteria);
+            return new EventLogSearchIndexProcessorHandler<TEventDTO>(indexer, asyncCriteria);
         }
 
         public static ProcessorHandler<TransactionReceiptVO> CreateProcessorHandler(
             this IIndexer<TransactionReceiptVO> indexer)
         {
-            return new TransactionReceiptSearchIndexProcessor(indexer);
+            return new TransactionReceiptSearchIndexProcessorHandler(indexer);
         }
 
         public static ProcessorHandler<TransactionReceiptVO> CreateProcessorHandler(
             this IIndexer<TransactionReceiptVO> indexer,
             Func<TransactionReceiptVO, bool> criteria)
         {
-            return new TransactionReceiptSearchIndexProcessor(indexer, criteria);
+            return new TransactionReceiptSearchIndexProcessorHandler(indexer, criteria);
         }
 
         public static ProcessorHandler<TransactionReceiptVO> CreateProcessorHandler(
             this IIndexer<TransactionReceiptVO> indexer,
             Func<TransactionReceiptVO, Task<bool>> asyncCriteria)
         {
-            return new TransactionReceiptSearchIndexProcessor(indexer, asyncCriteria);
+            return new TransactionReceiptSearchIndexProcessorHandler(indexer, asyncCriteria);
         }
 
         public static ProcessorHandler<TransactionReceiptVO> CreateProcessorHandler<TFunctionMessage>(
             this IIndexer<TransactionForFunctionVO<TFunctionMessage>> indexer)
                 where TFunctionMessage : FunctionMessage, new()
         {
-            return new FunctionMessageSearchIndexProcessor<TFunctionMessage>(indexer);
+            return new FunctionMessageSearchIndexProcessorHandler<TFunctionMessage>(indexer);
         }
 
         public static ProcessorHandler<TransactionReceiptVO> CreateProcessorHandler<TFunctionMessage>(
@@ -107,7 +105,7 @@ namespace Nethereum.BlockchainStore.Search
             Func<TransactionForFunctionVO<TFunctionMessage>, bool> criteria)
                 where TFunctionMessage : FunctionMessage, new()
         {
-            return new FunctionMessageSearchIndexProcessor<TFunctionMessage>(indexer, criteria);
+            return new FunctionMessageSearchIndexProcessorHandler<TFunctionMessage>(indexer, criteria);
         }
 
         public static ProcessorHandler<TransactionReceiptVO> CreateProcessorHandler<TFunctionMessage>(
@@ -115,7 +113,7 @@ namespace Nethereum.BlockchainStore.Search
             Func<TransactionForFunctionVO<TFunctionMessage>, Task<bool>> asyncCriteria)
                 where TFunctionMessage : FunctionMessage, new()
         {
-            return new FunctionMessageSearchIndexProcessor<TFunctionMessage>(indexer, asyncCriteria);
+            return new FunctionMessageSearchIndexProcessorHandler<TFunctionMessage>(indexer, asyncCriteria);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
     public class AzureTransactionReceiptVOIndexerWithMapperTests
     {
-        public class SearchDocument
+        public class SearchDocument: IHasId
         {
             public SearchDocument(TransactionReceiptVO transactionReceiptVO)
             {
@@ -19,6 +19,11 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             }
 
             public TransactionReceiptVO TransactionReceiptVO { get; }
+
+            public string GetId()
+            {
+                return TransactionReceiptVO.TransactionHash;
+            }
         }
 
         [Fact]

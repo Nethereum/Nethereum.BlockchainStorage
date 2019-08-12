@@ -7,12 +7,8 @@ namespace Nethereum.BlockchainStore.Search.Azure
 {
     public class FilterLogIndexUtil
     {
-        private static SearchField[] Presets = PresetSearchFields
-            .CreatePresetFilterLogFields()
-            .Values
-            .ToArray();
-
-        private static Field[] GetPresetAzureFields() => Presets
+        private static Field[] GetPresetAzureFields() => PresetSearchFields
+            .LogFields
             .Select(f => f.ToAzureField())
             .ToArray();
 
@@ -27,9 +23,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return index;
         }
 
-        public static Dictionary<string, object> Map(FilterLog filterLog)
+        public static GenericSearchDocument Map(FilterLog filterLog)
         {
-            return filterLog.ToAzureDocument(Presets); 
+            return filterLog.ToAzureDocument(PresetSearchFields.LogFields); 
         }
     }
 }

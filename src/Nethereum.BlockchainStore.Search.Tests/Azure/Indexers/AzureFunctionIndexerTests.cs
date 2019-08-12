@@ -13,11 +13,11 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
     public class AzureFunctionIndexerTests
     {
         [Fact]
-        public async Task MapsFunctionDtoToDictionary()
+        public async Task MapsFunctionDtoToGenericSearchDocument()
         {
             var indexDefinition = new FunctionIndexDefinition<TransferFunction>();
             var index = indexDefinition.ToAzureIndex();
-            var mockSearchIndexClient = new SearchIndexClientMock<Dictionary<string, object>>();
+            var mockSearchIndexClient = new SearchIndexClientMock<GenericSearchDocument>();
 
             var indexer = new AzureFunctionIndexer<TransferFunction>(
                 mockSearchIndexClient.SearchIndexClient, indexDefinition);

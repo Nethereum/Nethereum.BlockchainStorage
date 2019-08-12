@@ -7,7 +7,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 {
     public class AzureTransactionReceiptVOIndexer<TSearchDocument> :
         AzureIndexerBase<TransactionReceiptVO, TSearchDocument>,
-        IIndexer<TransactionReceiptVO> where TSearchDocument : class
+        IIndexer<TransactionReceiptVO> where TSearchDocument : class, IHasId
     {
 
         public AzureTransactionReceiptVOIndexer(

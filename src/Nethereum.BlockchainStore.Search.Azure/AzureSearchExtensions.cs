@@ -14,21 +14,21 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         public const string SuggesterName = "sg";
 
-        public static Dictionary<string, object> ToAzureDocument(
+        public static GenericSearchDocument ToAzureDocument(
             this FilterLog log,
             SearchField[] searchFields)
         {
             return CreateFieldWithValueDictionary(log, searchFields, (field) => field.GetFilterLogValue(log));
         }
 
-        public static Dictionary<string, object> ToAzureDocument<TEvent>(
+        public static GenericSearchDocument ToAzureDocument<TEvent>(
             this EventLog<TEvent> log, 
             EventIndexDefinition<TEvent> indexDefinition) where TEvent : class
         {
             return CreateFieldWithValueDictionary(log, indexDefinition.Fields, (field) => field.GetEventLogValue(log));
         }
 
-        public static Dictionary<string, object> ToAzureDocument<TFunctionMessage>(
+        public static GenericSearchDocument ToAzureDocument<TFunctionMessage>(
             this TransactionForFunctionVO<TFunctionMessage> transactionAndFunction,
             FunctionIndexDefinition<TFunctionMessage> indexDefinition)
             where TFunctionMessage : FunctionMessage, new()
@@ -36,16 +36,16 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return CreateFieldWithValueDictionary(transactionAndFunction, indexDefinition.Fields, (field) => field.GetTransactionForFunctionValue(transactionAndFunction));
         }
 
-        public static Dictionary<string, object> ToAzureDocument(
+        public static GenericSearchDocument ToAzureDocument(
             this TransactionReceiptVO transactionReceiptVO,
             TransactionReceiptVOIndexDefinition indexDefinition)
         {
             return CreateFieldWithValueDictionary(transactionReceiptVO, indexDefinition.Fields, (field) => field.GetTransactionReceiptValue(transactionReceiptVO));
         }
 
-        private static Dictionary<string, object> CreateFieldWithValueDictionary<T>(T source, SearchField[] searchFields, Func<SearchField, object> getValue)
+        private static GenericSearchDocument CreateFieldWithValueDictionary<T>(T source, SearchField[] searchFields, Func<SearchField, object> getValue)
         {
-            var dictionary = new Dictionary<string, object>();
+            var dictionary = new GenericSearchDocument();
             foreach (var field in searchFields)
             {
                 var azureField = field.ToAzureField();

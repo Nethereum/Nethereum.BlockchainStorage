@@ -10,16 +10,24 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
     public class AzureEventIndexerWithMapperTests
     {
-        public class SearchDocument
+        public class SearchDocument: IHasId
         {
+            string id;
+
             public SearchDocument(string transactionHash, HexBigInteger logIndex)
             {
                 TransactionHash = transactionHash;
                 LogIndex = logIndex.Value.ToString();
+                id = $"{TransactionHash}{logIndex.Value}";
             }
 
             public string TransactionHash { get; }
             public string LogIndex { get; }
+
+            public string GetId()
+            {
+                return id;
+            }
         }
 
         [Fact]

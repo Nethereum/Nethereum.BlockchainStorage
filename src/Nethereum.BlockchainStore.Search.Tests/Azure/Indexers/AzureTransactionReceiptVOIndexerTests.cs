@@ -12,11 +12,11 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
     public class AzureTransactionReceiptVOIndexerTests
     {
         [Fact]
-        public async Task MapsTransactionToDictionary()
+        public async Task MapsTransactionToGenericSearchDocument()
         {
             var indexDefinition = new TransactionReceiptVOIndexDefinition("my-transactions");
             var index = indexDefinition.ToAzureIndex();
-            var mockSearchIndexClient = new SearchIndexClientMock<Dictionary<string, object>>();
+            var mockSearchIndexClient = new SearchIndexClientMock<GenericSearchDocument>();
 
             var indexer = new AzureTransactionReceiptVOIndexer(
                 mockSearchIndexClient.SearchIndexClient, indexDefinition);

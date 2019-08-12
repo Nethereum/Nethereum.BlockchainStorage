@@ -168,8 +168,8 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
             var doc = eventLog.ToAzureDocument(indexDefinition);
 
-            Assert.IsType<Dictionary<string, object>>(doc);
-            var dictionary = doc as Dictionary<string, object>;
+            Assert.IsType<GenericSearchDocument>(doc);
+            var dictionary = doc as GenericSearchDocument;
 
             Assert.Equal(eventLog.Event.From, dictionary["from"]);
             Assert.Equal(eventLog.Event.To, dictionary["to"]);

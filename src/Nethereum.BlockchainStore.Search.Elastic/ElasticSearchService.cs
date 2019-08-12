@@ -1,6 +1,10 @@
 ﻿using Nest;
+using Nethereum.BlockchainStore.Search.Elastic;
+using Nethereum.BlockchainStore.Search.Services;
 using Nethereum.Contracts;
+using Nethereum.RPC.Eth.DTOs;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search.ElasticSearch
@@ -8,10 +12,12 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
     public class ElasticSearchService : IElasticSearchService
     {
         private readonly IElasticClient _elasticClient;
+        private readonly List<IDisposable> _indexers;
 
         public ElasticSearchService(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
+            _indexers = new List<IDisposable>();
         }
 
         public async Task<long> CountDocumentsAsync(string indexName)
@@ -20,23 +26,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             return countResponse.Count;
         }
 
-        public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent>(EventIndexDefinition<TEvent> searchIndexDefinition) where TEvent : class
-        {
-            await CreateIfNotExists(searchIndexDefinition);
-
-            var indexer =
-                new ElasticEventIndexer<TEvent>(_elasticClient, searchIndexDefinition);
-
-            return indexer;
-        }
-
-        public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent>(string indexName = null, bool addPresetEventLogFields = true) where TEvent : class
-        {
-            var eventIndexDefinition = new EventIndexDefinition<TEvent>(indexName, addPresetEventLogFields);
-            return await CreateEventIndexer(eventIndexDefinition);
-        }
-
-        private async Task CreateIfNotExists(IndexDefinition searchIndexDefinition)
+        public async Task CreateIfNotExists(IndexDefinition searchIndexDefinition)
         {
             var indexName = searchIndexDefinition.ElasticIndexName();
             var existsResponse = await _elasticClient.IndexExistsAsync(new IndexExistsRequest(indexName));
@@ -55,7 +45,7 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             }
         }
 
-        private async Task CreateIfNotExists(string indexName)
+        public async Task CreateIfNotExists(string indexName)
         {
             indexName = indexName.ToElasticName();
             var existsResponse = await _elasticClient.IndexExistsAsync(new IndexExistsRequest(indexName));
@@ -70,24 +60,6 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             }
         }
 
-        public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition) where TFunctionMessage : FunctionMessage, new()
-        {
-            await CreateIfNotExists(searchIndexDefinition);
-
-            var indexer =
-                new ElasticFunctionIndexer<TFunctionMessage>(_elasticClient, searchIndexDefinition);
-
-            return indexer;
-        }
-
-        public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage>(string indexName = null, bool addPresetEventLogFields = true) where TFunctionMessage : FunctionMessage, new()
-        {
-            var searchIndexDefinition =
-                new FunctionIndexDefinition<TFunctionMessage>(indexName, addPresetEventLogFields);
-
-            return await CreateFunctionIndexer(searchIndexDefinition);
-        }
-
         public Task DeleteIndexAsync(IndexDefinition searchIndex) => DeleteIndexAsync(searchIndex.ElasticIndexName());
 
         public async Task DeleteIndexAsync(string indexName)
@@ -99,47 +71,83 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             }
         }
 
-        public void Dispose(){}
-
-        public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(string indexName, IEventToSearchDocumentMapper<TEvent, TSearchDocument> mapper)
-            where TEvent : class
-            where TSearchDocument : class, IHasId, new()
+        public void Dispose()
         {
-            await CreateIfNotExists(indexName);
+            foreach(var indexer in _indexers)
+            {
+                indexer.Dispose();
+            }    
+        }
 
-            var indexer =
-                new ElasticEventIndexer<TEvent, TSearchDocument>(_elasticClient, indexName, mapper);
-
+        public async Task<bool> IndexExistsAsync(string indexName) 
+        {
+            var existsResponse = await _elasticClient.IndexExistsAsync(new IndexExistsRequest(indexName.ToElasticName())).ConfigureAwait(false);
+            return existsResponse.Exists;
+        }
+    
+        IIndexer<TSource> ISearchService.CreateIndexer<TSource, TSearchDocument>(string indexName, Func<TSource, TSearchDocument> mapper, int documentsPerBatch)
+        {
+            var indexer = new ElasticIndexer<TSource, TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
+            _indexers.Add(indexer);
             return indexer;
         }
 
-        public async Task<IEventIndexer<TEvent>> CreateEventIndexer<TEvent, TSearchDocument>(string indexName, Func<EventLog<TEvent>, TSearchDocument> mappingFunc)
-            where TEvent : class
-            where TSearchDocument : class, IHasId, new()
+        IIndexer<FilterLog> ISearchService.CreateIndexerForLog(string indexName, int documentsPerBatch)
         {
-            var mapper = new EventToSearchDocumentMapper<TEvent, TSearchDocument>(mappingFunc);
-
-            return await CreateEventIndexer(indexName, mapper);
-        }
-
-        public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(string indexName, IFunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument> mapper)
-            where TFunctionMessage : FunctionMessage, new()
-            where TSearchDocument : class, IHasId, new()
-        {
-            await CreateIfNotExists(indexName);
-
-            var indexer =
-                new ElasticFunctionIndexer<TFunctionMessage, TSearchDocument>(_elasticClient, indexName, mapper);
-
+            var indexer = new ElasticFilterLogIndexer(indexName, _elasticClient, documentsPerBatch);
+            _indexers.Add(indexer);
             return indexer;
         }
 
-        public async Task<IFunctionIndexer<TFunctionMessage>> CreateFunctionIndexer<TFunctionMessage, TSearchDocument>(string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapperFunc)
-            where TFunctionMessage : FunctionMessage, new()
-            where TSearchDocument : class, IHasId, new()
+        IIndexer<FilterLog> ISearchService.CreateIndexerForLog<TSearchDocument>(string indexName, Func<FilterLog, TSearchDocument> mapper, int documentsPerBatch)
         {
-            var mapper = new FunctionMessageToSearchDocumentMapper<TFunctionMessage, TSearchDocument>(mapperFunc);
-            return await CreateFunctionIndexer(indexName, mapper);
+            var indexer = new ElasticFilterLogIndexer<TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
+        }
+
+        IIndexer<EventLog<TEventDTO>> ISearchService.CreateIndexerForEventLog<TEventDTO>(string indexName, int documentsPerBatch)
+        {
+            var indexDefinition = new EventIndexDefinition<TEventDTO>(indexName);
+            var indexer = new ElasticEventIndexer<TEventDTO>(indexName, _elasticClient, indexDefinition, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
+        }
+
+        IIndexer<EventLog<TEventDTO>> ISearchService.CreateIndexerForEventLog<TEventDTO, TSearchDocument>(string indexName, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int documentsPerBatch)
+        {
+            var indexer = new ElasticEventIndexer<TEventDTO, TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
+        }
+
+        IIndexer<TransactionReceiptVO> ISearchService.CreateIndexerForTransactionReceiptVO(string indexName, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch)
+        {
+            var indexer = new ElasticTransactionReceiptVOIndexer(indexName, _elasticClient, indexDefinition, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
+        }
+
+        IIndexer<TransactionReceiptVO> ISearchService.CreateIndexerForTransactionReceiptVO<TSearchDocument>(string indexName, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch)
+        {
+            var indexer = new ElasticTransactionReceiptVOIndexer<TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
+        }
+
+        IIndexer<TransactionForFunctionVO<TFunctionMessage>> ISearchService.CreateIndexerForFunctionMessage<TFunctionMessage>(string indexName, int documentsPerBatch) 
+        {
+            var indexDefinition = new FunctionIndexDefinition<TFunctionMessage>(indexName);
+            var indexer = new ElasticFunctionIndexer<TFunctionMessage>(indexName, _elasticClient, indexDefinition, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
+        }
+
+        IIndexer<TransactionForFunctionVO<TFunctionMessage>> ISearchService.CreateIndexerForFunctionMessage<TFunctionMessage, TSearchDocument>(string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, int documentsPerBatch)
+        {
+            var indexer = new ElasticFunctionIndexer<TFunctionMessage, TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
+            _indexers.Add(indexer);
+            return indexer;
         }
     }
 }

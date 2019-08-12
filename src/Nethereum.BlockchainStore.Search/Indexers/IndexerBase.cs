@@ -39,7 +39,7 @@ namespace Nethereum.BlockchainStore.Search
         public async Task IndexPendingDocumentsAsync()
         {
             if(CurrentBatch?.IsEmpty ?? true) return;
-            await LockAndSend().ConfigureAwait(false);
+            await SendCurrentBatch().ConfigureAwait(false);
         }
 
         public int Indexed {get; private set; }
@@ -47,34 +47,43 @@ namespace Nethereum.BlockchainStore.Search
 
         public virtual void Dispose()
         {
-            IndexPendingDocumentsAsync().Wait();
+            _semaphoreSlim.WaitAsync().Wait();
+            try
+            {
+                IndexPendingDocumentsAsync().Wait();
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         }
 
         public abstract Task<long> DocumentCountAsync();
 
         public virtual async Task IndexAsync(TSource source)
         {
-            AddToBatch(source);
-            if (IsReadyToSend())
-            {
-                await LockAndSend().ConfigureAwait(false);
-            }
-        }
-
-        private async Task LockAndSend()
-        {
             await _semaphoreSlim.WaitAsync();
             try
-            { 
-                var numberToSend = CurrentBatch.Count;
-                await SendBatchAsync(CurrentBatch);
-                Indexed += numberToSend;
-                CurrentBatch.Clear();
+            {
+                AddToBatch(source);
+                if (IsReadyToSend())
+                {
+                    await SendCurrentBatch().ConfigureAwait(false);
+                }
             }
             finally
             {
                 _semaphoreSlim.Release();
             }
+        }
+
+        private async Task SendCurrentBatch()
+        {
+            if(CurrentBatch.IsEmpty) return;
+            var numberToSend = CurrentBatch.Count;
+            await SendBatchAsync(CurrentBatch.ToArray());
+            Indexed += numberToSend;
+            CurrentBatch.Clear();
         }
 
         protected abstract Task SendBatchAsync(IEnumerable<TSearchDocument> docs);
