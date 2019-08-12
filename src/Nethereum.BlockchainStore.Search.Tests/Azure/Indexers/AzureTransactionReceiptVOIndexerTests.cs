@@ -19,7 +19,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var mockSearchIndexClient = new SearchIndexClientMock<Dictionary<string, object>>();
 
             var indexer = new AzureTransactionReceiptVOIndexer(
-                index, mockSearchIndexClient.SearchIndexClient, indexDefinition);
+                mockSearchIndexClient.SearchIndexClient, indexDefinition);
 
             TransactionReceiptVO transaction = CreateSampleTransaction();
 

@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
             var index = FilterLogIndexUtil.Create("my-logs");
 
-            var indexer = new AzureFilterLogIndexer(index, searchIndexClientMock.SearchIndexClient);
+            var indexer = new AzureFilterLogIndexer(searchIndexClientMock.SearchIndexClient);
 
             var filterLog = new FilterLog {
                 BlockNumber = new Hex.HexTypes.HexBigInteger(4309), 

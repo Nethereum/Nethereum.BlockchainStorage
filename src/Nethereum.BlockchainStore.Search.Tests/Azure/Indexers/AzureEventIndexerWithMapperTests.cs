@@ -29,7 +29,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var mockSearchIndexClient = new SearchIndexClientMock<SearchDocument>();
 
             var indexer = new AzureEventIndexer<TransferEvent, SearchDocument>(
-                index, mockSearchIndexClient.SearchIndexClient, (tfr) => new SearchDocument(tfr.Log.TransactionHash, tfr.Log.LogIndex));
+                mockSearchIndexClient.SearchIndexClient, (tfr) => new SearchDocument(tfr.Log.TransactionHash, tfr.Log.LogIndex));
 
             var eventLog = TestData.Contracts.StandardContract.SampleTransferEventLog();
 

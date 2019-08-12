@@ -9,11 +9,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
         where TSource : class where TSearchDocument : class
     {
         public AzureIndexer(
-            Index index,
             ISearchIndexClient indexClient,
             Func<TSource, TSearchDocument> mapper,
             int documentsPerIndexBatch = 1) : base(
-                index,
                 indexClient,
                 mapper,
                 documentsPerIndexBatch)

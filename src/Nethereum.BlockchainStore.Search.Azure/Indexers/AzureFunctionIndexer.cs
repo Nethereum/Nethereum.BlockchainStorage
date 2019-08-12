@@ -12,10 +12,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
 
         public AzureFunctionIndexer(
-            Index index, 
             ISearchIndexClient indexClient, 
             Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper,
-            int documentsPerIndexBatch = 1) : base(index, indexClient, mapper, documentsPerIndexBatch)
+            int documentsPerIndexBatch = 1) : base(indexClient, mapper, documentsPerIndexBatch)
         {
         }
     }
@@ -26,12 +25,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
 
         public AzureFunctionIndexer(
-            Index index,
             ISearchIndexClient indexClient,
             FunctionIndexDefinition<TFunctionMessage> searchIndexDefinition,
             int documentsPerIndexBatch = 1
             )
-            :base(index, indexClient, (f) => f.ToAzureDocument(searchIndexDefinition), documentsPerIndexBatch)
+            :base(indexClient, (f) => f.ToAzureDocument(searchIndexDefinition), documentsPerIndexBatch)
         {
 
         }

@@ -15,9 +15,9 @@ namespace Nethereum.BlockchainStore.Search
             IndexName = indexName ?? searchable?.Name ?? eventAttribute?.Name ?? eventType.Name;
         }
 
-        protected override void LoadGenericBlockchainFields()
+        protected override void LoadPresetBlockchainFields()
         {
-            PresetSearchFields.AddPresetFilterLogFields(FieldDictionary);
+            FieldDictionary.AddPresetFilterLogFields();
         }
     }
 }

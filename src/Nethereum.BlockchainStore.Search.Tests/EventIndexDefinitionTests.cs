@@ -172,7 +172,7 @@ namespace Nethereum.BlockchainStore.Search.Tests
                     f => f.ReturnsValue(filterLog.Address))
                 .HasField(PresetSearchFieldName.log_topics,
                     f => f.IsString(),
-                    f => f.HasFlags(isFilterable: true, isSearchable: true, isFacetable: true),
+                    f => f.HasFlags(isFilterable: true, isSearchable: true, isFacetable: true, isCollection: true),
                     f => f.ReturnsValue(filterLog.Topics));
         }
 

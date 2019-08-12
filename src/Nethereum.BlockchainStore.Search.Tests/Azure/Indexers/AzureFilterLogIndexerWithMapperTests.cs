@@ -28,7 +28,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var mockSearchIndexClient = new SearchIndexClientMock<SearchDocument>();
 
             var indexer = new AzureFilterLogIndexer<SearchDocument>(
-                index, mockSearchIndexClient.SearchIndexClient, (tfr) => new SearchDocument(tfr.TransactionHash, tfr.LogIndex));
+                mockSearchIndexClient.SearchIndexClient, (tfr) => new SearchDocument(tfr.TransactionHash, tfr.LogIndex));
 
             var log = TestData.Contracts.StandardContract.SampleTransferLog();
 

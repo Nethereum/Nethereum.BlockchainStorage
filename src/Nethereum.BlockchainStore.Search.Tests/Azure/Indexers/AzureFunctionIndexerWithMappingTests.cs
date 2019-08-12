@@ -33,7 +33,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var mockSearchIndexClient = new SearchIndexClientMock<SearchDocument>();
 
             var indexer = new AzureFunctionIndexer<TransferFunction, SearchDocument>(
-                index, mockSearchIndexClient.SearchIndexClient, (tx) => new SearchDocument(tx));
+                mockSearchIndexClient.SearchIndexClient, (tx) => new SearchDocument(tx));
 
             TransactionForFunctionVO<TransferFunction> transactionForFunction = CreateSampleTransactionForFunction();
 

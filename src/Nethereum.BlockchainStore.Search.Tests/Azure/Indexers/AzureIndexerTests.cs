@@ -26,7 +26,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var mappedSearchDocument = new SearchDocument();
 
             var indexer = new AzureIndexer<Source, SearchDocument>(
-                index, mockSearchIndexClient.SearchIndexClient, (tfr) => mappedSearchDocument);
+                mockSearchIndexClient.SearchIndexClient, (tfr) => mappedSearchDocument);
 
             var source = new Source();
 

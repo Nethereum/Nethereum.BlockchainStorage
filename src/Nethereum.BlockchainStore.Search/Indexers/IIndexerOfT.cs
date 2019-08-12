@@ -7,7 +7,7 @@ namespace Nethereum.BlockchainStore.Search
     {
         Task IndexAsync(TSource source);
 
-        int PendingDocumentCount { get;}
+        int PendingDocumentCount { get; }
 
         Task IndexPendingDocumentsAsync();
     }

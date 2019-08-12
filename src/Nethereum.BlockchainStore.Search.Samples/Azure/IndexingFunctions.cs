@@ -57,14 +57,15 @@ namespace Nethereum.BlockchainStore.Search.Samples.Azure
                 try
                 {
                     //setup
-                    var index = await azureSearchService.CreateIndexForFunctionAsync<TransferFunction>(INDEX_NAME);
+                    var index = await azureSearchService.CreateIndexForFunctionMessageAsync<TransferFunction>(INDEX_NAME);
 
-                    var searchIndexProcessor = azureSearchService.CreateFunctionMessageProcessor<TransferFunction>(index, documentsPerBatch: 1);
+                    var indexer = azureSearchService.CreateIndexerForFunctionMessage<TransferFunction>(index.Name, documentsPerBatch: 1);
+                    var processorHandler = indexer.CreateProcessorHandler();
                     var web3 = new Web3.Web3(BlockchainUrl);
 
                     var blockchainProcessor = web3.Processing.Blocks.CreateBlockProcessor((steps) => {
                         steps.TransactionStep.SetMatchCriteria(tx => tx.Transaction.IsFrom("0xf47a8bb5c9ff814d39509591281ae31c0c7c2f38"));
-                        steps.TransactionReceiptStep.AddProcessorHandler(searchIndexProcessor);
+                        steps.TransactionReceiptStep.AddProcessorHandler(processorHandler);
                     });
 
                     var cancellationTokenSource = new CancellationTokenSource();

@@ -9,11 +9,11 @@ namespace Nethereum.BlockchainStore.Search
         public static Dictionary<string, SearchField> CreatePresetFilterLogFields()
         {
             var fields = new Dictionary<string, SearchField>();
-            AddPresetFilterLogFields(fields);
+            fields.AddPresetFilterLogFields();
             return fields;
         }
 
-        public static void AddPresetFilterLogFields(Dictionary<string, SearchField> fields)
+        public static void AddPresetFilterLogFields(this Dictionary<string, SearchField> fields)
         {
             IndexDefinition.AddField(fields, PresetSearchFieldName.log_key, f =>
             {
@@ -107,6 +107,7 @@ namespace Nethereum.BlockchainStore.Search
             IndexDefinition.AddField(fields, PresetSearchFieldName.log_topics, f =>
             {
                 f.DataType = typeof(string);
+                f.IsCollection = true;
                 f.IsSearchable = true;
                 f.IsSortable = false;
                 f.IsFilterable = true;
@@ -117,7 +118,7 @@ namespace Nethereum.BlockchainStore.Search
 
         }
 
-        public static void AddPresetTransactionFields(Dictionary<string, SearchField> fields)
+        public static void AddPresetTransactionFields(this Dictionary<string, SearchField> fields)
         {
             IndexDefinition.AddField(fields, PresetSearchFieldName.tx_uid, f =>
             {

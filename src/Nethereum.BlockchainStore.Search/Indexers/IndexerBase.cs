@@ -12,6 +12,8 @@ namespace Nethereum.BlockchainStore.Search
         private readonly Func<TSource, TSearchDocument> mapper;
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1);
 
+        public ConcurrentQueue<TSearchDocument> CurrentBatch { get; } = new ConcurrentQueue<TSearchDocument>();
+
         protected IndexerBase(Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
         {
             _documentsPerIndexBatch = documentsPerBatch;
@@ -36,13 +38,12 @@ namespace Nethereum.BlockchainStore.Search
 
         public async Task IndexPendingDocumentsAsync()
         {
-            if(CurrentBatch.IsEmpty) return;
+            if(CurrentBatch?.IsEmpty ?? true) return;
             await LockAndSend().ConfigureAwait(false);
         }
 
         public int Indexed {get; private set; }
 
-        public ConcurrentQueue<TSearchDocument> CurrentBatch { get; } = new ConcurrentQueue<TSearchDocument>();
 
         public virtual void Dispose()
         {

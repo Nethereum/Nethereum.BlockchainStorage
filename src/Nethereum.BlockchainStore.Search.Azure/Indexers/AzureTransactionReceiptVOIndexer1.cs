@@ -11,12 +11,11 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
 
         public AzureTransactionReceiptVOIndexer(
-            Index index,
             ISearchIndexClient indexClient,
             Func<TransactionReceiptVO, TSearchDocument> mapper,
             int documentsPerIndexBatch = 1
             )
-            : base(index, indexClient, (tx) => mapper(tx), documentsPerIndexBatch)
+            : base(indexClient, (tx) => mapper(tx), documentsPerIndexBatch)
         {
 
         }
