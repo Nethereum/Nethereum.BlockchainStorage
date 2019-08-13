@@ -42,11 +42,13 @@ Solidity Contract Excerpt
             public const string AWSElasticSearchUrl = "AWSElasticSearchUrl";
             public const string AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID";
             public const string AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY";
+            public const string Disable_Elastic_Search_Samples = "Disable_Elastic_Search_Samples";
         }
 
         private readonly string _awsSecretAccessKey;
         private readonly string _awsAccessKeyId;
         private readonly string _awsElasticSearchUrl;
+        private readonly bool _disableElasticSearch;
 
         public IndexingEvents()
         {
@@ -69,11 +71,20 @@ Solidity Contract Excerpt
             _awsAccessKeyId = appConfig[ConfigurationKeyNames.AWS_ACCESS_KEY_ID];
             _awsSecretAccessKey = appConfig[ConfigurationKeyNames.AWS_SECRET_ACCESS_KEY];
             _awsElasticSearchUrl = appConfig[ConfigurationKeyNames.AWSElasticSearchUrl];
+
+            // disable from CI
+            var disableElasticSearchValue = appConfig[ConfigurationKeyNames.Disable_Elastic_Search_Samples];
+            if(bool.TryParse(disableElasticSearchValue, out bool disable))
+            {
+                _disableElasticSearch = disable;
+            }
         }
 
         [Fact]
         public async Task OneEvent()
         {
+            if(_disableElasticSearch) return;
+
             const string INDEX_NAME = "transfer-logs";
 
             var elasticClient = CreateLocalElasticClient();
@@ -112,6 +123,8 @@ Solidity Contract Excerpt
         [Fact]
         public async Task OneEventWithMapping()
         {
+            if (_disableElasticSearch) return;
+
             const string INDEX_NAME = "mapped-transfer-logs";
 
             var elasticClient = CreateLocalElasticClient();
