@@ -1,9 +1,31 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 {
+    public class AzureStorageQueue<TSource, TQueueMessage> : AzureStorageQueue where TSource : class where TQueueMessage : class
+    {
+        public AzureStorageQueue(CloudQueue cloudQueue, Func<TSource, TQueueMessage> mapper) : base(cloudQueue)
+        {
+            Mapper = mapper;
+        }
+
+        public Func<TSource, TQueueMessage> Mapper { get; }
+
+        public override Task AddMessageAsync(object content)
+        {
+            if(content is TSource src)
+            {
+                var msg = Mapper(src);
+                return base.AddMessageAsync(msg);
+            }
+
+            return base.AddMessageAsync(content);
+        }
+    }
+
     public class AzureStorageQueue : IQueue
     {
         public AzureStorageQueue(CloudQueue cloudQueue)
@@ -16,16 +38,16 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
         public CloudQueue CloudQueue { get; }
         public async Task<int> GetApproxMessageCountAsync()
         {
-            await CloudQueue.FetchAttributesAsync();
+            await CloudQueue.FetchAttributesAsync().ConfigureAwait(false);
             var count = CloudQueue.ApproximateMessageCount;
             return count ?? 0;
         } 
 
-        public async Task AddMessageAsync(object content)
+        public virtual async Task AddMessageAsync(object content)
         {
             var contentAsJson = JsonConvert.SerializeObject(content);
             var message = new CloudQueueMessage(contentAsJson);
-            await CloudQueue.AddMessageAsync(message);
+            await CloudQueue.AddMessageAsync(message).ConfigureAwait(false);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
+using System;
 using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
@@ -15,17 +16,26 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
         public CloudStorageAccount CloudStorageAccount { get; }
         public CloudQueueClient CloudQueueClient { get; }
 
-        public Task<IQueue> GetOrCreateQueueAsync(string queueName) => GetOrCreateQueueAsync(queueName: queueName, retryNumber: 0);
+        public async Task<IQueue> GetOrCreateQueueAsync(string queueName) 
+        {
+            var queueReference = await GetOrCreateQueueReference(queueName: queueName, retryNumber: 0).ConfigureAwait(false);
+            return new AzureStorageQueue(queueReference);
+        }
 
-        private async Task<IQueue> GetOrCreateQueueAsync(string queueName, int retryNumber)
+        public async Task<IQueue> GetOrCreateQueueAsync<TSource, TQueueMessage>(string queueName, Func<TSource, TQueueMessage> mapper)
+            where TSource : class where TQueueMessage : class
+        {
+            var queueReference = await GetOrCreateQueueReference(queueName: queueName, retryNumber: 0).ConfigureAwait(false);
+            return new AzureStorageQueue<TSource, TQueueMessage>(queueReference, mapper);
+        }
+
+        private async Task<CloudQueue> GetOrCreateQueueReference(string queueName, int retryNumber)
         {
             try 
             { 
                 var queueReference = CloudQueueClient.GetQueueReference(queueName);
-
                 await queueReference.CreateIfNotExistsAsync().ConfigureAwait(false);
-
-                return new AzureStorageQueue(queueReference);
+                return queueReference;
             }
             catch (StorageException ex) when (ex.Message.StartsWith("The specified queue is being deleted"))
             {
@@ -33,7 +43,7 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 
                 retryNumber++;
                 await Task.Delay(2000 * retryNumber);
-                return await GetOrCreateQueueAsync(queueName: queueName, retryNumber: retryNumber).ConfigureAwait(false);
+                return await GetOrCreateQueueReference(queueName: queueName, retryNumber: retryNumber).ConfigureAwait(false);
             }
         }
 

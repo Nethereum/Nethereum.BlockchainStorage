@@ -73,9 +73,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             try 
             { 
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
-                var eventLogProcessor = new EventLogQueueProcessor(queue);
 
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor(filterLog => queue.AddMessageAsync(filterLog));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -102,9 +101,9 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             try
             {
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
-                var eventLogProcessor = new EventLogQueueProcessor<TransferEventDTO>(queue);
 
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor<TransferEventDTO>(
+                    transferLog => queue.AddMessageAsync(transferLog));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -135,8 +134,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
                 var erc20Queue = await azureQueueFactory.GetOrCreateQueueAsync(ERC20_QUEUE_NAME);
                 var erc721Queue = await azureQueueFactory.GetOrCreateQueueAsync(ERC721_QUEUE_NAME);
 
-                var erc20TransferProcessor = new EventLogQueueProcessor<TransferEventDTO>(erc20Queue);
-                var erc721TransferProcessor = new EventLogQueueProcessor<Erc721TransferEvent>(erc721Queue);
+                var erc20TransferProcessor = new EventLogProcessorHandler<TransferEventDTO>(transfer => erc20Queue.AddMessageAsync(transfer));
+                var erc721TransferProcessor = new EventLogProcessorHandler<Erc721TransferEvent>(transfer => erc721Queue.AddMessageAsync(transfer));
                 var logProcessors = new ProcessorHandler<FilterLog>[] {erc20TransferProcessor, erc721TransferProcessor};
 
                 var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessors);
@@ -168,11 +167,11 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             try
             {
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
-                var eventLogProcessor = new EventLogQueueProcessor(queue);
 
                 var contractFilter = new NewFilterInput { Address = new[] { "0x109424946d5aa4425b2dc1934031d634cdad3f90" } };
 
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor, filter: contractFilter);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor(
+                    action: filterLog => queue.AddMessageAsync(filterLog), filter: contractFilter);
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -199,11 +198,10 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             try
             {
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
-                var eventLogProcessor = new EventLogQueueProcessor<TransferEventDTO>(queue);
 
-                var contractFilter = new NewFilterInput { Address = new[] { "0x109424946d5aa4425b2dc1934031d634cdad3f90" } };
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor, filter: contractFilter);
+                var logProcessor = _web3.Processing.Logs.CreateProcessorForContract<TransferEventDTO>(
+                    "0x109424946d5aa4425b2dc1934031d634cdad3f90",
+                    transfer => queue.AddMessageAsync(transfer));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -234,8 +232,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
                 var erc20Queue = await azureQueueFactory.GetOrCreateQueueAsync(ERC20_QUEUE_NAME);
                 var approvalQueue = await azureQueueFactory.GetOrCreateQueueAsync(APPROVAL_QUEUE);
 
-                var erc20TransferProcessor = new EventLogQueueProcessor<TransferEventDTO>(erc20Queue);
-                var approvalProcessor = new EventLogQueueProcessor<ApprovalEventDTO>(approvalQueue);
+                var erc20TransferProcessor = new EventLogProcessorHandler<TransferEventDTO>(transfer => erc20Queue.AddMessageAsync(transfer));
+                var approvalProcessor = new EventLogProcessorHandler<ApprovalEventDTO>(approval => approvalQueue.AddMessageAsync(approval));
                 var logProcessors = new ProcessorHandler<FilterLog>[] { erc20TransferProcessor, approvalProcessor };
 
                 var contractFilter = new NewFilterInput
@@ -272,13 +270,12 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             try
             {
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
-                var eventLogProcessor = new EventLogQueueProcessor(queue);
 
                 var contractAddresses = new[] { "0x109424946d5aa4425b2dc1934031d634cdad3f90", "0x16c45b25c4817bdedfce770f795790795c9505a6" };
 
-                var contractFilter = new NewFilterInput { Address = contractAddresses };
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor, filter: contractFilter);
+                var logProcessor = _web3.Processing.Logs.CreateProcessorForContracts(
+                    contractAddresses, 
+                    filterLog => queue.AddMessageAsync(filterLog));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -288,6 +285,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
                     toBlockNumber: 3146690,
                     cancellationToken: cancellationTokenSource.Token,
                     startAtBlockNumberIfNotProcessed: 3146684);
+
+                await Task.Delay(2000);
 
                 Assert.Equal(8, await queue.GetApproxMessageCountAsync());
             }
@@ -305,13 +304,11 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             try
             {
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
-                var eventLogProcessor = new EventLogQueueProcessor<TransferEventDTO>(queue);
-
                 var contractAddresses = new[] { "0x109424946d5aa4425b2dc1934031d634cdad3f90", "0x16c45b25c4817bdedfce770f795790795c9505a6" };
 
-                var contractFilter = new NewFilterInput { Address = contractAddresses };
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor, filter: contractFilter);
+                var logProcessor = _web3.Processing.Logs.CreateProcessorForContracts<TransferEventDTO>(
+                    contractAddresses,
+                    transferEvent => queue.AddMessageAsync(transferEvent));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -342,8 +339,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
                 var erc20Queue = await azureQueueFactory.GetOrCreateQueueAsync(ERC20_QUEUE_NAME);
                 var approvalQueue = await azureQueueFactory.GetOrCreateQueueAsync(APPROVAL_QUEUE_NAME);
 
-                var erc20TransferProcessor = new EventLogQueueProcessor<TransferEventDTO>(erc20Queue);
-                var approvalProcessor = new EventLogQueueProcessor<ApprovalEventDTO>(approvalQueue);
+                var erc20TransferProcessor = new EventLogProcessorHandler<TransferEventDTO>(transfer => erc20Queue.AddMessageAsync(transfer));
+                var approvalProcessor = new EventLogProcessorHandler<ApprovalEventDTO>(approval => approvalQueue.AddMessageAsync(approval));
                 var logProcessors = new ProcessorHandler<FilterLog>[] { erc20TransferProcessor, approvalProcessor };
 
                 var contractAddresses = new[] { "0x9EDCb9A9c4d34b5d6A082c86cb4f117A1394F831", "0xafbfefa496ae205cf4e002dee11517e6d6da3ef6" };
@@ -402,12 +399,11 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             var azureQueueFactory = new AzureStorageQueueFactory(_azureConnectionString);
             try
             {
-                var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
+                var queue = await azureQueueFactory.GetOrCreateQueueAsync<FilterLog, MessageToQueue>(
+                    QUEUE_NAME, log => new MessageToQueue(log));
 
-                var eventLogProcessor = new EventLogQueueProcessor(
-                    destinationQueue: queue, mapper: (log) => new MessageToQueue(log));
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor(
+                    filterLog => queue.AddMessageAsync(filterLog));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -433,12 +429,11 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             var azureQueueFactory = new AzureStorageQueueFactory(_azureConnectionString);
             try
             {
-                var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
+                var queue = await azureQueueFactory.GetOrCreateQueueAsync<EventLog<TransferEventDTO>, MessageToQueue>(
+                    QUEUE_NAME, transferEvent => new MessageToQueue(transferEvent));
 
-                var eventLogProcessor = new EventLogQueueProcessor<TransferEventDTO>(
-                    destinationQueue: queue, mapper: (log) => new MessageToQueue(log));
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor<TransferEventDTO>(
+                    transferEvent => queue.AddMessageAsync(transferEvent));
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -468,19 +463,9 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
 
                 var minValue = BigInteger.Parse("5000000000000000000");
 
-                var hits = 0;
-                var criteria = new Func<EventLog<TransferEventDTO>, bool>(transferLog => 
-                {
-                    var match = transferLog.Event.Value >= minValue;
-                    if(match) hits++;
-                    return match;
-                });
-
-                var eventLogProcessor = new EventLogQueueProcessor<TransferEventDTO>(
-                    destinationQueue: queue, 
-                    eventCriteria:  criteria);
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor<TransferEventDTO>(
+                    action: transferEvent => queue.AddMessageAsync(transferEvent), 
+                    criteria: transferEvent => transferEvent.Event.Value >= minValue);
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -510,11 +495,9 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
             {
                 var queue = await azureQueueFactory.GetOrCreateQueueAsync(QUEUE_NAME);
 
-                var eventLogProcessor = new EventLogQueueProcessor(
-                    destinationQueue: queue,
-                    criteria: (filterLog) => filterLog.Removed == false);
-
-                var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
+                var logProcessor = _web3.Processing.Logs.CreateProcessor(
+                    action: filterLog => queue.AddMessageAsync(filterLog),
+                    criteria: filterLog => filterLog.Removed == false);
 
                 //if we need to stop the processor mid execution - call cancel on the token
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -524,6 +507,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
                     toBlockNumber: 3146690,
                     cancellationToken: cancellationTokenSource.Token,
                     startAtBlockNumberIfNotProcessed: 3146684);
+
+                await Task.Delay(2000);
 
                 Assert.Equal(65, await queue.GetApproxMessageCountAsync());
             }
