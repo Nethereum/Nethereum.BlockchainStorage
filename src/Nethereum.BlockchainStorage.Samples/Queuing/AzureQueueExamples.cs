@@ -468,9 +468,17 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
 
                 var minValue = BigInteger.Parse("5000000000000000000");
 
+                var hits = 0;
+                var criteria = new Func<EventLog<TransferEventDTO>, bool>(transferLog => 
+                {
+                    var match = transferLog.Event.Value >= minValue;
+                    if(match) hits++;
+                    return match;
+                });
+
                 var eventLogProcessor = new EventLogQueueProcessor<TransferEventDTO>(
                     destinationQueue: queue, 
-                    eventCriteria:  (transferLog) => transferLog.Event.Value >= minValue);
+                    eventCriteria:  criteria);
 
                 var logProcessor = _web3.Processing.Logs.CreateProcessor(logProcessor: eventLogProcessor);
 
@@ -482,6 +490,8 @@ namespace Nethereum.BlockchainStorage.Samples.Queuing
                     toBlockNumber: 3146690,
                     cancellationToken: cancellationTokenSource.Token,
                     startAtBlockNumberIfNotProcessed: 3146684);
+
+                await Task.Delay(2000); //give time for queue to update
 
                 Assert.Equal(6, await queue.GetApproxMessageCountAsync());
             }

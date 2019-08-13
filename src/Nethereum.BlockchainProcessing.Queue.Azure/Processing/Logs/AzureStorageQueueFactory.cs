@@ -15,13 +15,26 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
         public CloudStorageAccount CloudStorageAccount { get; }
         public CloudQueueClient CloudQueueClient { get; }
 
-        public async Task<IQueue> GetOrCreateQueueAsync(string queueName)
+        public Task<IQueue> GetOrCreateQueueAsync(string queueName) => GetOrCreateQueueAsync(queueName: queueName, retryNumber: 0);
+
+        private async Task<IQueue> GetOrCreateQueueAsync(string queueName, int retryNumber)
         {
-            var queueReference = CloudQueueClient.GetQueueReference(queueName);
+            try 
+            { 
+                var queueReference = CloudQueueClient.GetQueueReference(queueName);
 
-            await queueReference.CreateIfNotExistsAsync().ConfigureAwait(false);
+                await queueReference.CreateIfNotExistsAsync().ConfigureAwait(false);
 
-            return new AzureStorageQueue(queueReference);
+                return new AzureStorageQueue(queueReference);
+            }
+            catch (StorageException ex) when (ex.Message.StartsWith("The specified queue is being deleted"))
+            {
+                if(retryNumber > 5) throw;
+
+                retryNumber++;
+                await Task.Delay(2000 * retryNumber);
+                return await GetOrCreateQueueAsync(queueName: queueName, retryNumber: retryNumber).ConfigureAwait(false);
+            }
         }
 
         public async Task ClearQueueAsync(string queueName)
