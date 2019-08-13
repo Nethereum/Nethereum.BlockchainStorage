@@ -47,7 +47,7 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
                     ]
                 }}").ToObject<FilterLog>();
 
-            var filterLogVO = new FilterLogVO(transaction: null, receipt: null, log);
+            var filterLogVO = new FilterLogVO(transaction: null, receipt: null, log: log);
 
             await _repo.UpsertAsync(filterLogVO);
 
