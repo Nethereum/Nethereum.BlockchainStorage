@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nethereum.BlockchainStore.Search.Azure\Nethereum.BlockchainStore.Search.Azure.csproj" />
+    <ProjectReference Include="..\Nethereum.BlockchainStore.Search.Elastic\Nethereum.BlockchainStore.Search.Elastic.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Search\Nethereum.BlockchainStore.Search.csproj" />
     <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>

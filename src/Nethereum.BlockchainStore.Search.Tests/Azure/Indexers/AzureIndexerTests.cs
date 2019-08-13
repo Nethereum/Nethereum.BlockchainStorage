@@ -1,26 +1,15 @@
 ﻿using Microsoft.Azure.Search.Models;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Hex.HexTypes;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using TransferEvent = Nethereum.BlockchainStore.Search.Tests.TestData.Contracts.StandardContract.TransferEvent;
+using SearchDocument = Nethereum.BlockchainStore.Search.Tests.TestData.IndexerTestData.SearchDocument;
 
 namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
     public class AzureIndexerTests
     {
-        public class Source
-        {
-        }
-
-        public class SearchDocument : IHasId
-        {
-            public string GetId()
-            {
-                return GetHashCode().ToString();
-            }
-        }
+        public class Source{}
 
         [Fact]
         public async Task MapsSourceToSearchDocument()

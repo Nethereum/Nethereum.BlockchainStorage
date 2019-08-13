@@ -1,14 +1,8 @@
-﻿using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
-using Microsoft.Rest.Azure;
-using Moq;
+﻿using Microsoft.Azure.Search.Models;
 using Nethereum.BlockchainStore.Search.Azure;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 

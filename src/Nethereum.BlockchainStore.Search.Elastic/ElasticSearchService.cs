@@ -1,4 +1,5 @@
 ﻿using Nest;
+using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainStore.Search.Elastic;
 using Nethereum.BlockchainStore.Search.Services;
 using Nethereum.Contracts;
@@ -84,29 +85,34 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             var existsResponse = await _elasticClient.IndexExistsAsync(new IndexExistsRequest(indexName.ToElasticName())).ConfigureAwait(false);
             return existsResponse.Exists;
         }
-    
-        IIndexer<TSource> ISearchService.CreateIndexer<TSource, TSearchDocument>(string indexName, Func<TSource, TSearchDocument> mapper, int documentsPerBatch)
+
+        public IIndexer<TSource> CreateIndexer<TSource, TSearchDocument>(
+            string indexName, Func<TSource, TSearchDocument> mapper, int documentsPerBatch)
+                where TSource : class where TSearchDocument : class, IHasId
         {
             var indexer = new ElasticIndexer<TSource, TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
             _indexers.Add(indexer);
             return indexer;
         }
 
-        IIndexer<FilterLog> ISearchService.CreateIndexerForLog(string indexName, int documentsPerBatch)
+        public IIndexer<FilterLog> CreateIndexerForLog(string indexName, int documentsPerBatch)
         {
             var indexer = new ElasticFilterLogIndexer(indexName, _elasticClient, documentsPerBatch);
             _indexers.Add(indexer);
             return indexer;
         }
 
-        IIndexer<FilterLog> ISearchService.CreateIndexerForLog<TSearchDocument>(string indexName, Func<FilterLog, TSearchDocument> mapper, int documentsPerBatch)
+        public IIndexer<FilterLog> CreateIndexerForLog<TSearchDocument>(
+            string indexName, Func<FilterLog, TSearchDocument> mapper, int documentsPerBatch)
+                where TSearchDocument : class, IHasId
         {
             var indexer = new ElasticFilterLogIndexer<TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
             _indexers.Add(indexer);
             return indexer;
         }
 
-        IIndexer<EventLog<TEventDTO>> ISearchService.CreateIndexerForEventLog<TEventDTO>(string indexName, int documentsPerBatch)
+        public IIndexer<EventLog<TEventDTO>> CreateIndexerForEventLog<TEventDTO>(string indexName, int documentsPerBatch)
+            where TEventDTO : class, IEventDTO, new()
         {
             var indexDefinition = new EventIndexDefinition<TEventDTO>(indexName);
             var indexer = new ElasticEventIndexer<TEventDTO>(indexName, _elasticClient, indexDefinition, documentsPerBatch);
@@ -114,28 +120,35 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             return indexer;
         }
 
-        IIndexer<EventLog<TEventDTO>> ISearchService.CreateIndexerForEventLog<TEventDTO, TSearchDocument>(string indexName, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int documentsPerBatch)
+        public IIndexer<EventLog<TEventDTO>> CreateIndexerForEventLog<TEventDTO, TSearchDocument>(
+            string indexName, Func<EventLog<TEventDTO>, TSearchDocument> mapper, int documentsPerBatch)
+                where TEventDTO : class, IEventDTO, new() where TSearchDocument:  class, IHasId
         {
             var indexer = new ElasticEventIndexer<TEventDTO, TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
             _indexers.Add(indexer);
             return indexer;
         }
 
-        IIndexer<TransactionReceiptVO> ISearchService.CreateIndexerForTransactionReceiptVO(string indexName, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch)
+        public IIndexer<TransactionReceiptVO> CreateIndexerForTransactionReceiptVO(
+            string indexName, TransactionReceiptVOIndexDefinition indexDefinition, int documentsPerBatch)
         {
             var indexer = new ElasticTransactionReceiptVOIndexer(indexName, _elasticClient, indexDefinition, documentsPerBatch);
             _indexers.Add(indexer);
             return indexer;
         }
 
-        IIndexer<TransactionReceiptVO> ISearchService.CreateIndexerForTransactionReceiptVO<TSearchDocument>(string indexName, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch)
+        public IIndexer<TransactionReceiptVO> CreateIndexerForTransactionReceiptVO<TSearchDocument>(
+            string indexName, Func<TransactionReceiptVO, TSearchDocument> mapper, int documentsPerBatch)
+                where TSearchDocument: class, IHasId
         {
             var indexer = new ElasticTransactionReceiptVOIndexer<TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
             _indexers.Add(indexer);
             return indexer;
         }
 
-        IIndexer<TransactionForFunctionVO<TFunctionMessage>> ISearchService.CreateIndexerForFunctionMessage<TFunctionMessage>(string indexName, int documentsPerBatch) 
+        public IIndexer<TransactionForFunctionVO<TFunctionMessage>> CreateIndexerForFunctionMessage<TFunctionMessage>(
+            string indexName, int documentsPerBatch)
+             where TFunctionMessage : FunctionMessage, new()
         {
             var indexDefinition = new FunctionIndexDefinition<TFunctionMessage>(indexName);
             var indexer = new ElasticFunctionIndexer<TFunctionMessage>(indexName, _elasticClient, indexDefinition, documentsPerBatch);
@@ -143,7 +156,9 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             return indexer;
         }
 
-        IIndexer<TransactionForFunctionVO<TFunctionMessage>> ISearchService.CreateIndexerForFunctionMessage<TFunctionMessage, TSearchDocument>(string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, int documentsPerBatch)
+        public IIndexer<TransactionForFunctionVO<TFunctionMessage>> CreateIndexerForFunctionMessage<TFunctionMessage, TSearchDocument>(
+            string indexName, Func<TransactionForFunctionVO<TFunctionMessage>, TSearchDocument> mapper, int documentsPerBatch)
+                where TFunctionMessage : FunctionMessage, new() where TSearchDocument : class, IHasId
         {
             var indexer = new ElasticFunctionIndexer<TFunctionMessage, TSearchDocument>(indexName, _elasticClient, mapper, documentsPerBatch);
             _indexers.Add(indexer);

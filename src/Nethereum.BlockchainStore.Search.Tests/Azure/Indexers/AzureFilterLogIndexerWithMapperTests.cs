@@ -4,29 +4,12 @@ using Nethereum.Hex.HexTypes;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using SearchDocument = Nethereum.BlockchainStore.Search.Tests.TestData.IndexerTestData.SearchDocument;
 
 namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
     public class AzureFilterLogIndexerWithMapperTests
     {
-        public class SearchDocument: IHasId
-        {
-            string id;
-            public SearchDocument(string transactionHash, HexBigInteger logIndex)
-            {
-                TransactionHash = transactionHash;
-                LogIndex = logIndex.Value.ToString();
-                id = $"{transactionHash}{logIndex.HexValue}";
-            }
-
-            public string TransactionHash { get; }
-            public string LogIndex { get; }
-
-            public string GetId()
-            {
-                return id;
-            }
-        }
 
         [Fact]
         public async Task MapsFilterLogToSearchDocument()

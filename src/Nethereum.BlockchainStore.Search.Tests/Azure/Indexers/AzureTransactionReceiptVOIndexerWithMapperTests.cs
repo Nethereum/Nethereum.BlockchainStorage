@@ -1,31 +1,16 @@
 ﻿using Microsoft.Azure.Search.Models;
 using Nethereum.BlockchainStore.Search.Azure;
-using Nethereum.Hex.HexTypes;
+using Nethereum.BlockchainStore.Search.Tests.TestData;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using Xunit;
+using SearchDocument = Nethereum.BlockchainStore.Search.Tests.TestData.IndexerTestData.SearchDocument;
 
 namespace Nethereum.BlockchainStore.Search.Tests.Azure
 {
     public class AzureTransactionReceiptVOIndexerWithMapperTests
     {
-        public class SearchDocument: IHasId
-        {
-            public SearchDocument(TransactionReceiptVO transactionReceiptVO)
-            {
-                TransactionReceiptVO = transactionReceiptVO;
-            }
-
-            public TransactionReceiptVO TransactionReceiptVO { get; }
-
-            public string GetId()
-            {
-                return TransactionReceiptVO.TransactionHash;
-            }
-        }
-
         [Fact]
         public async Task MapsTransactionToSearchDocument()
         {
@@ -35,7 +20,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var indexer = new AzureTransactionReceiptVOIndexer<SearchDocument>(
                 mockSearchIndexClient.SearchIndexClient, (tx) => new SearchDocument(tx));
 
-            TransactionReceiptVO transaction = CreateSampleTransaction();
+            TransactionReceiptVO transaction = IndexerTestData.CreateSampleTransaction();
 
             await indexer.IndexAsync(transaction);
 
@@ -45,20 +30,6 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             //check mapping
             Assert.Same(transaction, document.TransactionReceiptVO);
 
-        }
-
-        private static TransactionReceiptVO CreateSampleTransaction()
-        {
-            Block block = new Block { Number = new HexBigInteger(new BigInteger(10)) };
-            var tx = new Transaction
-            {
-                BlockNumber = block.Number,
-                TransactionHash = "0x19ce02e0b4fdf5cfee0ed21141b38c2d88113c58828c771e813ce2624af127cd",
-                TransactionIndex = new HexBigInteger(new BigInteger(0))
-            };
-
-            var receipt = new TransactionReceipt { };
-            return new TransactionReceiptVO(block, tx, receipt, false);
         }
     }
 }

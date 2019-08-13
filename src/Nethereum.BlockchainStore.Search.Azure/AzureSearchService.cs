@@ -104,7 +104,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public IIndexer<TSource> CreateIndexer<TSource, TSearchDocument>(
             string indexName, Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
-                where TSource : class, new()
+                where TSource : class
                 where TSearchDocument : class, IHasId
         {
             var indexClient = GetOrCreateIndexClient(indexName);
