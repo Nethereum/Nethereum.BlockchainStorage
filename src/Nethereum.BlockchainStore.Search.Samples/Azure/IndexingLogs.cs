@@ -246,9 +246,9 @@ Solidity Contract Excerpt
                     var blockchainProcessor = web3.Processing.Logs.CreateProcessor<TransferEvent_ERC20>(async (log) => {
 
                         await transferIndexer.IndexAsync(log);
-                        var vo = await web3.Eth.GetTransactionReceiptVO(log.Log.BlockNumber, log.Log.TransactionHash).ConfigureAwait(false);
+                        var transactionWithReceipt = await web3.Eth.GetTransactionReceiptVO(log.Log.BlockNumber, log.Log.TransactionHash).ConfigureAwait(false);
 
-                        await transferFunctionProcessorHandler.ExecuteAsync(vo);
+                        await transferFunctionProcessorHandler.ExecuteAsync(transactionWithReceipt);
                     });
 
                     var cancellationTokenSource = new CancellationTokenSource();
