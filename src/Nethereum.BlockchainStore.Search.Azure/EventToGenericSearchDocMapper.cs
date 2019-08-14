@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             public const int StateValueCount = 10;
         }
 
-        public static GenericSearchDocument Map(EventLog<List<ParameterOutput>> from)
+        public static GenericSearchDocument Map(EventLog<List<ParameterOutput>> from, Dictionary<string, object> stateValues)
         {
             var searchDoc = new GenericSearchDocument();
 
@@ -35,17 +35,15 @@ namespace Nethereum.BlockchainStore.Search.Azure
             searchDoc[Fields.LogAddress] = from.Log.Address;
             searchDoc[Fields.LogIndex] = from.Log.LogIndex.Value.ToAzureFieldValue();
 
-            // TODO: mobe this logic to dynamic log processing
-
-            //if (from is DecodedEvent decodedEvent)
-            //{
-            //    int count = 0;
-            //    foreach (var key in decodedEvent.State.Keys)
-            //    {
-            //        count++;
-            //        searchDoc[Fields.StateValue(count)] = $"{key}:{decodedEvent.State[key]?.ToAzureFieldValue()}";
-            //    }
-            //}
+            if (stateValues != null)
+            {
+                int count = 0;
+                foreach (var key in stateValues.Keys)
+                {
+                    count++;
+                    searchDoc[Fields.StateValue(count)] = $"{key}:{stateValues[key]?.ToAzureFieldValue()}";
+                }
+            }
 
             foreach (var parameterOutput in from.Event.OrderBy(p => p.Parameter.Order))
             {
