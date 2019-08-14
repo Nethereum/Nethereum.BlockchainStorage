@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
                 return base.AddMessageAsync(msg);
             }
 
-            return base.AddMessageAsync(content);
+            return Task.CompletedTask;
         }
     }
 

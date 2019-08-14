@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.WindowsAzure.Storage.Table;
-using Nethereum.BlockchainProcessing.Processing.Logs.Configuration;
+﻿using Microsoft.WindowsAzure.Storage.Table;
 using Nethereum.BlockchainStore.AzureTables.Repositories.EventProcessingConfiguration;
 
 namespace Nethereum.BlockchainStore.AzureTables.Bootstrap.EventProcessingConfiguration
