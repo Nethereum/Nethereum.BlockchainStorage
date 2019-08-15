@@ -6,7 +6,6 @@ namespace Nethereum.BlockchainProcessing.Queue
     {
         string Name { get; }
 
-        //public CloudQueue CloudQueue { get; }
         Task<int> GetApproxMessageCountAsync();
 
         Task AddMessageAsync(object content);

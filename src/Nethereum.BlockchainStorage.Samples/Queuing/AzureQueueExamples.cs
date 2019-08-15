@@ -1,14 +1,13 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processor;
-using Nethereum.BlockchainProcessing.Queue;
-using Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs;
+using Nethereum.BlockchainProcessing.Queue.Azure;
 using Nethereum.Contracts;
+using Nethereum.Microsoft.Configuration.Utils;
 using Nethereum.RPC.Eth.DTOs;
 using System;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using Nethereum.Microsoft.Configuration.Utils;
 using Xunit;
 
 namespace Nethereum.BlockchainStorage.Samples.Queuing

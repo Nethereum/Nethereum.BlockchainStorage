@@ -3,9 +3,9 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using System;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
+namespace Nethereum.BlockchainProcessing.Queue.Azure
 {
-    public class AzureStorageQueueFactory // : ISubscriberQueueFactory
+    public class AzureStorageQueueFactory : IQueueFactory
     {
         public AzureStorageQueueFactory(string connectionString)
         {
@@ -16,7 +16,7 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
         public CloudStorageAccount CloudStorageAccount { get; }
         public CloudQueueClient CloudQueueClient { get; }
 
-        public async Task<IQueue> GetOrCreateQueueAsync(string queueName) 
+        public async Task<IQueue> GetOrCreateQueueAsync(string queueName)
         {
             var queueReference = await GetOrCreateQueueReference(queueName: queueName, retryNumber: 0).ConfigureAwait(false);
             return new AzureStorageQueue(queueReference);
@@ -31,15 +31,15 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
 
         private async Task<CloudQueue> GetOrCreateQueueReference(string queueName, int retryNumber)
         {
-            try 
-            { 
+            try
+            {
                 var queueReference = CloudQueueClient.GetQueueReference(queueName);
                 await queueReference.CreateIfNotExistsAsync().ConfigureAwait(false);
                 return queueReference;
             }
             catch (StorageException ex) when (ex.Message.StartsWith("The specified queue is being deleted"))
             {
-                if(retryNumber > 5) throw;
+                if (retryNumber > 5) throw;
 
                 retryNumber++;
                 await Task.Delay(2000 * retryNumber);
@@ -50,7 +50,7 @@ namespace Nethereum.BlockchainProcessing.Queue.Azure.Processing.Logs
         public async Task ClearQueueAsync(string queueName)
         {
             var queueReference = CloudQueueClient.GetQueueReference(queueName);
-            if(await queueReference.ExistsAsync())
+            if (await queueReference.ExistsAsync())
             {
                 await queueReference.ClearAsync().ConfigureAwait(false);
             }
