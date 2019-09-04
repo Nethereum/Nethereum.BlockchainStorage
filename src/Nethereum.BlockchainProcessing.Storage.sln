@@ -65,8 +65,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{088BF2F5-9C21-4590-8E3B-4B14315C7ACA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Queue.Azure", "Nethereum.BlockchainProcessing.Queue.Azure\Nethereum.BlockchainProcessing.Queue.Azure.csproj", "{66C77F22-909F-4054-8A66-3F4A808C62AE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queuing", "Queuing", "{410FB815-D45A-4FC1-B0B1-513567711B3A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Search", "Search", "{0ABA3B0B-00FC-438A-90BD-4C5B02350ED9}"
@@ -107,15 +105,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{35865406-3C34-46A4-B68A-1DF29447798E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainProcessing.Queue", "Nethereum.BlockchainProcessing.Queue\Nethereum.BlockchainProcessing.Queue.csproj", "{31DEE973-EC01-43C2-B65B-6357D783EE1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Queue", "Nethereum.BlockchainStore.Queue\Nethereum.BlockchainStore.Queue.csproj", "{31DEE973-EC01-43C2-B65B-6357D783EE1F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A150E121-5770-4C83-82B0-309DAAFAC490}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStorage.Samples", "Nethereum.BlockchainStorage.Samples\Nethereum.BlockchainStorage.Samples.csproj", "{59F572BE-463B-495B-98A8-59B3B526E860}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Samples", "Nethereum.BlockchainStore.Samples\Nethereum.BlockchainStore.Samples.csproj", "{59F572BE-463B-495B-98A8-59B3B526E860}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Search.Azure", "Nethereum.BlockchainStore.Search.Azure\Nethereum.BlockchainStore.Search.Azure.csproj", "{E76EE0FE-3206-4960-9749-5D83BDFCD4AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Search.Elastic", "Nethereum.BlockchainStore.Search.Elastic\Nethereum.BlockchainStore.Search.Elastic.csproj", "{2868D116-DD31-4332-B1DF-C9CCC3583DFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nethereum.BlockchainStore.Queue.Azure", "Nethereum.BlockchainStore.Queue.Azure\Nethereum.BlockchainStore.Queue.Azure.csproj", "{25DD3631-513A-4C26-8E1B-B038B3D530E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -475,18 +475,6 @@ Global
 		{274DAC05-402F-4970-BCD7-AE0CE4582E2F}.Release|x64.Build.0 = Release|Any CPU
 		{274DAC05-402F-4970-BCD7-AE0CE4582E2F}.Release|x86.ActiveCfg = Release|Any CPU
 		{274DAC05-402F-4970-BCD7-AE0CE4582E2F}.Release|x86.Build.0 = Release|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Debug|x64.Build.0 = Debug|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Debug|x86.Build.0 = Debug|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Release|x64.ActiveCfg = Release|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Release|x64.Build.0 = Release|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Release|x86.ActiveCfg = Release|Any CPU
-		{66C77F22-909F-4054-8A66-3F4A808C62AE}.Release|x86.Build.0 = Release|Any CPU
 		{870CCEA7-CFAE-42EB-8129-68E3234F51ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{870CCEA7-CFAE-42EB-8129-68E3234F51ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{870CCEA7-CFAE-42EB-8129-68E3234F51ED}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -595,6 +583,18 @@ Global
 		{2868D116-DD31-4332-B1DF-C9CCC3583DFA}.Release|x64.Build.0 = Release|Any CPU
 		{2868D116-DD31-4332-B1DF-C9CCC3583DFA}.Release|x86.ActiveCfg = Release|Any CPU
 		{2868D116-DD31-4332-B1DF-C9CCC3583DFA}.Release|x86.Build.0 = Release|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Debug|x64.Build.0 = Debug|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Debug|x86.Build.0 = Debug|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Release|x64.ActiveCfg = Release|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Release|x64.Build.0 = Release|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Release|x86.ActiveCfg = Release|Any CPU
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -629,7 +629,6 @@ Global
 		{FE48ECEA-043F-425F-9362-ABBAD98E08FD} = {A150E121-5770-4C83-82B0-309DAAFAC490}
 		{33FACD84-D0B4-440D-8B2A-EBC3D76BA03D} = {0ABA3B0B-00FC-438A-90BD-4C5B02350ED9}
 		{274DAC05-402F-4970-BCD7-AE0CE4582E2F} = {35865406-3C34-46A4-B68A-1DF29447798E}
-		{66C77F22-909F-4054-8A66-3F4A808C62AE} = {410FB815-D45A-4FC1-B0B1-513567711B3A}
 		{BB677D41-C1DB-4306-846B-5281BF1DE0EF} = {088BF2F5-9C21-4590-8E3B-4B14315C7ACA}
 		{7B429DD0-0225-4424-BAFC-D1BB18006653} = {088BF2F5-9C21-4590-8E3B-4B14315C7ACA}
 		{08ACA4E6-FB37-4E74-A3A6-6E2A31890968} = {088BF2F5-9C21-4590-8E3B-4B14315C7ACA}
@@ -651,6 +650,7 @@ Global
 		{59F572BE-463B-495B-98A8-59B3B526E860} = {A150E121-5770-4C83-82B0-309DAAFAC490}
 		{E76EE0FE-3206-4960-9749-5D83BDFCD4AE} = {0ABA3B0B-00FC-438A-90BD-4C5B02350ED9}
 		{2868D116-DD31-4332-B1DF-C9CCC3583DFA} = {0ABA3B0B-00FC-438A-90BD-4C5B02350ED9}
+		{25DD3631-513A-4C26-8E1B-B038B3D530E9} = {410FB815-D45A-4FC1-B0B1-513567711B3A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E41D708-ED72-4BF2-AF4D-AD449D80E959}

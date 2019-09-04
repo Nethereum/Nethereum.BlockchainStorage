@@ -3,7 +3,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using System;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Queue.Azure
+namespace Nethereum.BlockchainStore.Queue.Azure
 {
     public class AzureStorageQueueFactory : IQueueFactory
     {

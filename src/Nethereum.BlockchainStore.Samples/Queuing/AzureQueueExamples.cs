@@ -1,6 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.BlockchainProcessing.Processor;
-using Nethereum.BlockchainProcessing.Queue.Azure;
+using Nethereum.BlockchainStore.Queue.Azure;
 using Nethereum.Contracts;
 using Nethereum.Microsoft.Configuration.Utils;
 using Nethereum.RPC.Eth.DTOs;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Nethereum.BlockchainStorage.Samples.Queuing
+namespace Nethereum.BlockchainStore.Samples.Queuing
 {
     public class AzureQueueExamples
     {

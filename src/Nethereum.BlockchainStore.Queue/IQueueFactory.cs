@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Queue
+namespace Nethereum.BlockchainStore.Queue
 {
     public interface IQueueFactory
     {

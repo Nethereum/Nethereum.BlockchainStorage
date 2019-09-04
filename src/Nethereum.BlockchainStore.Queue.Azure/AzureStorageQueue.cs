@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
-namespace Nethereum.BlockchainProcessing.Queue.Azure
+namespace Nethereum.BlockchainStore.Queue.Azure
 {
     public class AzureStorageQueue<TSource, TQueueMessage> : AzureStorageQueue where TSource : class where TQueueMessage : class
     {
