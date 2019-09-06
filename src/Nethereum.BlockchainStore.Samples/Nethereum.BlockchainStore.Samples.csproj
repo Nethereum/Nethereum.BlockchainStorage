@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nethereum.BlockchainStore.AzureTables\Nethereum.BlockchainStore.AzureTables.csproj" />
     <ProjectReference Include="..\Nethereum.BlockchainStore.Queue.Azure\Nethereum.BlockchainStore.Queue.Azure.csproj" />
     <ProjectReference Include="..\Nethereum.Configuration.Utils\Nethereum.Microsoft.Configuration.Utils.csproj" />
   </ItemGroup>
