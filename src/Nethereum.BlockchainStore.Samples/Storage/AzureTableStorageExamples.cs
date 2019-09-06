@@ -31,28 +31,27 @@ namespace Nethereum.BlockchainStore.Samples.Storage
         {
             var repoFactory = new AzureTablesRepositoryFactory(_azureConnectionString, "bspsamples");
 
-            //create our processor
-            var processor = _web3.Processing.Blocks.CreateBlockStorageProcessor(repoFactory);
+            try
+            { 
+                //create our processor
+                var processor = _web3.Processing.Blocks.CreateBlockStorageProcessor(repoFactory);
 
-            //if we need to stop the processor mid execution - call cancel on the token
-            var cancellationToken = new CancellationToken();
+                //if we need to stop the processor mid execution - call cancel on the token
+                var cancellationToken = new CancellationToken();
 
-            //crawl the required block range
-            await processor.ExecuteAsync(
-                toBlockNumber: new BigInteger(2830145),
-                cancellationToken: cancellationToken,
-                startAtBlockNumberIfNotProcessed: new BigInteger(2830144));
+                //crawl the required block range
+                await processor.ExecuteAsync(
+                    toBlockNumber: new BigInteger(2830144),
+                    cancellationToken: cancellationToken,
+                    startAtBlockNumberIfNotProcessed: new BigInteger(2830144));
 
-            var block = await repoFactory.CreateBlockRepository().FindByBlockNumberAsync(new HexBigInteger(2830144));
-
-
-            Assert.NotNull(block);
-            //Assert.Equal(25, context.Transactions.Count);
-            //Assert.Equal(5, context.Contracts.Count);
-            //Assert.Equal(55, context.AddressTransactions.Count);
-            //Assert.Equal(28, context.TransactionLogs.Count);
-
-            await repoFactory.DeleteAllTables();
+                var block = await repoFactory.CreateBlockRepository().FindByBlockNumberAsync(new HexBigInteger(2830144));
+                Assert.NotNull(block);
+            }
+            finally 
+            { 
+                await repoFactory.DeleteAllTables();
+            }
         }
     }
 }
