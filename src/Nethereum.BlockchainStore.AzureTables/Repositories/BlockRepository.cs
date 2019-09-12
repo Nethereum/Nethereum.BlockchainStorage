@@ -48,9 +48,20 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             blockOutput.Miner = blockSource.Miner ?? string.Empty;
             blockOutput.Nonce = blockSource.Nonce ?? string.Empty;
 
-            blockOutput.TransactionCount = blockSource.TransactionCount();
+            blockOutput.TransactionCount = GetTransactionCount(blockSource);
 
             return blockOutput;
+        }
+
+        public static int GetTransactionCount(RPC.Eth.DTOs.Block block)
+        {
+            if (block is BlockWithTransactions b)
+                return b.Transactions?.Length ?? 0;
+
+            if (block is BlockWithTransactionHashes bh)
+                return bh.TransactionHashes?.Length ?? 0;
+
+            return 0;
         }
 
 
@@ -62,4 +73,5 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         }
 
     }
+
 }
