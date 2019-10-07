@@ -34,7 +34,10 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         {
             var transactionEntity = Entities.Transaction.CreateTransaction(transactionReceiptVO.Transaction,
                 transactionReceiptVO.TransactionReceipt,
-                transactionReceiptVO.HasError, transactionReceiptVO.BlockTimestamp, transactionReceiptVO.HasVmStack, transactionReceiptVO.Error);
+                transactionReceiptVO.HasError, 
+                transactionReceiptVO.BlockTimestamp, 
+                transactionReceiptVO.HasVmStack, 
+                transactionReceiptVO.Error);
 
             await UpsertAsync(transactionEntity).ConfigureAwait(false);
         }

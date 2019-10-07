@@ -39,8 +39,17 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         {
             return
                 (Transaction)
-                CreateTransaction(new Transaction(transactionSource.BlockNumber.Value.ToString(), transactionSource.TransactionHash), transactionSource, transactionReceipt,
-                    failed, timeStamp, error, hasVmStack);
+                CreateTransaction(
+                    new Transaction(
+                        transactionSource.BlockNumber.Value.ToString(), 
+                        transactionSource.TransactionHash), 
+                    transactionSource, 
+                    transactionReceipt,
+                    failed, 
+                    timeStamp, 
+                    error, 
+                    hasVmStack, 
+                    transactionReceipt.ContractAddress);
         }
 
 
@@ -52,8 +61,17 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         {
             return
                 (Transaction)
-                CreateTransaction(new Transaction(transactionSource.BlockNumber.Value.ToString(), transactionSource.TransactionHash), transactionSource, transactionReceipt,
-                    failed, timeStamp, null, false, newContractAddress);
+                CreateTransaction(
+                    new Transaction(
+                        transactionSource.BlockNumber.Value.ToString(), 
+                        transactionSource.TransactionHash), 
+                    transactionSource, 
+                    transactionReceipt,
+                    failed, 
+                    timeStamp, 
+                    null, 
+                    false, 
+                    newContractAddress);
         }
     }
 }
