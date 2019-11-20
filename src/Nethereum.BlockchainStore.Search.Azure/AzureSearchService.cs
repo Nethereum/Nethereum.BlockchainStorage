@@ -61,19 +61,19 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return index;
         }
 
-        public Task<Index> CreateIndexAsync(IndexDefinition indexDefinition)
-            => CreateIndexAsync(indexDefinition.ToAzureIndex());
+        public Task<Index> CreateIndexAsync(IndexDefinition indexDefinition, bool convertFieldNamesToLowerCase = false)
+            => CreateIndexAsync(indexDefinition.ToAzureIndex(convertFieldNamesToLowerCase));
 
         public Task<Index> CreateIndexForLogAsync(string indexName)
             => CreateIndexAsync(FilterLogIndexUtil.Create(indexName));
 
         public Task<Index> CreateIndexForEventLogAsync<TEventDTO>(string indexName = null)
             where TEventDTO : class
-            => CreateIndexAsync(new EventIndexDefinition<TEventDTO>(indexName));
+            => CreateIndexAsync(new EventIndexDefinition<TEventDTO>(indexName), convertFieldNamesToLowerCase: true);
 
         public Task<Index> CreateIndexForFunctionMessageAsync<TFunctionMessage>(string indexName = null)
             where TFunctionMessage : FunctionMessage
-            => CreateIndexAsync(new FunctionIndexDefinition<TFunctionMessage>(indexName));
+            => CreateIndexAsync(new FunctionIndexDefinition<TFunctionMessage>(indexName), convertFieldNamesToLowerCase: true);
 
         public async Task<Index> GetIndexAsync(string indexName)
         {
