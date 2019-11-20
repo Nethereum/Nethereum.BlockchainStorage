@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
     {
         Task<Index> GetIndexAsync(string indexName);
         Task<Index> CreateIndexAsync(Index index);
-        Task<Index> CreateIndexAsync(IndexDefinition indexDefinition);
+        Task<Index> CreateIndexAsync(IndexDefinition indexDefinition, bool convertFieldNamesToLowerCase = false);
         Task<Index> CreateIndexForEventLogAsync<TEventDTO>(string indexName = null) where TEventDTO : class;
         Task<Index> CreateIndexForLogAsync(string indexName);
         Task<Index> CreateIndexForFunctionMessageAsync<TFunctionMessage>(string indexName = null)

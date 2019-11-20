@@ -54,7 +54,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
                 IsSuggester = true
             };
 
-            var azureField = eventSearchField.ToAzureField();
+            var azureField = eventSearchField.ToAzureField(convertNameToLowercase: true);
             Assert.Equal("fielda_val", azureField.Name);
             Assert.Equal(DataType.String, azureField.Type);
             Assert.True(azureField.IsFacetable);
@@ -62,6 +62,14 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             Assert.True(azureField.IsFilterable);
             Assert.True(azureField.IsSortable);
             Assert.True(azureField.IsSearchable);
+        }
+
+        [Fact]
+        public void ToAzureFieldName()
+        {
+            Assert.Equal("FieldA", "FieldA".ToAzureFieldName());
+            Assert.Equal("FieldA", "FieldA".ToAzureFieldName(convertNameToLowercase: false));
+            Assert.Equal("fielda", "FieldA".ToAzureFieldName(convertNameToLowercase: true));
         }
 
         [Fact]
@@ -86,7 +94,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
                 new SearchField("FieldB")
             };
 
-            var azureSearchFields = fields.ToAzureFields();
+            var azureSearchFields = fields.ToAzureFields(convertNameToLowercase: true);
             Assert.Equal(2, azureSearchFields.Length);
             Assert.Equal("fielda_prop1", azureSearchFields[0].Name);
             Assert.Equal("fieldb", azureSearchFields[1].Name);
@@ -128,6 +136,10 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
 
             Assert.Equal("indexa", azureIndex.Name);
             Assert.Equal(eventSearchDefinition.Fields.Length, azureIndex.Fields.Count);
+            Assert.Equal("FieldA", azureIndex.Fields[0].Name);
+
+            azureIndex = eventSearchDefinition.ToAzureIndex(convertFieldNamesToLowercase: true);
+            Assert.Equal("fielda", azureIndex.Fields[0].Name);
         }
 
         [Event("Transfer")]

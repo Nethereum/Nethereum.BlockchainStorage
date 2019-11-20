@@ -48,7 +48,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
             var dictionary = new GenericSearchDocument();
             foreach (var field in searchFields)
             {
-                var azureField = field.ToAzureField();
+                var azureField = field.ToAzureField(convertNameToLowercase: true);
 
                 var val = getValue.Invoke(field)?.ToAzureFieldValue();
                 if (val != null)
@@ -60,12 +60,12 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return dictionary;
         }
 
-        public static Index ToAzureIndex(this IndexDefinition searchIndex)
+        public static Index ToAzureIndex(this IndexDefinition searchIndex, bool convertFieldNamesToLowercase = false)
         {
             var index = new Index
             {
                 Name = searchIndex.IndexName.ToAzureIndexName(), 
-                Fields = searchIndex.Fields.ToAzureFields(), 
+                Fields = searchIndex.Fields.ToAzureFields(convertFieldNamesToLowercase), 
                 Suggesters = searchIndex.Fields.ToAzureSuggesters()
             };
 
@@ -88,14 +88,14 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return new[] {new Suggester(SuggesterName, suggesterFields.Select(f => f.Name.ToLower()).ToArray())};
         }
 
-        public static Field[] ToAzureFields(this IEnumerable<SearchField> fields)
+        public static Field[] ToAzureFields(this IEnumerable<SearchField> fields, bool convertNameToLowercase = false)
         {
-            return fields.Select(ToAzureField).ToArray();
+            return fields.Select(f => f.ToAzureField(convertNameToLowercase)).ToArray();
         }
 
-        public static Field ToAzureField(this SearchField f)
+        public static Field ToAzureField(this SearchField f, bool convertNameToLowercase = false)
         {
-            return new Field(f.Name.ToAzureFieldName(), f.IsCollection ? DataType.Collection(f.DataType.ToAzureDataType()) : f.DataType.ToAzureDataType())
+            return new Field(f.Name.ToAzureFieldName(convertNameToLowercase), f.IsCollection ? DataType.Collection(f.DataType.ToAzureDataType()) : f.DataType.ToAzureDataType())
             {
                 IsKey = f.IsKey,
                 IsFilterable = f.IsFilterable,
@@ -105,9 +105,9 @@ namespace Nethereum.BlockchainStore.Search.Azure
             };
         }
 
-        public static string ToAzureFieldName(this string fieldName)
+        public static string ToAzureFieldName(this string fieldName, bool convertNameToLowercase = false)
         {
-            return fieldName.ToLower().Replace(".", "_");
+            return (convertNameToLowercase ? fieldName.ToLower() : fieldName).Replace(".", "_");
         }
 
         public static object ToAzureFieldValue(this object val)
