@@ -23,34 +23,26 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public override Task<long> DocumentCountAsync() => IndexClient.Documents.CountAsync();
 
-        protected override Task SendBatchAsync(IEnumerable<TSearchDocument> docs) => ExecuteBatch(docs);
+        protected override Task SendBatchAsync(IEnumerable<(DocumentIndexAction, TSearchDocument)> docs) => ExecuteBatch(docs);
 
-        protected virtual async Task ExecuteBatch<T>(IEnumerable<T> uploadOrMerge, IEnumerable<T> upload = null, IEnumerable<T> delete = null) 
+        protected virtual async Task ExecuteBatch<T>(IEnumerable<(DocumentIndexAction action, T document)> documents) 
             where T: class
         {
             var actions = new List<IndexAction<T>>();
 
-            if (uploadOrMerge != null)
+            foreach(var item in documents)
             {
-                foreach (var item in uploadOrMerge)
+                switch (item.action)
                 {
-                    actions.Add(IndexAction.MergeOrUpload<T>(item));
-                }
-            }
-
-            if (upload != null)
-            {
-                foreach (var item in upload)
-                {
-                    actions.Add(IndexAction.Upload<T>(item));
-                }
-            }
-
-            if (delete != null)
-            {
-                foreach (var item in delete)
-                {
-                    actions.Add(IndexAction.Delete<T>(item));
+                    case DocumentIndexAction.uploadOrMerge:
+                        actions.Add(IndexAction.MergeOrUpload<T>(item.document));
+                        break;
+                    case DocumentIndexAction.upload:
+                        actions.Add(IndexAction.Upload<T>(item.document));
+                        break;
+                    case DocumentIndexAction.delete:
+                        actions.Add(IndexAction.Delete<T>(item.document));
+                        break;
                 }
             }
 
@@ -68,7 +60,6 @@ namespace Nethereum.BlockchainStore.Search.Azure
         public override void Dispose()
         {
             base.Dispose();
-            //IndexClient?.Dispose();
         }
     }
 }

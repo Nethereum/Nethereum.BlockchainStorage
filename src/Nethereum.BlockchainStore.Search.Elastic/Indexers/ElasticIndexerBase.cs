@@ -26,13 +26,30 @@ namespace Nethereum.BlockchainStore.Search.ElasticSearch
             return countResponse.Count;
         }
 
-
-        protected override async Task SendBatchAsync(IEnumerable<TSearchDocument> documents)
+        protected override async Task SendBatchAsync(IEnumerable<(DocumentIndexAction action, TSearchDocument document)> documents)
         {
+            var operations = new List<IBulkOperation>();
+
+            foreach(var item in documents)
+            {
+                switch (item.action)
+                {
+                    case DocumentIndexAction.uploadOrMerge:
+                        operations.Add(new BulkIndexOperation<TSearchDocument>(item.document) { Id = item.document.GetId() });
+                        break;
+                    case DocumentIndexAction.upload:
+                        operations.Add(new BulkIndexOperation<TSearchDocument>(item.document) { Id = item.document.GetId() });
+                         break;
+                    case DocumentIndexAction.delete:
+                        operations.Add(new BulkDeleteOperation<TSearchDocument>(item.document) { Id = item.document.GetId() });
+                        break;
+                }
+                    
+            }
+
             var request = new BulkRequest(IndexName, "_doc")
             {
-                Operations = new List<IBulkOperation>(documents.Select(doc =>
-                    new BulkIndexOperation<TSearchDocument>(doc) { Id = doc.GetId() }))
+                Operations = operations
             };
 
             var bulkResponse = await Client.BulkAsync(request);
