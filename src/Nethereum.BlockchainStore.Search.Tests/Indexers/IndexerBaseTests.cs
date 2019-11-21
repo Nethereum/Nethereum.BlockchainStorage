@@ -18,14 +18,14 @@ namespace Nethereum.BlockchainStore.Search.Tests.Indexers
             {
             }
 
-            public List<SearchDocument> IndexedDocuments { get; } = new List<SearchDocument>();
+            public List<(DocumentIndexAction action, SearchDocument document)> IndexedDocuments { get; } = new List<(DocumentIndexAction action, SearchDocument document)>();
 
             public override Task<long> DocumentCountAsync()
             {
                 throw new NotImplementedException();
             }
 
-            protected override Task SendBatchAsync(IEnumerable<SearchDocument> docs)
+            protected override Task SendBatchAsync(IEnumerable<(DocumentIndexAction action, SearchDocument document)> docs)
             {
                 IndexedDocuments.AddRange(docs);
                 return Task.CompletedTask;
@@ -42,7 +42,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Indexers
 
             await indexer.IndexAsync(source);
 
-            Assert.Single(indexer.IndexedDocuments, searchDoc);
+            Assert.Single(indexer.IndexedDocuments, (DocumentIndexAction.uploadOrMerge, searchDoc));
         }
 
         [Fact]

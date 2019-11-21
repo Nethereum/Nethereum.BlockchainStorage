@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.Search
 {
+
     public abstract class IndexerBase<TSource, TSearchDocument> where TSearchDocument : class
     {
         private readonly int _documentsPerIndexBatch;
         private readonly Func<TSource, TSearchDocument> mapper;
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1);
 
-        public ConcurrentQueue<TSearchDocument> CurrentBatch { get; } = new ConcurrentQueue<TSearchDocument>();
+        public ConcurrentQueue<(DocumentIndexAction, TSearchDocument)> CurrentBatch { get; } = new ConcurrentQueue<(DocumentIndexAction, TSearchDocument)>();
 
         protected IndexerBase(Func<TSource, TSearchDocument> mapper, int documentsPerBatch = 1)
         {
@@ -20,13 +21,13 @@ namespace Nethereum.BlockchainStore.Search
             this.mapper = mapper;
         }
 
-        protected void AddToBatch(TSource eventLog)
+        protected virtual void AddToBatch(DocumentIndexAction indexAction, TSource eventLog)
         {
             var searchDoc = mapper.Invoke(eventLog);
 
             if(searchDoc == null) return;
 
-            CurrentBatch.Enqueue(searchDoc);
+            CurrentBatch.Enqueue((indexAction, searchDoc));
         }
 
         protected bool IsReadyToSend()
@@ -60,12 +61,12 @@ namespace Nethereum.BlockchainStore.Search
 
         public abstract Task<long> DocumentCountAsync();
 
-        public virtual async Task IndexAsync(TSource source)
+        public virtual async Task IndexAsync(TSource source, DocumentIndexAction indexAction = DocumentIndexAction.uploadOrMerge)
         {
             await _semaphoreSlim.WaitAsync();
             try
             {
-                AddToBatch(source);
+                AddToBatch(indexAction, source);
                 if (IsReadyToSend())
                 {
                     await SendCurrentBatch().ConfigureAwait(false);
@@ -86,6 +87,6 @@ namespace Nethereum.BlockchainStore.Search
             CurrentBatch.Clear();
         }
 
-        protected abstract Task SendBatchAsync(IEnumerable<TSearchDocument> docs);
+        protected abstract Task SendBatchAsync(IEnumerable<(DocumentIndexAction action, TSearchDocument document)> docs);
     }
 }
