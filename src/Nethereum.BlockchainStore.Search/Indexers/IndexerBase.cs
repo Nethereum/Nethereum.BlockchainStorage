@@ -48,10 +48,10 @@ namespace Nethereum.BlockchainStore.Search
 
         public virtual void Dispose()
         {
-            _semaphoreSlim.WaitAsync().Wait();
+            _semaphoreSlim.Wait(TimeSpan.FromSeconds(30));
             try
             {
-                IndexPendingDocumentsAsync().Wait();
+                IndexPendingDocumentsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             }
             finally
             {
