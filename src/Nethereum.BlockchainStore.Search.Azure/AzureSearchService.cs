@@ -194,22 +194,28 @@ namespace Nethereum.BlockchainStore.Search.Azure
             return azureIndexer;
         }
 
+        bool _disposed = false;
+
         public void Dispose()
         {
-            foreach (var client in _clients.Values)
-            {
-                client.Dispose();
-            }
+            if(_disposed) return;
 
             foreach (var indexer in _indexers)
             {
                 indexer.Dispose();
             }
 
-            if(createdSearchServiceClient)
+            foreach (var client in _clients.Values)
+            {
+                client.Dispose();
+            }
+
+            if (createdSearchServiceClient)
             { 
                 _client?.Dispose();
             }
+
+            _disposed = true;
         }
 
         public IAzureIndexSearcher CreateIndexSearcher(Index index)
