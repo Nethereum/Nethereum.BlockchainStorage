@@ -25,12 +25,12 @@ namespace Nethereum.BlockchainStore.EFCore.Tests.SqlServer.RepositoryTests
             try
             {
                 var ctx = Factory.CreateContext();
-                ctx.Database.ExecuteSqlCommand("TRUNCATE TABLE Blocks");
-                ctx.Database.ExecuteSqlCommand("TRUNCATE TABLE Contracts");
-                ctx.Database.ExecuteSqlCommand("TRUNCATE TABLE AddressTransactions");
-                ctx.Database.ExecuteSqlCommand("TRUNCATE TABLE Transactions");
-                ctx.Database.ExecuteSqlCommand("TRUNCATE TABLE TransactionLogs");
-                ctx.Database.ExecuteSqlCommand("TRUNCATE TABLE TransactionVMStacks");
+                ctx.Database.ExecuteSqlRaw("TRUNCATE TABLE Blocks");
+                ctx.Database.ExecuteSqlRaw("TRUNCATE TABLE Contracts");
+                ctx.Database.ExecuteSqlRaw("TRUNCATE TABLE AddressTransactions");
+                ctx.Database.ExecuteSqlRaw("TRUNCATE TABLE Transactions");
+                ctx.Database.ExecuteSqlRaw("TRUNCATE TABLE TransactionLogs");
+                ctx.Database.ExecuteSqlRaw("TRUNCATE TABLE TransactionVMStacks");
             }
             catch
             {

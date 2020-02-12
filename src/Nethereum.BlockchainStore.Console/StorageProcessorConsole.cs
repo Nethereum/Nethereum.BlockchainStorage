@@ -18,7 +18,10 @@ namespace Nethereum.BlockchainStore.Console
     public class StorageProcessorConsole<TRepositoryFactory> 
         where TRepositoryFactory : IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
     {
-        ILog log = ApplicationLogging.CreateConsoleLogger<StorageProcessorConsole<TRepositoryFactory>>().ToILog();
+        ILog log = LoggerFactory
+            .Create(builder => builder.AddConsole())
+            .CreateLogger<StorageProcessorConsole<TRepositoryFactory>>()
+            .ToILog();
 
         public StorageProcessorConsole(
             string[] consoleArgs,
