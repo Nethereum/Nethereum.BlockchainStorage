@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-
+    <UserSecretsId>Nethereum.BlockchainStore.AzureTables</UserSecretsId>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
