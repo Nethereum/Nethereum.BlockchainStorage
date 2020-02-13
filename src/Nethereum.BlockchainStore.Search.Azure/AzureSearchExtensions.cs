@@ -142,7 +142,7 @@ namespace Nethereum.BlockchainStore.Search.Azure
 
         public static IList<string> FacetableFieldNames(this Index index)
         {
-            return index.Fields.Where(f => f.IsFacetable).Select(f => f.Name).ToList();
+            return index.Fields.Where(f => f.IsFacetable ?? false).Select(f => f.Name).ToList();
         }
     }
 }

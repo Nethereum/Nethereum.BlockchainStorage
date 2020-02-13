@@ -12,6 +12,13 @@ namespace Nethereum.BlockchainStore.AzureTables.Tests.RepositoryTests
 
         public AzureTablesFixture()
         {
+            /*
+             To run the tests setup the connection string in the user secrets
+             In the command line navigate to folder: Nethereum.BlockchainStorage\src\Nethereum.BlockchainStore.AzureTables.Tests
+             Set the connection string using the syntax below
+             dotnet user-secrets set "AzureStorageConnectionString" "CONNECTION_STRING"
+             */
+
             ConfigurationUtils.SetEnvironmentAsDevelopment();
             var appConfig = ConfigurationUtils.Build(CommandLineArgs, UserSecretsId);
             var connectionString = appConfig["AzureStorageConnectionString"];
