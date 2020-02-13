@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public void CreatesExpectedKeyField()
         {
             var index = FilterLogIndexUtil.Create("my-index");
-            var keyFields = index.Fields.Where(f => f.IsKey).ToArray();
+            var keyFields = index.Fields.Where(f => f.IsKey ?? false).ToArray();
             Assert.Single(keyFields);
             Assert.Contains(keyFields, f => f.Name == PresetSearchFieldName.log_key.ToString());
         }
@@ -32,7 +32,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public void FacetableFields()
         {
             var index = FilterLogIndexUtil.Create("my-index");
-            var facetableFields = index.Fields.Where(f => f.IsFacetable).ToArray();
+            var facetableFields = index.Fields.Where(f => f.IsFacetable ?? false).ToArray();
 
             var expectedFields = new []
             {
@@ -49,7 +49,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public void SearchableFields()
         {
             var index = FilterLogIndexUtil.Create("my-index");
-            var searchableFields = index.Fields.Where(f => f.IsSearchable).ToArray();
+            var searchableFields = index.Fields.Where(f => f.IsSearchable ?? false).ToArray();
 
             var expectedFields = new[] 
             { 
@@ -66,7 +66,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
         public void FilterableFields()
         {
             var index = FilterLogIndexUtil.Create("my-index");
-            var filterableFields = index.Fields.Where(f => f.IsFilterable).ToArray();
+            var filterableFields = index.Fields.Where(f => f.IsFilterable ?? false).ToArray();
 
             var expectedFields = new[]
             {
@@ -89,7 +89,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.Azure
             var index = FilterLogIndexUtil.Create("my-index");
 
             var allFieldCount = Enum.GetNames(typeof(PresetSearchFieldName)).Where(n => n.StartsWith("log_")).Count();
-            Assert.Equal(allFieldCount, index.Fields.Count(f => f.IsRetrievable));
+            Assert.Equal(allFieldCount, index.Fields.Count(f => f.IsRetrievable ?? false));
             
         }
 
