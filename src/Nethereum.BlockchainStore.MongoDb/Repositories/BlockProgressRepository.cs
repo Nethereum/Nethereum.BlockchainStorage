@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
 using Nethereum.BlockchainStore.MongoDb.Entities;
@@ -32,6 +33,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
         public async Task UpsertProgressAsync(BigInteger blockNumber)
         {
             var block = blockNumber.MapToStorageEntityForUpsert<MongoDbBlockProgress>();
+            block.LastBlockProcessed = block.LastBlockProcessed.PadLeft(ColumnLengths.BigIntegerLength, '0');
             await UpsertDocumentAsync(block).ConfigureAwait(false);
         }
 

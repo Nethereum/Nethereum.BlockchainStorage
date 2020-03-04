@@ -28,6 +28,8 @@ namespace Nethereum.BlockchainStore.EFCore.Repositories
             {
                 var blockRange = blockNumber.MapToStorageEntityForUpsert<BlockProgress>();
 
+                blockRange.LastBlockProcessed = blockNumber.ToString().PadLeft(ColumnLengths.BigIntegerLength, '0');
+
                 context.BlockProgress.Add(blockRange);
 
                 await context.SaveChangesAsync().ConfigureAwait(false);
