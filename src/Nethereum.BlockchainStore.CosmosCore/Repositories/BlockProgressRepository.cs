@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Nethereum.BlockchainProcessing.BlockStorage.Entities;
 using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using Nethereum.BlockchainProcessing.ProgressRepositories;
 using Nethereum.BlockchainStore.CosmosCore.Entities;
@@ -42,6 +43,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         public async Task UpsertProgressAsync(BigInteger blockNumber)
         {
             var block = blockNumber.MapToStorageEntityForUpsert<CosmosBlockProgress>();
+            block.LastBlockProcessed = block.LastBlockProcessed.PadLeft(ColumnLengths.BigIntegerLength, '0');
             await UpsertDocumentAsync(block).ConfigureAwait(false);
         }
     }

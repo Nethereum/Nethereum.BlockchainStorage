@@ -11,7 +11,7 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
             entityBuilder.ToTable("BlockProgress");
             entityBuilder.HasKey(b => b.RowIndex);
 
-            entityBuilder.Property(b => b.LastBlockProcessed).IsAddress().IsRequired();
+            entityBuilder.Property(b => b.LastBlockProcessed).IsBigInteger().IsRequired();
             entityBuilder.HasIndex(b => b.LastBlockProcessed);
         }
     }

@@ -10,7 +10,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             ToTable("BlockProgress");
             HasKey(b => b.RowIndex);
 
-            Property(b => b.LastBlockProcessed).IsAddress().IsRequired();
+            Property(b => b.LastBlockProcessed).IsBigInteger().IsRequired();
             HasIndex(b => b.LastBlockProcessed).HasName("IX_BlockProgress_LastBlockProcessed");                
         }
     }

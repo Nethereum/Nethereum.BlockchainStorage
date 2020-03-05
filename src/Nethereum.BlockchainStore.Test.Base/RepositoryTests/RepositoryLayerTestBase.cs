@@ -1,4 +1,5 @@
 ﻿using Nethereum.BlockchainProcessing.BlockStorage.Repositories;
+using Nethereum.BlockchainProcessing.ProgressRepositories;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -12,6 +13,24 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
         protected RepositoryLayerTestBase(IBlockchainStoreRepositoryFactory repositoryFactory)
         {
             _repositoryFactory = repositoryFactory;
+        }
+
+        [Fact]
+        public virtual async Task BlockProgressRepositoryTests()
+        {
+            if(_repositoryFactory is IBlockProgressRepositoryFactory blockProgressRepositoryFactory)
+            {
+                var repo = blockProgressRepositoryFactory.CreateBlockProgressRepository();
+                try
+                {
+                    await new BlockProgressRepositoryTests(repo).RunAsync();
+                }
+                finally
+                {
+                    if (repo is IDisposable dispRep)
+                        dispRep.Dispose();
+                }
+            }
         }
 
         [Fact]

@@ -17,15 +17,9 @@ A DB user is created for each schema and allocated permissions only to that sche
 
 * Prerequisites
 	* Ensure you have sysadmin rights to a SQL server
-* Setup Default Logins
+* Setup DB
 	* Use SSMS (or some other query runner)
 		* (Feel free to change the passwords in the script)
-		* use master
-		* Run Script : Sql\01 CreateDbLogins.sql
-* Create the database and schema (runs migrations and db updates)
-	* From the command line 
-		* cd to Nethereum.BlockchainStore.SqlServer 
-		* run DbInitialCreate.bat
-* Apply default DB roles and permissions
-	* use BlockchainStorage - run 02 CreateAndApplyDbRoles.sql
-* Apply the scripts relating to the schemas you require (e.g. SqlServerBlockchainDbContext_dbo.sql, SqlServerBlockchainDbContext_rinkeby.sql etc)
+		* Run Script: Sql\01 CreateDbLogins.sql
+	    * Run Script: Sql\02 CreateAndApplyDbRoles.sql
+		* Apply the scripts from the Sql folder relating to the schemas you require (e.g. SqlServerBlockchainDbContext_dbo.sql, SqlServerBlockchainDbContext_rinkeby.sql etc)

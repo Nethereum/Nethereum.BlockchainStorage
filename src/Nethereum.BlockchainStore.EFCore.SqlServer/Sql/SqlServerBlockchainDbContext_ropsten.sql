@@ -29,7 +29,7 @@ CREATE TABLE [ropsten].[BlockProgress] (
     [RowIndex] int NOT NULL IDENTITY,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
-    [LastBlockProcessed] nvarchar(43) NOT NULL,
+    [LastBlockProcessed] nvarchar(100) NOT NULL,
     CONSTRAINT [PK_BlockProgress] PRIMARY KEY ([RowIndex])
 );
 
