@@ -36,7 +36,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task FillCache()
+        public async Task FillCacheAsync()
         {
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 

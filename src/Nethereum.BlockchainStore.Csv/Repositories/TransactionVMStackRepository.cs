@@ -13,12 +13,12 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
         {
         }
 
-        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string hash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAsync(string address, string hash)
         {
             return await FindAsync(t => t.Address == address && t.TransactionHash == hash).ConfigureAwait(false);
         }
 
-        public async Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
+        public async Task<ITransactionVmStackView> FindByTransactionHashAsync(string hash)
         {
             return await FindAsync(t => t.TransactionHash == hash).ConfigureAwait(false);
         }

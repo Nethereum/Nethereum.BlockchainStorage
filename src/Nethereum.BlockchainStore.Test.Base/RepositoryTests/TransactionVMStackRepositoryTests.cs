@@ -27,10 +27,10 @@ namespace Nethereum.BlockchainStore.Test.Base.RepositoryTests
 
             await _repo.UpsertAsync(transactionHash, address, stackTrace);
 
-            var storedRow = await _repo.FindByTransactionHashAync(transactionHash);
+            var storedRow = await _repo.FindByTransactionHashAsync(transactionHash);
 
             if (storedRow == null)
-                storedRow = await _repo.FindByAddressAndTransactionHashAync(address, transactionHash);
+                storedRow = await _repo.FindByAddressAndTransactionHashAsync(address, transactionHash);
 
             Assert.NotNull(storedRow);
 

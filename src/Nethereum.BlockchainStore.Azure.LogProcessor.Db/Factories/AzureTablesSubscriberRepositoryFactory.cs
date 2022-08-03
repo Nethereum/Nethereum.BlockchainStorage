@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nethereum.BlockchainStore.AzureTables.Factories
 {
-    public class AzureTablesSubscriberRepositoryFactory : //ISubscriberStorageFactory
+    public class AzureTablesSubscriberRepositoryFactory : ISubscriberStorageFactory
     {
         Dictionary<string, BlockProcessingCloudTableSetup> _cloudTableSetups = new Dictionary<string, BlockProcessingCloudTableSetup>();
         public AzureTablesSubscriberRepositoryFactory( 

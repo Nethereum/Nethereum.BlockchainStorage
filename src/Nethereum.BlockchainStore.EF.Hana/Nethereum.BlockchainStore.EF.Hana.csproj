@@ -2,7 +2,7 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>Kevin Small, Dave Whiffin, $(DefaultAuthors)</Authors>
+    <Authors>Kevin Small, $(OtherAuthors), $(DefaultAuthors)</Authors>
     <Description>Store Ethereum blockchain data in SAP Hana using Entity Framework (not core).</Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>

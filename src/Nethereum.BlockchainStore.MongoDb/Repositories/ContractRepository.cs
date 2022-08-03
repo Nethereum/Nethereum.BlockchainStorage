@@ -25,7 +25,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
             return response != null;
         }
 
-        public async Task FillCache()
+        public async Task FillCacheAsync()
         {
             using (var cursor = await Collection.FindAsync(FilterDefinition<MongoDbContract>.Empty))
             {

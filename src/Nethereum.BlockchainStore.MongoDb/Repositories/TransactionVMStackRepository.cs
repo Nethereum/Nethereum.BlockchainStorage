@@ -14,7 +14,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
         {
         }
 
-        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string hash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAsync(string address, string hash)
         {
             var filter = CreateDocumentFilter(new MongoDbTransactionVmStack()
                 {Address = address, TransactionHash = hash});
@@ -23,7 +23,7 @@ namespace Nethereum.BlockchainStore.MongoDb.Repositories
             return response;
         }
 
-        public async Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
+        public async Task<ITransactionVmStackView> FindByTransactionHashAsync(string hash)
         {
             var filter = CreateDocumentFilter(new MongoDbTransactionVmStack() {TransactionHash = hash});
 

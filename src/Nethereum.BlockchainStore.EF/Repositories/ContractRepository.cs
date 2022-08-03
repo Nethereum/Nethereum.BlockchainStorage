@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             return _cachedContracts.TryGetValue(contractAddress, out Contract val);
         }
 
-        public async Task FillCache()
+        public async Task FillCacheAsync()
         {
             _cachedContracts.Clear();
             using (var context = _contextFactory.CreateContext())

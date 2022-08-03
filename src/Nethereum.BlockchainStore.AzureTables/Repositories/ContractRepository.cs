@@ -45,7 +45,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
             CachedContracts.AddOrUpdate(contract.Address, contract, (s, existingContract) => contract);
         }
 
-        public virtual async Task FillCache()
+        public virtual async Task FillCacheAsync()
         {
             await InitContractsCacheAsync().ConfigureAwait(false);
         }

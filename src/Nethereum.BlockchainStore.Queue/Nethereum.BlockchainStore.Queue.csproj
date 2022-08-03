@@ -4,11 +4,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>$(DefaultAuthors), Dave Whiffin</Authors>
+    <Authors>$(DefaultAuthors), $(OtherAuthors)</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nethereum.Web3" Version="3.7.1" />
+    <PackageReference Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
   </ItemGroup>  
 
 </Project>

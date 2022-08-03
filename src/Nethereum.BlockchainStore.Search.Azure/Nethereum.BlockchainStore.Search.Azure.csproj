@@ -4,7 +4,7 @@
   
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>$(DefaultAuthors), Dave Whiffin</Authors>
+    <Authors>$(DefaultAuthors), $(OtherAuthors)</Authors>
   </PropertyGroup>
 
   <ItemGroup>

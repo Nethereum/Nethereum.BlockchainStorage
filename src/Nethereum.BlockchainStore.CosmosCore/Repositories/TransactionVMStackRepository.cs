@@ -15,7 +15,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
         {
         }
 
-        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string hash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAsync(string address, string hash)
         {
             var uri = CreateDocumentUri(new CosmosTransactionVmStack(){Address = address, TransactionHash = hash});
             try
@@ -32,7 +32,7 @@ namespace Nethereum.BlockchainStore.CosmosCore.Repositories
             }
         }
 
-        public async Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
+        public async Task<ITransactionVmStackView> FindByTransactionHashAsync(string hash)
         {
             var uri = CreateDocumentUri(new CosmosTransactionVmStack(){TransactionHash = hash});
             try

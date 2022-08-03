@@ -1,19 +1,22 @@
 <Project>
  <PropertyGroup>
    <DefaultAuthors>Nethereum team;Nethereum contributors;Juan Blanco</DefaultAuthors>
-   <PackageTags>Netherum;Ethereum;Blockchain;Crypto 2.0</PackageTags>
+   <OtherAuthors>Dave Whiffin</OtherAuthors>
+   <PackageTags>Netherum;Ethereum;Blockchain;</PackageTags>
    <PackageIconUrl>https://raw.githubusercontent.com/Nethereum/Nethereum/master/logos/logo64x64.png</PackageIconUrl>
+   <PackageIcon>images\logo64x64.png</PackageIcon>
    <PackageProjectUrl>https://nethereum.com</PackageProjectUrl>
    <RepositoryType>git</RepositoryType>
    <RepositoryUrl>https://github.com/Nethereum/Nethereum</RepositoryUrl>
-   <Copyright>Nethereum.com (Juan Blanco) 2015-2019</Copyright>
+   <Copyright>Nethereum.com (Juan Blanco) 2015-2022</Copyright>
    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-   <Version>3.7.1</Version>
+   <Version>4.7.0</Version>
+   <NethereumWeb3Version>4.7.0</NethereumWeb3Version>
  </PropertyGroup>
  
 <PropertyGroup>
@@ -22,6 +25,8 @@
 <ItemGroup>
   <None Include="..\..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)"/>
 </ItemGroup>
-
+<ItemGroup>
+    <None Condition="Exists('..\..\logos\logo64x64.png')"  Include="..\..\logos\logo64x64.png" Pack="true" Visible="false" PackagePath="images\logo64x64.png" />
+  </ItemGroup>
 </Project>
 

@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
-    <Authors>Dave Whiffin, $(DefaultAuthors)</Authors>
+    <Authors>$(OtherAuthors), $(DefaultAuthors)</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Store Ethereum blockchain data using Entity Framework core.  This package only contains the base components.  Use the other DB specific packages available for Sqlite, SqlServer etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.1" />
-    <PackageReference Include="Nethereum.Web3" Version="3.7.1" />    
+	<PackageReference Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />    
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
       <PrivateAssets>all</PrivateAssets>

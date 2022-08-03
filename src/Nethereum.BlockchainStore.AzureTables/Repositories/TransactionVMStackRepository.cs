@@ -15,14 +15,14 @@ namespace Nethereum.BlockchainStore.AzureTables.Repositories
         {
         }
 
-        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string transactionHash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAsync(string address, string transactionHash)
         {
             var operation = TableOperation.Retrieve<TransactionVmStack>(address.ToPartitionKey(), transactionHash.ToRowKey());
             var results = await Table.ExecuteAsync(operation).ConfigureAwait(false);
             return results.Result as TransactionVmStack;
         }
 
-        public Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
+        public Task<ITransactionVmStackView> FindByTransactionHashAsync(string hash)
         {
             return Task.FromResult((ITransactionVmStackView)null);
         }

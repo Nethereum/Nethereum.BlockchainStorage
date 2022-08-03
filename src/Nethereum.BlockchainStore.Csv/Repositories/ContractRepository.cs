@@ -22,7 +22,7 @@ namespace Nethereum.BlockchainStore.Csv.Repositories
             return contract != null;
         }
 
-        public async Task FillCache()
+        public async Task FillCacheAsync()
         {
             CachedContracts.Clear();
 

@@ -1,5 +1,4 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.ABI.JsonDeserialisation;
 using Nethereum.ABI.Model;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
@@ -41,7 +40,7 @@ namespace Nethereum.BlockchainStore.Search.Tests.TestData
             public static readonly string TransferEventSignature = "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
             public static readonly string ApprovalEventSignature = "8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
 
-            public static readonly ContractABI ContractAbi = new ABIDeserialiser().DeserialiseContract(Abi);
+            public static readonly ContractABI ContractAbi = ABI.ABIDeserialisation.ABIDeserialiserFactory.DeserialiseContractABI(Abi);
 
             public static readonly EventABI ApprovalEventAbi = ContractAbi.Events.First(e => e.Sha3Signature == ApprovalEventSignature);
 

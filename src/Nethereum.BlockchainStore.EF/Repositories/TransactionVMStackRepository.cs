@@ -13,7 +13,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
         {
         }
 
-        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAync(string address, string hash)
+        public async Task<ITransactionVmStackView> FindByAddressAndTransactionHashAsync(string address, string hash)
         {
             using (var context = _contextFactory.CreateContext())
             {
@@ -21,7 +21,7 @@ namespace Nethereum.BlockchainStore.EF.Repositories
             }
         }
 
-        public async Task<ITransactionVmStackView> FindByTransactionHashAync(string hash)
+        public async Task<ITransactionVmStackView> FindByTransactionHashAsync(string hash)
         {
             using (var context = _contextFactory.CreateContext())
             {

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
-    <Authors>Dave Whiffin, $(DefaultAuthors)</Authors>
+    <Authors>$(OtherAuthors), $(DefaultAuthors)</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Store Ethereum blockchain data in CSV format.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nethereum.Web3" Version="3.7.1" />
+	  <PackageReference Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
     <PackageReference Include="CsvHelper" Version="12.1.1" />
   </ItemGroup>
 
