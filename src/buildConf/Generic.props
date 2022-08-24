@@ -15,8 +15,8 @@
    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-   <Version>4.7.0</Version>
-   <NethereumWeb3Version>4.7.0</NethereumWeb3Version>
+   <Version>4.8.0</Version>
+   <NethereumWeb3Version>4.8.0</NethereumWeb3Version>
  </PropertyGroup>
  
 <PropertyGroup>

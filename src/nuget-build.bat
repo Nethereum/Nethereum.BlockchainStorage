@@ -68,6 +68,6 @@ for /R %DIR% %%a in (*.snupkg) do xcopy "%%a" "%OUTPUTDIR%"
 EXIT /B %ERRORLEVEL%
 
 :restorepack
-dotnet restore -c Release
+dotnet restore
 dotnet pack -c Release --include-symbols -p:SymbolPackageFormat=snupkg
 EXIT /B 0
