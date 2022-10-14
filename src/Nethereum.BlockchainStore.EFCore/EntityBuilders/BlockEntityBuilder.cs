@@ -23,6 +23,8 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
             entityBuilder.Property(b => b.GasUsed).IsBigInteger();
             entityBuilder.Property(b => b.Timestamp).IsBigInteger();
             entityBuilder.Property(b => b.Nonce).IsBigInteger();
+            entityBuilder.Property(b => b.BaseFeePerGas).IsBigInteger();
+     
 
             entityBuilder.HasIndex(b => new {b.BlockNumber, b.Hash}).IsUnique();
         }

@@ -2,7 +2,7 @@
 	<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
 
 	<PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
+	  <PackageReference  Condition="'$(UseLocalNethereum)' == 'false'" Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
+	  <ProjectReference Condition="'$(UseLocalNethereum)' == 'true'" Include="..\..\..\Nethereum\src\Nethereum.Web3\Nethereum.Web3.csproj" />
   </ItemGroup>
 
 </Project>

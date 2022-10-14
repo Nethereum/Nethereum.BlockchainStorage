@@ -41,6 +41,18 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
         public SqlServerBlockchainDbContext_ropsten(string connectionString) : base(connectionString){}
     }
 
+    [DbSchema(DbSchemaNames.goerli)]
+    public class SqlServerBlockchainDbContext_goerli : SqlServerBlockchainDbContext
+    {
+        public SqlServerBlockchainDbContext_goerli(string connectionString) : base(connectionString) { }
+    }
+
+    [DbSchema(DbSchemaNames.sepolia)]
+    public class SqlServerBlockchainDbContext_sepolia : SqlServerBlockchainDbContext
+    {
+        public SqlServerBlockchainDbContext_sepolia(string connectionString) : base(connectionString) { }
+    }
+
     public abstract class SqlServerBlockchainDbContext: BlockchainDbContextBase
     {
         private readonly string _connectionString;

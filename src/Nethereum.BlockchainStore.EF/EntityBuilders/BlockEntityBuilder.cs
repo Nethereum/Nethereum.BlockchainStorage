@@ -23,6 +23,7 @@ namespace Nethereum.BlockchainStore.EF.EntityBuilders
             Property(b => b.GasUsed).IsBigInteger();
             Property(b => b.Timestamp).IsBigInteger();
             Property(b => b.Nonce).IsBigInteger();
+            Property(b => b.BaseFeePerGas).IsBigInteger();
         }
     }
 }

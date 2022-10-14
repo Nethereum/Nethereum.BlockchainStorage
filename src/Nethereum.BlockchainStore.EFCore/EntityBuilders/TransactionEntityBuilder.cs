@@ -35,6 +35,15 @@ namespace Nethereum.BlockchainStore.EFCore.EntityBuilders
             entityBuilder.Property(b => b.GasUsed).IsBigInteger();
             entityBuilder.Property(b => b.Nonce).IsBigInteger();
             entityBuilder.Property(b => b.CumulativeGasUsed).IsBigInteger();
+            
+            
+            entityBuilder.Property(b => b.EffectiveGasPrice).IsBigInteger();
+            entityBuilder.Property(b => b.MaxFeePerGas).IsBigInteger();
+            entityBuilder.Property(b => b.MaxPriorityFeePerGas).IsBigInteger();
+     
+
+
+
         }
     }
 }

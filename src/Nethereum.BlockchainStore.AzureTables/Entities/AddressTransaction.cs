@@ -29,6 +29,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         //Store as a string so it can be parsed as a BigInteger
         public override string BlockNumber { get; set; } = string.Empty;
 
+     
+
         public static AddressTransaction CreateAddressTransaction(
             RPC.Eth.DTOs.Transaction transactionSource,
             TransactionReceipt transactionReceipt,

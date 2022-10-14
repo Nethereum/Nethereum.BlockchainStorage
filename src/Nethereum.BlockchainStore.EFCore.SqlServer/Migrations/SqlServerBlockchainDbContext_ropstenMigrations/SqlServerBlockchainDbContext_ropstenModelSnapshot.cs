@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nethereum.BlockchainStore.EFCore.SqlServer;
 
+#nullable disable
+
 namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockchainDbContext_ropstenMigrations
 {
     [DbContext(typeof(SqlServerBlockchainDbContext_ropsten))]
@@ -16,31 +18,39 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockch
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("ropsten")
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "6.0.10")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.AddressTransaction", b =>
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.AddressTransaction", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("BlockNumber")
                         .IsRequired()
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("RowIndex");
 
@@ -51,115 +61,149 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockch
                     b.HasIndex("BlockNumber", "Hash", "Address")
                         .IsUnique();
 
-                    b.ToTable("AddressTransactions");
+                    b.ToTable("AddressTransactions", "ropsten");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.Block", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.Block", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
+
+                    b.Property<string>("BaseFeePerGas")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BlockNumber")
                         .IsRequired()
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Difficulty")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ExtraData");
+                    b.Property<string>("ExtraData")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GasLimit")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("GasUsed")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("Miner")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("Nonce")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ParentHash")
                         .IsRequired()
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Size")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Timestamp")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TotalDifficulty")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<long>("TransactionCount");
+                    b.Property<long>("TransactionCount")
+                        .HasColumnType("bigint");
 
                     b.HasKey("RowIndex");
 
                     b.HasIndex("BlockNumber", "Hash")
                         .IsUnique();
 
-                    b.ToTable("Blocks");
+                    b.ToTable("Blocks", "ropsten");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.BlockProgress", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.BlockProgress", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
 
                     b.Property<string>("LastBlockProcessed")
                         .IsRequired()
-                        .HasMaxLength(43);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("RowIndex");
 
                     b.HasIndex("LastBlockProcessed");
 
-                    b.ToTable("BlockProgress");
+                    b.ToTable("BlockProgress", "ropsten");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.Contract", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.Contract", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
 
                     b.Property<string>("ABI")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Creator")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionHash")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.HasKey("RowIndex");
 
@@ -169,79 +213,114 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockch
                         .IsUnique()
                         .HasFilter("[Name] IS NOT NULL");
 
-                    b.ToTable("Contracts");
+                    b.ToTable("Contracts", "ropsten");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.Transaction", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.Transaction", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
 
                     b.Property<string>("AddressFrom")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("AddressTo")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("BlockHash")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("BlockNumber")
                         .IsRequired()
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CumulativeGasUsed")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EffectiveGasPrice")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Error")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Failed");
+                    b.Property<bool>("Failed")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("FailedCreateContract");
+                    b.Property<bool>("FailedCreateContract")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Gas")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("GasPrice")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("GasUsed")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("HasLog");
+                    b.Property<bool>("HasLog")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("HasVmStack");
+                    b.Property<bool>("HasVmStack")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("Input")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MaxFeePerGas")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MaxPriorityFeePerGas")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("NewContractAddress")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("Nonce")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ReceiptHash")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TimeStamp")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TransactionIndex")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Value")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("RowIndex");
 
@@ -256,43 +335,54 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockch
                     b.HasIndex("BlockNumber", "Hash")
                         .IsUnique();
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", "ropsten");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.TransactionLog", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.TransactionLog", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
                     b.Property<string>("Data")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EventHash")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("IndexVal1")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("IndexVal2")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("IndexVal3")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.Property<string>("LogIndex")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionHash")
                         .IsRequired()
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.HasKey("RowIndex");
 
@@ -310,27 +400,33 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockch
                         .IsUnique()
                         .HasFilter("[LogIndex] IS NOT NULL");
 
-                    b.ToTable("TransactionLogs");
+                    b.ToTable("TransactionLogs", "ropsten");
                 });
 
-            modelBuilder.Entity("Nethereum.BlockchainProcessing.Storage.Entities.TransactionVmStack", b =>
+            modelBuilder.Entity("Nethereum.BlockchainProcessing.BlockStorage.Entities.TransactionVmStack", b =>
                 {
                     b.Property<int>("RowIndex")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RowIndex"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .HasMaxLength(43);
+                        .HasMaxLength(43)
+                        .HasColumnType("nvarchar(43)");
 
-                    b.Property<DateTime?>("RowCreated");
+                    b.Property<DateTime?>("RowCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RowUpdated");
+                    b.Property<DateTime?>("RowUpdated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("StructLogs")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TransactionHash")
-                        .HasMaxLength(67);
+                        .HasMaxLength(67)
+                        .HasColumnType("nvarchar(67)");
 
                     b.HasKey("RowIndex");
 
@@ -338,7 +434,7 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer.Migrations.SqlServerBlockch
 
                     b.HasIndex("TransactionHash");
 
-                    b.ToTable("TransactionLogVmStacks");
+                    b.ToTable("TransactionLogVmStacks", "ropsten");
                 });
 #pragma warning restore 612, 618
         }

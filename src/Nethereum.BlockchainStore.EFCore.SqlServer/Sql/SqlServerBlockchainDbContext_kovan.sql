@@ -6,39 +6,36 @@ BEGIN
         CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
     );
 END;
+GO
 
+BEGIN TRANSACTION;
 GO
 
 IF SCHEMA_ID(N'kovan') IS NULL EXEC(N'CREATE SCHEMA [kovan];');
-
 GO
 
 CREATE TABLE [kovan].[AddressTransactions] (
     [RowIndex] int NOT NULL IDENTITY,
-    [RowCreated] datetime2 NULL,
-    [RowUpdated] datetime2 NULL,
     [BlockNumber] nvarchar(100) NOT NULL,
     [Hash] nvarchar(67) NOT NULL,
     [Address] nvarchar(43) NOT NULL,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
     CONSTRAINT [PK_AddressTransactions] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE TABLE [kovan].[BlockProgress] (
     [RowIndex] int NOT NULL IDENTITY,
+    [LastBlockProcessed] nvarchar(100) NOT NULL,
     [RowCreated] datetime2 NULL,
     [RowUpdated] datetime2 NULL,
-    [LastBlockProcessed] nvarchar(100) NOT NULL,
     CONSTRAINT [PK_BlockProgress] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE TABLE [kovan].[Blocks] (
     [RowIndex] int NOT NULL IDENTITY,
-    [RowCreated] datetime2 NULL,
-    [RowUpdated] datetime2 NULL,
     [BlockNumber] nvarchar(100) NOT NULL,
     [Hash] nvarchar(67) NOT NULL,
     [ParentHash] nvarchar(67) NOT NULL,
@@ -52,30 +49,29 @@ CREATE TABLE [kovan].[Blocks] (
     [GasUsed] nvarchar(100) NULL,
     [Timestamp] nvarchar(100) NULL,
     [TransactionCount] bigint NOT NULL,
+    [BaseFeePerGas] nvarchar(100) NULL,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
     CONSTRAINT [PK_Blocks] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE TABLE [kovan].[Contracts] (
     [RowIndex] int NOT NULL IDENTITY,
-    [RowCreated] datetime2 NULL,
-    [RowUpdated] datetime2 NULL,
     [Address] nvarchar(43) NULL,
     [Name] nvarchar(255) NULL,
     [ABI] nvarchar(max) NULL,
     [Code] nvarchar(max) NULL,
     [Creator] nvarchar(43) NULL,
     [TransactionHash] nvarchar(67) NULL,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
     CONSTRAINT [PK_Contracts] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE TABLE [kovan].[TransactionLogs] (
     [RowIndex] int NOT NULL IDENTITY,
-    [RowCreated] datetime2 NULL,
-    [RowUpdated] datetime2 NULL,
     [TransactionHash] nvarchar(67) NOT NULL,
     [LogIndex] nvarchar(100) NULL,
     [Address] nvarchar(43) NULL,
@@ -84,21 +80,21 @@ CREATE TABLE [kovan].[TransactionLogs] (
     [IndexVal2] nvarchar(67) NULL,
     [IndexVal3] nvarchar(67) NULL,
     [Data] nvarchar(max) NULL,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
     CONSTRAINT [PK_TransactionLogs] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE TABLE [kovan].[TransactionLogVmStacks] (
     [RowIndex] int NOT NULL IDENTITY,
-    [RowCreated] datetime2 NULL,
-    [RowUpdated] datetime2 NULL,
     [Address] nvarchar(43) NULL,
     [TransactionHash] nvarchar(67) NULL,
     [StructLogs] nvarchar(max) NULL,
+    [RowCreated] datetime2 NULL,
+    [RowUpdated] datetime2 NULL,
     CONSTRAINT [PK_TransactionLogVmStacks] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE TABLE [kovan].[Transactions] (
@@ -121,98 +117,82 @@ CREATE TABLE [kovan].[Transactions] (
     [ReceiptHash] nvarchar(67) NULL,
     [GasUsed] nvarchar(100) NULL,
     [CumulativeGasUsed] nvarchar(100) NULL,
+    [EffectiveGasPrice] nvarchar(100) NULL,
     [HasLog] bit NOT NULL,
     [Error] nvarchar(max) NULL,
     [HasVmStack] bit NOT NULL,
     [NewContractAddress] nvarchar(43) NULL,
     [FailedCreateContract] bit NOT NULL,
+    [MaxFeePerGas] nvarchar(100) NULL,
+    [MaxPriorityFeePerGas] nvarchar(100) NULL,
     CONSTRAINT [PK_Transactions] PRIMARY KEY ([RowIndex])
 );
-
 GO
 
 CREATE INDEX [IX_AddressTransactions_Address] ON [kovan].[AddressTransactions] ([Address]);
-
-GO
-
-CREATE INDEX [IX_AddressTransactions_Hash] ON [kovan].[AddressTransactions] ([Hash]);
-
 GO
 
 CREATE UNIQUE INDEX [IX_AddressTransactions_BlockNumber_Hash_Address] ON [kovan].[AddressTransactions] ([BlockNumber], [Hash], [Address]);
+GO
 
+CREATE INDEX [IX_AddressTransactions_Hash] ON [kovan].[AddressTransactions] ([Hash]);
 GO
 
 CREATE INDEX [IX_BlockProgress_LastBlockProcessed] ON [kovan].[BlockProgress] ([LastBlockProcessed]);
-
 GO
 
 CREATE UNIQUE INDEX [IX_Blocks_BlockNumber_Hash] ON [kovan].[Blocks] ([BlockNumber], [Hash]);
-
 GO
 
 CREATE INDEX [IX_Contracts_Address] ON [kovan].[Contracts] ([Address]);
-
 GO
 
 CREATE UNIQUE INDEX [IX_Contracts_Name] ON [kovan].[Contracts] ([Name]) WHERE [Name] IS NOT NULL;
-
 GO
 
 CREATE INDEX [IX_TransactionLogs_Address] ON [kovan].[TransactionLogs] ([Address]);
-
 GO
 
 CREATE INDEX [IX_TransactionLogs_EventHash] ON [kovan].[TransactionLogs] ([EventHash]);
-
 GO
 
 CREATE INDEX [IX_TransactionLogs_IndexVal1] ON [kovan].[TransactionLogs] ([IndexVal1]);
-
 GO
 
 CREATE INDEX [IX_TransactionLogs_IndexVal2] ON [kovan].[TransactionLogs] ([IndexVal2]);
-
 GO
 
 CREATE INDEX [IX_TransactionLogs_IndexVal3] ON [kovan].[TransactionLogs] ([IndexVal3]);
-
 GO
 
 CREATE UNIQUE INDEX [IX_TransactionLogs_TransactionHash_LogIndex] ON [kovan].[TransactionLogs] ([TransactionHash], [LogIndex]) WHERE [LogIndex] IS NOT NULL;
-
 GO
 
 CREATE INDEX [IX_TransactionLogVmStacks_Address] ON [kovan].[TransactionLogVmStacks] ([Address]);
-
 GO
 
 CREATE INDEX [IX_TransactionLogVmStacks_TransactionHash] ON [kovan].[TransactionLogVmStacks] ([TransactionHash]);
-
 GO
 
 CREATE INDEX [IX_Transactions_AddressFrom] ON [kovan].[Transactions] ([AddressFrom]);
-
 GO
 
 CREATE INDEX [IX_Transactions_AddressTo] ON [kovan].[Transactions] ([AddressTo]);
-
-GO
-
-CREATE INDEX [IX_Transactions_Hash] ON [kovan].[Transactions] ([Hash]);
-
-GO
-
-CREATE INDEX [IX_Transactions_NewContractAddress] ON [kovan].[Transactions] ([NewContractAddress]);
-
 GO
 
 CREATE UNIQUE INDEX [IX_Transactions_BlockNumber_Hash] ON [kovan].[Transactions] ([BlockNumber], [Hash]);
+GO
 
+CREATE INDEX [IX_Transactions_Hash] ON [kovan].[Transactions] ([Hash]);
+GO
+
+CREATE INDEX [IX_Transactions_NewContractAddress] ON [kovan].[Transactions] ([NewContractAddress]);
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20190712143012_InitialCreate', N'2.1.1-rtm-30846');
+VALUES (N'20221014164534_InitialCreate', N'6.0.10');
+GO
 
+COMMIT;
 GO
 

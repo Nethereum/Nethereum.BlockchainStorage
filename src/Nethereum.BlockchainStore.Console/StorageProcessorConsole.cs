@@ -18,10 +18,9 @@ namespace Nethereum.BlockchainStore.Console
     public class StorageProcessorConsole<TRepositoryFactory> 
         where TRepositoryFactory : IBlockchainStoreRepositoryFactory, IBlockProgressRepositoryFactory
     {
-        ILog log = LoggerFactory
+        ILogger log = LoggerFactory
             .Create(builder => builder.AddConsole())
-            .CreateLogger<StorageProcessorConsole<TRepositoryFactory>>()
-            .ToILog();
+            .CreateLogger<StorageProcessorConsole<TRepositoryFactory>>();
 
         public StorageProcessorConsole(
             string[] consoleArgs,
@@ -30,7 +29,7 @@ namespace Nethereum.BlockchainStore.Console
             Action<TRepositoryFactory> disposeRepositoriesCallback = null
             )
         {
-            log.Info("StorageProcessorConsole constructor");
+            log.LogInformation("StorageProcessorConsole constructor");
             ConsoleArgs = consoleArgs;
             UserSecretsId = userSecretsId;
             CreateRepositoryFactoryCallback = createRepositoryFactoryCallback;
@@ -70,7 +69,7 @@ namespace Nethereum.BlockchainStore.Console
             }
             catch (Exception ex)
             {
-                log?.Error(ex);
+                log?.LogError(ex.Message);
                 if(repoFactory != null) DisposeAction?.Invoke(repoFactory);
                 return 1;
             }
@@ -82,9 +81,9 @@ namespace Nethereum.BlockchainStore.Console
             var web3 = new Web3.Web3(TargetConfiguration.BlockchainUrl);
 
             var steps = new BlockProcessingSteps();
-            steps.BlockStep.AddProcessorHandler((b) => { log.Info($"Processing block {b.Number.Value}, Tx Count: {b.Transactions.Length}"); return Task.CompletedTask; });
-            steps.TransactionReceiptStep.AddProcessorHandler((tx) => { log.Info($"\tTransaction: Index: {tx.Transaction.TransactionIndex}, Hash: {tx.TransactionHash}"); return Task.CompletedTask; });
-            steps.FilterLogStep.AddProcessorHandler((l) => { log.Info($"\t\tLog: Index: {l.LogIndex}"); return Task.CompletedTask; });
+            steps.BlockStep.AddProcessorHandler((b) => { log.LogInformation($"Processing block {b.Number.Value}, Tx Count: {b.Transactions.Length}"); return Task.CompletedTask; });
+            steps.TransactionReceiptStep.AddProcessorHandler((tx) => { log.LogInformation($"\tTransaction: Index: {tx.Transaction.TransactionIndex}, Hash: {tx.TransactionHash}"); return Task.CompletedTask; });
+            steps.FilterLogStep.AddProcessorHandler((l) => { log.LogInformation($"\t\tLog: Index: {l.LogIndex}"); return Task.CompletedTask; });
 
             var orchestrator = new BlockCrawlOrchestrator(web3.Eth, steps);
             orchestrator.ContractCreatedCrawlerStep.RetrieveCode = true;

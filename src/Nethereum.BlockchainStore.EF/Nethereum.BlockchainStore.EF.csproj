@@ -2,17 +2,17 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
     <Authors> $(OtherAuthors), $(DefaultAuthors)</Authors>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Description>Store Ethereum blockchain data using Entity Framework (not EF core).  This package only contains the base components.  Use the other DB specific packages available for Sqlite, SqlServer etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-	 <PackageReference Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference  Condition="'$(UseLocalNethereum)' == 'false'" Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
+		<ProjectReference Condition="'$(UseLocalNethereum)' == 'true'" Include="..\..\..\Nethereum\src\Nethereum.Web3\Nethereum.Web3.csproj" />
+	</ItemGroup>
   
 </Project>

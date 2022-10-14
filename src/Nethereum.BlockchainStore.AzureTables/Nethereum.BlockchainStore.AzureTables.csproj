@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Authors>$(DefaultAuthors), $(OtherAuthors)</Authors>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -13,8 +13,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-	  <PackageReference Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
+	 
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference  Condition="'$(UseLocalNethereum)' == 'false'" Include="Nethereum.Web3" Version="$(NethereumWeb3Version)" />
+    <ProjectReference Condition="'$(UseLocalNethereum)' == 'true'" Include="..\..\..\Nethereum\src\Nethereum.Web3\Nethereum.Web3.csproj" />
   </ItemGroup>
 
 </Project>

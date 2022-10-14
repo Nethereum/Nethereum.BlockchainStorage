@@ -35,6 +35,7 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public string GasUsed { get; set; } = string.Empty;
         public string TimeStamp { get; set; } = string.Empty;
         public long TransactionCount { get; set; } = 0;
+        public string BaseFeePerGas {get; set;} = string.Empty;
 
         public void SetBlockNumber(HexBigInteger blockNumber)
         {

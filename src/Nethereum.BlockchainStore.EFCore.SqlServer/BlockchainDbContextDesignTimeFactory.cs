@@ -21,6 +21,8 @@ namespace Nethereum.BlockchainStore.EFCore.SqlServer
     public class BlockchainDbContextDesignTimeFactory_kovan: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_kovan>{}
     public class BlockchainDbContextDesignTimeFactory_ropsten: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_ropsten>{} 
     public class BlockchainDbContextDesignTimeFactory_main: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_main>{}
+    public class BlockchainDbContextDesignTimeFactory_goerli: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_goerli>{}
+    public class BlockchainDbContextDesignTimeFactory_sepolia: BlockchainDbContextDesignTimeFactory<SqlServerBlockchainDbContext_sepolia>{}
    
     public abstract class BlockchainDbContextDesignTimeFactory<T> : IDesignTimeDbContextFactory<T>
         where T : SqlServerBlockchainDbContext

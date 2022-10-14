@@ -28,6 +28,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
         public bool HasVmStack{ get; set; } = false;
         public string NewContractAddress{ get; set; } = string.Empty;
         public bool FailedCreateContract{ get; set; } = false;
+        public string MaxFeePerGas { get; set; } = string.Empty;
+        public string MaxPriorityFeePerGas { get; set; } = string.Empty;
 
         public static TransactionBase CreateTransaction(
             TransactionBase transaction,
@@ -58,6 +60,8 @@ namespace Nethereum.BlockchainStore.AzureTables.Entities
             transaction.SetTimeStamp(timeStamp);
             transaction.Error = error ?? string.Empty;
             transaction.HasVmStack = hasVmStack;
+            transaction.MaxFeePerGas = transactionSource.MaxFeePerGas?.Value.ToString();
+            transaction.MaxPriorityFeePerGas = transactionSource.MaxPriorityFeePerGas?.Value.ToString();
 
             return transaction;
         }

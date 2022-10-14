@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\buildConf\Generic.props" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Authors>$(OtherAuthors), $(DefaultAuthors)</Authors>
     <Description>Store Ethereum blockchain data in Sqlite using Entity Framework (not core).</Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>

@@ -4,3 +4,5 @@ dotnet ef migrations script --context SqlServerBlockchainDbContext_kovan --outpu
 dotnet ef migrations script --context SqlServerBlockchainDbContext_rinkeby --output ./Sql/SqlServerBlockchainDbContext_rinkeby.sql
 dotnet ef migrations script --context SqlServerBlockchainDbContext_ropsten --output ./Sql/SqlServerBlockchainDbContext_ropsten.sql
 dotnet ef migrations script --context SqlServerBlockchainDbContext_main --output ./Sql/SqlServerBlockchainDbContext_main.sql
+dotnet ef migrations script --context SqlServerBlockchainDbContext_goerli --output ./Sql/SqlServerBlockchainDbContext_goerli.sql
+dotnet ef migrations script --context SqlServerBlockchainDbContext_sepolia --output ./Sql/SqlServerBlockchainDbContext_sepolia.sql
