@@ -2,7 +2,7 @@
 
 ## Blockchain Storage
 
-The storage folder contains a base library and a set of adapters the allow retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
+The storage folder contains a base library and a set of adapters that allow retrieving and storage of the Ethereum Blockchain by connecting a Node using RPC.
 
 The current implementation processes and stores Blocks, Transactions, Logs, Contracts and the VM Stack.
 
